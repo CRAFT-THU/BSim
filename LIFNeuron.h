@@ -4,20 +4,35 @@
  */
 #ifndef LIFNEURON_H
 #define LIFNEURON_H
-#include "Neuron.h"
+#include "NeuronBase.h"
 
-class LIFNeuron : Neuron {
+class LIFNeuron : NeuronBase {
 public:
-	LIFNeuron(int _N, double *_synapsis, double _tm, double _thV = 1.0, double _rV = 0.0, double axon = 0.0);
+	LIFNeuron(float v_rest, float v_reset, float cm, float tau_m, float tau_refrac, float tau_syn_E, float tau_syn_I, float v_thresh, float i_offset);
+	LIFNeuron(LIFNeuron neuron);
 	~LIFNeuron();
 
-	void presynapsis();
-	void integrate();
-	void postsynapsis();
-private:
-	double alpha;
-	double tm;
-	double leak;
+	int init();
+	virtual int reset();
+	virtual int update();
+protected:
+	float v_init;
+	float v_rest;
+	float v_reset;
+	float cm;
+	float tau_m;
+	float tau_refrac;
+	float tau_syn_E;
+	float tau_syn_I;
+	float v_thresh;
+	float i_offset;
+	float i_syn;
+	float vm;
+	float _dt;
+	float C1;
+	float C2;
+	float i_tmp;
+	int refrac_step;
 };
 
 #endif /* LIFNEURON_H */

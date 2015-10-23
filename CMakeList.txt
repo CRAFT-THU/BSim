@@ -1,0 +1,5 @@
+PROJECT (SNNsim)
+set(CMAKE_BUILD_TYPE Release)
+
+add_library
+
