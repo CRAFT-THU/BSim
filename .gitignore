@@ -4,3 +4,5 @@
 lib/
 obj/
 bin/
+*.log
+*.res
