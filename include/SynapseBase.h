@@ -7,15 +7,20 @@
 #define SYNAPSEBASE_H
 
 #include "constant.h"
+#include "NeuronBase.h"
+
+extern ID sid;
 
 class SynapseBase {
 public:
 	virtual int update() = 0;
 	virtual int recv() = 0;
-	virtual int reset(float dt) = 0;
+	virtual int reset(real dt) = 0;
+	virtual void setDst(NeuronBase *p) = 0;
+	virtual void monitor() = 0;
 protected:
-	floatn weight;
-	floatn delay;
+	real weight;
+	real delay;
 };
 
 #endif /* SYNAPSEBASE_H */

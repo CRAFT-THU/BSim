@@ -4,6 +4,10 @@
  */
 #ifndef POPULATION_H
 #define POPULATION_H
+
+#include <vector>
+using std::vector;
+
 template<class Neuron>
 class Population {
 public:
@@ -12,7 +16,7 @@ public:
 protected:
 	int N;
 	vector<Neuron> neurons;
-}
+};
 
 #endif /* POPULATION_H */
 

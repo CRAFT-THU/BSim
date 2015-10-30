@@ -1,0 +1,140 @@
+In file included from /usr/include/c++/4.9/vector:64:0,
+                 from ../Connector.h:8,
+                 from ../Simulator.h:8,
+                 from neural_test.cpp:6:
+/usr/include/c++/4.9/bits/stl_vector.h: In instantiation of ‘class std::vector<ExpSyn>’:
+../IF_curr_exp.h:23:17:   required from here
+/usr/include/c++/4.9/bits/stl_vector.h:713:7: error: invalid abstract parameter type ‘ExpSyn’
+       resize(size_type __new_size, value_type __x = value_type())
+       ^
+In file included from ../IF_curr_exp.h:10:0,
+                 from ../Neuron.h:10,
+                 from ../Connector.h:10,
+                 from ../Simulator.h:8,
+                 from neural_test.cpp:6:
+../ExpSyn.h:14:7: note:   because the following virtual functions are pure within ‘ExpSyn’:
+ class ExpSyn : public SynapseBase {
+       ^
+In file included from ../ExpSyn.h:9:0,
+                 from ../IF_curr_exp.h:10,
+                 from ../Neuron.h:10,
+                 from ../Connector.h:10,
+                 from ../Simulator.h:8,
+                 from neural_test.cpp:6:
+../SynapseBase.h:20:15: note: 	virtual void SynapseBase::monitor()
+  virtual void monitor() = 0;
+               ^
+neural_test.cpp: In function ‘int main(int, char**)’:
+neural_test.cpp:12:16: error: no matching function for call to ‘Connector::Connector(IF_curr_exp*)’
+  Connector c(&n);
+                ^
+neural_test.cpp:12:16: note: candidates are:
+In file included from ../Simulator.h:8:0,
+                 from neural_test.cpp:6:
+../Connector.h:19:2: note: Connector::Connector()
+  Connector();
+  ^
+../Connector.h:19:2: note:   candidate expects 0 arguments, 1 provided
+../Connector.h:17:7: note: Connector::Connector(const Connector&)
+ class Connector {
+       ^
+../Connector.h:17:7: note:   no known conversion for argument 1 from ‘IF_curr_exp*’ to ‘const Connector&’
+In file included from /usr/include/c++/4.9/vector:64:0,
+                 from ../Connector.h:8,
+                 from ../Simulator.h:8,
+                 from ../Simulator.cpp:7:
+/usr/include/c++/4.9/bits/stl_vector.h: In instantiation of ‘class std::vector<ExpSyn>’:
+../IF_curr_exp.h:23:17:   required from here
+/usr/include/c++/4.9/bits/stl_vector.h:713:7: error: invalid abstract parameter type ‘ExpSyn’
+       resize(size_type __new_size, value_type __x = value_type())
+       ^
+In file included from ../IF_curr_exp.h:10:0,
+                 from ../Neuron.h:10,
+                 from ../Connector.h:10,
+                 from ../Simulator.h:8,
+                 from ../Simulator.cpp:7:
+../ExpSyn.h:14:7: note:   because the following virtual functions are pure within ‘ExpSyn’:
+ class ExpSyn : public SynapseBase {
+       ^
+In file included from ../ExpSyn.h:9:0,
+                 from ../IF_curr_exp.h:10,
+                 from ../Neuron.h:10,
+                 from ../Connector.h:10,
+                 from ../Simulator.h:8,
+                 from ../Simulator.cpp:7:
+../SynapseBase.h:20:15: note: 	virtual void SynapseBase::monitor()
+  virtual void monitor() = 0;
+               ^
+In file included from /usr/include/c++/4.9/vector:64:0,
+                 from ../Connector.h:8,
+                 from ../Connector.cpp:7:
+/usr/include/c++/4.9/bits/stl_vector.h: In instantiation of ‘class std::vector<ExpSyn>’:
+../IF_curr_exp.h:23:17:   required from here
+/usr/include/c++/4.9/bits/stl_vector.h:713:7: error: invalid abstract parameter type ‘ExpSyn’
+       resize(size_type __new_size, value_type __x = value_type())
+       ^
+In file included from ../IF_curr_exp.h:10:0,
+                 from ../Neuron.h:10,
+                 from ../Connector.h:10,
+                 from ../Connector.cpp:7:
+../ExpSyn.h:14:7: note:   because the following virtual functions are pure within ‘ExpSyn’:
+ class ExpSyn : public SynapseBase {
+       ^
+In file included from ../ExpSyn.h:9:0,
+                 from ../IF_curr_exp.h:10,
+                 from ../Neuron.h:10,
+                 from ../Connector.h:10,
+                 from ../Connector.cpp:7:
+../SynapseBase.h:20:15: note: 	virtual void SynapseBase::monitor()
+  virtual void monitor() = 0;
+               ^
+../ExpSyn.cpp:71:22: error: no ‘void ExpSyn::monitor()’ member function declared in class ‘ExpSyn’
+ void ExpSyn::monitor()
+                      ^
+In file included from /usr/include/c++/4.9/vector:64:0,
+                 from ../IF_curr_exp.h:8,
+                 from ../IF_curr_exp.cpp:6:
+/usr/include/c++/4.9/bits/stl_vector.h: In instantiation of ‘class std::vector<ExpSyn>’:
+../IF_curr_exp.h:23:17:   required from here
+/usr/include/c++/4.9/bits/stl_vector.h:713:7: error: invalid abstract parameter type ‘ExpSyn’
+       resize(size_type __new_size, value_type __x = value_type())
+       ^
+In file included from ../IF_curr_exp.h:10:0,
+                 from ../IF_curr_exp.cpp:6:
+../ExpSyn.h:14:7: note:   because the following virtual functions are pure within ‘ExpSyn’:
+ class ExpSyn : public SynapseBase {
+       ^
+In file included from ../ExpSyn.h:9:0,
+                 from ../IF_curr_exp.h:10,
+                 from ../IF_curr_exp.cpp:6:
+../SynapseBase.h:20:15: note: 	virtual void SynapseBase::monitor()
+  virtual void monitor() = 0;
+               ^
+../IF_curr_exp.cpp: In member function ‘virtual SynapseBase* IF_curr_exp::addSyn(float, float, SynType, NeuronBase*)’:
+../IF_curr_exp.cpp:36:9: error: cannot declare variable ‘st’ to be of abstract type ‘ExpSyn’
+  ExpSyn st(weight, delay, tau);
+         ^
+In file included from /usr/include/c++/4.9/vector:69:0,
+                 from ../IF_curr_exp.h:8,
+                 from ../IF_curr_exp.cpp:6:
+/usr/include/c++/4.9/bits/vector.tcc: In instantiation of ‘void std::vector<_Tp, _Alloc>::_M_insert_aux(std::vector<_Tp, _Alloc>::iterator, const _Tp&) [with _Tp = ExpSyn; _Alloc = std::allocator<ExpSyn>; std::vector<_Tp, _Alloc>::iterator = __gnu_cxx::__normal_iterator<ExpSyn*, std::vector<ExpSyn> >; typename std::_Vector_base<_Tp, _Alloc>::pointer = ExpSyn*]’:
+/usr/include/c++/4.9/bits/stl_vector.h:925:28:   required from ‘void std::vector<_Tp, _Alloc>::push_back(const value_type&) [with _Tp = ExpSyn; _Alloc = std::allocator<ExpSyn>; std::vector<_Tp, _Alloc>::value_type = ExpSyn]’
+../IF_curr_exp.cpp:18:27:   required from here
+/usr/include/c++/4.9/bits/vector.tcc:337:19: error: cannot allocate an object of abstract type ‘ExpSyn’
+    _Tp __x_copy = __x;
+                   ^
+/usr/include/c++/4.9/bits/vector.tcc:337:8: error: cannot declare variable ‘__x_copy’ to be of abstract type ‘ExpSyn’
+    _Tp __x_copy = __x;
+        ^
+In file included from /usr/include/x86_64-linux-gnu/c++/4.9/bits/c++allocator.h:33:0,
+                 from /usr/include/c++/4.9/bits/allocator.h:46,
+                 from /usr/include/c++/4.9/vector:61,
+                 from ../IF_curr_exp.h:8,
+                 from ../IF_curr_exp.cpp:6:
+/usr/include/c++/4.9/ext/new_allocator.h: In instantiation of ‘void __gnu_cxx::new_allocator<_Tp>::construct(__gnu_cxx::new_allocator<_Tp>::pointer, const _Tp&) [with _Tp = ExpSyn; __gnu_cxx::new_allocator<_Tp>::pointer = ExpSyn*]’:
+/usr/include/c++/4.9/ext/alloc_traits.h:189:9:   required from ‘static void __gnu_cxx::__alloc_traits<_Alloc>::construct(_Alloc&, __gnu_cxx::__alloc_traits<_Alloc>::pointer, const _Tp&) [with _Tp = ExpSyn; _Alloc = std::allocator<ExpSyn>; __gnu_cxx::__alloc_traits<_Alloc>::pointer = ExpSyn*]’
+/usr/include/c++/4.9/bits/stl_vector.h:918:34:   required from ‘void std::vector<_Tp, _Alloc>::push_back(const value_type&) [with _Tp = ExpSyn; _Alloc = std::allocator<ExpSyn>; std::vector<_Tp, _Alloc>::value_type = ExpSyn]’
+../IF_curr_exp.cpp:18:27:   required from here
+/usr/include/c++/4.9/ext/new_allocator.h:130:9: error: invalid new-expression of abstract class type ‘ExpSyn’
+       { ::new((void *)__p) _Tp(__val); }
+         ^
