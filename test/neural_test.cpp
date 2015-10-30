@@ -3,7 +3,7 @@
  * Tue October 13 2015
  */
 
-#include "../Simulator.h"
+#include "../include/SNNsim.h"
 
 int main(int argc, char **argv)
 {

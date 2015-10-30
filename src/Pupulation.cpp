@@ -3,12 +3,14 @@
  * Fri October 23 2015
  */
 
-#include "Pupulation.h"
+#include "Population.h"
 
-Population::Population(int N, Neuron templ) {
+template<class Neuron>
+Population<Neuron>::Population(int N, Neuron templ) {
 }
 
-Population::~Population() {
+template<class Neuron>
+Population<Neuron>::~Population() {
 	neurons.clear();
 }
 

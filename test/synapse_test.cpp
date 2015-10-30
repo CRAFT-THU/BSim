@@ -4,7 +4,7 @@
  */
 
 #include <iostream>
-#include "../Simulator.h"
+#include "../include/SNNsim.h"
 
 using namespace std;
 

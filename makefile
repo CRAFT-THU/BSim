@@ -3,32 +3,36 @@ SRC_DIR = $(HOME)/src
 INC_DIR = $(HOME)/include
 OBJ_DIR = $(HOME)/obj
 BIN_DIR = $(HOME)/bin
+LIB_DIR = $(HOME)/lib
 
 TARGET = libsnnsim.a
-BIN_TARGET = $(BIN_DIR)/$(TARGET)
+BIN_TARGET = $(LIB_DIR)/$(TARGET)
 
-SRC = ($(wildcard ${DIR_SRC}/*.c)  $(wildcard ${DIR_SRC}/*.cpp))
-OBJ = ($(patsubst %.c,${DIR_OBJ}/%.o,$(notdir ${SRC})) $(patsubst %.cpp,${DIR_OBJ}/%.o,$(notdir ${SRC})))
+CFILES = $(wildcard ${SRC_DIR}/*.c)
+CXXFILES = $(wildcard ${SRC_DIR}/*.cpp)
+SRC = $(CFILES) $(CXXFILES)
+OBJ = $(patsubst %.c,${OBJ_DIR}/%.c.o,$(notdir ${CFILES})) $(patsubst %.cpp,${OBJ_DIR}/%.cpp.o,$(notdir ${CXXFILES}))
 
 CFLAGS =  -O3 -Wall
 
-.PHONY: default all clean
+.PHONY: default all clean test
 
 default: all
-all: $(BIN)
+all: $(BIN_TARGET)
 
 $(BIN_TARGET): $(OBJ)
-	ar $@ $^
+	ar cr $@ $^
 
 
-%.o: %.cpp 
+$(OBJ_DIR)/%.cpp.o: $(SRC_DIR)/%.cpp 
 	$(CXX) $(CFLAGS) -o $@ -c $^ -I$(INC_DIR)
 
-%.o: %.c 
-	$(CC) $(CFLAGS) -o $@ -c $^ -I$(INC_DIR)
+$(OBJ_DIR)/%.c.o: $(SRC_DIR)/%.c 
+	$(CXX) $(CFLAGS) -o $@ -c $^ -I$(INC_DIR)
+
+test:
+	cd ./test &&  make
 
 clean:
-	rm -f  *.o $(OBJS) $(BIN)
-
-all:
-	echo your template files need work
+	rm -f  *.o $(OBJ_DIR)/* $(BIN_DIR)/* $(BIN_TARGET)
+	cd ./test && make clean
