@@ -1,4 +1,5 @@
 HOME = .
+VPATH = src:src/utils:.
 SRC_DIR = $(HOME)/src
 INC_DIR = $(HOME)/include
 OBJ_DIR = $(HOME)/obj
@@ -8,10 +9,11 @@ LIB_DIR = $(HOME)/lib
 TARGET = libsnnsim.a
 BIN_TARGET = $(LIB_DIR)/$(TARGET)
 
-CFILES = $(wildcard ${SRC_DIR}/*.c)
-CXXFILES = $(wildcard ${SRC_DIR}/*.cpp)
+DIRS := $(shell find $(SRC_DIR) -maxdepth 3 -type d)
+CFILES = $(foreach dir, $(DIRS), $(wildcard ${dir}/*.c))
+CXXFILES = $(foreach dir, $(DIRS), $(wildcard ${dir}/*.cpp))
 SRC = $(CFILES) $(CXXFILES)
-OBJ = $(patsubst %.c,${OBJ_DIR}/%.c.o,$(notdir ${CFILES})) $(patsubst %.cpp,${OBJ_DIR}/%.cpp.o,$(notdir ${CXXFILES}))
+OBJ += $(patsubst %.c,${OBJ_DIR}/%.c.o,$(notdir ${CFILES})) $(patsubst %.cpp,${OBJ_DIR}/%.cpp.o,$(notdir ${CXXFILES}))
 
 CFLAGS =  -O3 -Wall
 
@@ -24,10 +26,10 @@ $(BIN_TARGET): $(OBJ)
 	ar cr $@ $^
 
 
-$(OBJ_DIR)/%.cpp.o: $(SRC_DIR)/%.cpp 
+$(OBJ_DIR)/%.cpp.o: %.cpp 
 	$(CXX) $(CFLAGS) -o $@ -c $^ -I$(INC_DIR)
 
-$(OBJ_DIR)/%.c.o: $(SRC_DIR)/%.c 
+$(OBJ_DIR)/%.c.o: %.c 
 	$(CXX) $(CFLAGS) -o $@ -c $^ -I$(INC_DIR)
 
 test:

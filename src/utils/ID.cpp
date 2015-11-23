@@ -4,8 +4,6 @@
  */
 
 #include "ID.h"
-#include "NeuronBase.h"
-#include "SynapseBase.h"
 
 ID::ID() {
 	id = 0;
