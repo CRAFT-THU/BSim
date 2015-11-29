@@ -1,5 +1,4 @@
 HOME = .
-VPATH = src:src/utils:.
 SRC_DIR = $(HOME)/src
 INC_DIR = $(HOME)/include
 OBJ_DIR = $(HOME)/obj
@@ -9,13 +8,15 @@ LIB_DIR = $(HOME)/lib
 TARGET = libsnnsim.a
 BIN_TARGET = $(LIB_DIR)/$(TARGET)
 
-DIRS := $(shell find $(SRC_DIR) -maxdepth 3 -type d)
+SPACE := $(eval) $(eval)
+DIRS := $(shell find $(SRC_DIR) -maxdepth 4 -type d)
+VPATH = $(subst  $(SPACE),:,$(DIRS)):.
 CFILES = $(foreach dir, $(DIRS), $(wildcard ${dir}/*.c))
 CXXFILES = $(foreach dir, $(DIRS), $(wildcard ${dir}/*.cpp))
 SRC = $(CFILES) $(CXXFILES)
 OBJ += $(patsubst %.c,${OBJ_DIR}/%.c.o,$(notdir ${CFILES})) $(patsubst %.cpp,${OBJ_DIR}/%.cpp.o,$(notdir ${CXXFILES}))
 
-CFLAGS =  -O3 -Wall
+CFLAGS =  -O2 -Wall -std=c++11
 
 .PHONY: default all clean test
 

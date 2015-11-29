@@ -14,6 +14,8 @@ class SynapseBase;
 
 class NeuronBase {
 public:
+	virtual ~NeuronBase();
+
 	virtual int reset(real dt) = 0;
 	virtual int recv(real I) = 0;
 	virtual int update() = 0;
@@ -23,6 +25,7 @@ public:
 	virtual int fire() = 0;
 protected:
 	int id;
+	NeuronType type;
 };
 
 #endif /* NEURONBASE_H */

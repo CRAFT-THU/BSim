@@ -6,9 +6,9 @@
 #define CONSTANT_H
 
 typedef float real;
-enum NeuronType { LIF_Curr = 0 };
+enum NeuronType { IF_Curr = 0 };
 enum SynapseType { Alpha = 0, Exp = 1 };
-enum SynType { Excitatory = 0, Inhibitory };
+enum SynType { Excitatory = 0, Inhibitory = 1 };
 
 #endif /* CONSTANT_H */
 

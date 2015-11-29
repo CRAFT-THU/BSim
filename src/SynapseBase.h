@@ -13,6 +13,7 @@ extern ID sid;
 
 class SynapseBase {
 public:
+	virtual ~SynapseBase();
 	virtual int update() = 0;
 	virtual int recv() = 0;
 	virtual int reset(real dt) = 0;
@@ -21,6 +22,7 @@ public:
 protected:
 	real weight;
 	real delay;
+	SynType type;
 };
 
 #endif /* SYNAPSEBASE_H */

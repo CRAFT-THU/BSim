@@ -5,15 +5,16 @@
 #ifndef SIMULATOR_H
 #define SIMULATOR_H
 
-#include "Connector.h"
+#include "Network.h"
 
 class Simulator {
 public:
-	Simulator(Connector* network, real dt);
+	Simulator(Network* network, real dt);
 	~Simulator();
-	int run(real dt);
+	int run(real time);
+	int reset();
 protected:
-	Connector* network;
+	Network* network;
 	real dt;
 };
 

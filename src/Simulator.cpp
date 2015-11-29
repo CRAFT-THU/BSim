@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include "Simulator.h"
 
-Simulator::Simulator(Connector *network, real dt)
+Simulator::Simulator(Network *network, real dt)
 	: network(network), dt(dt)
 {
 }
@@ -15,12 +15,11 @@ Simulator::~Simulator()
 {
 }
 
-int Simulator::run(real time)
+int Simulator::reset()
 {
-	int sim_time = (int) (time/dt);
-
 	vector<SynapseBase*>::iterator iterS;
 	vector<NeuronBase*>::iterator iterN;
+	vector<PopulationBase*>::iterator iterP;
 	for (iterS=network->pSynapses.begin(); iterS!=network->pSynapses.end(); iterS++) {
 		SynapseBase *p = *iterS;
 		p->reset(dt);
@@ -29,12 +28,33 @@ int Simulator::run(real time)
 		NeuronBase * p = *iterN;
 		p->reset(dt);
 	}
+	for (iterP=network->pPopulations.begin(); iterP!=network->pPopulations.end(); iterP++) {
+		PopulationBase * p = *iterP;
+		p->reset(dt);
+	}
+	return 0;
+}
 
-	printf("Start runing for %d cycles...\n", sim_time);
-	for (int i=0; i<sim_time; i++) {
-		//printf("Cycle: %d\n", i);
+int Simulator::run(real time)
+{
+	int sim_cycle = (int) (time/dt);
+
+	vector<SynapseBase*>::iterator iterS;
+	vector<NeuronBase*>::iterator iterN;
+	vector<PopulationBase*>::iterator iterP;
+
+	printf("Start runing for %d cycles\n", sim_cycle);
+	for (int i=0; i<sim_cycle; i++) {
+		printf("\rCycle: %d", i);
+		fflush(stdout);
 		for (iterS=network->pSynapses.begin(); iterS!=network->pSynapses.end(); iterS++) {
 			SynapseBase *p = *iterS;
+			p->update();
+			p->monitor();
+		}
+
+		for (iterP=network->pPopulations.begin(); iterP!=network->pPopulations.end(); iterP++) {
+			PopulationBase * p = *iterP;
 			p->update();
 			p->monitor();
 		}
@@ -48,7 +68,7 @@ int Simulator::run(real time)
 			p->monitor();
 		}
 	}
-	printf("Finish runing\n");
+	printf("\nFinish runing\n");
 
 	return 0;
 }
