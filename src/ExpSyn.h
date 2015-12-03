@@ -20,11 +20,14 @@ public:
 	virtual int recv();
 	virtual int reset(real dt);
 	virtual void monitor();
+	virtual size_t getSize();
+	virtual size_t hardCopy(unsigned char* data);
 
 	ExpSyn(real weight, real delay, real tau_syn);
 	~ExpSyn(); 
 
 protected:
+	SynType type;
 	real weight;
 	real delay;
 	real C1;

@@ -15,6 +15,15 @@ using std::vector;
 using std::map;
 using std::pair;
 
+struct PlainNetwork {
+	size_t neuronSize;
+	size_t synapseSize;
+	size_t populationSize;
+	void *pNeurons;
+	void *pSynapses;
+	void *pPopulations;
+};
+
 class Network {
 public:
 	Network();
@@ -26,7 +35,7 @@ public:
 	int connect(NeuronBase *pSrc, NeuronBase *pDst, real weight, real delay, SynType type, bool store = true);
 	template<class Neuron>
 	int connect(Population<Neuron*> *pSrc, Population<Neuron*> *pDst, real *weight, real *delay, SynType *type, int size);
-
+	PlainNetwork* buildNetwrok();
 //protected:
 	//map<NeuronBase*, vector<SynapseBase*> > network;
 	vector<PopulationBase*> pPopulations;

@@ -84,3 +84,14 @@ void ExpSyn::monitor()
 
 	return;
 }
+
+size_t ExpSyn::getSize()
+{
+	return sizeof(ExpSyn);
+}
+
+size_t ExpSyn::hardCopy(unsigned char *data)
+{
+	memcpy(data, this, sizeof(ExpSyn));
+	return sizeof(ExpSyn);
+}

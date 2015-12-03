@@ -21,7 +21,11 @@ public:
 	virtual bool is_fired();
 	virtual void monitor();
 	virtual real get_vm();
+	virtual size_t getSize();
+	virtual size_t hardCopy(unsigned char* data);
 protected:
+	int id;
+	NeuronType type;
 	real v_init;
 	real v_rest;
 	real v_reset;
@@ -40,7 +44,6 @@ protected:
 	real i_tmp;
 	int refrac_step;
 	bool fired;
-	int id;
 	FILE* file;
 };
 

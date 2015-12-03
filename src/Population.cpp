@@ -8,12 +8,8 @@
 template<class Neuron>
 Population<Neuron>::Population(int N, Neuron templ) 
 {
-	if (!neurons.empty()) {
-		neurons.clear();
-	}
-	for (int i=0; i<N; i++) {
-		neurons.push_back(templ);
-	}
+	neurons.resize(N, templ);
+	size = N * templ.getSize();
 }
 
 template<class Neuron>
@@ -23,7 +19,7 @@ Population<Neuron>::~Population()
 }
 
 template<class Neuron>
-int Population<Neuron>::getSize()
+int Population<Neuron>::getNum()
 {
 	return N;
 }
@@ -53,7 +49,7 @@ int Population<Neuron>::reset(real dt)
 	typename vector<Neuron>::iterator iter;
 	for (iter = neurons.begin(); iter != neurons.end(); iter++) {
 		Neuron *p = iter;
-		ret += p->reset();
+		ret += p->reset(dt);
 	}
 	return ret;
 }
@@ -63,3 +59,22 @@ int Population<Neuron>::reset(real dt)
 //{
 //	return &pNeurons;
 //}
+
+template<class Neuron>
+size_t Population<Neuron>::getSize()
+{
+	return size;
+}
+
+template<class Neuron>
+size_t Population<Neuron>::hardCopy(unsigned char *data)
+{
+	size_t copiedBytes = 0;
+	typename vector<Neuron>::iterator iter;
+	for (iter = neurons.begin(); iter != neurons.end(); iter++) {
+		Neuron *p = iter;
+		size_t copied = p->hardCopy(data+copiedBytes);
+		copiedBytes += copied;
+	}
+	return copiedBytes;
+}

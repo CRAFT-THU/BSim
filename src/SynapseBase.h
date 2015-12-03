@@ -19,10 +19,9 @@ public:
 	virtual int reset(real dt) = 0;
 	virtual void setDst(NeuronBase *p) = 0;
 	virtual void monitor() = 0;
+	virtual size_t getSize() = 0;
+	virtual size_t hardCopy(unsigned char *data) = 0;
 protected:
-	real weight;
-	real delay;
-	SynType type;
 };
 
 #endif /* SYNAPSEBASE_H */

@@ -39,6 +39,7 @@ int Simulator::run(real time)
 {
 	int sim_cycle = (int) (time/dt);
 
+	reset();
 	vector<SynapseBase*>::iterator iterS;
 	vector<NeuronBase*>::iterator iterN;
 	vector<PopulationBase*>::iterator iterP;

@@ -23,9 +23,8 @@ public:
 	virtual void monitor() = 0;
 	virtual SynapseBase* addSyn(real weight, real delay, SynType type, NeuronBase *pDest) = 0;
 	virtual int fire() = 0;
-protected:
-	int id;
-	NeuronType type;
+	virtual size_t getSize() = 0;
+	virtual size_t hardCopy(unsigned char *data) = 0;
 };
 
 #endif /* NEURONBASE_H */

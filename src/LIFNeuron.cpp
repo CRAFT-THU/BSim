@@ -132,3 +132,14 @@ void LIFNeuron::monitor()
 	}
 	fprintf(file, "%lf", this->vm); 
 }
+
+size_t LIFNeuron::getSize()
+{
+	return sizeof(LIFNeuron);
+}
+
+size_t LIFNeuron::hardCopy(unsigned char* data)
+{
+	memcpy(data, this, sizeof(LIFNeuron));
+	return sizeof(LIFNeuron);
+}

@@ -80,3 +80,14 @@ void AlphaSyn::monitor()
 
 	return;
 }
+
+size_t AlphaSyn::getSize()
+{
+	return sizeof(AlphaSyn);
+}
+
+size_t AlphaSyn::hardCopy(unsigned char* data)
+{
+	memcpy(data, this, sizeof(AlphaSyn));
+	return sizeof(AlphaSyn);
+}

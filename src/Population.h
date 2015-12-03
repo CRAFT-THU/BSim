@@ -15,8 +15,10 @@ public:
 	virtual ~PopulationBase() {};
 	virtual int update() = 0;
 	virtual int monitor() = 0;
-	virtual int getSize() = 0;
+	virtual int getNum() = 0;
 	virtual int reset(real dt) = 0;
+	virtual size_t getSize() = 0;
+	virtual size_t hardCopy(unsigned char *data) = 0;
 	//virtual vector<NeuronBase*> * getNeurons() = 0;
 };
 
@@ -27,11 +29,14 @@ public:
 	~Population();
 	int update();
 	int monitor();
-	int getSize();
+	int getNum();
+	size_t getSize();
 	int reset(real dt);
+	size_t hardCopy(unsigned char *data);
 	NeuronBase* getNeuron(int id);
 protected:
 	int N;
+	int size;
 	vector<Neuron> neurons;
 };
 

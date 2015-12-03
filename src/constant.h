@@ -5,6 +5,7 @@
 #ifndef CONSTANT_H
 #define CONSTANT_H
 
+#include <string.h>
 typedef float real;
 enum NeuronType { IF_Curr = 0 };
 enum SynapseType { Alpha = 0, Exp = 1 };
