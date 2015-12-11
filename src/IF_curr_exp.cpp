@@ -5,27 +5,20 @@
 
 #include "IF_curr_exp.h"
 
-IF_curr_exp::IF_curr_exp(real v_init, real v_rest, real v_reset, real cm, real tau_m, real tau_refrac, real tau_syn_E, real tau_syn_I, real v_thresh, real i_offset) : LIFNeuron(v_init, v_rest, v_reset, cm, tau_m, tau_refrac, tau_syn_E, tau_syn_I, v_thresh, i_offset)
+IF_curr_exp::IF_curr_exp(ID id, real v_init, real v_rest, real v_reset, real cm, real tau_m, real tau_refrac, real tau_syn_E, real tau_syn_I, real v_thresh, real i_offset) : LIFNeuron(id, v_init, v_rest, v_reset, cm, tau_m, tau_refrac, tau_syn_E, tau_syn_I, v_thresh, i_offset)
 {
 	type = IF_Curr;
-	synapses.clear();
 }
 
-IF_curr_exp::IF_curr_exp(const IF_curr_exp &neuron) : LIFNeuron(neuron.v_init, neuron.v_rest, neuron.v_reset, neuron.cm, neuron.tau_m, neuron.tau_refrac, neuron.tau_syn_E, neuron.tau_syn_I, neuron.v_thresh, neuron.i_offset)
+IF_curr_exp::IF_curr_exp(const IF_curr_exp &neuron, ID id) : LIFNeuron(id, neuron.v_init, neuron.v_rest, neuron.v_reset, neuron.cm, neuron.tau_m, neuron.tau_refrac, neuron.tau_syn_E, neuron.tau_syn_I, neuron.v_thresh, neuron.i_offset)
 {
-	//printf("Not well designed, be careful!");
-	synapses.clear();
-	for (vector<ExpSyn>::const_iterator iter=neuron.synapses.begin(); iter !=neuron.synapses.end(); iter++) {
-		synapses.push_back(*iter);
-	}
 }
 
 IF_curr_exp::~IF_curr_exp()
 {
-	synapses.clear();
 }
 
-SynapseBase* IF_curr_exp::addSyn(real weight, real delay, SynType type, NeuronBase *pDest)
+SynapseBase* IF_curr_exp::addSynapse(real weight, real delay, SpikeType type, NeuronBase *pDest)
 {
 	real tau = 0.0f;
 	if (type == Excitatory) {
@@ -34,21 +27,19 @@ SynapseBase* IF_curr_exp::addSyn(real weight, real delay, SynType type, NeuronBa
 		tau = tau_syn_I;
 	}
 
-	ExpSyn st(weight, delay, tau);
-	st.setDst(pDest);
+	ExpSynapse *tmp = new ExpSynapse(sidPool.getID(), weight, delay, tau);
+	tmp->setDst(pDest);
 
-	synapses.push_back(st);
-
-	SynapseBase * ret = &(*(synapses.end() -1));
-
+	SynapseBase *ret = (SynapseBase *)tmp;
+	pSynapses.push_back(ret);
 	return ret;
 }
 
 int IF_curr_exp::fire()
 {
-	vector<ExpSyn>::iterator iter;
-	for (iter=synapses.begin(); iter!=synapses.end(); iter++) {
-		(*iter).recv();
+	vector<SynapseBase*>::iterator iter;
+	for (iter=pSynapses.begin(); iter!=pSynapses.end(); iter++) {
+		(*iter)->recv();
 	}
 
 	return 0;

@@ -5,8 +5,8 @@
 #ifndef SYNAPSE_H
 #define SYNAPSE_H
 
-#include "AlphaSyn.h"
-#include "ExpSyn.h"
+#include "AlphaSynapse.h"
+#include "ExpSynapse.h"
 
 #endif /* SYNAPSE_H */
 

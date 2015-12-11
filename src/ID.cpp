@@ -2,16 +2,18 @@
  * usually just for fun.
  * Wed October 28 2015
  */
-
 #include "ID.h"
 
-ID::ID() {
+ID::ID()
+{
 	id = 0;
 }
 
-ID::~ID() {
+ID::ID(const ID &a)
+{
+	this->id = a.id;
 }
 
-int ID::getID() {
-	return id++;
+ID::~ID()
+{
 }

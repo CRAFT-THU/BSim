@@ -48,11 +48,6 @@ int Simulator::run(real time)
 	for (int i=0; i<sim_cycle; i++) {
 		printf("\rCycle: %d", i);
 		fflush(stdout);
-		for (iterS=network->pSynapses.begin(); iterS!=network->pSynapses.end(); iterS++) {
-			SynapseBase *p = *iterS;
-			p->update();
-			p->monitor();
-		}
 
 		for (iterP=network->pPopulations.begin(); iterP!=network->pPopulations.end(); iterP++) {
 			PopulationBase * p = *iterP;
@@ -63,9 +58,12 @@ int Simulator::run(real time)
 		for (iterN=network->pNeurons.begin(); iterN!=network->pNeurons.end(); iterN++) {
 			NeuronBase * p = *iterN;
 			p->update();
-			if (p->is_fired()) {
-				p->fire();
-			}
+			p->monitor();
+		}
+
+		for (iterS=network->pSynapses.begin(); iterS!=network->pSynapses.end(); iterS++) {
+			SynapseBase *p = *iterS;
+			p->update();
 			p->monitor();
 		}
 	}

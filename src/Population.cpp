@@ -25,9 +25,9 @@ int Population<Neuron>::getNum()
 }
 
 template<class Neuron>
-NeuronBase* Population<Neuron>::getNeuron(int id)
+NeuronBase* Population<Neuron>::getNeuron(int idx)
 {
-	return &neurons[id];
+	return &neurons[idx];
 }
 
 template<class Neuron>

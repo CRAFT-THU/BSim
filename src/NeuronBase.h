@@ -6,25 +6,24 @@
 #define NEURONBASE_H
 
 #include "constant.h"
-#include "utils/ID.h"
-
-extern ID nid;
+#include "utils/IDPool.h"
 
 class SynapseBase;
 
 class NeuronBase {
 public:
-	virtual ~NeuronBase();
+	virtual ~NeuronBase() = 0;
 
-	virtual int reset(real dt) = 0;
-	virtual int recv(real I) = 0;
-	virtual int update() = 0;
-	virtual bool is_fired() = 0;
-	virtual void monitor() = 0;
-	virtual SynapseBase* addSyn(real weight, real delay, SynType type, NeuronBase *pDest) = 0;
 	virtual int fire() = 0;
+	virtual ID getID() = 0;
+	virtual int update() = 0;
+	virtual void monitor() = 0;
+	virtual bool is_fired() = 0;
+	virtual int recv(real I) = 0;
 	virtual size_t getSize() = 0;
-	virtual size_t hardCopy(unsigned char *data) = 0;
+	virtual int reset(real dt) = 0;
+	virtual size_t hardCopy(void *data) = 0;
+	virtual SynapseBase *addSynapse(real weight, real delay, SpikeType type, NeuronBase *dst) = 0;
 };
 
 #endif /* NEURONBASE_H */

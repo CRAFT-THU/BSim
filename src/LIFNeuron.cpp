@@ -8,15 +8,15 @@
 #include <math.h>
 using std::vector;
 
-LIFNeuron::LIFNeuron(real v_init, real v_rest, real v_reset, real cm, real tau_m, real tau_refrac, real tau_syn_E, real tau_syn_I, real v_thresh, real i_offset)
+LIFNeuron::LIFNeuron(ID id, real v_init, real v_rest, real v_reset, real cm, real tau_m, real tau_refrac, real tau_syn_E, real tau_syn_I, real v_thresh, real i_offset)
 	:v_init(v_init), v_rest(v_rest), v_reset(v_reset), cm(cm), tau_m(tau_m), tau_refrac(tau_refrac), tau_syn_E(tau_syn_E), tau_syn_I(tau_syn_I), v_thresh(v_thresh), i_offset(i_offset)
 {
 	this->i_syn = 0;
-	this->id = nid.getID();
+	this->id = id;
 	this->file = NULL;
 }
 
-LIFNeuron::LIFNeuron(const LIFNeuron &neuron)
+LIFNeuron::LIFNeuron(const LIFNeuron &neuron, ID id)
 {
 	this->v_init = neuron.v_init;
 	this->v_rest = neuron.v_rest;
@@ -30,7 +30,7 @@ LIFNeuron::LIFNeuron(const LIFNeuron &neuron)
 	this->i_offset = neuron.i_offset;
 	this->i_syn = 0;
 	this->file = NULL;
-	id = nid.getID();
+	this->id = id;
 }
 
 LIFNeuron::~LIFNeuron()
@@ -98,6 +98,7 @@ int LIFNeuron::update()
 
 	if (fired) {
 	//TODO fire
+		fire();
 		return 1;
 	} else {
 		return -1;
@@ -118,6 +119,11 @@ int LIFNeuron::reset(real dt)
 	return init(dt);
 }
 
+ID LIFNeuron::getID()
+{
+	return id;
+}
+
 real LIFNeuron::get_vm()
 {
 	return vm;
@@ -127,19 +133,39 @@ void LIFNeuron::monitor()
 {
 	if (file == NULL) {
 		char filename[128];
-		sprintf(filename, "Neuron_%d.log", id);
+		sprintf(filename, "Neuron_%d.log", id.id);
 		file = fopen(filename, "w+");
 	}
-	fprintf(file, "%lf", this->vm); 
+	fprintf(file, "%lf\n", this->vm); 
 }
 
 size_t LIFNeuron::getSize()
 {
-	return sizeof(LIFNeuron);
+	return sizeof(GLIFNeuron);
 }
 
-size_t LIFNeuron::hardCopy(unsigned char* data)
+size_t LIFNeuron::hardCopy(void* data)
 {
-	memcpy(data, this, sizeof(LIFNeuron));
-	return sizeof(LIFNeuron);
+	GLIFNeuron * p = (GLIFNeuron *) data;
+	p->id = id;
+	p->type = type;
+	p->v_init = v_init;
+	p->v_rest = v_rest;
+	p->v_reset = v_reset;
+	p->cm = cm;
+	p->tau_m = tau_m;
+	p->tau_refrac = tau_refrac;
+	p->tau_syn_E = tau_syn_E;
+	p->tau_syn_I = tau_syn_I;
+	p->v_thresh = v_thresh;
+	p->i_offset = i_offset;
+	p->i_syn = i_syn;
+	p->vm = vm;
+	p->_dt = _dt;
+	p->C1 = C1;
+	p->C2 = C2;
+	p->i_tmp = i_tmp;
+	p->refrac_step = refrac_step;
+	
+	return sizeof(GLIFNeuron);
 }

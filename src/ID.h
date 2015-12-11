@@ -5,12 +5,11 @@
 #ifndef ID_H
 #define ID_H
 
-class ID {
+struct ID {
 public:
 	ID();
+	ID(const ID &id);
 	~ID();
-	int getID();
-private:
 	int id;
 };
 

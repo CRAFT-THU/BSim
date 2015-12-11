@@ -9,19 +9,18 @@
 #include "constant.h"
 #include "NeuronBase.h"
 
-extern ID sid;
-
 class SynapseBase {
 public:
-	virtual ~SynapseBase();
-	virtual int update() = 0;
+	virtual ~SynapseBase() = 0;
+
 	virtual int recv() = 0;
-	virtual int reset(real dt) = 0;
-	virtual void setDst(NeuronBase *p) = 0;
+	virtual ID getID() = 0;
+	virtual int update() = 0;
 	virtual void monitor() = 0;
 	virtual size_t getSize() = 0;
-	virtual size_t hardCopy(unsigned char *data) = 0;
-protected:
+	virtual int reset(real dt) = 0;
+	virtual void setDst(NeuronBase *p) = 0;
+	virtual size_t hardCopy(void *data) = 0;
 };
 
 #endif /* SYNAPSEBASE_H */

@@ -8,23 +8,48 @@
 #include <stdio.h>
 #include "NeuronBase.h"
 
+struct GLIFNeuron {
+	ID id;
+	NeuronType type;
+	real v_init;
+	real v_rest;
+	real v_reset;
+	real cm;
+	real tau_m;
+	real tau_refrac;
+	real tau_syn_E;
+	real tau_syn_I;
+	real v_thresh;
+	real i_offset;
+	real i_syn;
+	real vm;
+	real _dt;
+	real C1;
+	real C2;
+	real i_tmp;
+	int refrac_step;
+	int size;
+	ID *synapse;
+};
+
 class LIFNeuron : public NeuronBase {
 public:
-	LIFNeuron(real v_init, real v_rest, real v_reset, real cm, real tau_m, real tau_refrac, real tau_syn_E, real tau_syn_I, real v_thresh, real i_offset);
-	LIFNeuron(const LIFNeuron &neuron);
+	LIFNeuron(ID id, real v_init, real v_rest, real v_reset, real cm, real tau_m, real tau_refrac, real tau_syn_E, real tau_syn_I, real v_thresh, real i_offset);
+	LIFNeuron(const LIFNeuron &neuron, ID id);
 	~LIFNeuron();
 
+	ID getID();
 	int init(real dt);
-	virtual int reset(real dt);
-	virtual int recv(real I);
-	virtual int update();
-	virtual bool is_fired();
-	virtual void monitor();
-	virtual real get_vm();
-	virtual size_t getSize();
-	virtual size_t hardCopy(unsigned char* data);
+	int update();
+	real get_vm();
+	void monitor();
+	bool is_fired();
+	size_t getSize();
+	int recv(real I);
+	int reset(real dt);
+	size_t hardCopy(void * data);
 protected:
-	int id;
+	ID id;
 	NeuronType type;
 	real v_init;
 	real v_rest;

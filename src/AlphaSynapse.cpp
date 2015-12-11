@@ -3,28 +3,28 @@
  * Fri October 23 2015
  */
 
-#include "AlphaSyn.h"
+#include "AlphaSynapse.h"
 #include <math.h>
 #include <cstdio>
 
-AlphaSyn::AlphaSyn(real weight, real delay = 0.0, real tau_syn = 0.0)
+AlphaSynapse::AlphaSynapse(ID id, real weight, real delay = 0.0, real tau_syn = 0.0)
 {
 	this->weight = weight;
 	this->delay = delay;
 	this->tau_syn = tau_syn;
-	id = sid.getID();
+	this->id = id;
 }
 
-AlphaSyn::~AlphaSyn()
+AlphaSynapse::~AlphaSynapse()
 {
 	delay_step.clear();
 }
 
-void AlphaSyn::setDst(NeuronBase *p) {
+void AlphaSynapse::setDst(NeuronBase *p) {
 	pDest = p;
 }
 
-int AlphaSyn::reset(real dt) {
+int AlphaSynapse::reset(real dt) {
 	I_syn = 0;
 	I_tmp = 0;
 	init(dt);
@@ -32,7 +32,7 @@ int AlphaSyn::reset(real dt) {
 	return 0;
 }
 
-int AlphaSyn::init(real dt) {
+int AlphaSynapse::init(real dt) {
 	_dt = dt;
 	if (tau_syn > 0) {
 		C1 = expf(-dt/tau_syn);
@@ -47,7 +47,7 @@ int AlphaSyn::init(real dt) {
 	return 0;
 }
 
-int AlphaSyn::update()
+int AlphaSynapse::update()
 {
 	I_syn = C1 * I_syn + C2 * I_tmp;
 	I_tmp *= C1;
@@ -68,26 +68,43 @@ int AlphaSyn::update()
 	return 0;
 }
 
-int AlphaSyn::recv()
+int AlphaSynapse::recv()
 {
 	delay_step.push_back((int) delay/_dt + 1);
 
 	return 0;
 }
 
-void AlphaSyn::monitor()
+void AlphaSynapse::monitor()
 {
 
 	return;
 }
 
-size_t AlphaSyn::getSize()
+size_t AlphaSynapse::getSize()
 {
-	return sizeof(AlphaSyn);
+	return sizeof(GAlphaSynapse);
 }
 
-size_t AlphaSyn::hardCopy(unsigned char* data)
+ID AlphaSynapse::getID()
 {
-	memcpy(data, this, sizeof(AlphaSyn));
-	return sizeof(AlphaSyn);
+	return id;
+}
+
+size_t AlphaSynapse::hardCopy(void *data)
+{
+	GAlphaSynapse *p = (GAlphaSynapse*)data;
+	p->type = type;
+	p->weight = weight;
+	p->delay = delay;
+	p->C1 = C1;
+	p->C2 = C2;
+	p->_C1 = _C1;
+	p->_C2 = _C2;
+	p->tau_syn = tau_syn;
+	p->I_syn = I_syn;
+	p->I_tmp = I_tmp;
+	p->_dt = _dt;
+	p->id = id;
+	return sizeof(GAlphaSynapse);
 }

@@ -33,7 +33,7 @@ public:
 	size_t getSize();
 	int reset(real dt);
 	size_t hardCopy(unsigned char *data);
-	NeuronBase* getNeuron(int id);
+	NeuronBase* getNeuron(int idx);
 protected:
 	int N;
 	int size;
