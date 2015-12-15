@@ -11,7 +11,7 @@ int main(int argc, char **argv)
 	IF_curr_exp n = IF_curr_exp(nidPool.getID(), 0.0f, 0.0f, 0.0f, 1.0e-1f, 10.0e-3f, 0.0f, 1.0f, 1.0f, 15.0e-3f, 2.0e-3f);
 	Network c;
 	c.create(n);
-	Simulator s(&c, 1.0e-3f);
+	SingleThreadSimulator s(&c, 1.0e-3f);
 	s.run(0.1f);
 
 	return 0;

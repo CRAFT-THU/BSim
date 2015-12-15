@@ -4,6 +4,7 @@
  */
 
 #include "Network.h"
+#include "utils.h"
 
 Network::Network()
 {
@@ -54,6 +55,13 @@ int Network::connect(NeuronBase *pn1, NeuronBase *pn2, real weight, real delay, 
 	SynapseBase * p = pn1->addSynapse(weight, delay, type, pn2);
 
 	pSynapses.push_back(p);
+	synapseNum++;
+	s2nNetwork[p->getID()] = pn2->getID(); 
+	n2sNetwork[pn1->getID()].push_back(p->getID());
+
+	if (delay > maxDelay) {
+		maxDelay = delay;
+	}
 	
 	return 1;
 }
@@ -61,65 +69,87 @@ int Network::connect(NeuronBase *pn1, NeuronBase *pn2, real weight, real delay, 
 
 PlainNetwork* Network::buildNetwrok()
 {
+	//size_t populationSize = 0;
+	//size_t neuronSize = 0;
+	//size_t synapseSize = 0;
+	vector<PopulationBase*>::iterator piter;
+	vector<NeuronBase*>::iterator niter;
+	vector<SynapseBase*>::iterator siter;
+
+	//for (piter = pPopulations.begin(); piter != pPopulations.end();  piter++) {
+	//	PopulationBase * p = *piter;
+	//	populationSize += p->getSize();
+	//	neuronNum += p->getNum();
+	//}
+	//for (niter = pNeurons.begin(); niter != pNeurons.end();  niter++) {
+	//	NeuronBase * p = *niter;
+	//	neuronSize += p->getSize();
+	//	neuronNum++;
+	//}
+	//for (siter = pSynapses.begin(); siter != pSynapses.end();  siter++) {
+	//	SynapseBase * p = *siter;
+	//	synapseSize += p->getSize();
+	//	synapseNum++;
+	//}
+
+	//ret->populationSize = populationSize;
+	//ret->neuronSize = neuronSize;
+	//ret->synapseSize = synapseSize;
+	
+	GLIFNeurons *pGLIF = (GLIFNeurons*)malloc(sizeof(GLIFNeurons));
+	GExpSynapses *pGExp = (GExpSynapses*)malloc(sizeof(GExpSynapses));
+	pGLIF->allocNeurons(neuronNum);
+	pGLIF->allocConnects(synapseNum);
+
+	unsigned int idx = 0;
+	for (piter = pPopulations.begin(); piter != pPopulations.end();  piter++) {
+		PopulationBase * p = *piter;
+		size_t copied = p->hardCopy(pGLIF, idx);
+		idx += copied;
+	}
+	for (niter = pNeurons.begin(); niter != pNeurons.end();  niter++) {
+		NeuronBase * p = *niter;
+		size_t copied = p->hardCopy(pGLIF, idx);
+		idx += copied;
+	}
+	idx = 0;
+	for (siter = pSynapses.begin(); siter != pSynapses.end();  siter++) {
+		SynapseBase * p = *siter;
+		int copied = p->hardCopy(pGExp, idx);
+		idx += copied;
+	}
+
+	map<ID, vector<ID>>::iterator n2sIter;
+	map<ID, ID>::iterator s2nIter;
+	unsigned int loc = 0;
+	for (n2sIter = n2sNetwork.begin(); n2sIter != n2sNetwork.end(); n2sIter++) {
+		unsigned int idx = id2idx(pGLIF->pID, neuronNum, n2sIter->first);
+		pGLIF->pSynapsesNum[idx] = n2sIter->second.size();
+		pGLIF->pSynapsesLoc[idx] = loc;
+		for (unsigned int i = 0; i<pGLIF->pSynapsesNum[idx]; i++) {
+			unsigned int idx2 = id2idx(pGExp->pID, synapseNum, n2sIter->second.at(i)); 
+			pGLIF->pSynapsesIdx[loc] = idx2;
+			loc++;
+			pGExp->pSrc[idx2] = idx;
+		}	
+	}
+
+	for (s2nIter = s2nNetwork.begin(); s2nIter != s2nNetwork.end(); s2nIter++) {
+		unsigned int idx = id2idx(pGExp->pID, synapseNum, s2nIter->first);
+		pGExp->pDst[idx] = id2idx(pGLIF->pID, neuronNum, s2nIter->second);
+	}
+
 	PlainNetwork * ret = (PlainNetwork*)malloc(sizeof(PlainNetwork));
 	if (ret == NULL) {
 		printf("Malloc PlainNetwork failed/n");
 		return NULL;
 	}
-	size_t populationSize = 0;
-	size_t neuronSize = 0;
-	size_t synapseSize = 0;
-	vector<PopulationBase*>::iterator piter;
-	for (piter = pPopulations.begin(); piter != pPopulations.end();  piter++) {
-		PopulationBase * p = *piter;
-		populationSize += p->getSize();
-	}
-	vector<NeuronBase*>::iterator niter;
-	for (niter = pNeurons.begin(); niter != pNeurons.end();  niter++) {
-		NeuronBase * p = *niter;
-		neuronSize += p->getSize();
-	}
-	vector<SynapseBase*>::iterator siter;
-	for (siter = pSynapses.begin(); siter != pSynapses.end();  siter++) {
-		SynapseBase * p = *siter;
-		synapseSize += p->getSize();
-	}
 
-	ret->populationSize = populationSize;
-	ret->neuronSize = neuronSize;
-	ret->synapseSize = synapseSize;
-
-	ret->pPopulations = malloc(populationSize);
-	ret->pNeurons = malloc(neuronSize);
-	ret->pSynapses = malloc(synapseSize);
-
-	if ((ret->pPopulations == NULL) || (ret->pNeurons == NULL) || (ret->pSynapses == NULL)) {
-		printf("Malloc PlainNetwork failed/n");
-		free(ret->pPopulations);
-		free(ret->pNeurons);
-		free(ret->pSynapses);
-		free(ret);
-		return NULL;
-	}
-
-	size_t idx = 0;
-	for (piter = pPopulations.begin(); piter != pPopulations.end();  piter++) {
-		PopulationBase * p = *piter;
-		size_t copied = p->hardCopy(((unsigned char*)ret->pPopulations) + idx);
-		idx += copied;
-	}
-	idx = 0;
-	for (niter = pNeurons.begin(); niter != pNeurons.end();  niter++) {
-		NeuronBase * p = *niter;
-		size_t copied = p->hardCopy(((unsigned char*)ret->pNeurons) + idx);
-		idx += copied;
-	}
-	idx = 0;
-	for (siter = pSynapses.begin(); siter != pSynapses.end();  siter++) {
-		SynapseBase * p = *siter;
-		size_t copied = p->hardCopy(((unsigned char*)ret->pSynapses) + idx);
-		idx += copied;
-	}
+	ret->neuronNum = neuronNum;
+	ret->synapseNum = synapseNum;
+	ret->pNeurons = pGLIF;
+	ret->pSynapses = pGExp;
+	ret->MAX_DELAY = maxDelay;
 
 	return ret;
 }

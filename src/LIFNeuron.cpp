@@ -3,9 +3,12 @@
  * Tue September 29 2015
  */
 
-#include "LIFNeuron.h"
 #include <vector>
 #include <math.h>
+
+#include "LIFNeuron.h"
+#include "GLIFNeuron.h"
+
 using std::vector;
 
 LIFNeuron::LIFNeuron(ID id, real v_init, real v_rest, real v_reset, real cm, real tau_m, real tau_refrac, real tau_syn_E, real tau_syn_I, real v_thresh, real i_offset)
@@ -141,31 +144,31 @@ void LIFNeuron::monitor()
 
 size_t LIFNeuron::getSize()
 {
-	return sizeof(GLIFNeuron);
+	return sizeof(GLIFNeurons);
 }
 
-size_t LIFNeuron::hardCopy(void* data)
+unsigned int LIFNeuron::hardCopy(void* data, unsigned int idx)
 {
-	GLIFNeuron * p = (GLIFNeuron *) data;
-	p->id = id;
-	p->type = type;
-	p->v_init = v_init;
-	p->v_rest = v_rest;
-	p->v_reset = v_reset;
-	p->cm = cm;
-	p->tau_m = tau_m;
-	p->tau_refrac = tau_refrac;
-	p->tau_syn_E = tau_syn_E;
-	p->tau_syn_I = tau_syn_I;
-	p->v_thresh = v_thresh;
-	p->i_offset = i_offset;
-	p->i_syn = i_syn;
-	p->vm = vm;
-	p->_dt = _dt;
-	p->C1 = C1;
-	p->C2 = C2;
-	p->i_tmp = i_tmp;
-	p->refrac_step = refrac_step;
+	GLIFNeurons * p = (GLIFNeurons *) data;
+	p->pID[idx] = id;
+	p->pType[idx] = type;
+	p->p_v_init[idx] = v_init;
+	p->p_v_rest[idx] = v_rest;
+	p->p_v_reset[idx] = v_reset;
+	p->p_cm[idx] = cm;
+	p->p_tau_m[idx] = tau_m;
+	p->p_tau_refrac[idx] = tau_refrac;
+	p->p_tau_syn_E[idx] = tau_syn_E;
+	p->p_tau_syn_I[idx] = tau_syn_I;
+	p->p_v_thresh[idx] = v_thresh;
+	p->p_i_offset[idx] = i_offset;
+	p->p_i_syn[idx] = i_syn;
+	p->p_vm[idx] = vm;
+	p->p__dt[idx] = _dt;
+	p->p_C1[idx] = C1;
+	p->p_C2[idx] = C2;
+	p->p_i_tmp[idx] = i_tmp;
+	p->p_refrac_step[idx] = refrac_step;
 	
-	return sizeof(GLIFNeuron);
+	return 1;
 }

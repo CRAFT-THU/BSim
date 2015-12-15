@@ -20,7 +20,7 @@ public:
 	virtual size_t getSize() = 0;
 	virtual int reset(real dt) = 0;
 	virtual void setDst(NeuronBase *p) = 0;
-	virtual size_t hardCopy(void *data) = 0;
+	virtual unsigned int hardCopy(void *data, unsigned int idx) = 0;
 };
 
 #endif /* SYNAPSEBASE_H */

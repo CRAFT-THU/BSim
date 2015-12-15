@@ -17,3 +17,11 @@ ID::ID(const ID &a)
 ID::~ID()
 {
 }
+
+bool ID::operator==(const ID &id1)const{  
+	return (id == id1.id);  
+}    
+
+bool ID::operator<(const ID &id1)const{  
+	return (id < id1.id);  
+}    

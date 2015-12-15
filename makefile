@@ -5,8 +5,8 @@ OBJ_DIR = $(HOME)/obj
 BIN_DIR = $(HOME)/bin
 LIB_DIR = $(HOME)/lib
 
-TARGET = libsnnsim.a
-BIN_TARGET = $(LIB_DIR)/$(TARGET)
+TARGET = libsnnsim.a libsnnsim_gpu.a
+BIN_TARGET = $(foreach tgt, $(TARGET),  $(LIB_DIR)/$(tgt))
 
 SPACE := $(eval) $(eval)
 DIRS := $(shell find $(SRC_DIR) -maxdepth 4 -type d)
@@ -15,7 +15,8 @@ CFILES = $(foreach dir, $(DIRS), $(wildcard ${dir}/*.c))
 CUFILES = $(foreach dir, $(DIRS), $(wildcard ${dir}/*.cu))
 CXXFILES = $(foreach dir, $(DIRS), $(wildcard ${dir}/*.cpp))
 SRC = $(CFILES) $(CUFILES) $(CXXFILES)
-OBJ += $(patsubst %.c,${OBJ_DIR}/%.c.o,$(notdir ${CFILES})) $(patsubst %.cu,${OBJ_DIR}/%.cu.o,$(notdir ${CUFILES})) $(patsubst %.cpp,${OBJ_DIR}/%.cpp.o,$(notdir ${CXXFILES}))
+CPUOBJ += $(patsubst %.c,${OBJ_DIR}/%.c.o,$(notdir ${CFILES})) $(patsubst %.cpp,${OBJ_DIR}/%.cpp.o,$(notdir ${CXXFILES}))
+GPUOBJ += $(patsubst %.c,${OBJ_DIR}/%.c.o,$(notdir ${CFILES})) $(patsubst %.cu,${OBJ_DIR}/%.cu.o,$(notdir ${CUFILES})) $(patsubst %.cpp,${OBJ_DIR}/%.cpp.o,$(notdir ${CXXFILES}))
 
 CFLAGS =  -g -O2 -Wall -std=c++11
 CUFLAGS =  -g -O2 -std=c++11
@@ -27,18 +28,22 @@ all: $(BIN_TARGET)
 
 #echo $(SRC)
 
-$(BIN_TARGET): $(OBJ)
+$(LIB_DIR)/libsnnsim.a: $(CPUOBJ)
+	ar cr $@ $^
+$(LIB_DIR)/libsnnsim_gpu.a: $(GPUOBJ)
 	ar cr $@ $^
 
 
-$(OBJ_DIR)/%.cpp.o: %.cpp 
+$(OBJ_DIR)/%.cpp.o: %.cpp
 	$(CXX) $(CFLAGS) -o $@ -c $^ -I$(INC_DIR)
 
 $(OBJ_DIR)/%.cu.o: %.cu
 	nvcc $(CUFLAGS) -o $@ -c $^ -I$(INC_DIR)
 
-$(OBJ_DIR)/%.c.o: %.c 
+$(OBJ_DIR)/%.c.o: %.c
 	$(CXX) $(CFLAGS) -o $@ -c $^ -I$(INC_DIR)
+
+
 
 test:
 	cd ./test &&  make

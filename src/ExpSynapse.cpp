@@ -3,8 +3,10 @@
  * Fri October 23 2015
  */
 
-#include "ExpSynapse.h"
 #include <math.h>
+
+#include "ExpSynapse.h"
+#include "GExpSynapses.h"
 
 ExpSynapse::ExpSynapse(ID id, real weight, real delay = 0, real tau_syn = 0)
 {
@@ -82,7 +84,7 @@ void ExpSynapse::monitor()
 {
 	if (file == NULL) {
 		char filename[128];
-		sprintf(filename, "Neuron_%d.log", id.id);
+		sprintf(filename, "Synapse_%d.log", id.id);
 		file = fopen(filename, "w+");
 	}
 	fprintf(file, "%f\n", this->I_syn); 
@@ -92,20 +94,20 @@ void ExpSynapse::monitor()
 
 size_t ExpSynapse::getSize()
 {
-	return sizeof(GExpSynapse);
+	return sizeof(GExpSynapses);
 }
 
-size_t ExpSynapse::hardCopy(void *data)
+unsigned int ExpSynapse::hardCopy(void *data, unsigned int idx)
 {
-	GExpSynapse *p = (GExpSynapse *)data;
-	p->type = type;
-	p->weight = weight;
-	p->delay = delay;
-	p->C1 = C1;
-	p->_C1 = _C1;
-	p->tau_syn = tau_syn;
-	p->I_syn = I_syn;
-	p->_dt = _dt;
-	p->id = id;
-	return sizeof(GExpSynapse);
+	GExpSynapses *p = (GExpSynapses *)data;
+	p->pID[idx] = id;
+	p->pType[idx] = type;
+	p->p_weight[idx] = weight;
+	p->p_delay[idx] = delay;
+	p->p_C1[idx] = C1;
+	p->p__C1[idx] = _C1;
+	p->p_tau_syn[idx] = tau_syn;
+	p->p_I_syn[idx] = I_syn;
+	p->p__dt[idx] = _dt;
+	return 1;
 }

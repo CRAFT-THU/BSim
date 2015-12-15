@@ -3,9 +3,11 @@
  * Fri October 23 2015
  */
 
-#include "AlphaSynapse.h"
 #include <math.h>
 #include <cstdio>
+
+#include "AlphaSynapse.h"
+#include "GAlphaSynapses.h"
 
 AlphaSynapse::AlphaSynapse(ID id, real weight, real delay = 0.0, real tau_syn = 0.0)
 {
@@ -83,7 +85,7 @@ void AlphaSynapse::monitor()
 
 size_t AlphaSynapse::getSize()
 {
-	return sizeof(GAlphaSynapse);
+	return sizeof(GAlphaSynapses);
 }
 
 ID AlphaSynapse::getID()
@@ -91,20 +93,20 @@ ID AlphaSynapse::getID()
 	return id;
 }
 
-size_t AlphaSynapse::hardCopy(void *data)
+unsigned int AlphaSynapse::hardCopy(void *data, unsigned int idx)
 {
-	GAlphaSynapse *p = (GAlphaSynapse*)data;
-	p->type = type;
-	p->weight = weight;
-	p->delay = delay;
-	p->C1 = C1;
-	p->C2 = C2;
-	p->_C1 = _C1;
-	p->_C2 = _C2;
-	p->tau_syn = tau_syn;
-	p->I_syn = I_syn;
-	p->I_tmp = I_tmp;
-	p->_dt = _dt;
-	p->id = id;
-	return sizeof(GAlphaSynapse);
+	GAlphaSynapses *p = (GAlphaSynapses*)data;
+	p->pType[idx] = type;
+	p->p_weight[idx] = weight;
+	p->p_delay[idx] = delay;
+	p->p_C1[idx]= C1;
+	p->p_C2[idx] = C2;
+	p->p__C1[idx] = _C1;
+	p->p__C2[idx] = _C2;
+	p->p_tau_syn[idx] = tau_syn;
+	p->p_I_syn[idx] = I_syn;
+	p->p_I_tmp[idx] = I_tmp;
+	p->p__dt[idx] = _dt;
+	p->pID[idx] = id;
+	return 1;
 }

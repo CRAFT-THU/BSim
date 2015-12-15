@@ -4,38 +4,18 @@
  */
 
 #include <stdio.h>
-#include "Simulator.h"
+#include "SingleThreadSimulator.h"
 
-Simulator::Simulator(Network *network, real dt)
-	: network(network), dt(dt)
+SingleThreadSimulator::SingleThreadSimulator(Network *network, real dt)
+	: SimulatorBase(network, dt)
 {
 }
 
-Simulator::~Simulator()
+SingleThreadSimulator::~SingleThreadSimulator()
 {
 }
 
-int Simulator::reset()
-{
-	vector<SynapseBase*>::iterator iterS;
-	vector<NeuronBase*>::iterator iterN;
-	vector<PopulationBase*>::iterator iterP;
-	for (iterS=network->pSynapses.begin(); iterS!=network->pSynapses.end(); iterS++) {
-		SynapseBase *p = *iterS;
-		p->reset(dt);
-	}
-	for (iterN=network->pNeurons.begin(); iterN!=network->pNeurons.end(); iterN++) {
-		NeuronBase * p = *iterN;
-		p->reset(dt);
-	}
-	for (iterP=network->pPopulations.begin(); iterP!=network->pPopulations.end(); iterP++) {
-		PopulationBase * p = *iterP;
-		p->reset(dt);
-	}
-	return 0;
-}
-
-int Simulator::run(real time)
+int SingleThreadSimulator::run(real time)
 {
 	int sim_cycle = (int) (time/dt);
 

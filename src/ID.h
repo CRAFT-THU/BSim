@@ -5,11 +5,16 @@
 #ifndef ID_H
 #define ID_H
 
+#include "constant.h"
+
 struct ID {
 public:
 	ID();
 	ID(const ID &id);
 	~ID();
+	bool operator==(const ID &id1)const; 
+	bool operator<(const ID &id1)const; 
+
 	int id;
 };
 

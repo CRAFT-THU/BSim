@@ -6,7 +6,7 @@
 #define NEURONBASE_H
 
 #include "constant.h"
-#include "utils/IDPool.h"
+#include "IDPool.h"
 
 class SynapseBase;
 
@@ -22,7 +22,7 @@ public:
 	virtual int recv(real I) = 0;
 	virtual size_t getSize() = 0;
 	virtual int reset(real dt) = 0;
-	virtual size_t hardCopy(void *data) = 0;
+	virtual unsigned int hardCopy(void *data, unsigned int idx) = 0;
 	virtual SynapseBase *addSynapse(real weight, real delay, SpikeType type, NeuronBase *dst) = 0;
 };
 

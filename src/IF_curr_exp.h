@@ -19,7 +19,7 @@ public:
 	~IF_curr_exp();
 
 	SynapseBase* addSynapse(real weight, real delay, SpikeType type, NeuronBase *pDest);
-	int fire();
+	virtual int fire();
 
 private:
 	vector<SynapseBase*> pSynapses;

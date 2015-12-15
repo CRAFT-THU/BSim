@@ -18,7 +18,7 @@ public:
 	virtual int getNum() = 0;
 	virtual int reset(real dt) = 0;
 	virtual size_t getSize() = 0;
-	virtual size_t hardCopy(unsigned char *data) = 0;
+	virtual unsigned int hardCopy(void *data, unsigned int idx) = 0;
 	//virtual vector<NeuronBase*> * getNeurons() = 0;
 };
 
@@ -32,7 +32,7 @@ public:
 	int getNum();
 	size_t getSize();
 	int reset(real dt);
-	size_t hardCopy(unsigned char *data);
+	unsigned int hardCopy(void *data, unsigned int idx);
 	NeuronBase* getNeuron(int idx);
 protected:
 	int N;

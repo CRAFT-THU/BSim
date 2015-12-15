@@ -67,14 +67,14 @@ size_t Population<Neuron>::getSize()
 }
 
 template<class Neuron>
-size_t Population<Neuron>::hardCopy(unsigned char *data)
+unsigned int Population<Neuron>::hardCopy(void *data, unsigned int idx)
 {
-	size_t copiedBytes = 0;
+	size_t copiedIdxs = 0;
 	typename vector<Neuron>::iterator iter;
 	for (iter = neurons.begin(); iter != neurons.end(); iter++) {
 		Neuron *p = iter;
-		size_t copied = p->hardCopy(data+copiedBytes);
-		copiedBytes += copied;
+		size_t copied = p->hardCopy(data, idx+copiedIdxs);
+		copiedIdxs += copied;
 	}
-	return copiedBytes;
+	return copiedIdxs;
 }

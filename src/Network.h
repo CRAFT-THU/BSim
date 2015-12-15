@@ -20,11 +20,13 @@ using std::vector;
 struct PlainNetwork {
 	void *pNeurons;
 	void *pSynapses;
-	void *pPopulations;
-	void *network;
-	size_t neuronSize;
-	size_t synapseSize;
-	size_t populationSize;
+	//void *pPopulations;
+	//size_t neuronSize;
+	//size_t synapseSize;
+	//size_t populationSize;
+	unsigned int neuronNum;
+	unsigned int synapseNum;
+	unsigned int MAX_DELAY;
 };
 
 class Network {
@@ -35,6 +37,8 @@ public:
 	template<class Neuron>
 	Neuron* create(Neuron n1);
 	template<class Neuron>
+	Population<Neuron>* createPopulation(Neuron n1, unsigned int num);
+	template<class Neuron>
 	int connect(Population<Neuron> *pSrc, Population<Neuron> *pDst, real *weight, real *delay, SpikeType *type, int size);
 	
 	int connect(NeuronBase *pSrc, NeuronBase *pDst, real weight, real delay, SpikeType type, bool store = true);
@@ -44,18 +48,38 @@ public:
 	vector<PopulationBase*> pPopulations;
 	vector<NeuronBase*> pNeurons;
 	vector<SynapseBase*> pSynapses;
-	map<NeuronBase*, vector<SynapseBase*> > network;
+	map<ID, vector<ID> > n2sNetwork;
+	map<ID, ID > s2nNetwork;
+	real maxDelay;
+	real maxFireRate;
+	unsigned int populationNum;
+	unsigned int neuronNum;
+	unsigned int synapseNum;
 };
 
 template<class Neuron>
 Neuron* Network::create(Neuron n1)
 {
-	NeuronBase *pn1 = new Neuron(n1);
+	Neuron *pn1 = new Neuron(n1);
 	if (find(pNeurons.begin(), pNeurons.end(), pn1) == pNeurons.end()) {
 		pNeurons.push_back(pn1);
+		neuronNum++;
 	}
 
-	return (Neuron*) pn1;
+	return pn1;
+}
+
+template<class Neuron>
+Population<Neuron>* Network::createPopulation(Neuron n1, unsigned int num)
+{
+	Population<Neuron> * pp1 = new Population<Neuron>(n1, num);
+	if (find(pPopulations.begin(), pPopulations.end(), pp1) == pPopulations.end()) {
+		pPopulations.push_back(pp1);
+		populationNum++;
+		neuronNum += pp1->getNum();
+	}
+
+	return pp1;
 }
 
 template<class Neuron>
@@ -67,9 +91,13 @@ int Network::connect(Population<Neuron> *pSrc, Population<Neuron> *pDst, real *w
 	}	
 	if (find(pPopulations.begin(), pPopulations.end(), pSrc) == pPopulations.end()) {
 		pPopulations.push_back(pSrc);
+		populationNum++;
+		neuronNum += pSrc->getNum();
 	}
 	if (find(pPopulations.begin(), pPopulations.end(), pDst) == pPopulations.end()) {
 		pNeurons.push_back(pDst);
+		populationNum++;
+		neuronNum += pDst->getNum();
 	}
 
 	int count = 0;

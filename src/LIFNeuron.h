@@ -8,30 +8,6 @@
 #include <stdio.h>
 #include "NeuronBase.h"
 
-struct GLIFNeuron {
-	ID id;
-	NeuronType type;
-	real v_init;
-	real v_rest;
-	real v_reset;
-	real cm;
-	real tau_m;
-	real tau_refrac;
-	real tau_syn_E;
-	real tau_syn_I;
-	real v_thresh;
-	real i_offset;
-	real i_syn;
-	real vm;
-	real _dt;
-	real C1;
-	real C2;
-	real i_tmp;
-	int refrac_step;
-	int size;
-	ID *synapse;
-};
-
 class LIFNeuron : public NeuronBase {
 public:
 	LIFNeuron(ID id, real v_init, real v_rest, real v_reset, real cm, real tau_m, real tau_refrac, real tau_syn_E, real tau_syn_I, real v_thresh, real i_offset);
@@ -39,15 +15,15 @@ public:
 	~LIFNeuron();
 
 	ID getID();
-	int init(real dt);
-	int update();
-	real get_vm();
-	void monitor();
-	bool is_fired();
-	size_t getSize();
-	int recv(real I);
-	int reset(real dt);
-	size_t hardCopy(void * data);
+	virtual int init(real dt);
+	virtual int update();
+	virtual real get_vm();
+	virtual void monitor();
+	virtual bool is_fired();
+	virtual size_t getSize();
+	virtual int recv(real I);
+	virtual int reset(real dt);
+	virtual unsigned int hardCopy(void * data, unsigned int idx);
 protected:
 	ID id;
 	NeuronType type;

@@ -5,7 +5,7 @@
 #ifndef IDPOOL_H
 #define IDPOOL_H
 
-#include "../ID.h"
+#include "ID.h"
 
 class IDPool {
 public:

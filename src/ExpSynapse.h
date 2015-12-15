@@ -12,20 +12,6 @@
 
 using std::list;
 
-struct GExpSynapse {
-	SpikeType type;
-	real weight;
-	real delay;
-	real C1;
-	real _C1;
-	real tau_syn;
-	real I_syn;
-	real _dt;
-	ID id;
-	ID src;
-	ID dst;
-};
-
 class ExpSynapse : public SynapseBase {
 public:
 	ID getID();
@@ -36,7 +22,7 @@ public:
 	virtual size_t getSize();
 	virtual int reset(real dt);
 	virtual void setDst(NeuronBase *p);
-	virtual size_t hardCopy(void *data);
+	virtual unsigned int hardCopy(void *data, unsigned int idx);
 
 	ExpSynapse(ID id, real weight, real delay, real tau_syn);
 	~ExpSynapse(); 
