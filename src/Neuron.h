@@ -7,7 +7,7 @@
 
 #include "NeuronBase.h"
 #include "LIFNeuron.h"
-#include "GLIFNeuron.h"
+#include "GLIFNeurons.h"
 #include "IF_curr_exp.h"
 
 #endif /* NEURON_H */

@@ -7,7 +7,7 @@
 #include <math.h>
 
 #include "LIFNeuron.h"
-#include "GLIFNeuron.h"
+#include "GLIFNeurons.h"
 
 using std::vector;
 

@@ -12,7 +12,7 @@ public:
 	SimulatorBase(Network* network, real dt);
 	virtual ~SimulatorBase();
 	virtual int run(real time) = 0;
-	virtual int reset() = 0;
+	virtual int reset();
 protected:
 	Network* network;
 	real dt;

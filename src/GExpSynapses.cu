@@ -3,28 +3,8 @@
  * Mon December 14 2015
  */
 
-#include "stdlib.h"
-
 #include "utils/cuda/helper_cuda.h"
 #include "GExpSynapses.h"
-
-int GExpSynapses::allocSynapses(unsigned int S)
-{
-	num = S;
-	pID = (ID*)malloc(S*sizeof(ID));
-	pType = (SpikeType*)malloc(S*sizeof(SpikeType));
-	p_weight = (real*)malloc(S*sizeof(real));
-	p_delay = (real*)malloc(S*sizeof(real));
-	p_C1 = (real*)malloc(S*sizeof(real));
-	p__C1 = (real*)malloc(S*sizeof(real));
-	p_tau_syn = (real*)malloc(S*sizeof(real));
-	p_I_syn = (real*)malloc(S*sizeof(real));
-	p__dt = (real*)malloc(S*sizeof(real));
-	pSrc = (unsigned int *)malloc(S*sizeof(unsigned int));
-	pDst = (unsigned int *)malloc(S*sizeof(unsigned int));
-
-	return 0;
-}
 
 int GExpSynapses::allocGSynapses(GExpSynapses *pGpuSynapses)
 {

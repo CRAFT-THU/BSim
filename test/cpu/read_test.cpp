@@ -3,7 +3,7 @@
  * Mon November 23 2015
  */
 
-#include "../include/SNNsim.h"
+#include "../../include/SNNsim.h"
 #include <iostream>
 
 using namespace std;

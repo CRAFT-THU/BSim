@@ -5,6 +5,16 @@
 
 #include "SimulatorBase.h"
 
+SimulatorBase::SimulatorBase(Network* network, real dt)
+{
+	this->network = network;
+	this->dt = dt;
+}
+
+SimulatorBase::~SimulatorBase()
+{
+}
+
 int SimulatorBase::reset()
 {
 	vector<SynapseBase*>::iterator iterS;

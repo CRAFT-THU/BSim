@@ -12,8 +12,6 @@ public:
 	SingleGPUSimulator(Network *network, real dt);
 	~SingleGPUSimulator();
 	virtual int run(real time);
-	virtual int reset();
-	virtual PlainNetwork* copyDataToGPU(PlainNetwork * pCpuNet);
 };
 
 #endif /* SINGLEGPUSIMULATOR_H */

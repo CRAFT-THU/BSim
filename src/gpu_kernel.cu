@@ -126,13 +126,19 @@ __global__ void update_lif_neuron(GLIFNeurons *d_neurons, int num, unsigned int 
 	__syncthreads();
 }
 
-__global__ void update_alpha_synapse(GAlphaSynapses *d_synapses, unsigned int num, unsigned int simTime)
+__global__ void update_alpha_synapse(GLIFNeurons *d_neurons, GAlphaSynapses *d_synapses, unsigned int num, unsigned int simTime)
 {
 	int tid = blockIdx.x * blockDim.x + threadIdx.x;
 	int sid = tid;
 	if (sid < num) {
 		d_synapses->p_I_syn[sid] = d_synapses->p_C1[sid] * d_synapses->p_I_syn[sid] + d_synapses->p_C2[sid] * d_synapses->p_I_tmp[sid];
 		d_synapses->p_I_tmp[sid] *= d_synapses->p_C1[sid];
+	}
+	__syncthreads();
+	if (sid < num) {
+		if (gSynapsesFiredTable[sid]) {
+			atomicAdd(&(d_neurons->p_vm[d_synapses->pDst[sid]]), d_synapses->p_I_syn[sid]);
+		}
 	}
 	__syncthreads();
 }

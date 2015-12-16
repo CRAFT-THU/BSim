@@ -12,7 +12,6 @@ public:
 	SingleThreadSimulator(Network *network, real dt);
 	~SingleThreadSimulator();
 	virtual int run(real time);
-	virtual int reset();
 };
 
 #endif /* SINGLETHREADSIMULATOR_H */

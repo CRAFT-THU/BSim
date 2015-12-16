@@ -100,7 +100,7 @@ PlainNetwork* Network::buildNetwrok()
 	GExpSynapses *pGExp = (GExpSynapses*)malloc(sizeof(GExpSynapses));
 	pGLIF->allocNeurons(neuronNum);
 	pGLIF->allocConnects(synapseNum);
-	pGExp->allocSynapses(synapseNum);
+	pGExp->allocSynapses(synapseNum)
 
 	unsigned int idx = 0;
 	for (piter = pPopulations.begin(); piter != pPopulations.end();  piter++) {
