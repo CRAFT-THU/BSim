@@ -42,3 +42,26 @@ int GAlphaSynapses::allocGSynapses(GAlphaSynapses *pGpuSynapses)
 
 	return 0;
 }
+
+int freeGSynapses(GAlphaSynapses *pGpuSynapses)
+{
+	checkCudaErrors(cudaFree(pGpuSynapses->pID));
+
+	checkCudaErrors(cudaFree(pGpuSynapses->pType));
+
+	checkCudaErrors(cudaFree(pGpuSynapses->p_weight));
+	checkCudaErrors(cudaFree(pGpuSynapses->p_delay));
+	checkCudaErrors(cudaFree(pGpuSynapses->p_C1));
+	checkCudaErrors(cudaFree(pGpuSynapses->p_C2));
+	checkCudaErrors(cudaFree(pGpuSynapses->p__C1));
+	checkCudaErrors(cudaFree(pGpuSynapses->p__C2));
+	checkCudaErrors(cudaFree(pGpuSynapses->p_tau_syn));
+	checkCudaErrors(cudaFree(pGpuSynapses->p_I_syn));
+	checkCudaErrors(cudaFree(pGpuSynapses->p_I_tmp));
+	checkCudaErrors(cudaFree(pGpuSynapses->p__dt));
+
+	checkCudaErrors(cudaFree(pGpuSynapses->pSrc));
+	checkCudaErrors(cudaFree(pGpuSynapses->pDst));
+
+	return 0;
+}

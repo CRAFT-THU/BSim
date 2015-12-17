@@ -19,7 +19,7 @@ CPUOBJ += $(patsubst %.c,${OBJ_DIR}/%.c.o,$(notdir ${CFILES})) $(patsubst %.cpp,
 GPUOBJ += $(patsubst %.c,${OBJ_DIR}/%.c.o,$(notdir ${CFILES})) $(patsubst %.cu,${OBJ_DIR}/%.cu.o,$(notdir ${CUFILES})) $(patsubst %.cpp,${OBJ_DIR}/%.cpp.o,$(notdir ${CXXFILES}))
 
 CFLAGS = -g -Wall -std=c++11
-CUFLAGS = -g -std=c++11
+CUFLAGS = -g -G -std=c++11
 
 .PHONY: default all clean test
 

@@ -38,4 +38,6 @@ struct GLIFNeurons {
 	int allocGNeurons(GLIFNeurons * pGpuNeurons);
 };
 
+int freeGNeurons(GLIFNeurons * pGpuNeurons);
+
 #endif /* GLIFNEURON_H */

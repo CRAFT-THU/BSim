@@ -28,5 +28,7 @@ struct GAlphaSynapses {
 	int allocGSynapses(GAlphaSynapses *pGpuSynapses);
 };
 
+int freeGSynapses(GAlphaSynapses *pGpuSynapses);
+
 #endif /* GALPHASYNAPSES_H */
 

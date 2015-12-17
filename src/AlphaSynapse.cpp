@@ -55,9 +55,6 @@ int AlphaSynapse::update()
 	I_tmp *= C1;
 
 	list<int>::iterator iter;
-	for (iter = delay_step.begin(); iter != delay_step.end(); iter++) {
-		*iter = *iter - 1;
-	}
 
 	if (!delay_step.empty() && delay_step.front() <= 0) {
 		double I_t = _C2 * I_syn + _C2 * I_tmp;
@@ -67,12 +64,16 @@ int AlphaSynapse::update()
 		delay_step.pop_front();
 	}
 
+	for (iter = delay_step.begin(); iter != delay_step.end(); iter++) {
+		*iter = *iter - 1;
+	}
+
 	return 0;
 }
 
 int AlphaSynapse::recv()
 {
-	delay_step.push_back((int) delay/_dt + 1);
+	delay_step.push_back((unsigned int)(delay/_dt));
 
 	return 0;
 }

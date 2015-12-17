@@ -48,6 +48,10 @@ int ExpSynapse::init(real dt) {
 		return -1;
 	}
 
+	printf("W: %f, D: %f, T:%f\n", weight, delay, tau_syn);
+	printf("C1: %f, ", C1);
+	printf("dt: %f\n", dt);
+
 	return 0;
 }
 
@@ -56,21 +60,23 @@ int ExpSynapse::update()
 	I_syn = C1 * I_syn;
 	
 	list<int>::iterator iter;
-	for (iter = delay_step.begin(); iter != delay_step.end(); iter++) {
-		*iter = *iter - 1;
-	}
 
 	while (!delay_step.empty() && (delay_step.front() <= 0)) {
 		I_syn += weight/_C1;
 		pDest->recv(I_syn);
 		delay_step.pop_front();
 	}
+
+	for (iter = delay_step.begin(); iter != delay_step.end(); iter++) {
+		*iter = *iter - 1;
+	}
+
 	return 0;
 }
 
 int ExpSynapse::recv()
 {
-	delay_step.push_back((int) delay/_dt + 1);
+	delay_step.push_back((unsigned int)(delay/_dt));
 
 	return 0;
 }

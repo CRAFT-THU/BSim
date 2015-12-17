@@ -32,18 +32,30 @@ int SingleThreadSimulator::run(real time)
 		for (iterP=network->pPopulations.begin(); iterP!=network->pPopulations.end(); iterP++) {
 			PopulationBase * p = *iterP;
 			p->update();
-			p->monitor();
 		}
 
 		for (iterN=network->pNeurons.begin(); iterN!=network->pNeurons.end(); iterN++) {
 			NeuronBase * p = *iterN;
 			p->update();
-			p->monitor();
 		}
 
 		for (iterS=network->pSynapses.begin(); iterS!=network->pSynapses.end(); iterS++) {
 			SynapseBase *p = *iterS;
 			p->update();
+		}
+
+		for (iterP=network->pPopulations.begin(); iterP!=network->pPopulations.end(); iterP++) {
+			PopulationBase * p = *iterP;
+			p->monitor();
+		}
+
+		for (iterN=network->pNeurons.begin(); iterN!=network->pNeurons.end(); iterN++) {
+			NeuronBase * p = *iterN;
+			p->monitor();
+		}
+
+		for (iterS=network->pSynapses.begin(); iterS!=network->pSynapses.end(); iterS++) {
+			SynapseBase *p = *iterS;
 			p->monitor();
 		}
 	}

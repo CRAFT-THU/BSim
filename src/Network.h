@@ -26,7 +26,7 @@ struct PlainNetwork {
 	//size_t populationSize;
 	unsigned int neuronNum;
 	unsigned int synapseNum;
-	unsigned int MAX_DELAY;
+	real MAX_DELAY;
 };
 
 class Network {

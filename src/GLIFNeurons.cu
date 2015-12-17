@@ -61,3 +61,33 @@ int GLIFNeurons::allocGNeurons(GLIFNeurons * pGpuNeurons)
 	return 0;
 }
 
+int freeGNeurons(GLIFNeurons * pGpuNeurons)
+{
+	checkCudaErrors(cudaFree(pGpuNeurons->pID));
+	checkCudaErrors(cudaFree(pGpuNeurons->pType));
+
+	checkCudaErrors(cudaFree(pGpuNeurons->p_v_init));
+	checkCudaErrors(cudaFree(pGpuNeurons->p_v_rest));
+	checkCudaErrors(cudaFree(pGpuNeurons->p_v_reset));
+	checkCudaErrors(cudaFree(pGpuNeurons->p_cm));
+	checkCudaErrors(cudaFree(pGpuNeurons->p_tau_m));
+	checkCudaErrors(cudaFree(pGpuNeurons->p_tau_refrac));
+	checkCudaErrors(cudaFree(pGpuNeurons->p_tau_syn_E));
+	checkCudaErrors(cudaFree(pGpuNeurons->p_tau_syn_I));
+	checkCudaErrors(cudaFree(pGpuNeurons->p_v_thresh));
+	checkCudaErrors(cudaFree(pGpuNeurons->p_i_offset));
+	checkCudaErrors(cudaFree(pGpuNeurons->p_i_syn));
+	checkCudaErrors(cudaFree(pGpuNeurons->p_vm));
+	checkCudaErrors(cudaFree(pGpuNeurons->p__dt));
+	checkCudaErrors(cudaFree(pGpuNeurons->p_C1));
+	checkCudaErrors(cudaFree(pGpuNeurons->p_C2));
+	checkCudaErrors(cudaFree(pGpuNeurons->p_i_tmp));
+
+	checkCudaErrors(cudaFree(pGpuNeurons->p_refrac_step));
+
+	checkCudaErrors(cudaFree(pGpuNeurons->pSynapsesNum));
+	checkCudaErrors(cudaFree(pGpuNeurons->pSynapsesLoc));
+	checkCudaErrors(cudaFree(pGpuNeurons->pSynapsesIdx));
+
+	return 0;
+}
