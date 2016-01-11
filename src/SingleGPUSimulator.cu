@@ -78,7 +78,7 @@ int SingleGPUSimulator::run(real time)
 	printf("Start runing for %d cycles\n", sim_cycle);
 	for (unsigned int time=0; time<sim_cycle; time++) {
 		printf("\rCycle: %d", time);
-		update_lif_neuron<<<1, 2, 0>>>((GLIFNeurons*)c_pGpuNet->pNeurons, c_pGpuNet->neuronNum, time);
+		update_lif_neuron<<<3, 2, 0>>>((GLIFNeurons*)c_pGpuNet->pNeurons, c_pGpuNet->neuronNum, time);
 		update_pre_synapse<<<1, 1, 0>>>((GLIFNeurons*)c_pGpuNet->pNeurons, (GExpSynapses*)c_pGpuNet->pSynapses, time);
 		update_exp_synapse<<<1, 1, 0>>>((GLIFNeurons*)c_pGpuNet->pNeurons, (GExpSynapses*)c_pGpuNet->pSynapses, c_pGpuNet->synapseNum, time);
 

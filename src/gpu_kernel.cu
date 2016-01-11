@@ -111,25 +111,26 @@ __global__ void update_lif_neuron(GLIFNeurons *d_neurons, int num, unsigned int 
 	__syncthreads();
 
 	bool fired = false;
-	int tid = blockIdx.x * blockDim.x + threadIdx.x;
-	int nid = tid;
-	if (nid < num) {
-		real I = d_neurons->p_i_syn[nid] + d_neurons->p_i_tmp[nid];
-		d_neurons->p_vm[nid] = d_neurons->p_vm[nid] * d_neurons->p_C1[nid] + d_neurons->p_C2[nid] * I;
-		d_neurons->p_i_syn[nid] = 0;
+	unsigned int tid = blockIdx.x * blockDim.x + threadIdx.x;
+	unsigned int nid = 0;
+	for (unsigned int idx = tid; idx < num; idx +=blockDim.x*gridDim.x) {
+		nid = idx;
+		if (nid < num) {
+			real I = d_neurons->p_i_syn[nid] + d_neurons->p_i_tmp[nid];
+			d_neurons->p_vm[nid] = d_neurons->p_vm[nid] * d_neurons->p_C1[nid] + d_neurons->p_C2[nid] * I;
+			d_neurons->p_i_syn[nid] = 0;
 
-		if (d_neurons->p_refrac_step[nid] > 0) {
-			d_neurons->p_refrac_step[nid] --;
-			d_neurons->p_vm[nid] = 0;
+			if (d_neurons->p_refrac_step[nid] > 0) {
+				d_neurons->p_refrac_step[nid] --;
+				d_neurons->p_vm[nid] = 0;
+			}
+
+			if (d_neurons->p_vm[nid] >= d_neurons->p_v_thresh[nid]) {
+				fired = true;
+				//d_neurons[nid].refrac_step = (int)(d_neurons[nid].tau_refrac/d_neurons[nid]._dt) - 1;
+				//d_neurons[nid].vm = d_neurons[nid].v_reset;
+			}
 		}
-
-		if (d_neurons->p_vm[nid] >= d_neurons->p_v_thresh[nid]) {
-			fired = true;
-			//d_neurons[nid].refrac_step = (int)(d_neurons[nid].tau_refrac/d_neurons[nid]._dt) - 1;
-			//d_neurons[nid].vm = d_neurons[nid].v_reset;
-		}
-
-
 	}
 	__syncthreads();
 
@@ -154,8 +155,8 @@ __global__ void update_lif_neuron(GLIFNeurons *d_neurons, int num, unsigned int 
 
 __global__ void update_alpha_synapse(GLIFNeurons *d_neurons, GAlphaSynapses *d_synapses, unsigned int num, unsigned int simTime)
 {
-	int tid = blockIdx.x * blockDim.x + threadIdx.x;
-	int sid = tid;
+	unsigned int tid = blockIdx.x * blockDim.x + threadIdx.x;
+	unsigned int sid = tid;
 	if (sid < num) {
 		d_synapses->p_I_syn[sid] = d_synapses->p_C1[sid] * d_synapses->p_I_syn[sid] + d_synapses->p_C2[sid] * d_synapses->p_I_tmp[sid];
 		d_synapses->p_I_tmp[sid] *= d_synapses->p_C1[sid];
@@ -175,8 +176,8 @@ __global__ void update_alpha_synapse(GLIFNeurons *d_neurons, GAlphaSynapses *d_s
 
 __global__ void update_exp_synapse(GLIFNeurons *d_neurons, GExpSynapses *d_synapses, unsigned int num, unsigned int simTime)
 {
-	int tid = blockIdx.x * blockDim.x + threadIdx.x;
-	int sid = tid;
+	unsigned int tid = blockIdx.x * blockDim.x + threadIdx.x;
+	unsigned int sid = tid;
 	if (sid < num) {
 		d_synapses->p_I_syn[sid] *= d_synapses->p_C1[sid];
 	}

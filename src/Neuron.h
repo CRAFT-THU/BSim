@@ -6,6 +6,7 @@
 #define NEURON_H
 
 #include "NeuronBase.h"
+#include "PossionNeuron.h"
 #include "LIFNeuron.h"
 #include "GLIFNeurons.h"
 #include "IF_curr_exp.h"

@@ -16,6 +16,7 @@ IF_curr_exp::IF_curr_exp(const IF_curr_exp &neuron, ID id) : LIFNeuron(id, neuro
 
 IF_curr_exp::~IF_curr_exp()
 {
+	pSynapses.clear();
 }
 
 SynapseBase* IF_curr_exp::addSynapse(real weight, real delay, SpikeType type, NeuronBase *pDest)
