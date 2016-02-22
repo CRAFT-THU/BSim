@@ -13,7 +13,7 @@ COBJ = $(patsubst %.cpp,${OBJ_DIR}/%.cpu.o,$(notdir ${CFILES}))
 GOBJ = $(patsubst %.cpp,${OBJ_DIR}/%.gpu.o,$(notdir ${GFILES}))
 BIN_TARGET = $(patsubst %.cpp,${BIN_DIR}/%.cpu.out,$(notdir ${CFILES})) $(patsubst %.cpp,${BIN_DIR}/%.gpu.out,$(notdir ${GFILES}))
 
-CFLAGS =  -g -Wall
+CFLAGS =  -g -Wall -std=c++11
 
 .PHONY: default all clean
 

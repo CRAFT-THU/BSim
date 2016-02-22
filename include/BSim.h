@@ -5,6 +5,9 @@
 #ifndef SNNSIM_H
 #define SNNSIM_H
 
+#include "../src/Generator.h"
+#include "../src/SNNReader.h"
+#include "../src/SNNWriter.h"
 #include "../src/Simulator.h"
 
 #endif /* SNNSIM_H */

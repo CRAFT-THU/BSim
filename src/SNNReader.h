@@ -5,7 +5,13 @@
 #ifndef SNNREADER_H
 #define SNNREADER_H
 
+#include <string>
 
+#include "Network.h"
+
+using std::string;
+
+Network * readNetwork(string filename);
+int readInput(Network *network, string filename);
 
 #endif /* SNNREADER_H */
-

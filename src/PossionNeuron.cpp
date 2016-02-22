@@ -21,9 +21,10 @@ double uRandom()
 PossionNeuron::PossionNeuron(ID id, double rate, double refract, double startTime)
 	:m_rate(rate), m_refract(refract), m_startTime(startTime), m_id(id)
 {
+	file = NULL;
 	fired = false;
+	monitored = false;
 	m_fireCycle= 0;
-	m_currCycle = 0;
 	m_startCycle = 0;
 }
 
@@ -32,12 +33,11 @@ PossionNeuron::~PossionNeuron()
 	pSynapses.clear();
 }
 
-int PossionNeuron::reset(real dt)
+int PossionNeuron::reset(SimInfo &info)
 {
 	fired = false;
-	_dt = dt;
-	m_currCycle = 0;
-	m_startCycle = m_startTime/dt;
+	_dt = info.dt;
+	m_startCycle = m_startTime/info.dt;
 	m_fireCycle = m_startCycle;
 	return 0;
 }
@@ -67,11 +67,10 @@ ID PossionNeuron::getID()
 	return m_id;
 }
 
-int PossionNeuron::update()
+int PossionNeuron::update(SimInfo &info)
 {
 	fired = false;
-	m_currCycle++;
-	if (m_currCycle == m_fireCycle && m_currCycle > m_startCycle) {
+	if (info.currCycle == m_fireCycle && info.currCycle > m_startCycle) {
 		fired = true;
 		m_fireCycle = possion(m_fireCycle);
 		fire();
@@ -79,12 +78,25 @@ int PossionNeuron::update()
 	return 0;
 }
 
-void PossionNeuron::monitor()
+void PossionNeuron::monitorOn()
 {
+	monitored = true;
+}
+
+void PossionNeuron::monitor(SimInfo &info)
+{
+	if (monitored) {
+		if (file == NULL) {
+			char filename[128];
+			sprintf(filename, "PossionNeuron_%d_%d.log", this->m_id.groupId, this->m_id.id);
+			file = fopen(filename, "w+");
+		}
+		fprintf(file, "%d\n", (int)this->fired); 
+	}
 	return;
 }
 
-bool PossionNeuron::is_fired()
+bool PossionNeuron::isFired()
 {
 	return fired;
 }

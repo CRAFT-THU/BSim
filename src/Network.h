@@ -8,26 +8,17 @@
 #include <vector>
 #include <map>
 #include <algorithm>
+
 #include "Neuron.h"
 #include "Synapse.h"
 #include "Population.h"
+#include "GNetwork.h"
 
 using std::map;
 using std::pair;
 using std::find;
 using std::vector;
 
-struct PlainNetwork {
-	void *pNeurons;
-	void *pSynapses;
-	//void *pPopulations;
-	//size_t neuronSize;
-	//size_t synapseSize;
-	//size_t populationSize;
-	unsigned int neuronNum;
-	unsigned int synapseNum;
-	real MAX_DELAY;
-};
 
 class Network {
 public:
@@ -37,19 +28,23 @@ public:
 	template<class Neuron>
 	Neuron* create(Neuron n1);
 	template<class Neuron>
-	Population<Neuron>* createPopulation(Neuron n1, unsigned int num);
+	Population<Neuron>* createPopulation(ID id, unsigned int num, Neuron templ);
 	template<class Neuron>
 	int connect(Population<Neuron> *pSrc, Population<Neuron> *pDst, real *weight, real *delay, SpikeType *type, int size);
 	
 	int connect(NeuronBase *pSrc, NeuronBase *pDst, real weight, real delay, SpikeType type, bool store = true);
-	PlainNetwork* buildNetwrok();
+	int connect(unsigned int populationIDSrc, unsigned int neuronIDSrc, unsigned int populationIDDst, unsigned int neuronIDDst, real weight, real delay);
+	GNetwork* buildNetwrok();
+
+	int addMonitor(unsigned int populationIDSrc, unsigned int neuronIDSrc);
+	NeuronBase* findNeuron(unsigned int populationIDSrc, unsigned int neuronIDSrc);
 
 //protected:
 	vector<PopulationBase*> pPopulations;
 	vector<NeuronBase*> pNeurons;
 	vector<SynapseBase*> pSynapses;
 	map<ID, vector<ID> > n2sNetwork;
-	map<ID, ID > s2nNetwork;
+	map<ID, ID> s2nNetwork;
 	real maxDelay;
 	real maxFireRate;
 	unsigned int populationNum;
@@ -70,9 +65,9 @@ Neuron* Network::create(Neuron n1)
 }
 
 template<class Neuron>
-Population<Neuron>* Network::createPopulation(Neuron n1, unsigned int num)
+Population<Neuron>* Network::createPopulation(ID id, unsigned int num, Neuron tmpl)
 {
-	Population<Neuron> * pp1 = new Population<Neuron>(n1, num);
+	Population<Neuron> * pp1 = new Population<Neuron>(id, num);
 	if (find(pPopulations.begin(), pPopulations.end(), pp1) == pPopulations.end()) {
 		pPopulations.push_back(pp1);
 		populationNum++;

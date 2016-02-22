@@ -10,12 +10,16 @@
 struct ID {
 public:
 	ID();
+	ID(int _groupId, unsigned int _id);
+	ID(unsigned int _id);
 	ID(const ID &id);
 	~ID();
 	bool operator==(const ID &id1)const; 
 	bool operator<(const ID &id1)const; 
 
-	int id;
+//private:
+	int groupId;
+	unsigned int id;
 };
 
 #endif /* ID_H */

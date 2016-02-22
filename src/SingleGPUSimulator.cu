@@ -18,8 +18,8 @@ SingleGPUSimulator::~SingleGPUSimulator()
 {
 }
 
-PlainNetwork* copyDataToGPU(PlainNetwork *);
-int freeGPUData(PlainNetwork *);
+GNetwork* copyDataToGPU(GNetwork *);
+int freeGPUData(GNetwork *);
 
 int SingleGPUSimulator::run(real time)
 {
@@ -29,7 +29,7 @@ int SingleGPUSimulator::run(real time)
 
 	reset();
 
-	PlainNetwork *pCpuNet = network->buildNetwrok();
+	GNetwork *pCpuNet = network->buildNetwrok();
 	real * c_n_vm = (real*)malloc(sizeof(real)*pCpuNet->neuronNum);
 	real * c_s_vm = (real*)malloc(sizeof(real)*pCpuNet->synapseNum);
 	FILE **fileN = (FILE**)malloc(sizeof(FILE*)*pCpuNet->neuronNum);
@@ -44,7 +44,7 @@ int SingleGPUSimulator::run(real time)
 		fileS[i] = fopen(filename, "w+");
 	}
 
-	PlainNetwork *c_pGpuNet = copyDataToGPU(pCpuNet);
+	GNetwork *c_pGpuNet = copyDataToGPU(pCpuNet);
 	unsigned int *c_gTimeTable = NULL;
 	unsigned int *c_gFiredTable = NULL;
 	bool *c_gSynapsesFiredTable = NULL;
@@ -116,10 +116,10 @@ int SingleGPUSimulator::run(real time)
 	return 0;
 }
 
-PlainNetwork* copyDataToGPU(PlainNetwork *pCpuNet)
+GNetwork* copyDataToGPU(GNetwork *pCpuNet)
 {
-	PlainNetwork *tmpNet = (PlainNetwork*)malloc(sizeof(PlainNetwork));
-	memcpy(tmpNet, pCpuNet, sizeof(PlainNetwork));
+	GNetwork *tmpNet = (GNetwork*)malloc(sizeof(GNetwork));
+	memcpy(tmpNet, pCpuNet, sizeof(GNetwork));
 
 	GLIFNeurons *pN = (GLIFNeurons*)pCpuNet->pNeurons;
 	GExpSynapses *pS = (GExpSynapses*)pCpuNet->pSynapses;
@@ -149,7 +149,7 @@ PlainNetwork* copyDataToGPU(PlainNetwork *pCpuNet)
 }
 
 
-int freeGPUData(PlainNetwork *pGpuNet)
+int freeGPUData(GNetwork *pGpuNet)
 {
 	GLIFNeurons *pN = (GLIFNeurons*)pGpuNet->pNeurons;
 	GExpSynapses *pS = (GExpSynapses*)pGpuNet->pSynapses;

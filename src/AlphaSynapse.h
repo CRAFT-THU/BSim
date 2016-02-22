@@ -16,10 +16,14 @@ public:
 	ID getID();
 	int init(real dt);
 	virtual int recv();
-	virtual int update();
-	virtual void monitor();
 	virtual size_t getSize();
-	virtual int reset(real dt);
+
+	virtual void monitorOn();
+	virtual int reset(SimInfo &info);
+	virtual int update(SimInfo &info);
+	virtual void monitor(SimInfo &info);
+
+	virtual int getData(void *data);
 	virtual void setDst(NeuronBase *p);
 	virtual unsigned int hardCopy(void *data, unsigned int idx);
 
@@ -39,6 +43,7 @@ protected:
 	real I_tmp;
 	real _dt;
 	ID id;
+	bool monitored;
 	list<int> delay_step;
 	NeuronBase *pDest;
 };

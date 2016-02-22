@@ -3,7 +3,7 @@
  * Tue December 15 2015
  */
 
-#include "../../include/SNNsim.h"
+#include "../../include/BSim.h"
 
 using namespace std;
 

@@ -6,6 +6,7 @@
 #include <math.h>
 #include <cstdio>
 
+#include "utils/json/json.h"
 #include "AlphaSynapse.h"
 #include "GAlphaSynapses.h"
 
@@ -15,6 +16,7 @@ AlphaSynapse::AlphaSynapse(ID id, real weight, real delay = 0.0, real tau_syn = 
 	this->delay = delay;
 	this->tau_syn = tau_syn;
 	this->id = id;
+	this->monitored = false;
 }
 
 AlphaSynapse::~AlphaSynapse()
@@ -26,10 +28,10 @@ void AlphaSynapse::setDst(NeuronBase *p) {
 	pDest = p;
 }
 
-int AlphaSynapse::reset(real dt) {
+int AlphaSynapse::reset(SimInfo &info) {
 	I_syn = 0;
 	I_tmp = 0;
-	init(dt);
+	init(info.dt);
 
 	return 0;
 }
@@ -49,7 +51,7 @@ int AlphaSynapse::init(real dt) {
 	return 0;
 }
 
-int AlphaSynapse::update()
+int AlphaSynapse::update(SimInfo &info)
 {
 	I_syn = C1 * I_syn + C2 * I_tmp;
 	I_tmp *= C1;
@@ -78,7 +80,7 @@ int AlphaSynapse::recv()
 	return 0;
 }
 
-void AlphaSynapse::monitor()
+void AlphaSynapse::monitor(SimInfo &info)
 {
 
 	return;
@@ -92,6 +94,15 @@ size_t AlphaSynapse::getSize()
 ID AlphaSynapse::getID()
 {
 	return id;
+}
+
+int AlphaSynapse::getData(void *data)
+{
+	Json::Value *p = (Json::Value*)data;
+	(*p)["weight"] = weight;
+	(*p)["delay"] = delay;
+
+	return 0;
 }
 
 unsigned int AlphaSynapse::hardCopy(void *data, unsigned int idx)

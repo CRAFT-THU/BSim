@@ -15,13 +15,18 @@ using std::list;
 class ExpSynapse : public SynapseBase {
 public:
 	ID getID();
+
 	int init(real dt);
 	virtual int recv();
-	virtual int update();
-	virtual void monitor();
-	virtual size_t getSize();
-	virtual int reset(real dt);
 	virtual void setDst(NeuronBase *p);
+
+	virtual void monitorOn();
+	virtual int reset(SimInfo &info);
+	virtual int update(SimInfo &info);
+	virtual void monitor(SimInfo &info);
+
+	virtual size_t getSize();
+	virtual int getData(void *data);
 	virtual unsigned int hardCopy(void *data, unsigned int idx);
 
 	ExpSynapse(ID id, real weight, real delay, real tau_syn);
@@ -39,6 +44,7 @@ protected:
 	ID id;
 	list<int> delay_step;
 	NeuronBase *pDest;
+	bool monitored;
 	FILE* file;
 };
 

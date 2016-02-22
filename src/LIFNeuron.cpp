@@ -6,6 +6,7 @@
 #include <vector>
 #include <math.h>
 
+#include "utils/json/json.h"
 #include "LIFNeuron.h"
 #include "GLIFNeurons.h"
 
@@ -17,6 +18,7 @@ LIFNeuron::LIFNeuron(ID id, real v_init, real v_rest, real v_reset, real cm, rea
 	this->i_syn = 0;
 	this->id = id;
 	this->file = NULL;
+	this->monitored = false;
 }
 
 LIFNeuron::LIFNeuron(const LIFNeuron &neuron, ID id)
@@ -44,7 +46,7 @@ LIFNeuron::~LIFNeuron()
 	}
 }
 
-bool LIFNeuron::is_fired()
+bool LIFNeuron::isFired()
 {
 	return fired;
 }
@@ -52,7 +54,10 @@ bool LIFNeuron::is_fired()
 int LIFNeuron::init(real dt)
 {
 	_dt = dt;
-	real rm = cm/tau_m;
+	real rm = 1.0;
+	if (fabs(cm) > 1e-18) {
+		rm = tau_m/cm;
+	}
 	if (tau_m > 0) {
 		C1 = expf(-dt/tau_m);
 		C2 = rm*(1-C1);
@@ -63,19 +68,21 @@ int LIFNeuron::init(real dt)
 
 	if (rm > 0) {
 		i_tmp = i_offset + v_rest/rm;
+	} else {
+		i_tmp = 0;
 	}
 
 	refrac_step = tau_refrac/dt;
 	
-	printf("R: %f, C: %f, T:%f\n", rm, cm, tau_m);
-	printf("C1: %f, C2: %f\n", C1, C2);
-	printf("i_offset: %f, vrest: %f\n", i_offset, v_rest);
-	printf("T_ref: %f, dt: %f\n", tau_refrac, _dt);
+	//printf("R: %f, C: %f, T:%f\n", rm, cm, tau_m);
+	//printf("C1: %f, C2: %f\n", C1, C2);
+	//printf("i_offset: %f, vrest: %f\n", i_offset, v_rest);
+	//printf("T_ref: %f, dt: %f\n", tau_refrac, _dt);
 
 	return 0;
 }
 
-int LIFNeuron::update()
+int LIFNeuron::update(SimInfo &info)
 {
 	fired = false;
 
@@ -114,12 +121,12 @@ int LIFNeuron::recv(real I)
 	return 0;
 }
 
-int LIFNeuron::reset(real dt)
+int LIFNeuron::reset(SimInfo &info)
 {
 	vm = v_init;
 	refrac_step = -1;
 	i_syn = 0;
-	return init(dt);
+	return init(info.dt);
 }
 
 ID LIFNeuron::getID()
@@ -132,14 +139,23 @@ real LIFNeuron::get_vm()
 	return vm;
 }
 
-void LIFNeuron::monitor() 
+void LIFNeuron::monitorOn()
 {
-	if (file == NULL) {
-		char filename[128];
-		sprintf(filename, "Neuron_%d.log", id.id);
-		file = fopen(filename, "w+");
+	monitored = true;
+}
+
+void LIFNeuron::monitor(SimInfo &info) 
+{
+	if (monitored) {
+		if (fired) {
+			if (file == NULL) {
+				char filename[128];
+				sprintf(filename, "Neuron_%d_%d.log", id.groupId, id.id);
+				file = fopen(filename, "w+");
+			}
+			fprintf(file, "%d\n", info.currCycle); 
+		}
 	}
-	fprintf(file, "%lf\n", this->vm); 
 }
 
 size_t LIFNeuron::getSize()
@@ -147,7 +163,26 @@ size_t LIFNeuron::getSize()
 	return sizeof(GLIFNeurons);
 }
 
-unsigned int LIFNeuron::hardCopy(void* data, unsigned int idx)
+int LIFNeuron::getData(void *data)
+{
+	Json::Value *p = (Json::Value *)data;
+
+	(*p)["id"] = id.id;
+	(*p)["v_init"] = v_init;
+	(*p)["v_rest"] = v_rest;
+	(*p)["v_reset"] = v_reset;
+	(*p)["cm"] = cm;
+	(*p)["tau_m"] = tau_m;
+	(*p)["tau_refrac"] = tau_refrac;
+	(*p)["tau_syn_E"] = tau_syn_E;
+	(*p)["tau_syn_I"] = tau_syn_I;
+	(*p)["v_thresh"] = v_thresh;
+	(*p)["i_offset"] = i_offset;
+
+	return 0;
+}
+
+unsigned int LIFNeuron::hardCopy(void *data, unsigned int idx)
 {
 	GLIFNeurons * p = (GLIFNeurons *) data;
 	p->pID[idx] = id;

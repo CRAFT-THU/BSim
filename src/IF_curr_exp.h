@@ -6,6 +6,7 @@
 #define IF_CURR_EXP_H
 
 #include <vector>
+
 #include "LIFNeuron.h"
 #include "ExpSynapse.h"
 

@@ -9,9 +9,22 @@ ID::ID()
 	id = 0;
 }
 
+ID::ID(unsigned int _id)
+{
+	id = _id;
+	groupId = -1;
+}
+
+ID::ID(int _groupId, unsigned int _id)
+{
+	id = _id;
+	groupId = _groupId;
+}
+
 ID::ID(const ID &a)
 {
 	this->id = a.id;
+	this->groupId = a.groupId;
 }
 
 ID::~ID()
@@ -19,9 +32,21 @@ ID::~ID()
 }
 
 bool ID::operator==(const ID &id1)const{  
-	return (id == id1.id);  
+	return ((groupId == id1.groupId) && (id == id1.id));  
 }    
 
+//bool ID::operator==(const unsigned int &id1)const{  
+//	return (id == id1);  
+//}    
+
 bool ID::operator<(const ID &id1)const{  
-	return (id < id1.id);  
+	if (groupId < id1.groupId) {
+		return true;
+	} 
+
+	if ((groupId == id1.groupId) && (id < id1.id)) {
+		return true;
+	}
+
+	return false;
 }    

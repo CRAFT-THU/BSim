@@ -3,14 +3,16 @@
  * Mon November 23 2015
  */
 
-#include "../../include/SNNsim.h"
 #include <iostream>
+
+#include "../../include/BSim.h"
 
 using namespace std;
 
 int main(int argc, char **argv)
 {
-	Network c;
+	Network *net = readNetwork("random_net.json");
+	writeNetwork("write.json", net);
 
 	return 0;
 } 

@@ -10,6 +10,7 @@ IDPool nidPool;
 
 IDPool::IDPool()
 {
+	this->id.groupId = -2;
 	this->id.id = 0;
 }
 

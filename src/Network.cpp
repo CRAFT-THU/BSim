@@ -63,11 +63,102 @@ int Network::connect(NeuronBase *pn1, NeuronBase *pn2, real weight, real delay, 
 		maxDelay = delay;
 	}
 	
-	return 1;
+	return 0;
+}
+
+NeuronBase* Network::findNeuron(unsigned int populationIDSrc, unsigned int neuronIDSrc)
+{
+	PopulationBase *pP= NULL;
+	vector<PopulationBase*>::iterator iter;
+	for (iter = pPopulations.begin(); iter != pPopulations.end(); iter++) {
+		PopulationBase * t = *iter;
+		if (t->getID().id == populationIDSrc) {
+			pP = *iter;
+		}
+		if (pP != NULL) {
+			break;
+		}
+	}
+	if (pP == NULL) {
+		printf("Cann't find population: %d\n", populationIDSrc);
+		return NULL;
+	}
+	NeuronBase *pN = NULL;
+	pN = pP->findNeuron(ID(populationIDSrc, neuronIDSrc));
+	if (pN == NULL) {
+		printf("Cann't find neuron: %d:%d\n", populationIDSrc, neuronIDSrc);
+		return NULL;
+	}
+
+	return pN;
+}
+
+int Network::addMonitor(unsigned int populationIDSrc, unsigned int neuronIDSrc)
+{
+	NeuronBase *pN = findNeuron(populationIDSrc, neuronIDSrc);
+	if (pN == NULL) {
+		printf("Cann't find neuron: %d:%d\n", populationIDSrc, neuronIDSrc);
+		return -1;
+	} else {
+		pN->monitorOn();
+	}
+
+	return 0;
+}
+
+int Network::connect(unsigned int populationIDSrc, unsigned int neuronIDSrc, unsigned int populationIDDst, unsigned int neuronIDDst, real weight, real delay)
+{
+	//PopulationBase *ppSrc = NULL, *ppDst = NULL;
+	//vector<PopulationBase*>::iterator iter;
+	//for (iter = pPopulations.begin(); iter != pPopulations.end(); iter++) {
+	//	PopulationBase * t = *iter;
+	//	if (t->getID().id == populationIDSrc) {
+	//		ppSrc = *iter;
+	//	}
+	//	if (t->getID().id == populationIDDst) {
+	//		ppDst = *iter;
+	//	}
+
+	//	if ((ppSrc != NULL) && (ppDst != NULL)) {
+	//		break;
+	//	}
+	//}
+
+	//if (ppSrc == NULL) {
+	//	printf("Cann't find population: %d\n", populationIDSrc);
+	//	return -1;
+	//}
+
+	//if (ppDst == NULL) {
+	//	printf("Cann't find population: %d\n", populationIDDst);
+	//	return -2;
+	//}
+
+	NeuronBase *pnSrc = NULL, *pnDst = NULL;
+	pnSrc = findNeuron(populationIDSrc, neuronIDSrc);
+	pnDst = findNeuron(populationIDDst, neuronIDDst);
+
+	if (pnSrc == NULL) {
+		printf("Cann't find neuron: %d:%d\n", populationIDSrc, neuronIDSrc);
+		return -1;
+	}
+
+	if (pnDst == NULL) {
+		printf("Cann't find neuron: %d:%d\n", populationIDDst, neuronIDDst);
+		return -2;
+	}
+	
+	SpikeType type = Excitatory;
+	if (delay < 0) {
+		type = Inhibitory;
+	}
+	connect(pnSrc, pnDst, weight, delay, type);
+
+	return 0;
 }
 
 
-PlainNetwork* Network::buildNetwrok()
+GNetwork* Network::buildNetwrok()
 {
 	//size_t populationSize = 0;
 	//size_t neuronSize = 0;
@@ -140,9 +231,9 @@ PlainNetwork* Network::buildNetwrok()
 		pGExp->pDst[idx] = id2idx(pGLIF->pID, neuronNum, s2nIter->second);
 	}
 
-	PlainNetwork * ret = (PlainNetwork*)malloc(sizeof(PlainNetwork));
+	GNetwork * ret = (GNetwork*)malloc(sizeof(GNetwork));
 	if (ret == NULL) {
-		printf("Malloc PlainNetwork failed/n");
+		printf("Malloc GNetwork failed/n");
 		return NULL;
 	}
 

@@ -5,6 +5,7 @@
 
 #include <math.h>
 
+#include "utils/json/json.h"
 #include "ExpSynapse.h"
 #include "GExpSynapses.h"
 
@@ -14,6 +15,7 @@ ExpSynapse::ExpSynapse(ID id, real weight, real delay = 0, real tau_syn = 0)
 	this->delay = delay;
 	this->tau_syn = tau_syn;
 	this->id = id;
+	this->monitored = false;
 	file = NULL;
 }
 
@@ -31,9 +33,9 @@ void ExpSynapse::setDst(NeuronBase *p) {
 	pDest = p;
 }
 
-int ExpSynapse::reset(real dt) {
+int ExpSynapse::reset(SimInfo &info) {
 	I_syn = 0;
-	init(dt);
+	init(info.dt);
 
 	return 0;
 }
@@ -55,7 +57,7 @@ int ExpSynapse::init(real dt) {
 	return 0;
 }
 
-int ExpSynapse::update()
+int ExpSynapse::update(SimInfo &info)
 {
 	I_syn = C1 * I_syn;
 	
@@ -86,14 +88,21 @@ ID ExpSynapse::getID()
 	return id;
 }
 
-void ExpSynapse::monitor()
+void ExpSynapse::monitorOn() 
 {
-	if (file == NULL) {
-		char filename[128];
-		sprintf(filename, "Synapse_%d.log", id.id);
-		file = fopen(filename, "w+");
+	monitored = false;
+}
+
+void ExpSynapse::monitor(SimInfo &info)
+{
+	if (monitored) {
+		if (file == NULL) {
+			char filename[128];
+			sprintf(filename, "Synapse_%d.log", id.id);
+			file = fopen(filename, "w+");
+		}
+		fprintf(file, "%f\n", this->I_syn); 
 	}
-	fprintf(file, "%f\n", this->I_syn); 
 
 	return;
 }
@@ -101,6 +110,15 @@ void ExpSynapse::monitor()
 size_t ExpSynapse::getSize()
 {
 	return sizeof(GExpSynapses);
+}
+
+int ExpSynapse::getData(void *data)
+{
+	Json::Value *p = (Json::Value *)data;
+	(*p)["weight"] = weight;
+	(*p)["delay"] = delay;
+
+	return 0;
 }
 
 unsigned int ExpSynapse::hardCopy(void *data, unsigned int idx)

@@ -6,21 +6,16 @@
 #ifndef SYNAPSEBASE_H
 #define SYNAPSEBASE_H
 
-#include "constant.h"
 #include "NeuronBase.h"
 
-class SynapseBase {
+class SynapseBase : public Base {
 public:
 	virtual ~SynapseBase() = 0;
+	
 
 	virtual int recv() = 0;
-	virtual ID getID() = 0;
-	virtual int update() = 0;
-	virtual void monitor() = 0;
-	virtual size_t getSize() = 0;
-	virtual int reset(real dt) = 0;
+	virtual void monitorOn() = 0;
 	virtual void setDst(NeuronBase *p) = 0;
-	virtual unsigned int hardCopy(void *data, unsigned int idx) = 0;
 };
 
 #endif /* SYNAPSEBASE_H */

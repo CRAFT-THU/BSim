@@ -6,6 +6,7 @@
 #define LIFNEURON_H
 
 #include <stdio.h>
+
 #include "NeuronBase.h"
 
 class LIFNeuron : public NeuronBase {
@@ -15,14 +16,20 @@ public:
 	~LIFNeuron();
 
 	ID getID();
-	virtual int init(real dt);
-	virtual int update();
+
 	virtual real get_vm();
-	virtual void monitor();
-	virtual bool is_fired();
+	virtual int init(real dt);
+
+	virtual void monitorOn();
+	virtual int reset(SimInfo &info);
+	virtual int update(SimInfo &info);
+	virtual void monitor(SimInfo &info);
+
+	virtual bool isFired();
+
 	virtual size_t getSize();
 	virtual int recv(real I);
-	virtual int reset(real dt);
+	virtual int getData(void *data);
 	virtual unsigned int hardCopy(void * data, unsigned int idx);
 protected:
 	ID id;
@@ -45,6 +52,7 @@ protected:
 	real i_tmp;
 	int refrac_step;
 	bool fired;
+	bool monitored;
 	FILE* file;
 };
 
