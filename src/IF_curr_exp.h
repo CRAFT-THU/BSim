@@ -8,7 +8,6 @@
 #include <vector>
 
 #include "LIFNeuron.h"
-#include "ExpSynapse.h"
 
 using std::vector;
 

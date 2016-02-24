@@ -10,12 +10,14 @@
 
 class SynapseBase : public Base {
 public:
+	SynapseBase();
 	virtual ~SynapseBase() = 0;
-	
 
 	virtual int recv() = 0;
 	virtual void monitorOn() = 0;
 	virtual void setDst(NeuronBase *p) = 0;
+private:
+	bool monitored;
 };
 
 #endif /* SYNAPSEBASE_H */

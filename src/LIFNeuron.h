@@ -20,12 +20,10 @@ public:
 	virtual real get_vm();
 	virtual int init(real dt);
 
-	virtual void monitorOn();
 	virtual int reset(SimInfo &info);
 	virtual int update(SimInfo &info);
 	virtual void monitor(SimInfo &info);
 
-	virtual bool isFired();
 
 	virtual size_t getSize();
 	virtual int recv(real I);
@@ -51,8 +49,6 @@ protected:
 	real C2;
 	real i_tmp;
 	int refrac_step;
-	bool fired;
-	bool monitored;
 	FILE* file;
 };
 

@@ -12,15 +12,19 @@ class SynapseBase;
 
 class NeuronBase : public Base {
 public:
+	NeuronBase();
 	virtual ~NeuronBase() = 0;
 
+	virtual void monitorOn();
+
+	virtual bool isFired();
+
 	virtual int fire() = 0;
-	virtual bool isFired() = 0;
-
-	virtual void monitorOn() = 0;
-
 	virtual int recv(real I) = 0;
 	virtual SynapseBase *addSynapse(real weight, real delay, SpikeType type, NeuronBase *dst) = 0;
+protected:
+	bool fired;
+	bool monitored;
 };
 
 #endif /* NEURONBASE_H */

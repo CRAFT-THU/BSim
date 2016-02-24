@@ -5,4 +5,18 @@
 
 #include "NeuronBase.h"
 
+NeuronBase::NeuronBase() 
+{
+	fired = false;
+	monitored = false;
+}
+
 NeuronBase::~NeuronBase() {}
+
+bool NeuronBase::isFired() {
+	return fired;
+}
+
+void NeuronBase::monitorOn() {
+	monitored = true;
+}

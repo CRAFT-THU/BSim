@@ -11,6 +11,9 @@
 #include "./utils/json/json.h"
 #include "SNNReader.h"
 
+//#define NEURONTYPE Nengo_lowpass
+#define NEURONTYPE IF_curr_exp
+
 using std::ifstream;
 
 Json::Value testValue(Json::Value value, unsigned int idx)
@@ -70,10 +73,10 @@ Network * readNetwork(string filename)
 	for (unsigned int i=0; i<populationSize; i++) {
 		unsigned int num = population[i]["size"].asUInt();
 		unsigned int id = population[i]["id"].asUInt();
-		Population<IF_curr_exp> *popu =  res->createPopulation(ID(id), num, IF_curr_exp(ID(0), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
+		Population<NEURONTYPE> *popu =  res->createPopulation(ID(id), num, NEURONTYPE(ID(0), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
 		for (unsigned int j=0; j<num; j++) {
 			Json::Value para = population[i]["parameters"];
-			IF_curr_exp n(ID(id, testValue(para["id"], j).asUInt()), testValue(para["voltage"], j).asDouble(), testValue(para["v_rest"], j).asDouble(), testValue(para["reset"], j).asDouble(), testValue(para["cm"], j).asDouble(), testValue(para["tau_rc"], j).asDouble(), testValue(para["tau_ref"], j).asDouble(), testValue(para["tau_syn_E"], j).asDouble(), testValue(para["tau_syn_I"], j).asDouble(), testValue(para["threshold"], j).asDouble(), testValue(para["bias"], j).asDouble());
+			NEURONTYPE n(ID(id, testValue(para["id"], j).asUInt()), testValue(para["voltage"], j).asDouble(), testValue(para["v_rest"], j).asDouble(), testValue(para["reset"], j).asDouble(), testValue(para["cm"], j).asDouble(), testValue(para["tau_rc"], j).asDouble(), testValue(para["tau_ref"], j).asDouble(), testValue(para["tau_syn_E"], j).asDouble(), testValue(para["tau_syn_I"], j).asDouble(), testValue(para["threshold"], j).asDouble(), testValue(para["bias"], j).asDouble());
 			popu->addNeuron(n);
 		}
 	}

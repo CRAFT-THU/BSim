@@ -48,7 +48,7 @@ int SingleThreadSimulator::run(real time)
 
 	printf("Start runing for %d cycles\n", sim_cycle);
 	for (int cycle=0; cycle<sim_cycle; cycle++) {
-		//printf("\rCycle: %d", cycle);
+		printf("\rCycle: %d", cycle);
 		fflush(stdout);
 
 		info.currCycle = cycle;
@@ -73,18 +73,19 @@ int SingleThreadSimulator::run(real time)
 		//Log info
 		for (iterP=network->pPopulations.begin(); iterP!=network->pPopulations.end(); iterP++) {
 			PopulationBase * p = *iterP;
+			p->monitorOn();
 			p->monitor(info);
 		}
 
-		for (iterN=network->pNeurons.begin(); iterN!=network->pNeurons.end(); iterN++) {
-			NeuronBase * p = *iterN;
-			p->monitor(info);
-		}
+		//for (iterN=network->pNeurons.begin(); iterN!=network->pNeurons.end(); iterN++) {
+		//	NeuronBase * p = *iterN;
+		//	p->monitor(info);
+		//}
 
-		for (iterS=network->pSynapses.begin(); iterS!=network->pSynapses.end(); iterS++) {
-			SynapseBase *p = *iterS;
-			p->monitor(info);
-		}
+		//for (iterS=network->pSynapses.begin(); iterS!=network->pSynapses.end(); iterS++) {
+		//	SynapseBase *p = *iterS;
+		//	p->monitor(info);
+		//}
 
 		int size = info.fired.size();
 		if (size > 0) {

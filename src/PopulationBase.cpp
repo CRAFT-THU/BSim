@@ -5,4 +5,14 @@
 
 #include "PopulationBase.h"
 
+PopulationBase::PopulationBase() 
+{
+	monitored = false;
+}
+
 PopulationBase::~PopulationBase() {}
+
+void PopulationBase::monitorOn()
+{
+	monitored = true;
+}

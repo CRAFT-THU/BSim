@@ -3,6 +3,7 @@
  * Sun October 25 2015
  */
 
+#include "ExpSynapse.h"
 #include "IF_curr_exp.h"
 
 IF_curr_exp::IF_curr_exp(ID id, real v_init, real v_rest, real v_reset, real cm, real tau_m, real tau_refrac, real tau_syn_E, real tau_syn_I, real v_thresh, real i_offset) : LIFNeuron(id, v_init, v_rest, v_reset, cm, tau_m, tau_refrac, tau_syn_E, tau_syn_I, v_thresh, i_offset)

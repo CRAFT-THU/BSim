@@ -8,9 +8,9 @@
 #include "NeuronBase.h"
 #include "PossionNeuron.h"
 #include "InputNeuron.h"
-#include "LIFNeuron.h"
 #include "GLIFNeurons.h"
 #include "IF_curr_exp.h"
+#include "Nengo_lowpass.h"
 
 #endif /* NEURON_H */
 

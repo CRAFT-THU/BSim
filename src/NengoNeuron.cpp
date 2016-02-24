@@ -45,21 +45,15 @@ NengoNeuron::~NengoNeuron()
 	}
 }
 
-bool NengoNeuron::isFired()
-{
-	return fired;
-}
-
 int NengoNeuron::init(real dt)
 {
 	_dt = dt;
-	real rm = 1.0;
 	if (tau_m > 0) {
-		C1 = 1 + expf(-dt/tau_m);
-		C2 = -expf(-dt/tau_m)*rm;
+		C1 = 1 + expm1(-dt/tau_m);
+		C2 = 1-C1;
 	} else {
-		C1 = 1.0f;
-		C2 = 0;
+		C1 = 0;
+		C2 = 1.0f;
 	}
 
 	i_tmp = i_offset;
@@ -124,11 +118,6 @@ ID NengoNeuron::getID()
 real NengoNeuron::get_vm()
 {
 	return vm;
-}
-
-void NengoNeuron::monitorOn()
-{
-	monitored = true;
 }
 
 void NengoNeuron::monitor(SimInfo &info) 

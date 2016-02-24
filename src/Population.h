@@ -83,9 +83,12 @@ NeuronBase* Population<Neuron>::findNeuron(ID id)
 template<class Neuron>
 void Population<Neuron>::monitor(SimInfo &info)
 {
-	typename vector<Neuron>::iterator iter;
-	for (iter = neurons.begin(); iter != neurons.end(); iter++) {
-		iter->monitor(info);
+	if(monitored) {
+		typename vector<Neuron>::iterator iter;
+		for (iter = neurons.begin(); iter != neurons.end(); iter++) {
+			iter->monitorOn();
+			iter->monitor(info);
+		}
 	}
 }
 

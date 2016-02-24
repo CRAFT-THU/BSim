@@ -46,20 +46,15 @@ LIFNeuron::~LIFNeuron()
 	}
 }
 
-bool LIFNeuron::isFired()
-{
-	return fired;
-}
-
 int LIFNeuron::init(real dt)
 {
 	_dt = dt;
 	real rm = 1.0;
-	if (fabs(cm) > 1e-18) {
+	if (fabs(cm) > 1e-10) {
 		rm = tau_m/cm;
 	}
 	if (tau_m > 0) {
-		C1 = expf(-dt/tau_m);
+		C1 = exp(-dt/tau_m);
 		C2 = rm*(1-C1);
 	} else {
 		C1 = 0.0f;
@@ -128,11 +123,6 @@ ID LIFNeuron::getID()
 real LIFNeuron::get_vm()
 {
 	return vm;
-}
-
-void LIFNeuron::monitorOn()
-{
-	monitored = true;
 }
 
 void LIFNeuron::monitor(SimInfo &info) 

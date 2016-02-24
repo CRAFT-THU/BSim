@@ -5,4 +5,14 @@
 
 #include "SynapseBase.h"
 
+SynapseBase::SynapseBase() 
+{
+	monitored = false;
+}
+
 SynapseBase::~SynapseBase() {}
+
+void SynapseBase::monitorOn()
+{
+	monitored = false;
+}

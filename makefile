@@ -5,7 +5,9 @@ OBJ_DIR = $(HOME)/obj
 BIN_DIR = $(HOME)/bin
 LIB_DIR = $(HOME)/lib
 
-TARGET = libsnnsim.a libsnnsim_gpu.a
+CPUTARGET = libsnnsim.a
+GPUTARGET = libsnnsim_gpu.a
+TARGET = $(CPUTARGET) 
 BIN_TARGET = $(foreach tgt, $(TARGET),  $(LIB_DIR)/$(tgt))
 
 SPACE := $(eval) $(eval)
@@ -23,8 +25,12 @@ CUFLAGS = -g -G -std=c++11
 
 .PHONY: default all clean test
 
-default: all test
+default: all
 all: $(BIN_TARGET)
+
+cpu: $(foreach tgt, $(CPUTARGET), $(LIB_DIR)/$(tgt))
+
+gpu: $(foreach tgt, $(GPUTARGET), $(LIB_DIR)/$(tgt))
 
 $(LIB_DIR)/libsnnsim.a: $(CPUOBJ)
 	ar cr $@ $^

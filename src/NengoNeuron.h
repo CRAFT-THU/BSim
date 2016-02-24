@@ -51,8 +51,6 @@ protected:
 	real C2;
 	real i_tmp;
 	int refrac_step;
-	bool fired;
-	bool monitored;
 	FILE* file;
 };
 
