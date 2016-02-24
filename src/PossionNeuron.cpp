@@ -91,7 +91,7 @@ void PossionNeuron::monitor(SimInfo &info)
 			sprintf(filename, "PossionNeuron_%d_%d.log", this->m_id.groupId, this->m_id.id);
 			file = fopen(filename, "w+");
 		}
-		fprintf(file, "%d\n", (int)this->fired); 
+		fprintf(file, "%d\n", m_fireCycle); 
 	}
 	return;
 }

@@ -93,6 +93,19 @@ NeuronBase* Network::findNeuron(unsigned int populationIDSrc, unsigned int neuro
 	return pN;
 }
 
+int Network::addOutput(unsigned int populationIDSrc, unsigned int neuronIDSrc)
+{
+	NeuronBase *pN = findNeuron(populationIDSrc, neuronIDSrc);
+	if (pN == NULL) {
+		printf("Cann't find neuron: %d:%d\n", populationIDSrc, neuronIDSrc);
+		return -1;
+	} else {
+		pOutputs.push_back(pN);
+	}
+
+	return 0;
+}
+
 int Network::addMonitor(unsigned int populationIDSrc, unsigned int neuronIDSrc)
 {
 	NeuronBase *pN = findNeuron(populationIDSrc, neuronIDSrc);

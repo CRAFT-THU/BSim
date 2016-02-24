@@ -5,11 +5,17 @@
 #ifndef SIMINFO_H
 #define SIMINFO_H
 
+#include <vector>
+
+#include "ID.h"
 #include "constant.h"
+
+using std::vector;
 
 struct SimInfo {
 	unsigned int currCycle;
 	real dt;
+	vector<ID> fired;
 };
 
 #endif /* SIMINFO_H */

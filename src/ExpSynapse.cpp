@@ -50,10 +50,6 @@ int ExpSynapse::init(real dt) {
 		return -1;
 	}
 
-	printf("W: %f, D: %f, T:%f\n", weight, delay, tau_syn);
-	printf("C1: %f, ", C1);
-	printf("dt: %f\n", dt);
-
 	return 0;
 }
 
@@ -100,8 +96,15 @@ void ExpSynapse::monitor(SimInfo &info)
 			char filename[128];
 			sprintf(filename, "Synapse_%d.log", id.id);
 			file = fopen(filename, "w+");
+			if (file == NULL) {
+				printf("Open file %s failed\n", filename);
+				return;
+			}
+			fprintf(file, "W: %f, D: %f, T:%f\n", weight, delay, tau_syn);
+			fprintf(file, "C1: %f, ", C1);
+			fprintf(file, "dt: %f\n", _dt);
 		}
-		fprintf(file, "%f\n", this->I_syn); 
+		fprintf(file, "Cycle %d: %f\n", info.currCycle, this->I_syn); 
 	}
 
 	return;

@@ -21,6 +21,11 @@ InputNeuron::~InputNeuron()
 {
 	pSynapses.clear();
 	fireTime.clear();
+	if (file != NULL) {
+		fflush(file);
+		fclose(file);
+		file = NULL;
+	}
 }
 
 int InputNeuron::reset(SimInfo &info)
@@ -65,10 +70,14 @@ int InputNeuron::update(SimInfo &info)
 {
 	fired = false;
 	if (!fireTime.empty()) {
-		if (fireTime.front() == info.currCycle) {
+		while (fireTime.front() <= info.currCycle) {
 			fired = true;
 			fire();
+			info.fired.push_back(this->m_id);
 			fireTime.pop_front();
+			if (fireTime.empty()) {
+				break;
+			}
 		}
 	}
 	return 0;
@@ -82,8 +91,9 @@ void InputNeuron::monitorOn()
 void InputNeuron::monitor(SimInfo &info)
 {
 	if (monitored) {
-		if (fired) {
-			if (file == NULL) {
+		if (file == NULL) {
+			int size = fireTime.size();
+			if (size > 0) {
 				char filename[128];
 				sprintf(filename, "InputNeuron_%d_%d.log", this->m_id.groupId, this->m_id.id);
 				file = fopen(filename, "w+");
@@ -91,8 +101,11 @@ void InputNeuron::monitor(SimInfo &info)
 					printf("Open File: %s failed\n", filename);
 					return;
 				}
+				fprintf(file, "Size: %d\n", size);
+				for (int i=0; i<size; i++) {
+					fprintf(file, "%d\n", fireTime[i]);
+				}
 			}
-			fprintf(file, "%d\n", info.currCycle); 
 		}
 	}
 	return;

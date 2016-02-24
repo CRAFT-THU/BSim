@@ -37,12 +37,14 @@ public:
 	GNetwork* buildNetwrok();
 
 	int addMonitor(unsigned int populationIDSrc, unsigned int neuronIDSrc);
+	int addOutput(unsigned int populationIDSrc, unsigned int neuronIDSrc);
 	NeuronBase* findNeuron(unsigned int populationIDSrc, unsigned int neuronIDSrc);
 
 //protected:
 	vector<PopulationBase*> pPopulations;
 	vector<NeuronBase*> pNeurons;
 	vector<SynapseBase*> pSynapses;
+	vector<NeuronBase*> pOutputs;
 	map<ID, vector<ID> > n2sNetwork;
 	map<ID, ID> s2nNetwork;
 	real maxDelay;

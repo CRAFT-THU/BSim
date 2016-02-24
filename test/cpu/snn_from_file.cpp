@@ -20,8 +20,8 @@ int main(int argc, char **argv)
 
 	double dt = 1.0e-3f;
 
-	STSim s(net, 1.0e-3f);
-	s.run(cycles*dt);
+	STSim s(net, dt);
+	s.run(cycles * dt);
 
 	return 0;
 } 
