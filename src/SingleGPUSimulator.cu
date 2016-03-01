@@ -45,22 +45,22 @@ int SingleGPUSimulator::run(real time)
 	}
 
 	GNetwork *c_pGpuNet = copyDataToGPU(pCpuNet);
-	unsigned int *c_gTimeTable = NULL;
-	unsigned int *c_gFiredTable = NULL;
+	int *c_gTimeTable = NULL;
+	int *c_gFiredTable = NULL;
 	bool *c_gSynapsesFiredTable = NULL;
 
 
-	unsigned int MAX_DELAY = (unsigned int)(pCpuNet->MAX_DELAY/dt);
+	int MAX_DELAY = (int)(pCpuNet->MAX_DELAY/dt);
 	printf("MAX_DELAY: %lf %lf %lf\n", network->maxDelay, pCpuNet->MAX_DELAY, dt);
 	printf("MAX_DELAY: %u\n", MAX_DELAY);
 
 	GLIFNeurons *pN = (GLIFNeurons*)pCpuNet->pNeurons;
 	GExpSynapses *pS = (GExpSynapses*)pCpuNet->pSynapses;
-	checkCudaErrors(cudaMalloc((void**)&c_gTimeTable, sizeof(unsigned int)*(1000+MAX_DELAY+1)));
-	checkCudaErrors(cudaMemset(c_gTimeTable, 0, sizeof(unsigned int)*(1000+MAX_DELAY+1)));
+	checkCudaErrors(cudaMalloc((void**)&c_gTimeTable, sizeof(int)*(1000+MAX_DELAY+1)));
+	checkCudaErrors(cudaMemset(c_gTimeTable, 0, sizeof(int)*(1000+MAX_DELAY+1)));
 	//TODO: need to adapt the length
-	checkCudaErrors(cudaMalloc((void**)&c_gFiredTable, sizeof(unsigned int)*((pN->num)*(MAX_DELAY+1)*1000)));
-	checkCudaErrors(cudaMemset(c_gFiredTable, 0, sizeof(unsigned int)*((pN->num)*(MAX_DELAY+1)*1000)));
+	checkCudaErrors(cudaMalloc((void**)&c_gFiredTable, sizeof(int)*((pN->num)*(MAX_DELAY+1)*1000)));
+	checkCudaErrors(cudaMemset(c_gFiredTable, 0, sizeof(int)*((pN->num)*(MAX_DELAY+1)*1000)));
 	checkCudaErrors(cudaMalloc((void**)&c_gSynapsesFiredTable, sizeof(bool)*(pS->num)));
 	checkCudaErrors(cudaMemset(c_gSynapsesFiredTable, 0, sizeof(bool)*(pS->num)));
 
@@ -76,7 +76,7 @@ int SingleGPUSimulator::run(real time)
 	init_global<<<1, 1, 0>>>(MAX_DELAY, c_gTimeTable, 1000+MAX_DELAY+1, c_gFiredTable, (pN->num)*(MAX_DELAY+1)*1000, c_gSynapsesFiredTable, pS->num);
 
 	printf("Start runing for %d cycles\n", sim_cycle);
-	for (unsigned int time=0; time<sim_cycle; time++) {
+	for (int time=0; time<sim_cycle; time++) {
 		printf("\rCycle: %d", time);
 		update_lif_neuron<<<3, 2, 0>>>((GLIFNeurons*)c_pGpuNet->pNeurons, c_pGpuNet->neuronNum, time);
 		update_pre_synapse<<<1, 1, 0>>>((GLIFNeurons*)c_pGpuNet->pNeurons, (GExpSynapses*)c_pGpuNet->pSynapses, time);

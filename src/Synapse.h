@@ -10,5 +10,7 @@
 #include "ExpSynapse.h"
 #include "GExpSynapses.h"
 
+#include "LowpassSynapse.h"
+
 #endif /* SYNAPSE_H */
 

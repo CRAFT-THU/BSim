@@ -8,8 +8,8 @@
 #include <stdio.h>
 #include "ID.h"
 
-unsigned int id2idx(ID* array, unsigned int num, ID id) {
-	for (unsigned int i=0; i<num; i++) {
+int id2idx(ID* array, int num, ID id) {
+	for (int i=0; i<num; i++) {
 		if (array[i] == id) {
 			return i;
 		}

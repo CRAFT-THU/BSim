@@ -51,12 +51,12 @@ int GLIFNeurons::allocGNeurons(GLIFNeurons * pGpuNeurons)
 	checkCudaErrors(cudaMalloc((void**)&(pGpuNeurons->p_refrac_step), sizeof(int)*num));
 	checkCudaErrors(cudaMemcpy(pGpuNeurons->p_refrac_step, p_refrac_step, sizeof(int)*num, cudaMemcpyHostToDevice));
 
-	checkCudaErrors(cudaMalloc((void**)&(pGpuNeurons->pSynapsesNum), sizeof(unsigned int)*num));
-	checkCudaErrors(cudaMemcpy(pGpuNeurons->pSynapsesNum, pSynapsesNum, sizeof(unsigned int)*num, cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaMalloc((void**)&(pGpuNeurons->pSynapsesLoc), sizeof(unsigned int)*num));
-	checkCudaErrors(cudaMemcpy(pGpuNeurons->pSynapsesLoc, pSynapsesLoc, sizeof(unsigned int)*num, cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaMalloc((void**)&(pGpuNeurons->pSynapsesIdx), sizeof(unsigned int)*synapsesNum));
-	checkCudaErrors(cudaMemcpy(pGpuNeurons->pSynapsesIdx, pSynapsesIdx, sizeof(unsigned int)*synapsesNum, cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMalloc((void**)&(pGpuNeurons->pSynapsesNum), sizeof(int)*num));
+	checkCudaErrors(cudaMemcpy(pGpuNeurons->pSynapsesNum, pSynapsesNum, sizeof(int)*num, cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMalloc((void**)&(pGpuNeurons->pSynapsesLoc), sizeof(int)*num));
+	checkCudaErrors(cudaMemcpy(pGpuNeurons->pSynapsesLoc, pSynapsesLoc, sizeof(int)*num, cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMalloc((void**)&(pGpuNeurons->pSynapsesIdx), sizeof(int)*synapsesNum));
+	checkCudaErrors(cudaMemcpy(pGpuNeurons->pSynapsesIdx, pSynapsesIdx, sizeof(int)*synapsesNum, cudaMemcpyHostToDevice));
 
 	return 0;
 }

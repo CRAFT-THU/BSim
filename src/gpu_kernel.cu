@@ -3,15 +3,15 @@
 
 #define MAX_FIRED 512
 
-__device__ unsigned int MAX_DELAY;
-__device__ unsigned int *gTimeTable;
-__device__ unsigned int gTimeTableSize;
-__device__ unsigned int *gFiredTable;
-__device__ unsigned int gFiredTableSize;
-__device__ unsigned int gFiredCnt;
-__device__ unsigned int gFiredCntTest;
+__device__ int MAX_DELAY;
+__device__ int *gTimeTable;
+__device__ int gTimeTableSize;
+__device__ int *gFiredTable;
+__device__ int gFiredTableSize;
+__device__ int gFiredCnt;
+__device__ int gFiredCntTest;
 __device__ bool *gSynapsesFiredTable;
-__device__ unsigned int gSynapsesFiredTableSize;
+__device__ int gSynapsesFiredTableSize;
 
 __device__ double atomicAdd(double *address, double val)
 {
@@ -25,7 +25,7 @@ __device__ double atomicAdd(double *address, double val)
 	return __longlong_as_double(old);
 }
 
-__device__ int updateTimeTable(unsigned int simTime)
+__device__ int updateTimeTable(int simTime)
 {
 	if ((threadIdx.x == 0) && (blockIdx.x == 0)) {
 		gTimeTable[simTime + MAX_DELAY + 1] = gFiredCnt;
@@ -34,10 +34,10 @@ __device__ int updateTimeTable(unsigned int simTime)
 	return 0;
 }
 
-__device__ int updateFiredTable(unsigned int *fireTable, unsigned int fireCnt, unsigned int simTime)
+__device__ int updateFiredTable(int *fireTable, int fireCnt, int simTime)
 {
-	__shared__ volatile unsigned int cnt;
-	unsigned int idx = 0;
+	__shared__ volatile int cnt;
+	int idx = 0;
 	if (threadIdx.x == 0) {
 		cnt = atomicAdd(&gFiredCntTest, fireCnt);
 		//TODO: check over add items
@@ -46,13 +46,13 @@ __device__ int updateFiredTable(unsigned int *fireTable, unsigned int fireCnt, u
 	__syncthreads();
 
 	for (int i=threadIdx.x; i<fireCnt; i+=blockDim.x) {
-		idx = atomicAdd((unsigned int*)&cnt, 1);
+		idx = atomicAdd((int*)&cnt, 1);
 		gFiredTable[idx] = fireTable[i];
 	}
 	return 0;
 }
 
-__global__ void init_global(unsigned int max_delay, unsigned int *c_gTimeTable, unsigned int c_gTimeTableSize, unsigned int *c_gFiredTable, unsigned int c_gFiredTableSize, bool *c_gSynapsesFiredTable, unsigned int c_gSynapsesFiredTableSize) 
+__global__ void init_global(int max_delay, int *c_gTimeTable, int c_gTimeTableSize, int *c_gFiredTable, int c_gFiredTableSize, bool *c_gSynapsesFiredTable, int c_gSynapsesFiredTableSize) 
 {
 	if ((threadIdx.x == 0) && (blockIdx.x == 0)) {
 		MAX_DELAY = max_delay;
@@ -67,14 +67,14 @@ __global__ void init_global(unsigned int max_delay, unsigned int *c_gTimeTable, 
 	}
 }
 
-__global__ void update_pre_synapse(GLIFNeurons *d_neurons, GExpSynapses* d_synapses, unsigned int simTime)
+__global__ void update_pre_synapse(GLIFNeurons *d_neurons, GExpSynapses* d_synapses, int simTime)
 {
 	//int tid = blockIdx.x * blockDim.x + threadIdx.x;
-	unsigned int idx_s = gTimeTable[simTime];	
-	unsigned int idx_e = gTimeTable[simTime+MAX_DELAY];
-	for (unsigned int idx = idx_s + threadIdx.x; idx <= idx_e; idx += blockDim.x) {
-		unsigned int nid = gFiredTable[idx];
-		unsigned int t = 0;
+	int idx_s = gTimeTable[simTime];	
+	int idx_e = gTimeTable[simTime+MAX_DELAY];
+	for (int idx = idx_s + threadIdx.x; idx <= idx_e; idx += blockDim.x) {
+		int nid = gFiredTable[idx];
+		int t = 0;
 		for (t=max(0, simTime-MAX_DELAY-1); t<simTime+MAX_DELAY+1; t++) {
 			if (gTimeTable[t+MAX_DELAY+1] > idx) {
 				break;
@@ -85,10 +85,10 @@ __global__ void update_pre_synapse(GLIFNeurons *d_neurons, GExpSynapses* d_synap
 			d_neurons->p_vm[nid] = d_neurons->p_v_reset[nid];
 
 		}
-		for (unsigned int i=0; i<d_neurons->pSynapsesNum[nid]; i++) {
-			unsigned int loc = d_neurons->pSynapsesLoc[nid];
-			unsigned int sid = d_neurons->pSynapsesIdx[i+loc];
-			if (simTime == t+(unsigned int)(d_synapses->p_delay[sid]/d_synapses->p__dt[sid]))
+		for (int i=0; i<d_neurons->pSynapsesNum[nid]; i++) {
+			int loc = d_neurons->pSynapsesLoc[nid];
+			int sid = d_neurons->pSynapsesIdx[i+loc];
+			if (simTime == t+(int)(d_synapses->p_delay[sid]/d_synapses->p__dt[sid]))
 					gSynapsesFiredTable[d_neurons->pSynapsesIdx[i+loc]] = true;
 		}
 
@@ -96,11 +96,11 @@ __global__ void update_pre_synapse(GLIFNeurons *d_neurons, GExpSynapses* d_synap
 	__syncthreads();
 }
 
-__global__ void update_lif_neuron(GLIFNeurons *d_neurons, int num, unsigned int simTime)
+__global__ void update_lif_neuron(GLIFNeurons *d_neurons, int num, int simTime)
 {
-	__shared__ volatile unsigned int fireCnt;
-	__shared__ volatile unsigned int fireCntTest;
-	__shared__ unsigned int fireTable[MAX_FIRED];
+	__shared__ volatile int fireCnt;
+	__shared__ volatile int fireCntTest;
+	__shared__ int fireTable[MAX_FIRED];
 
 	int idx = 0;
 	if (threadIdx.x == 0) {
@@ -111,9 +111,9 @@ __global__ void update_lif_neuron(GLIFNeurons *d_neurons, int num, unsigned int 
 	__syncthreads();
 
 	bool fired = false;
-	unsigned int tid = blockIdx.x * blockDim.x + threadIdx.x;
-	unsigned int nid = 0;
-	for (unsigned int idx = tid; idx < num; idx +=blockDim.x*gridDim.x) {
+	int tid = blockIdx.x * blockDim.x + threadIdx.x;
+	int nid = 0;
+	for (int idx = tid; idx < num; idx +=blockDim.x*gridDim.x) {
 		nid = idx;
 		if (nid < num) {
 			real I = d_neurons->p_i_syn[nid] + d_neurons->p_i_tmp[nid];
@@ -135,10 +135,10 @@ __global__ void update_lif_neuron(GLIFNeurons *d_neurons, int num, unsigned int 
 	__syncthreads();
 
 	if (fired) {
-		idx = atomicAdd((unsigned int *)&fireCntTest, 1);
+		idx = atomicAdd((int *)&fireCntTest, 1);
 	}
 	if (fired && idx < MAX_FIRED) {
-		idx = atomicAdd((unsigned int *)&fireCnt, 1);
+		idx = atomicAdd((int *)&fireCnt, 1);
 		fired = false;
 		fireTable[idx] = nid;
 	}
@@ -153,10 +153,10 @@ __global__ void update_lif_neuron(GLIFNeurons *d_neurons, int num, unsigned int 
 	__syncthreads();
 }
 
-__global__ void update_alpha_synapse(GLIFNeurons *d_neurons, GAlphaSynapses *d_synapses, unsigned int num, unsigned int simTime)
+__global__ void update_alpha_synapse(GLIFNeurons *d_neurons, GAlphaSynapses *d_synapses, int num, int simTime)
 {
-	unsigned int tid = blockIdx.x * blockDim.x + threadIdx.x;
-	unsigned int sid = tid;
+	int tid = blockIdx.x * blockDim.x + threadIdx.x;
+	int sid = tid;
 	if (sid < num) {
 		d_synapses->p_I_syn[sid] = d_synapses->p_C1[sid] * d_synapses->p_I_syn[sid] + d_synapses->p_C2[sid] * d_synapses->p_I_tmp[sid];
 		d_synapses->p_I_tmp[sid] *= d_synapses->p_C1[sid];
@@ -174,10 +174,10 @@ __global__ void update_alpha_synapse(GLIFNeurons *d_neurons, GAlphaSynapses *d_s
 	__syncthreads();
 }
 
-__global__ void update_exp_synapse(GLIFNeurons *d_neurons, GExpSynapses *d_synapses, unsigned int num, unsigned int simTime)
+__global__ void update_exp_synapse(GLIFNeurons *d_neurons, GExpSynapses *d_synapses, int num, int simTime)
 {
-	unsigned int tid = blockIdx.x * blockDim.x + threadIdx.x;
-	unsigned int sid = tid;
+	int tid = blockIdx.x * blockDim.x + threadIdx.x;
+	int sid = tid;
 	if (sid < num) {
 		d_synapses->p_I_syn[sid] *= d_synapses->p_C1[sid];
 	}

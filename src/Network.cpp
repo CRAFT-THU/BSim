@@ -66,34 +66,59 @@ int Network::connect(NeuronBase *pn1, NeuronBase *pn2, real weight, real delay, 
 	return 0;
 }
 
-NeuronBase* Network::findNeuron(unsigned int populationIDSrc, unsigned int neuronIDSrc)
+PopulationBase* Network::findPopulation(int populationID)
 {
 	PopulationBase *pP= NULL;
 	vector<PopulationBase*>::iterator iter;
 	for (iter = pPopulations.begin(); iter != pPopulations.end(); iter++) {
 		PopulationBase * t = *iter;
-		if (t->getID().id == populationIDSrc) {
+		if (t->getID().id == populationID) {
 			pP = *iter;
 		}
 		if (pP != NULL) {
 			break;
 		}
 	}
+
+	//if (pP == NULL) {
+	//	printf("Cann't find population: %d\n", populationID);
+	//	return NULL;
+	//}
+
+	return pP;
+}
+
+NeuronBase* Network::findNeuron(int populationIDSrc, int neuronIDSrc)
+{
+	//PopulationBase *pP= NULL;
+	//vector<PopulationBase*>::iterator iter;
+	//for (iter = pPopulations.begin(); iter != pPopulations.end(); iter++) {
+	//	PopulationBase * t = *iter;
+	//	if (t->getID().id == populationIDSrc) {
+	//		pP = *iter;
+	//	}
+	//	if (pP != NULL) {
+	//		break;
+	//	}
+	//}
+	
+	PopulationBase *pP = findPopulation(populationIDSrc);
 	if (pP == NULL) {
-		printf("Cann't find population: %d\n", populationIDSrc);
+		//printf("Cann't find population: %d\n", populationIDSrc);
 		return NULL;
 	}
+
 	NeuronBase *pN = NULL;
 	pN = pP->findNeuron(ID(populationIDSrc, neuronIDSrc));
 	if (pN == NULL) {
-		printf("Cann't find neuron: %d:%d\n", populationIDSrc, neuronIDSrc);
+		//printf("Cann't find neuron: %d:%d\n", populationIDSrc, neuronIDSrc);
 		return NULL;
 	}
 
 	return pN;
 }
 
-int Network::addOutput(unsigned int populationIDSrc, unsigned int neuronIDSrc)
+int Network::addOutput(int populationIDSrc, int neuronIDSrc)
 {
 	NeuronBase *pN = findNeuron(populationIDSrc, neuronIDSrc);
 	if (pN == NULL) {
@@ -103,10 +128,27 @@ int Network::addOutput(unsigned int populationIDSrc, unsigned int neuronIDSrc)
 		pOutputs.push_back(pN);
 	}
 
+	NeuronBase *probe = findNeuron(-2, populationIDSrc);
+	if (probe == NULL) {
+		PopulationBase *pP = findPopulation(-2);
+		if (pP == NULL) {
+			pP = createPopulation(ID(0, -2), 1, Probe_lowpass(ProbeNeuron(ID(0, 0), 0.01, 0.01), ID(0, 0)));
+		}
+		Population<Probe_lowpass> *pNewP = (Population<Probe_lowpass>*)pP;
+		pNewP->addNeuron(Probe_lowpass(ProbeNeuron(ID(0, 0), 0.01, 0.01), ID(-2, populationIDSrc)));
+		probe = findNeuron(-2, populationIDSrc);
+		if (pN == NULL) {
+			printf("Cann't find neuron: %d:%d\n", -2, populationIDSrc);
+			return -1;
+		}
+		probe->monitorOn();
+	}
+	connect(pN, probe, 1, 0, Excitatory, false);
+
 	return 0;
 }
 
-int Network::addMonitor(unsigned int populationIDSrc, unsigned int neuronIDSrc)
+int Network::addMonitor(int populationIDSrc, int neuronIDSrc)
 {
 	NeuronBase *pN = findNeuron(populationIDSrc, neuronIDSrc);
 	if (pN == NULL) {
@@ -119,7 +161,7 @@ int Network::addMonitor(unsigned int populationIDSrc, unsigned int neuronIDSrc)
 	return 0;
 }
 
-int Network::connect(unsigned int populationIDSrc, unsigned int neuronIDSrc, unsigned int populationIDDst, unsigned int neuronIDDst, real weight, real delay)
+int Network::connect(int populationIDSrc, int neuronIDSrc, int populationIDDst, int neuronIDDst, real weight, real delay)
 {
 	//PopulationBase *ppSrc = NULL, *ppDst = NULL;
 	//vector<PopulationBase*>::iterator iter;
@@ -206,7 +248,7 @@ GNetwork* Network::buildNetwrok()
 	pGLIF->allocConnects(synapseNum);
 	pGExp->allocSynapses(synapseNum);
 
-	unsigned int idx = 0;
+	int idx = 0;
 	for (piter = pPopulations.begin(); piter != pPopulations.end();  piter++) {
 		PopulationBase * p = *piter;
 		size_t copied = p->hardCopy(pGLIF, idx);
@@ -226,13 +268,13 @@ GNetwork* Network::buildNetwrok()
 
 	map<ID, vector<ID>>::iterator n2sIter;
 	map<ID, ID>::iterator s2nIter;
-	unsigned int loc = 0;
+	int loc = 0;
 	for (n2sIter = n2sNetwork.begin(); n2sIter != n2sNetwork.end(); n2sIter++) {
-		unsigned int idx = id2idx(pGLIF->pID, neuronNum, n2sIter->first);
+		int idx = id2idx(pGLIF->pID, neuronNum, n2sIter->first);
 		pGLIF->pSynapsesNum[idx] = n2sIter->second.size();
 		pGLIF->pSynapsesLoc[idx] = loc;
-		for (unsigned int i = 0; i<pGLIF->pSynapsesNum[idx]; i++) {
-			unsigned int idx2 = id2idx(pGExp->pID, synapseNum, n2sIter->second.at(i)); 
+		for (int i = 0; i<pGLIF->pSynapsesNum[idx]; i++) {
+			int idx2 = id2idx(pGExp->pID, synapseNum, n2sIter->second.at(i)); 
 			pGLIF->pSynapsesIdx[loc] = idx2;
 			loc++;
 			pGExp->pSrc[idx2] = idx;
@@ -240,7 +282,7 @@ GNetwork* Network::buildNetwrok()
 	}
 
 	for (s2nIter = s2nNetwork.begin(); s2nIter != s2nNetwork.end(); s2nIter++) {
-		unsigned int idx = id2idx(pGExp->pID, synapseNum, s2nIter->first);
+		int idx = id2idx(pGExp->pID, synapseNum, s2nIter->first);
 		pGExp->pDst[idx] = id2idx(pGLIF->pID, neuronNum, s2nIter->second);
 	}
 

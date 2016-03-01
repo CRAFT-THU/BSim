@@ -21,10 +21,10 @@ struct GAlphaSynapses {
 	real *p_I_syn;
 	real *p_I_tmp;
 	real *p__dt;
-	unsigned int *pSrc;
-	unsigned int *pDst;
+	int *pSrc;
+	int *pDst;
 
-	int allocSynapses(unsigned int S);
+	int allocSynapses(int S);
 	int allocGSynapses(GAlphaSynapses *pGpuSynapses);
 };
 

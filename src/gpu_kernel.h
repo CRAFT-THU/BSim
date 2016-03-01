@@ -10,16 +10,16 @@
 #include "GAlphaSynapses.h"
 #include "GNetwork.h"
 
-__global__ void init_global(unsigned int max_delay, unsigned int *c_gTimeTable, unsigned int c_gTimeTableSize, unsigned int *c_gFiredTable, unsigned int c_gFiredTableSize, bool *c_gSynapsesFiredTable, unsigned int c_gSynapsesFiredTableSize);
+__global__ void init_global(int max_delay, int *c_gTimeTable, int c_gTimeTableSize, int *c_gFiredTable, int c_gFiredTableSize, bool *c_gSynapsesFiredTable, int c_gSynapsesFiredTableSize);
 //__global__ void free_global(GNetwork * c_pGpuNet);
 
-__global__ void update_pre_synapse(GLIFNeurons *d_neurons, GExpSynapses* d_synapses, unsigned int simTime);
+__global__ void update_pre_synapse(GLIFNeurons *d_neurons, GExpSynapses* d_synapses, int simTime);
 
-__global__ void update_lif_neuron(GLIFNeurons *d_neurons, int num, unsigned int simTime);
+__global__ void update_lif_neuron(GLIFNeurons *d_neurons, int num, int simTime);
 
-__global__ void update_alpha_synapse(GLIFNeurons *d_neurons, GAlphaSynapses *d_synapses, unsigned int num, unsigned int simTime);
+__global__ void update_alpha_synapse(GLIFNeurons *d_neurons, GAlphaSynapses *d_synapses, int num, int simTime);
 
-__global__ void update_exp_synapse(GLIFNeurons *d_neurons, GExpSynapses *d_synapses, unsigned int num, unsigned int simTime);
+__global__ void update_exp_synapse(GLIFNeurons *d_neurons, GExpSynapses *d_synapses, int num, int simTime);
 
 #endif /* GPU_KERNEL_H */
 

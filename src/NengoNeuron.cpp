@@ -11,8 +11,8 @@
 
 using std::vector;
 
-NengoNeuron::NengoNeuron(ID id, real v_init, real v_min, real v_reset, real cm, real tau_m, real tau_refrac, real tau_syn_E, real tau_syn_I, real v_thresh, real i_offset)
-	:v_init(v_init), v_min(v_min), v_reset(v_reset), cm(cm), tau_m(tau_m), tau_refrac(tau_refrac), tau_syn_E(tau_syn_E), tau_syn_I(tau_syn_I), v_thresh(v_thresh), i_offset(i_offset)
+NengoNeuron::NengoNeuron(ID id, real v_init, real v_min, real v_reset, real cm, real tau_m, real tau_refrac, real tau_syn_E, real tau_syn_I, real v_thresh, real i_offset, real encoder)
+	:v_init(v_init), v_min(v_min), v_reset(v_reset), cm(cm), tau_m(tau_m), tau_refrac(tau_refrac), tau_syn_E(tau_syn_E), tau_syn_I(tau_syn_I), v_thresh(v_thresh), i_offset(i_offset), encoder(encoder)
 {
 	this->i_syn = 0;
 	this->id = id;
@@ -32,6 +32,7 @@ NengoNeuron::NengoNeuron(const NengoNeuron &neuron, ID id)
 	this->tau_syn_I = neuron.tau_syn_I;
 	this->v_thresh = neuron.v_thresh;
 	this->i_offset = neuron.i_offset;
+	this->encoder = neuron.encoder;
 	this->i_syn = 0;
 	this->file = NULL;
 	this->id = id;
@@ -68,18 +69,27 @@ int NengoNeuron::update(SimInfo &info)
 	fired = false;
 
 	if (refrac_step > 0) {
+		if (file != NULL) {
+			fprintf(file, "Cycle %d: i_syn=%f vm = %f\n", info.currCycle, i_syn, vm); 
+		}
 		--refrac_step;
 	} else {
-		real I = i_syn + i_tmp;
+		real I = i_syn * encoder + i_tmp;
 		vm = C1 * vm + C2 * I;
 		
+		real vm_t = vm;
+
 		if (vm < v_min) {
 			vm = v_min;
 		}
 
+		if (file != NULL) {
+			fprintf(file, "Cycle %d: i_syn=%f vm = %f vm' = %f\n", info.currCycle, i_syn, vm, vm_t); 
+		}
+
 		if (vm >= v_thresh) {
 			fired = true;
-			refrac_step = (int)(tau_refrac/_dt) - 1;
+			refrac_step = (int)(tau_refrac/_dt);
 			vm = v_reset;
 		}
 	}
@@ -134,11 +144,11 @@ void NengoNeuron::monitor(SimInfo &info)
 			}
 
 			fprintf(file, "C1: %f, C2: %f\n", C1, C2);
-			fprintf(file, "i_offset: %f, vrest: %f\n", i_offset, v_min);
+			fprintf(file, "i_offset: %f, v_min: %f, encoder: %f\n", i_offset, v_min, encoder);
 			fprintf(file, "T_ref: %f, dt: %f\n", tau_refrac, _dt);
 			fprintf(file, "vm = %f, v_thresh:%f, v_reset:%f\n", vm, v_thresh, v_reset);
 		}
-		fprintf(file, "Cycle %d: vm = %f\n", info.currCycle, vm); 
+		//fprintf(file, "Cycle %d: vm = %f\n", info.currCycle, vm); 
 	}
 }
 
@@ -167,7 +177,7 @@ int NengoNeuron::getData(void *data)
 	return 0;
 }
 
-unsigned int NengoNeuron::hardCopy(void *data, unsigned int idx)
+int NengoNeuron::hardCopy(void *data, int idx)
 {
 	//GNengoNeurons * p = (GNengoNeurons *) data;
 	//p->pID[idx] = id;
@@ -191,4 +201,14 @@ unsigned int NengoNeuron::hardCopy(void *data, unsigned int idx)
 	//p->p_refrac_step[idx] = refrac_step;
 	
 	return 1;
+}
+
+int NengoNeuron::fire()
+{
+	return 0;
+}	
+
+SynapseBase* NengoNeuron::addSynapse(real weight, real delay, SpikeType type, NeuronBase *pDest)
+{
+	return NULL;
 }

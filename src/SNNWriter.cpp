@@ -22,21 +22,21 @@ int writeNetwork(string filename, Network *net)
 		populations.append(population);
 	}
 
-	for (unsigned int i=0; i<net->pPopulations.size()-1; i++) {
-		for (unsigned int j=i; j<net->pPopulations.size(); j++) {
+	for (int i=0; i<(int)net->pPopulations.size()-1; i++) {
+		for (int j=i; j<(int)net->pPopulations.size(); j++) {
 			Json::Value projection;
 			projection["src"] = net->pPopulations[i]->getID().id;
 			projection["dst"] = net->pPopulations[j]->getID().id;
 			Json::Value connections(Json::arrayValue);
-			unsigned int sizeA = net->pPopulations[i]->getNum();
-			unsigned int sizeB = net->pPopulations[j]->getNum();
-			for (unsigned int k=0; k<sizeA; k++) {
-				for (unsigned int l=0; l<sizeB; l++) {
+			int sizeA = net->pPopulations[i]->getNum();
+			int sizeB = net->pPopulations[j]->getNum();
+			for (int k=0; k<sizeA; k++) {
+				for (int l=0; l<sizeB; l++) {
 					Json::Value connection;
 					connection["src"] = k;
 					connection["dst"] = l;
 					vector<ID> sids = net->n2sNetwork[ID(net->pPopulations[i]->getID().id, k)];
-					for (unsigned int m =0; m<sids.size(); m++) {
+					for (int m =0; m<(int)sids.size(); m++) {
 						if (net->s2nNetwork[sids[m]] == ID(net->pPopulations[j]->getID().id, l)) {
 							for (vector<SynapseBase*>::iterator iter = net->pSynapses.begin(); iter != net->pSynapses.end(); iter++) {
 								if ((*iter)->getID() == sids[m]) {

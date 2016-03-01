@@ -68,7 +68,7 @@ int LowpassSynapse::update(SimInfo &info)
 
 int LowpassSynapse::recv()
 {
-	delay_step.push_back((unsigned int)(delay/_dt));
+	delay_step.push_back((int)(delay/_dt));
 
 	return 0;
 }
@@ -119,7 +119,7 @@ int LowpassSynapse::getData(void *data)
 	return 0;
 }
 
-unsigned int LowpassSynapse::hardCopy(void *data, unsigned int idx)
+int LowpassSynapse::hardCopy(void *data, int idx)
 {
 	//GLowpassSynapses *p = (GLowpassSynapses *)data;
 	//p->pID[idx] = id;

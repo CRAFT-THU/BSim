@@ -7,7 +7,7 @@
 
 #include "GLIFNeurons.h"
 
-int GLIFNeurons::allocNeurons(unsigned int N)
+int GLIFNeurons::allocNeurons(int N)
 {
 	num = N;
 	pID = (ID*)malloc(N*sizeof(ID));
@@ -29,15 +29,15 @@ int GLIFNeurons::allocNeurons(unsigned int N)
 	p_C2 = (real*)malloc(N*sizeof(real));
 	p_i_tmp = (real*)malloc(N*sizeof(real));
 	p_refrac_step = (int*)malloc(N*sizeof(int));
-	pSynapsesNum = (unsigned int*)malloc(N*sizeof(unsigned int));
-	pSynapsesLoc = (unsigned int*)malloc(N*sizeof(unsigned int));
+	pSynapsesNum = (int*)malloc(N*sizeof(int));
+	pSynapsesLoc = (int*)malloc(N*sizeof(int));
 	
 	return 0;
 }
 
-int GLIFNeurons::allocConnects(unsigned int S)
+int GLIFNeurons::allocConnects(int S)
 {
 	synapsesNum = S;
-	pSynapsesIdx = (unsigned int*)malloc(S*sizeof(unsigned int));
+	pSynapsesIdx = (int*)malloc(S*sizeof(int));
 	return 0;
 }

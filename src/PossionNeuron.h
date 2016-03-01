@@ -29,10 +29,10 @@ class PossionNeuron : public NeuronBase {
 	virtual int recv(real I);
 
 	virtual size_t getSize();
-	virtual unsigned int hardCopy(void *data, unsigned int idx);
+	virtual int hardCopy(void *data, int idx);
 	virtual SynapseBase *addSynapse(real weight, real delay, SpikeType type, NeuronBase *pDest);
 
-	unsigned int possion(unsigned int input);
+	int possion(int input);
 
 private:
 	vector<SynapseBase*> pSynapses;
@@ -43,8 +43,8 @@ private:
 	double _dt;
 	bool fired;
 	bool monitored;
-	unsigned int m_startCycle;
-	unsigned int m_fireCycle;
+	int m_startCycle;
+	int m_fireCycle;
 	FILE *file;
 	ID m_id;
 };

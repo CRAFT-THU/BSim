@@ -29,12 +29,12 @@ struct GLIFNeurons {
 	real *p_C2;
 	real *p_i_tmp;
 	int *p_refrac_step;
-	unsigned int *pSynapsesNum;
-	unsigned int *pSynapsesLoc;
-	unsigned int *pSynapsesIdx;
+	int *pSynapsesNum;
+	int *pSynapsesLoc;
+	int *pSynapsesIdx;
 
-	int allocNeurons(unsigned int N);
-	int allocConnects(unsigned int N);
+	int allocNeurons(int N);
+	int allocConnects(int N);
 	int allocGNeurons(GLIFNeurons * pGpuNeurons);
 };
 

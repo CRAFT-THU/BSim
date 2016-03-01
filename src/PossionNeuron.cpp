@@ -110,19 +110,19 @@ size_t PossionNeuron::getSize() {
 }
 
 
-unsigned int PossionNeuron::hardCopy(void *data, unsigned int idx)
+int PossionNeuron::hardCopy(void *data, int idx)
 {
 	return 0;
 }
 
-unsigned int PossionNeuron::possion(unsigned int input)
+int PossionNeuron::possion(int input)
 {
 	bool finished = false;
-	unsigned int ret = 0;
+	int ret = 0;
 	while (!finished) {
 		double tmpVal = uRandom();
-		unsigned int advance = -log(tmpVal)/m_rate;
-		if (advance >= (unsigned int)(m_refract/_dt)) {
+		int advance = -log(tmpVal)/m_rate;
+		if (advance >= (int)(m_refract/_dt)) {
 			finished = true;
 			ret = input + advance;
 		}

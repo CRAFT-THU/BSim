@@ -75,7 +75,7 @@ int AlphaSynapse::update(SimInfo &info)
 
 int AlphaSynapse::recv()
 {
-	delay_step.push_back((unsigned int)(delay/_dt));
+	delay_step.push_back((int)(delay/_dt));
 
 	return 0;
 }
@@ -105,7 +105,7 @@ int AlphaSynapse::getData(void *data)
 	return 0;
 }
 
-unsigned int AlphaSynapse::hardCopy(void *data, unsigned int idx)
+int AlphaSynapse::hardCopy(void *data, int idx)
 {
 	GAlphaSynapses *p = (GAlphaSynapses*)data;
 	p->pType[idx] = type;

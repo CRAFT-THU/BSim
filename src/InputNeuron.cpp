@@ -15,11 +15,23 @@ InputNeuron::InputNeuron(ID id)
 	file = NULL;
 	fired = false;
 	monitored = false;
+	tau_syn_E = 1e-3;
+	tau_syn_I = 1e-3;
+
+}
+
+InputNeuron::InputNeuron(const InputNeuron &templ, ID id)
+	:m_id(id)
+{
+	file = NULL;
+	fired = false;
+	monitored = templ.monitored;
+	tau_syn_E = templ.tau_syn_E;
+	tau_syn_I = templ.tau_syn_I;
 }
 
 InputNeuron::~InputNeuron()
 {
-	pSynapses.clear();
 	fireTime.clear();
 	if (file != NULL) {
 		fflush(file);
@@ -38,17 +50,12 @@ int InputNeuron::reset(SimInfo &info)
 
 int InputNeuron::fire()
 {
-	vector<SynapseBase*>::iterator iter;
-	for (iter=pSynapses.begin(); iter!=pSynapses.end(); iter++) {
-		(*iter)->recv();
-	}
+	//vector<SynapseBase*>::iterator iter;
+	//for (iter=pSynapses.begin(); iter!=pSynapses.end(); iter++) {
+	//	(*iter)->recv();
+	//}
 
 	return 0;
-}
-
-bool InputNeuron::isFired()
-{
-	return fired;
 }
 
 ID InputNeuron::getID()
@@ -58,12 +65,13 @@ ID InputNeuron::getID()
 
 SynapseBase * InputNeuron::addSynapse(real weight, real delay, SpikeType type, NeuronBase *pDest)
 {
-	ExpSynapse *tmp = new ExpSynapse(sidPool.getID(), weight, delay, 1e-3);
-	tmp->setDst(pDest);
+	//ExpSynapse *tmp = new ExpSynapse(sidPool.getID(), weight, delay, 1e-3);
+	//tmp->setDst(pDest);
 
-	SynapseBase *ret = (SynapseBase *)tmp;
-	pSynapses.push_back(ret);
-	return ret;
+	//SynapseBase *ret = (SynapseBase *)tmp;
+	//pSynapses.push_back(ret);
+	//return ret;
+	return NULL;
 }
 
 int InputNeuron::update(SimInfo &info)
@@ -81,11 +89,6 @@ int InputNeuron::update(SimInfo &info)
 		}
 	}
 	return 0;
-}
-
-void InputNeuron::monitorOn()
-{
-	monitored = true;
 }
 
 void InputNeuron::monitor(SimInfo &info)
@@ -111,7 +114,7 @@ void InputNeuron::monitor(SimInfo &info)
 	return;
 }
 
-int InputNeuron::addFireTime(unsigned int cycle)
+int InputNeuron::addFireTime(int cycle)
 {
 	fireTime.push_back(cycle);
 	return 0;
@@ -125,7 +128,7 @@ size_t InputNeuron::getSize() {
 	return 0;
 }
 
-unsigned int InputNeuron::hardCopy(void *data, unsigned int idx)
+int InputNeuron::hardCopy(void *data, int idx)
 {
 	return 0;
 }

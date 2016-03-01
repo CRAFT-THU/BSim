@@ -17,31 +17,29 @@ using std::deque;
 class InputNeuron: public NeuronBase {
 public:
 	InputNeuron(ID id);
+	InputNeuron(const InputNeuron &templ, ID id);
 	~InputNeuron();
 
 	virtual ID getID();
 
 	virtual int fire();
-	virtual bool isFired();
 	virtual int recv(real I);
 
-	virtual void monitorOn();
 	virtual int reset(SimInfo &info);
 	virtual int update(SimInfo &info);
 	virtual void monitor(SimInfo &info);
 
 	virtual size_t getSize();
 	virtual int getData(void *data);
-	virtual unsigned int hardCopy(void *data, unsigned int idx);
+	virtual int hardCopy(void *data, int idx);
 	virtual SynapseBase *addSynapse(real weight, real delay, SpikeType type, NeuronBase *pDest);
 
-	int addFireTime(unsigned int cycle);
-private:
-	vector<SynapseBase*> pSynapses;
-	deque<unsigned int> fireTime;
-	double _dt;
-	bool fired;
-	bool monitored;
+	int addFireTime(int cycle);
+protected:
+	deque<int> fireTime;
+	real _dt;
+	real tau_syn_E;
+	real tau_syn_I;
 	FILE *file;
 	ID m_id;
 };

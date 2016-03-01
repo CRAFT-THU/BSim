@@ -171,7 +171,7 @@ int LIFNeuron::getData(void *data)
 	return 0;
 }
 
-unsigned int LIFNeuron::hardCopy(void *data, unsigned int idx)
+int LIFNeuron::hardCopy(void *data, int idx)
 {
 	GLIFNeurons * p = (GLIFNeurons *) data;
 	p->pID[idx] = id;
@@ -195,4 +195,14 @@ unsigned int LIFNeuron::hardCopy(void *data, unsigned int idx)
 	p->p_refrac_step[idx] = refrac_step;
 	
 	return 1;
+}
+
+int LIFNeuron::fire()
+{
+	return 0;
+}	
+
+SynapseBase* LIFNeuron::addSynapse(real weight, real delay, SpikeType type, NeuronBase *pDest)
+{
+	return NULL;
 }

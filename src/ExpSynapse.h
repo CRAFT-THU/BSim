@@ -27,7 +27,7 @@ public:
 
 	virtual size_t getSize();
 	virtual int getData(void *data);
-	virtual unsigned int hardCopy(void *data, unsigned int idx);
+	virtual int hardCopy(void *data, int idx);
 
 	ExpSynapse(ID id, real weight, real delay, real tau_syn);
 	~ExpSynapse(); 

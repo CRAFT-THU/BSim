@@ -35,10 +35,10 @@ int GAlphaSynapses::allocGSynapses(GAlphaSynapses *pGpuSynapses)
 	checkCudaErrors(cudaMalloc((void**)&(pGpuSynapses->p__dt), sizeof(real)*num));
 	checkCudaErrors(cudaMemcpy(pGpuSynapses->p__dt, p__dt, sizeof(real)*num, cudaMemcpyHostToDevice));
 
-	checkCudaErrors(cudaMalloc((void**)&(pGpuSynapses->pSrc), sizeof(unsigned int)*num));
-	checkCudaErrors(cudaMemcpy(pGpuSynapses->pSrc, pSrc, sizeof(unsigned int)*num, cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaMalloc((void**)&(pGpuSynapses->pDst), sizeof(unsigned int)*num));
-	checkCudaErrors(cudaMemcpy(pGpuSynapses->pDst, pDst, sizeof(unsigned int)*num, cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMalloc((void**)&(pGpuSynapses->pSrc), sizeof(int)*num));
+	checkCudaErrors(cudaMemcpy(pGpuSynapses->pSrc, pSrc, sizeof(int)*num, cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMalloc((void**)&(pGpuSynapses->pDst), sizeof(int)*num));
+	checkCudaErrors(cudaMemcpy(pGpuSynapses->pDst, pDst, sizeof(int)*num, cudaMemcpyHostToDevice));
 
 	return 0;
 }

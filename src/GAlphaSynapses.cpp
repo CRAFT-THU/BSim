@@ -7,7 +7,7 @@
 
 #include "GAlphaSynapses.h"
 
-int GAlphaSynapses::allocSynapses(unsigned int S)
+int GAlphaSynapses::allocSynapses(int S)
 {
 	num = S;
 	pID = (ID*)malloc(S*sizeof(ID));
@@ -22,8 +22,8 @@ int GAlphaSynapses::allocSynapses(unsigned int S)
 	p_I_syn = (real*)malloc(S*sizeof(real));
 	p_I_tmp = (real*)malloc(S*sizeof(real));
 	p__dt = (real*)malloc(S*sizeof(real));
-	pSrc = (unsigned int*)malloc(S*sizeof(unsigned int));
-	pDst = (unsigned int*)malloc(S*sizeof(unsigned int));
+	pSrc = (int*)malloc(S*sizeof(int));
+	pDst = (int*)malloc(S*sizeof(int));
 
 	return 0;
 }

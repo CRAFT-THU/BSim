@@ -25,7 +25,7 @@ public:
 
 	virtual int getData(void *data);
 	virtual void setDst(NeuronBase *p);
-	virtual unsigned int hardCopy(void *data, unsigned int idx);
+	virtual int hardCopy(void *data, int idx);
 
 	AlphaSynapse(ID id, real weight, real delay, real tau_syn);
 	~AlphaSynapse();

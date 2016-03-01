@@ -27,7 +27,7 @@ public:
 	void monitor(SimInfo &info);
 
 	int getData(void *data);
-	unsigned int hardCopy(void *data, unsigned int idx);
+	int hardCopy(void *data, int idx);
 
 	int addNeuron(Neuron templ);
 	NeuronBase* findNeuron(ID id);
@@ -128,11 +128,15 @@ template<class Neuron>
 int Population<Neuron>::addNeuron(Neuron templ)
 {
 	neurons.push_back(templ);
+	if (neurons.size() > N) {
+		N = neurons.size();
+	}
+
 	return neurons.size() - 1;
 }
 
 template<class Neuron>
-unsigned int Population<Neuron>::hardCopy(void *data, unsigned int idx)
+int Population<Neuron>::hardCopy(void *data, int idx)
 {
 	size_t copiedIdxs = 0;
 	typename vector<Neuron>::iterator iter;

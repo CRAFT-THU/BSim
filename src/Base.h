@@ -19,7 +19,7 @@ public:
 
 	virtual size_t getSize() = 0;
 	virtual int getData(void *data) = 0;
-	virtual unsigned int hardCopy(void *data, unsigned int idx) = 0;
+	virtual int hardCopy(void *data, int idx) = 0;
 };
 
 #endif /* BASE_H */

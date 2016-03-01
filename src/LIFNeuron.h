@@ -20,15 +20,18 @@ public:
 	virtual real get_vm();
 	virtual int init(real dt);
 
+	virtual int fire();
+	virtual int recv(real I);
+
 	virtual int reset(SimInfo &info);
 	virtual int update(SimInfo &info);
 	virtual void monitor(SimInfo &info);
 
+	virtual SynapseBase *addSynapse(real weight, real delay, SpikeType type, NeuronBase *pDest);
 
 	virtual size_t getSize();
-	virtual int recv(real I);
 	virtual int getData(void *data);
-	virtual unsigned int hardCopy(void * data, unsigned int idx);
+	virtual int hardCopy(void * data, int idx);
 protected:
 	ID id;
 	NeuronType type;

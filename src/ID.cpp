@@ -9,13 +9,13 @@ ID::ID()
 	id = 0;
 }
 
-ID::ID(unsigned int _id)
+ID::ID(int _id)
 {
 	id = _id;
 	groupId = -1;
 }
 
-ID::ID(int _groupId, unsigned int _id)
+ID::ID(int _groupId, int _id)
 {
 	id = _id;
 	groupId = _groupId;
@@ -35,7 +35,7 @@ bool ID::operator==(const ID &id1)const{
 	return ((groupId == id1.groupId) && (id == id1.id));  
 }    
 
-//bool ID::operator==(const unsigned int &id1)const{  
+//bool ID::operator==(const int &id1)const{  
 //	return (id == id1);  
 //}    
 

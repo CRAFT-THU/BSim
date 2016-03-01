@@ -74,7 +74,7 @@ int ExpSynapse::update(SimInfo &info)
 
 int ExpSynapse::recv()
 {
-	delay_step.push_back((unsigned int)(delay/_dt));
+	delay_step.push_back((int)(delay/_dt));
 
 	return 0;
 }
@@ -124,7 +124,7 @@ int ExpSynapse::getData(void *data)
 	return 0;
 }
 
-unsigned int ExpSynapse::hardCopy(void *data, unsigned int idx)
+int ExpSynapse::hardCopy(void *data, int idx)
 {
 	GExpSynapses *p = (GExpSynapses *)data;
 	p->pID[idx] = id;

@@ -13,7 +13,7 @@
 using std::vector;
 
 struct SimInfo {
-	unsigned int currCycle;
+	int currCycle;
 	real dt;
 	vector<ID> fired;
 };

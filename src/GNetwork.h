@@ -14,8 +14,8 @@ struct GNetwork {
 	//size_t neuronSize;
 	//size_t synapseSize;
 	//size_t populationSize;
-	unsigned int neuronNum;
-	unsigned int synapseNum;
+	int neuronNum;
+	int synapseNum;
 	real MAX_DELAY;
 };
 

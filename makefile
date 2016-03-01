@@ -52,5 +52,5 @@ test:
 	cd ./test &&  make
 
 clean:
-	rm -f  *.o $(OBJ_DIR)/* $(BIN_DIR)/* $(BIN_TARGET)
+	rm -f  *.o $(OBJ_DIR)/* $(BIN_DIR)/*.out $(BIN_DIR)/*.log $(BIN_DIR)/*.csv $(BIN_TARGET)
 	cd ./test && make clean

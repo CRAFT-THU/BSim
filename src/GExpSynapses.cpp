@@ -7,7 +7,7 @@
 
 #include "GExpSynapses.h"
 
-int GExpSynapses::allocSynapses(unsigned int S)
+int GExpSynapses::allocSynapses(int S)
 {
 	num = S;
 	pID = (ID*)malloc(S*sizeof(ID));
@@ -19,8 +19,8 @@ int GExpSynapses::allocSynapses(unsigned int S)
 	p_tau_syn = (real*)malloc(S*sizeof(real));
 	p_I_syn = (real*)malloc(S*sizeof(real));
 	p__dt = (real*)malloc(S*sizeof(real));
-	pSrc = (unsigned int *)malloc(S*sizeof(unsigned int));
-	pDst = (unsigned int *)malloc(S*sizeof(unsigned int));
+	pSrc = (int *)malloc(S*sizeof(int));
+	pDst = (int *)malloc(S*sizeof(int));
 
 	return 0;
 }
