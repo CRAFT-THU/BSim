@@ -3,6 +3,8 @@
  * Fri December 11 2015
  */
 
+#include <stdio.h>
+
 #include "NeuronBase.h"
 
 NeuronBase::NeuronBase() 

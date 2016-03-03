@@ -3,6 +3,8 @@
  * Sun October 25 2015
  */
 
+#include <math.h>
+
 #include "ExpSynapse.h"
 #include "IF_curr_exp.h"
 
@@ -20,10 +22,12 @@ IF_curr_exp::~IF_curr_exp()
 	pSynapses.clear();
 }
 
-SynapseBase* IF_curr_exp::addSynapse(real weight, real delay, SpikeType type, NeuronBase *pDest)
+SynapseBase* IF_curr_exp::addSynapse(real weight, real delay, SpikeType type, real tau_in,  NeuronBase *pDest)
 {
 	real tau = 0.0f;
-	if (type == Excitatory) {
+	if (fabs(tau_in) > ZERO) {
+		tau = tau_in;
+	} else if (type == Excitatory) {
 		tau = tau_syn_E;
 	} else {
 		tau = tau_syn_I;

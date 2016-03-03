@@ -15,6 +15,8 @@ LowpassSynapse::LowpassSynapse(ID id, real weight, real delay = 0, real tau_syn 
 	this->tau_syn = tau_syn;
 	this->id = id;
 	this->monitored = false;
+	//this->C1 = a;
+	//this->_C1 = b;
 	file = NULL;
 }
 
@@ -41,20 +43,33 @@ int LowpassSynapse::reset(SimInfo &info) {
 
 int LowpassSynapse::init(real dt) {
 	_dt = dt;
-	C1 = -0.81873075;
-	_C1 = 0.18126925;
+	if (tau_syn == 0.01) {
+		C1 = -0.90483742;
+		_C1 = 0.09516258;
+	} else {
+		C1 = -0.81873075;
+		_C1 = 0.18126925;
+	}
 
 	return 0;
 }
 
 int LowpassSynapse::update(SimInfo &info)
 {
-	I_syn = -C1 * I_syn;
 	
 	list<int>::iterator iter;
 
 	while (!delay_step.empty() && (delay_step.front() <= 0)) {
-		I_syn += weight*_C1;
+		//printf("Syn: %d_%d\n", this->getID().groupId, this->getID().id);
+		//getchar();
+		real i_tmp = I_syn;
+		I_syn = -C1 * I_syn;
+		I_syn += weight/_dt*_C1;
+		if (monitored) {
+			if (file != NULL) {
+				fprintf(file, "Cycle %d: weighted %f, lowpass %f\n", info.currCycle, i_tmp, this->I_syn); 
+			}
+		}
 		pDest->recv(I_syn);
 		delay_step.pop_front();
 	}
@@ -68,7 +83,13 @@ int LowpassSynapse::update(SimInfo &info)
 
 int LowpassSynapse::recv()
 {
+	//printf("Syn: %d_%d\n", this->getID().groupId, this->getID().id);
 	delay_step.push_back((int)(delay/_dt));
+	if (monitored) {
+		if (file != NULL) {
+			fprintf(file, "recived %d\n", (int)(delay/_dt)); 
+		}
+	}
 
 	return 0;
 }
@@ -80,7 +101,7 @@ ID LowpassSynapse::getID()
 
 void LowpassSynapse::monitorOn() 
 {
-	monitored = false;
+	monitored = true;
 }
 
 void LowpassSynapse::monitor(SimInfo &info)
@@ -98,7 +119,6 @@ void LowpassSynapse::monitor(SimInfo &info)
 			fprintf(file, "C1: %f, ", C1);
 			fprintf(file, "dt: %f\n", _dt);
 		}
-		fprintf(file, "Cycle %d: %f\n", info.currCycle, this->I_syn); 
 	}
 
 	return;

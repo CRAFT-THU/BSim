@@ -82,10 +82,10 @@ int SingleThreadSimulator::run(real time)
 		//	p->monitor(info);
 		//}
 
-		//for (iterS=network->pSynapses.begin(); iterS!=network->pSynapses.end(); iterS++) {
-		//	SynapseBase *p = *iterS;
-		//	p->monitor(info);
-		//}
+		for (iterS=network->pSynapses.begin(); iterS!=network->pSynapses.end(); iterS++) {
+			SynapseBase *p = *iterS;
+			p->monitor(info);
+		}
 
 		int size = info.fired.size();
 		if (size > 0) {
@@ -99,6 +99,7 @@ int SingleThreadSimulator::run(real time)
 		size = network->pOutputs.size();
 		if (size > 0) {
 			fprintf(outFile, "%d", info.currCycle);
+			fprintf(outFile, ",%d", network->pOutputs[0]->isFired());
 			for (int i=1; i<size; i++) {
 				fprintf(outFile, ",%d", network->pOutputs[i]->isFired());
 			}

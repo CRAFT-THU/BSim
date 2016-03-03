@@ -32,7 +32,7 @@ public:
 	virtual size_t getSize();
 	virtual int getData(void *data);
 	virtual int hardCopy(void *data, int idx);
-	virtual SynapseBase *addSynapse(real weight, real delay, SpikeType type, NeuronBase *pDest);
+	virtual SynapseBase *addSynapse(real weight, real delay, SpikeType type, real tau, NeuronBase *pDest);
 
 	int addFireTime(int cycle);
 protected:

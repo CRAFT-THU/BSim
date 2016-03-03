@@ -7,7 +7,6 @@
 #include <math.h>
 
 #include "InputNeuron.h"
-#include "ExpSynapse.h"
 
 InputNeuron::InputNeuron(ID id)
 	:m_id(id)
@@ -63,7 +62,7 @@ ID InputNeuron::getID()
 	return m_id;
 }
 
-SynapseBase * InputNeuron::addSynapse(real weight, real delay, SpikeType type, NeuronBase *pDest)
+SynapseBase * InputNeuron::addSynapse(real weight, real delay, SpikeType type, real tau, NeuronBase *pDest)
 {
 	//ExpSynapse *tmp = new ExpSynapse(sidPool.getID(), weight, delay, 1e-3);
 	//tmp->setDst(pDest);

@@ -41,7 +41,7 @@ Network::~Network()
 	pSynapses.clear();
 }
 
-int Network::connect(NeuronBase *pn1, NeuronBase *pn2, real weight, real delay, SpikeType type, bool store)
+SynapseBase* Network::connect(NeuronBase *pn1, NeuronBase *pn2, real weight, real delay, SpikeType type, real tau, bool store)
 {
 	if (store) {
 		if (find(pNeurons.begin(), pNeurons.end(), pn1) == pNeurons.end()) {
@@ -52,7 +52,7 @@ int Network::connect(NeuronBase *pn1, NeuronBase *pn2, real weight, real delay, 
 		}
 	}
 
-	SynapseBase * p = pn1->addSynapse(weight, delay, type, pn2);
+	SynapseBase * p = pn1->addSynapse(weight, delay, type, tau, pn2);
 
 	pSynapses.push_back(p);
 	synapseNum++;
@@ -63,7 +63,7 @@ int Network::connect(NeuronBase *pn1, NeuronBase *pn2, real weight, real delay, 
 		maxDelay = delay;
 	}
 	
-	return 0;
+	return p;
 }
 
 PopulationBase* Network::findPopulation(int populationID)
@@ -118,7 +118,7 @@ NeuronBase* Network::findNeuron(int populationIDSrc, int neuronIDSrc)
 	return pN;
 }
 
-int Network::addOutput(int populationIDSrc, int neuronIDSrc)
+int Network::addOutput(int populationIDSrc, int neuronIDSrc, double weight)
 {
 	NeuronBase *pN = findNeuron(populationIDSrc, neuronIDSrc);
 	if (pN == NULL) {
@@ -137,13 +137,14 @@ int Network::addOutput(int populationIDSrc, int neuronIDSrc)
 		Population<Probe_lowpass> *pNewP = (Population<Probe_lowpass>*)pP;
 		pNewP->addNeuron(Probe_lowpass(ProbeNeuron(ID(0, 0), 0.01, 0.01), ID(-2, populationIDSrc)));
 		probe = findNeuron(-2, populationIDSrc);
-		if (pN == NULL) {
+		if (probe == NULL) {
 			printf("Cann't find neuron: %d:%d\n", -2, populationIDSrc);
 			return -1;
 		}
 		probe->monitorOn();
 	}
-	connect(pN, probe, 1, 0, Excitatory, false);
+	SynapseBase * t = connect(pN, probe, weight, 0, Excitatory, 0.01, false);
+	t->monitorOn();
 
 	return 0;
 }
@@ -161,7 +162,7 @@ int Network::addMonitor(int populationIDSrc, int neuronIDSrc)
 	return 0;
 }
 
-int Network::connect(int populationIDSrc, int neuronIDSrc, int populationIDDst, int neuronIDDst, real weight, real delay)
+int Network::connect(int populationIDSrc, int neuronIDSrc, int populationIDDst, int neuronIDDst, real weight, real delay, real tau)
 {
 	//PopulationBase *ppSrc = NULL, *ppDst = NULL;
 	//vector<PopulationBase*>::iterator iter;
@@ -207,7 +208,7 @@ int Network::connect(int populationIDSrc, int neuronIDSrc, int populationIDDst, 
 	if (delay < 0) {
 		type = Inhibitory;
 	}
-	connect(pnSrc, pnDst, weight, delay, type);
+	connect(pnSrc, pnDst, weight, delay, type, tau, false);
 
 	return 0;
 }

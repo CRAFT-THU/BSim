@@ -32,12 +32,12 @@ public:
 	template<class Neuron>
 	int connect(Population<Neuron> *pSrc, Population<Neuron> *pDst, real *weight, real *delay, SpikeType *type, int size);
 	
-	int connect(NeuronBase *pSrc, NeuronBase *pDst, real weight, real delay, SpikeType type, bool store = true);
-	int connect(int populationIDSrc, int neuronIDSrc, int populationIDDst, int neuronIDDst, real weight, real delay);
+	SynapseBase* connect(NeuronBase *pSrc, NeuronBase *pDst, real weight, real delay, SpikeType type = Excitatory, real tau = 0, bool store = true);
+	int connect(int populationIDSrc, int neuronIDSrc, int populationIDDst, int neuronIDDst, real weight, real delay, real tau = 0);
 	GNetwork* buildNetwrok();
 
 	int addMonitor(int populationIDSrc, int neuronIDSrc);
-	int addOutput(int populationIDSrc, int neuronIDSrc);
+	int addOutput(int populationIDSrc, int neuronIDSrc, double weight = 1);
 	PopulationBase* findPopulation(int populationID);
 	NeuronBase* findNeuron(int populationIDSrc, int neuronIDSrc);
 

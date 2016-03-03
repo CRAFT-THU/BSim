@@ -128,7 +128,7 @@ int ProbeNeuron::fire()
 	return 0;
 }	
 
-SynapseBase* ProbeNeuron::addSynapse(real weight, real delay, SpikeType type, NeuronBase *pDest)
+SynapseBase* ProbeNeuron::addSynapse(real weight, real delay, SpikeType type, real tau, NeuronBase *pDest)
 {
 	return NULL;
 }

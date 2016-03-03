@@ -21,7 +21,7 @@ public:
 
 	virtual int fire() = 0;
 	virtual int recv(real I) = 0;
-	virtual SynapseBase *addSynapse(real weight, real delay, SpikeType type, NeuronBase *dst) = 0;
+	virtual SynapseBase *addSynapse(real weight, real delay, SpikeType type, real tau, NeuronBase *dst) = 0;
 protected:
 	bool fired;
 	bool monitored;

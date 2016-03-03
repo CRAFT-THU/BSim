@@ -50,7 +50,7 @@ int LIFNeuron::init(real dt)
 {
 	_dt = dt;
 	real rm = 1.0;
-	if (fabs(cm) > 1e-10) {
+	if (fabs(cm) > ZERO) {
 		rm = tau_m/cm;
 	}
 	if (tau_m > 0) {

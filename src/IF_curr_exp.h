@@ -18,7 +18,7 @@ public:
 	IF_curr_exp(const IF_curr_exp &neuron, ID id);
 	~IF_curr_exp();
 
-	SynapseBase* addSynapse(real weight, real delay, SpikeType type, NeuronBase *pDest);
+	SynapseBase* addSynapse(real weight, real delay, SpikeType type, real tau, NeuronBase *pDest);
 	virtual int fire();
 
 private:

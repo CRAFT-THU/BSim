@@ -59,7 +59,7 @@ int NengoNeuron::init(real dt)
 
 	i_tmp = i_offset;
 
-	refrac_step = tau_refrac/dt;
+	refrac_time = tau_refrac;
 
 	return 0;
 }
@@ -68,30 +68,40 @@ int NengoNeuron::update(SimInfo &info)
 {
 	fired = false;
 
-	if (refrac_step > 0) {
-		if (file != NULL) {
-			fprintf(file, "Cycle %d: i_syn=%f vm = %f\n", info.currCycle, i_syn, vm); 
-		}
-		--refrac_step;
-	} else {
-		real I = i_syn * encoder + i_tmp;
-		vm = C1 * vm + C2 * I;
-		
-		real vm_t = vm;
+	//real I = i_syn * encoder + i_tmp;
+	real I = i_syn + i_tmp;
+	real vm_back = vm;
+	vm = C1 * vm + C2 * I;
+	real dv = vm - vm_back;
 
-		if (vm < v_min) {
-			vm = v_min;
-		}
+	real vm_t = vm;
 
-		if (file != NULL) {
-			fprintf(file, "Cycle %d: i_syn=%f vm = %f vm' = %f\n", info.currCycle, i_syn, vm, vm_t); 
-		}
+	if (vm < v_min) {
+		vm = v_min;
+	}
 
-		if (vm >= v_thresh) {
-			fired = true;
-			refrac_step = (int)(tau_refrac/_dt);
-			vm = v_reset;
-		}
+	refrac_time -= _dt;
+
+	real tmp = 1-refrac_time/_dt;
+	if (tmp < 0) {
+		tmp = 0;
+	}
+	if (tmp > 1) {
+		tmp = 1;
+	}
+
+	vm = vm * tmp;
+
+	if (file != NULL) {
+		fprintf(file, "Cycle %d: i_syn=%f i=%f vm = %f vm' = %f\n", info.currCycle, i_syn, I, vm, vm_t); 
+	}
+
+	if (vm >= v_thresh) {
+		real overshoot = (vm -1)/dv;
+		real spiketime = _dt*(1-overshoot);
+		fired = true;
+		refrac_time = tau_refrac + spiketime;
+		vm = 0;
 	}
 
 	i_syn = 0;
@@ -109,13 +119,16 @@ int NengoNeuron::update(SimInfo &info)
 int NengoNeuron::recv(real I)
 {
 	i_syn += I;
+	//printf("Neuron: %d_%d, %f\n", this->getID().groupId, this->getID().id, i_syn);
+	//getchar();
+
 	return 0;
 }
 
 int NengoNeuron::reset(SimInfo &info)
 {
 	vm = v_init;
-	refrac_step = -1;
+	refrac_time = -1;
 	i_syn = 0;
 	return init(info.dt);
 }
@@ -205,10 +218,12 @@ int NengoNeuron::hardCopy(void *data, int idx)
 
 int NengoNeuron::fire()
 {
+	printf("ERROR: Should NOT RUN\n");
 	return 0;
 }	
 
-SynapseBase* NengoNeuron::addSynapse(real weight, real delay, SpikeType type, NeuronBase *pDest)
+SynapseBase* NengoNeuron::addSynapse(real weight, real delay, SpikeType type, real tau, NeuronBase *pDest)
 {
+	printf("ERROR: Should NOT RUN\n");
 	return NULL;
 }

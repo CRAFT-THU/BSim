@@ -5,6 +5,7 @@
 #ifndef COMPOSITENEURON_H
 #define COMPOSITENEURON_H
 
+#include <math.h>
 #include <vector>
 
 #include "LIFNeuron.h"
@@ -17,7 +18,7 @@ public:
 	CompositeNeuron(const Neuron &templ, ID id);
 	~CompositeNeuron();
 
-	SynapseBase* addSynapse(real weight, real delay, SpikeType type, NeuronBase *pDest);
+	SynapseBase* addSynapse(real weight, real delay, SpikeType type, real tau, NeuronBase *pDest);
 	virtual int fire();
 
 private:
@@ -35,10 +36,12 @@ CompositeNeuron<Neuron, Synapse>::~CompositeNeuron()
 }
 
 template<class Neuron, class Synapse>
-SynapseBase* CompositeNeuron<Neuron, Synapse>::addSynapse(real weight, real delay, SpikeType type, NeuronBase *pDest)
+SynapseBase* CompositeNeuron<Neuron, Synapse>::addSynapse(real weight, real delay, SpikeType type, real tau_in, NeuronBase *pDest)
 {
 	real tau = 0.0f;
-	if (type == Excitatory) {
+	if (fabs(tau_in) > ZERO) {
+		tau = tau_in;
+	} else if (type == Excitatory) {
 		tau = this->tau_syn_E;
 	} else {
 		tau = this->tau_syn_I;
@@ -55,6 +58,8 @@ SynapseBase* CompositeNeuron<Neuron, Synapse>::addSynapse(real weight, real dela
 template<class Neuron, class Synapse>
 int CompositeNeuron<Neuron, Synapse>::fire()
 {
+	//printf("Fired: %d_%d\n", this->getID().groupId, this->getID().id);
+	//getchar();
 	vector<SynapseBase*>::iterator iter;
 	for (iter=pSynapses.begin(); iter!=pSynapses.end(); iter++) {
 		(*iter)->recv();

@@ -27,7 +27,7 @@ public:
 	virtual int update(SimInfo &info);
 	virtual void monitor(SimInfo &info);
 
-	virtual SynapseBase *addSynapse(real weight, real delay, SpikeType type, NeuronBase *pDest);
+	virtual SynapseBase *addSynapse(real weight, real delay, SpikeType type, real tau, NeuronBase *pDest);
 
 	virtual size_t getSize();
 	virtual int getData(void *data);
