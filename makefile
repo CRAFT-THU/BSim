@@ -25,7 +25,7 @@ CUFLAGS = -g -G -std=c++11
 
 .PHONY: default all clean test
 
-default: all
+default: all test
 all: $(BIN_TARGET)
 
 cpu: $(foreach tgt, $(CPUTARGET), $(LIB_DIR)/$(tgt))

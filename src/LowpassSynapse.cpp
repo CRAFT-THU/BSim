@@ -15,8 +15,6 @@ LowpassSynapse::LowpassSynapse(ID id, real weight, real delay = 0, real tau_syn 
 	this->tau_syn = tau_syn;
 	this->id = id;
 	this->monitored = false;
-	//this->C1 = a;
-	//this->_C1 = b;
 	file = NULL;
 }
 
@@ -43,7 +41,7 @@ int LowpassSynapse::reset(SimInfo &info) {
 
 int LowpassSynapse::init(real dt) {
 	_dt = dt;
-	if (tau_syn == 0.01) {
+	if (tau_syn > 0.008) {
 		C1 = -0.90483742;
 		_C1 = 0.09516258;
 	} else {
@@ -59,10 +57,8 @@ int LowpassSynapse::update(SimInfo &info)
 	
 	list<int>::iterator iter;
 
-	while (!delay_step.empty() && (delay_step.front() <= 0)) {
-		//printf("Syn: %d_%d\n", this->getID().groupId, this->getID().id);
-		//getchar();
-		real i_tmp = I_syn;
+	while (!delay_step.empty()) /* && (delay_step.front() <= 0)) */ {
+		real i_tmp = weight/_dt;
 		I_syn = -C1 * I_syn;
 		I_syn += weight/_dt*_C1;
 		if (monitored) {
@@ -74,9 +70,9 @@ int LowpassSynapse::update(SimInfo &info)
 		delay_step.pop_front();
 	}
 
-	for (iter = delay_step.begin(); iter != delay_step.end(); iter++) {
-		*iter = *iter - 1;
-	}
+	//for (iter = delay_step.begin(); iter != delay_step.end(); iter++) {
+	//	*iter = *iter - 1;
+	//}
 
 	return 0;
 }

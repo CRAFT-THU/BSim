@@ -37,7 +37,8 @@ public:
 	GNetwork* buildNetwrok();
 
 	int addMonitor(int populationIDSrc, int neuronIDSrc);
-	int addOutput(int populationIDSrc, int neuronIDSrc, double weight = 1);
+	int addOutput(int populationIDSrc, int neuronIDSrc);
+	int addProbe(int populationIDSrc, int neuronIDSrc, double weight = 1);
 	PopulationBase* findPopulation(int populationID);
 	NeuronBase* findNeuron(int populationIDSrc, int neuronIDSrc);
 

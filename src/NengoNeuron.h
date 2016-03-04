@@ -50,7 +50,6 @@ protected:
 	real vm;
 	real _dt;
 	real C1;
-	real C2;
 	real i_tmp;
 	real refrac_time;
 	FILE* file;

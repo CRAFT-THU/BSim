@@ -50,16 +50,14 @@ int NengoNeuron::init(real dt)
 {
 	_dt = dt;
 	if (tau_m > 0) {
-		C1 = 1 + expm1(-dt/tau_m);
-		C2 = 1-C1;
+		C1 = -expm1(-dt/tau_m);
 	} else {
-		C1 = 0;
-		C2 = 1.0f;
+		C1 = 1;
 	}
 
 	i_tmp = i_offset;
 
-	refrac_time = tau_refrac;
+	refrac_time = 0;
 
 	return 0;
 }
@@ -70,9 +68,8 @@ int NengoNeuron::update(SimInfo &info)
 
 	//real I = i_syn * encoder + i_tmp;
 	real I = i_syn + i_tmp;
-	real vm_back = vm;
-	vm = C1 * vm + C2 * I;
-	real dv = vm - vm_back;
+	real dv = C1 * (I - vm);
+	vm = vm + dv;
 
 	real vm_t = vm;
 
@@ -94,6 +91,21 @@ int NengoNeuron::update(SimInfo &info)
 
 	if (file != NULL) {
 		fprintf(file, "Cycle %d: i_syn=%f i=%f vm = %f vm' = %f\n", info.currCycle, i_syn, I, vm, vm_t); 
+	} else {
+			char filename[128];
+			sprintf(filename, "Neuron_%d_%d.log", id.groupId, id.id);
+			file = fopen(filename, "w+");
+
+			if (file == NULL) {
+				printf("Open File: %s failed\n", filename);
+				return -1;
+			}
+
+			fprintf(file, "C1: %f\n", C1);
+			fprintf(file, "i_offset: %f, v_min: %f, encoder: %f\n", i_offset, v_min, encoder);
+			fprintf(file, "T_ref: %f, dt: %f\n", tau_refrac, _dt);
+			fprintf(file, "vm = %f, v_thresh:%f, v_reset:%f\n", vm, v_thresh, v_reset);
+			fprintf(file, "Cycle %d: i_syn=%f i=%f vm = %f vm' = %f\n", info.currCycle, i_syn, I, vm, vm_t); 
 	}
 
 	if (vm >= v_thresh) {
@@ -156,7 +168,7 @@ void NengoNeuron::monitor(SimInfo &info)
 				return;
 			}
 
-			fprintf(file, "C1: %f, C2: %f\n", C1, C2);
+			fprintf(file, "C1: %f\n", C1);
 			fprintf(file, "i_offset: %f, v_min: %f, encoder: %f\n", i_offset, v_min, encoder);
 			fprintf(file, "T_ref: %f, dt: %f\n", tau_refrac, _dt);
 			fprintf(file, "vm = %f, v_thresh:%f, v_reset:%f\n", vm, v_thresh, v_reset);

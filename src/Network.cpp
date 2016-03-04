@@ -118,7 +118,7 @@ NeuronBase* Network::findNeuron(int populationIDSrc, int neuronIDSrc)
 	return pN;
 }
 
-int Network::addOutput(int populationIDSrc, int neuronIDSrc, double weight)
+int Network::addOutput(int populationIDSrc, int neuronIDSrc)
 {
 	NeuronBase *pN = findNeuron(populationIDSrc, neuronIDSrc);
 	if (pN == NULL) {
@@ -128,14 +128,25 @@ int Network::addOutput(int populationIDSrc, int neuronIDSrc, double weight)
 		pOutputs.push_back(pN);
 	}
 
+	return 0;
+}
+
+int Network::addProbe(int populationIDSrc, int neuronIDSrc, double weight)
+{
+	NeuronBase *pN = findNeuron(populationIDSrc, neuronIDSrc);
+	if (pN == NULL) {
+		printf("Cann't find neuron: %d:%d\n", populationIDSrc, neuronIDSrc);
+		return -1;
+	}
+
 	NeuronBase *probe = findNeuron(-2, populationIDSrc);
 	if (probe == NULL) {
 		PopulationBase *pP = findPopulation(-2);
 		if (pP == NULL) {
-			pP = createPopulation(ID(0, -2), 1, Probe_lowpass(ProbeNeuron(ID(0, 0), 0.01, 0.01), ID(0, 0)));
+			pP = createPopulation(ID(0, -2), 1, ProbeNeuron(ID(0, 0), 0.01, 0.01));
 		}
-		Population<Probe_lowpass> *pNewP = (Population<Probe_lowpass>*)pP;
-		pNewP->addNeuron(Probe_lowpass(ProbeNeuron(ID(0, 0), 0.01, 0.01), ID(-2, populationIDSrc)));
+		Population<ProbeNeuron> *pNewP = (Population<ProbeNeuron>*)pP;
+		pNewP->addNeuron(ProbeNeuron(ID(-2, populationIDSrc), 0.01, 0.01));
 		probe = findNeuron(-2, populationIDSrc);
 		if (probe == NULL) {
 			printf("Cann't find neuron: %d:%d\n", -2, populationIDSrc);
@@ -143,8 +154,7 @@ int Network::addOutput(int populationIDSrc, int neuronIDSrc, double weight)
 		}
 		probe->monitorOn();
 	}
-	SynapseBase * t = connect(pN, probe, weight, 0, Excitatory, 0.01, false);
-	t->monitorOn();
+	((ProbeNeuron*)probe)->addProbe(pN, weight);
 
 	return 0;
 }

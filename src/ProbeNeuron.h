@@ -32,14 +32,17 @@ public:
 	virtual size_t getSize();
 	virtual int getData(void *data);
 	virtual int hardCopy(void * data, int idx);
+
+	int addProbe(NeuronBase *pNeuron, real weight); 
 protected:
 	ID id;
 	NeuronType type;
 	real _dt;
 	real tau_syn_E;
 	real tau_syn_I;
-	real i_syn;
-	real i_tmp;
+	real vm;
+	vector<NeuronBase*> pProbes;
+	vector<real> weights;
 	FILE* file;
 };
 

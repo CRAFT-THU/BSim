@@ -15,8 +15,6 @@ using std::vector;
 ProbeNeuron::ProbeNeuron(ID id, real tau_syn_E, real tau_syn_I)
 	:tau_syn_E(tau_syn_E), tau_syn_I(tau_syn_I)
 {
-	this->i_syn = 0;
-	this->i_tmp = 0;
 	this->id = id;
 	this->file = NULL;
 	this->monitored = false;
@@ -26,14 +24,15 @@ ProbeNeuron::ProbeNeuron(const ProbeNeuron &neuron, ID id)
 {
 	this->tau_syn_E = neuron.tau_syn_E;
 	this->tau_syn_I = neuron.tau_syn_I;
-	this->i_syn = 0;
-	this->i_tmp = 0;
 	this->file = NULL;
 	this->id = id;
 }
 
 ProbeNeuron::~ProbeNeuron()
 {
+	pProbes.clear();
+	weights.clear();
+
 	if (file != NULL) {
 		fflush(file);
 		fclose(file);
@@ -49,21 +48,17 @@ int ProbeNeuron::init(real dt)
 
 int ProbeNeuron::update(SimInfo &info)
 {
-	i_tmp = i_syn;
-	i_syn = 0;
 
 	return 0;
 }
 
 int ProbeNeuron::recv(real I)
 {
-	i_syn += I;
 	return 0;
 }
 
 int ProbeNeuron::reset(SimInfo &info)
 {
-	i_syn = 0;
 	return init(info.dt);
 }
 
@@ -74,25 +69,33 @@ ID ProbeNeuron::getID()
 
 real ProbeNeuron::get_vm()
 {
-	return 0;
+	return vm;
 }
 
 void ProbeNeuron::monitor(SimInfo &info) 
 {
-	if (monitored) {
+	if (file == NULL) {
+		char filename[128];
+		sprintf(filename, "Probe_%d_%d.log", id.groupId, id.id);
+		file = fopen(filename, "w+");
+
 		if (file == NULL) {
-			char filename[128];
-			sprintf(filename, "Probe_%d_%d.log", id.groupId, id.id);
-			file = fopen(filename, "w+");
-
-			if (file == NULL) {
-				printf("Open File: %s failed\n", filename);
-				return;
-			}
-
+			printf("Open File: %s failed\n", filename);
+			return;
 		}
-		fprintf(file, "Cycle %d: %f\n", info.currCycle-1, i_tmp); 
+
 	}
+	real w_t = 0;
+	for (int i=0; i<(int)pProbes.size(); i++) {
+		if (pProbes[i]->isFired()) {
+			w_t += weights[i];
+		}
+	}
+
+	real C1 = -0.90483742;
+	real _C1 = 0.09516258;
+	vm =  -C1 * vm + w_t / _dt * _C1;
+	fprintf(file, "Cycle %d: %f\n", info.currCycle, vm); 
 }
 
 size_t ProbeNeuron::getSize()
@@ -131,4 +134,12 @@ int ProbeNeuron::fire()
 SynapseBase* ProbeNeuron::addSynapse(real weight, real delay, SpikeType type, real tau, NeuronBase *pDest)
 {
 	return NULL;
+}
+
+int ProbeNeuron::addProbe(NeuronBase *pNeuron, real weight) 
+{
+	pProbes.push_back(pNeuron);
+	weights.push_back(weight);
+
+	return 0;
 }

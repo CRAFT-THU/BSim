@@ -112,7 +112,8 @@ Network * readNetwork(string filename)
 		const Json::Value weights = output[i]["weights"];
 		int neuronsSize = neurons.size();
 		for (int j=0; j<neuronsSize; j++) {
-			res->addOutput(id, j, weights[0][j].asDouble());
+			res->addOutput(id, j);
+			res->addProbe(id, j, weights[0][j].asDouble());
 		}
 	}
 
