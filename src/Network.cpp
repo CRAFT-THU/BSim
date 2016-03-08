@@ -8,6 +8,17 @@
 
 Network::Network()
 {
+	pPopulations.clear();
+	pNeurons.clear();
+	pSynapses.clear();
+	pOutputs.clear();
+	n2sNetwork.clear();
+	s2nNetwork.clear();
+	maxDelay = 0;
+	maxFireRate = 0;
+	populationNum = 0;
+	neuronNum = 0;
+	synapseNum = 0;
 }
 
 Network::~Network()
@@ -224,7 +235,7 @@ int Network::connect(int populationIDSrc, int neuronIDSrc, int populationIDDst, 
 }
 
 
-GNetwork* Network::buildNetwrok()
+GNetwork* Network::buildNetwork()
 {
 	//size_t populationSize = 0;
 	//size_t neuronSize = 0;

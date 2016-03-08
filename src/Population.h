@@ -129,6 +129,7 @@ int Population<Neuron>::addNeuron(Neuron templ)
 {
 	neurons.push_back(templ);
 	if (neurons.size() > N) {
+		printf("Population overflow!!");
 		N = neurons.size();
 	}
 

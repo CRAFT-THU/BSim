@@ -9,6 +9,8 @@
 #include "gpu_kernel.h"
 #include "SingleGPUSimulator.h"
 
+#define TEST
+
 SingleGPUSimulator::SingleGPUSimulator(Network *network, real dt)
 	: SimulatorBase(network, dt)
 {
@@ -29,9 +31,21 @@ int SingleGPUSimulator::run(real time)
 
 	reset();
 
-	GNetwork *pCpuNet = network->buildNetwrok();
+	GNetwork *pCpuNet = network->buildNetwork();
+	bool * c_n_fired = (bool*)malloc(sizeof(bool)*pCpuNet->neuronNum);
+
+#ifdef TEST
 	real * c_n_vm = (real*)malloc(sizeof(real)*pCpuNet->neuronNum);
 	real * c_s_vm = (real*)malloc(sizeof(real)*pCpuNet->synapseNum);
+#endif 
+
+	FILE *logFile = fopen("SimGPU.log", "w+");
+	if (logFile == NULL) {
+		printf("ERROR: Open file SimGPU.log failed\n");
+		return -1;
+	}
+
+#ifdef TEST
 	FILE **fileN = (FILE**)malloc(sizeof(FILE*)*pCpuNet->neuronNum);
 	char filename[128];
 	for (int i=0; i<pCpuNet->neuronNum; i++) {
@@ -43,10 +57,11 @@ int SingleGPUSimulator::run(real time)
 		sprintf(filename, "GSynapse_%d.log", i);
 		fileS[i] = fopen(filename, "w+");
 	}
+#endif
 
 	GNetwork *c_pGpuNet = copyDataToGPU(pCpuNet);
 	int *c_gTimeTable = NULL;
-	int *c_gFiredTable = NULL;
+	bool *c_gFiredTable = NULL;
 	bool *c_gSynapsesFiredTable = NULL;
 
 
@@ -56,14 +71,15 @@ int SingleGPUSimulator::run(real time)
 
 	GLIFNeurons *pN = (GLIFNeurons*)pCpuNet->pNeurons;
 	GExpSynapses *pS = (GExpSynapses*)pCpuNet->pSynapses;
-	checkCudaErrors(cudaMalloc((void**)&c_gTimeTable, sizeof(int)*(1000+MAX_DELAY+1)));
-	checkCudaErrors(cudaMemset(c_gTimeTable, 0, sizeof(int)*(1000+MAX_DELAY+1)));
+	checkCudaErrors(cudaMalloc((void**)&c_gTimeTable, sizeof(int)*(MAX_DELAY+1)));
+	checkCudaErrors(cudaMemset(c_gTimeTable, 0, sizeof(int)*(MAX_DELAY+1)));
 	//TODO: need to adapt the length
-	checkCudaErrors(cudaMalloc((void**)&c_gFiredTable, sizeof(int)*((pN->num)*(MAX_DELAY+1)*1000)));
-	checkCudaErrors(cudaMemset(c_gFiredTable, 0, sizeof(int)*((pN->num)*(MAX_DELAY+1)*1000)));
+	checkCudaErrors(cudaMalloc((void**)&c_gFiredTable, sizeof(bool)*((pN->num)*(MAX_DELAY+1))));
+	checkCudaErrors(cudaMemset(c_gFiredTable, 0, sizeof(bool)*((pN->num)*(MAX_DELAY+1))));
 	checkCudaErrors(cudaMalloc((void**)&c_gSynapsesFiredTable, sizeof(bool)*(pS->num)));
 	checkCudaErrors(cudaMemset(c_gSynapsesFiredTable, 0, sizeof(bool)*(pS->num)));
 
+#ifdef TEST
 	GLIFNeurons *pNTmp = (GLIFNeurons*)malloc(sizeof(GLIFNeurons));
 	GExpSynapses *pSTmp = (GExpSynapses*)malloc(sizeof(GExpSynapses));
 	checkCudaErrors(cudaMemcpy(pNTmp, ((GLIFNeurons*)(c_pGpuNet->pNeurons)), sizeof(GLIFNeurons), cudaMemcpyDeviceToHost));
@@ -72,8 +88,9 @@ int SingleGPUSimulator::run(real time)
 	real *g_s_vm = pSTmp->p_I_syn;
 	free(pNTmp);
 	free(pSTmp);
+#endif
 
-	init_global<<<1, 1, 0>>>(MAX_DELAY, c_gTimeTable, 1000+MAX_DELAY+1, c_gFiredTable, (pN->num)*(MAX_DELAY+1)*1000, c_gSynapsesFiredTable, pS->num);
+	init_global<<<1, 1, 0>>>(MAX_DELAY, c_gTimeTable, MAX_DELAY+1, c_gFiredTable, pN->num, c_gSynapsesFiredTable, pS->num);
 
 	printf("Start runing for %d cycles\n", sim_cycle);
 	for (int time=0; time<sim_cycle; time++) {
@@ -82,6 +99,10 @@ int SingleGPUSimulator::run(real time)
 		update_pre_synapse<<<1, 1, 0>>>((GLIFNeurons*)c_pGpuNet->pNeurons, (GExpSynapses*)c_pGpuNet->pSynapses, time);
 		update_exp_synapse<<<1, 1, 0>>>((GLIFNeurons*)c_pGpuNet->pNeurons, (GExpSynapses*)c_pGpuNet->pSynapses, c_pGpuNet->synapseNum, time);
 
+		int currentIdx = time%(MAX_DELAY+1);
+		checkCudaErrors(cudaMemcpy(c_n_fired, c_gFiredTable + (currentIdx*pN->num), sizeof(bool)*pN->num, cudaMemcpyDeviceToHost));
+
+#ifdef TEST
 		checkCudaErrors(cudaMemcpy(c_n_vm, g_n_vm, sizeof(real)*pCpuNet->neuronNum,cudaMemcpyDeviceToHost));
 		checkCudaErrors(cudaMemcpy(c_s_vm, g_s_vm, sizeof(real)*pCpuNet->synapseNum,cudaMemcpyDeviceToHost));
 		for (int i=0; i<pCpuNet->neuronNum; i++) {
@@ -90,9 +111,24 @@ int SingleGPUSimulator::run(real time)
 		for (int i=0; i<pCpuNet->synapseNum; i++) {
 			fprintf(fileS[i], "%lf\n", c_s_vm[i]); 
 		}
+#endif
 
-		fflush(stdout);
-
+		int count = 0;
+		for (int i=0; i<pCpuNet->neuronNum; i++) {
+			if (c_n_fired[i]) {
+				count++;
+			}
+		}
+		if (count > 0) {
+			fprintf(logFile, "Cycle %d: ", time);
+			for (int i=0; i<pCpuNet->neuronNum; i++) {
+				if (c_n_fired[i]) {
+					fprintf(logFile, " %d_%d", pN->pID[i].groupId, pN->pID[i].id);
+				}
+			}
+			fprintf(logFile, "\n");
+			fflush(stdout);
+		}
 	}
 	printf("\nFinish runing\n");
 
@@ -101,6 +137,7 @@ int SingleGPUSimulator::run(real time)
 	checkCudaErrors(cudaFree(c_gSynapsesFiredTable));
 	freeGPUData(c_pGpuNet);
 
+#ifdef TEST
 	for (int i=0; i<pCpuNet->neuronNum; i++) {
 		fflush(fileN[i]);
 		fclose(fileN[i]);
@@ -112,6 +149,7 @@ int SingleGPUSimulator::run(real time)
 
 	free(fileN);
 	free(fileS);
+#endif
 
 	return 0;
 }

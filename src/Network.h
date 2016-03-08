@@ -34,7 +34,7 @@ public:
 	
 	SynapseBase* connect(NeuronBase *pSrc, NeuronBase *pDst, real weight, real delay, SpikeType type = Excitatory, real tau = 0, bool store = true);
 	int connect(int populationIDSrc, int neuronIDSrc, int populationIDDst, int neuronIDDst, real weight, real delay, real tau = 0);
-	GNetwork* buildNetwrok();
+	GNetwork* buildNetwork();
 
 	int addMonitor(int populationIDSrc, int neuronIDSrc);
 	int addOutput(int populationIDSrc, int neuronIDSrc);

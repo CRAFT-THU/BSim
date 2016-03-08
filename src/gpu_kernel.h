@@ -10,7 +10,7 @@
 #include "GAlphaSynapses.h"
 #include "GNetwork.h"
 
-__global__ void init_global(int max_delay, int *c_gTimeTable, int c_gTimeTableSize, int *c_gFiredTable, int c_gFiredTableSize, bool *c_gSynapsesFiredTable, int c_gSynapsesFiredTableSize);
+__global__ void init_global(int max_delay, int *c_gTimeTable, int c_gTimeTableSize, bool *c_gFiredTable, int c_gFiredTableSize, bool *c_gSynapsesFiredTable, int c_gSynapsesFiredTableSize);
 //__global__ void free_global(GNetwork * c_pGpuNet);
 
 __global__ void update_pre_synapse(GLIFNeurons *d_neurons, GExpSynapses* d_synapses, int simTime);
