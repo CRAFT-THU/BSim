@@ -12,6 +12,8 @@
 
 using std::vector;
 
+const Type LIFNeuron::type = LIF;
+
 LIFNeuron::LIFNeuron(ID id, real v_init, real v_rest, real v_reset, real cm, real tau_m, real tau_refrac, real tau_syn_E, real tau_syn_I, real v_thresh, real i_offset)
 	:v_init(v_init), v_rest(v_rest), v_reset(v_reset), cm(cm), tau_m(tau_m), tau_refrac(tau_refrac), tau_syn_E(tau_syn_E), tau_syn_I(tau_syn_I), v_thresh(v_thresh), i_offset(i_offset)
 {
@@ -118,6 +120,11 @@ int LIFNeuron::reset(SimInfo &info)
 ID LIFNeuron::getID()
 {
 	return id;
+}
+
+Type LIFNeuron::getType()
+{
+	return type;
 }
 
 real LIFNeuron::get_vm()

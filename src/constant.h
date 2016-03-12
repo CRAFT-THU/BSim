@@ -9,8 +9,13 @@
 typedef float real;
 const real ZERO = 1e-10;
 
-enum NeuronType { IF_Curr = 0, Nengo = 1};
-enum SynapseType { Alpha = 0, Exp = 1 };
+enum Type { 
+	LIF = 0, Alpha = 1, Exp,
+	Nengo, Lowpass, 
+	Input, Possion, 
+	Probe
+}; 
+
 enum SpikeType { Excitatory = 0, Inhibitory = 1, None = 2};
 
 #endif /* CONSTANT_H */

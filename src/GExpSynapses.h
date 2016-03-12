@@ -8,9 +8,8 @@
 #include "ID.h"
 
 struct GExpSynapses {
-	int num;
 	ID *pID;
-	SpikeType *pType;
+	Type *pType;
 	real *p_weight;
 	real *p_delay;
 	real *p_C1;
@@ -18,14 +17,17 @@ struct GExpSynapses {
 	real *p_tau_syn;
 	real *p_I_syn;
 	real *p__dt;
-	int *pSrc;
+	//int *pSrc;
 	int *pDst;
-
-	int allocSynapses(int S);
-	int allocGSynapses(GExpSynapses *pGpuSynapses);
+	int num;
 };
 
-int freeGSynapses(GExpSynapses *pGpuSynapses);
+void *createExpSynapses();
+size_t getExpSize();
+int allocExpSynapses(void *pSynapses, int S);
+int allocExpConnects(void *pCpu, int *pSynapsesDst, int *notUsed1, int *notUsed2, int notUsed3);
+int cudaAllocExpSynapses(void *pCpu, void *pGpu);
+int cudaFreeExpSynapses(void *pGpu);
 
 #endif /* GEXPSYNAPSES_H */
 

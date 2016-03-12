@@ -8,6 +8,8 @@
 #include "utils/json/json.h"
 #include "LowpassSynapse.h"
 
+const Type LowpassSynapse::type = Lowpass;
+
 LowpassSynapse::LowpassSynapse(ID id, real weight, real delay = 0, real tau_syn = 0)
 {
 	this->weight = weight;
@@ -93,6 +95,11 @@ int LowpassSynapse::recv()
 ID LowpassSynapse::getID()
 {
 	return id;
+}
+
+Type LowpassSynapse::getType()
+{
+	return type;
 }
 
 void LowpassSynapse::monitorOn() 

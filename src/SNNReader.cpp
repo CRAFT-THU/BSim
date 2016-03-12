@@ -86,7 +86,7 @@ Network * readNetwork(string filename)
 			Json::Value para = population[i]["parameters"];
 			//NEURONTYPE n(ID(id, testValue(para["id"], j).asInt()), testValue(para["voltage"], j).asDouble(), testValue(para["v_rest"], j).asDouble(), testValue(para["reset"], j).asDouble(), testValue(para["cm"], j).asDouble(), testValue(para["tau_rc"], j).asDouble(), testValue(para["tau_ref"], j).asDouble(), testValue(para["tau_syn_E"], j).asDouble(), testValue(para["tau_syn_I"], j).asDouble(), testValue(para["threshold"], j).asDouble(), testValue(para["bias"], j).asDouble());
 			Nengo_lowpass2 n(NengoNeuron(ID(0), testValue(para["voltage"], j).asDouble(), testValue(para["min_voltage"], j).asDouble(), testValue(para["reset"], j).asDouble(), testValue(para["cm"], j).asDouble(), testValue(para["tau_rc"], j).asDouble(), testValue(para["tau_ref"], j).asDouble(), testValue(para["tau_syn_E"], j).asDouble(), testValue(para["tau_syn_I"], j).asDouble(), testValue(para["threshold"], j).asDouble(), testValue(para["bias"], j).asDouble(), testValue(para["scaled_encoders"], j)[0].asDouble()), ID(id, testValue(para["id"], j).asInt()));
-			popu->addNeuron(n);
+			//popu->addNeuron(n);
 		}
 	}
 

@@ -9,6 +9,8 @@
 #include "ExpSynapse.h"
 #include "GExpSynapses.h"
 
+const Type ExpSynapse::type = Exp;
+
 ExpSynapse::ExpSynapse(ID id, real weight, real delay = 0, real tau_syn = 0)
 {
 	this->weight = weight;
@@ -82,6 +84,11 @@ int ExpSynapse::recv()
 ID ExpSynapse::getID()
 {
 	return id;
+}
+
+Type ExpSynapse::getType()
+{
+	return type;
 }
 
 void ExpSynapse::monitorOn() 

@@ -8,6 +8,8 @@
 
 #include "InputNeuron.h"
 
+const Type InputNeuron::type = Input;
+
 InputNeuron::InputNeuron(ID id)
 	:m_id(id)
 {
@@ -60,6 +62,11 @@ int InputNeuron::fire()
 ID InputNeuron::getID()
 {
 	return m_id;
+}
+
+Type InputNeuron::getType()
+{
+	return type;
 }
 
 SynapseBase * InputNeuron::addSynapse(real weight, real delay, SpikeType type, real tau, NeuronBase *pDest)

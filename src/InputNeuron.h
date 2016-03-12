@@ -21,6 +21,7 @@ public:
 	~InputNeuron();
 
 	virtual ID getID();
+	virtual Type getType();
 
 	virtual int fire();
 	virtual int recv(real I);
@@ -35,6 +36,8 @@ public:
 	virtual SynapseBase *addSynapse(real weight, real delay, SpikeType type, real tau, NeuronBase *pDest);
 
 	int addFireTime(int cycle);
+
+	const static Type type;
 protected:
 	deque<int> fireTime;
 	real _dt;

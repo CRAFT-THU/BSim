@@ -7,23 +7,42 @@
 
 #include "GAlphaSynapses.h"
 
-int GAlphaSynapses::allocSynapses(int S)
+void *createAlphaSynapses()
 {
-	num = S;
-	pID = (ID*)malloc(S*sizeof(ID));
-	pType = (SpikeType*)malloc(S*sizeof(SpikeType));
-	p_weight = (real*)malloc(S*sizeof(real));
-	p_delay = (real*)malloc(S*sizeof(real));
-	p_C1 = (real*)malloc(S*sizeof(real));
-	p_C2 = (real*)malloc(S*sizeof(real));
-	p__C1 = (real*)malloc(S*sizeof(real));
-	p__C2 = (real*)malloc(S*sizeof(real));
-	p_tau_syn = (real*)malloc(S*sizeof(real));
-	p_I_syn = (real*)malloc(S*sizeof(real));
-	p_I_tmp = (real*)malloc(S*sizeof(real));
-	p__dt = (real*)malloc(S*sizeof(real));
-	pSrc = (int*)malloc(S*sizeof(int));
-	pDst = (int*)malloc(S*sizeof(int));
+	return malloc(sizeof(GAlphaSynapses));
+}
+
+size_t getAlphaSize()
+{
+	return sizeof(GAlphaSynapses);
+}
+
+int allocAlphaSynapses(void *pSynapses, int S)
+{
+	GAlphaSynapses * p = (GAlphaSynapses*)pSynapses;
+	p->num = S;
+	p->pID = (ID*)malloc(S*sizeof(ID));
+	p->pType = (Type*)malloc(S*sizeof(Type));
+	p->p_weight = (real*)malloc(S*sizeof(real));
+	p->p_delay = (real*)malloc(S*sizeof(real));
+	p->p_C1 = (real*)malloc(S*sizeof(real));
+	p->p_C2 = (real*)malloc(S*sizeof(real));
+	p->p__C1 = (real*)malloc(S*sizeof(real));
+	p->p__C2 = (real*)malloc(S*sizeof(real));
+	p->p_tau_syn = (real*)malloc(S*sizeof(real));
+	p->p_I_syn = (real*)malloc(S*sizeof(real));
+	p->p_I_tmp = (real*)malloc(S*sizeof(real));
+	p->p__dt = (real*)malloc(S*sizeof(real));
+	//p->pSrc = (int*)malloc(S*sizeof(int));
+	//p->pDst = (int*)malloc(S*sizeof(int));
+
+	return 0;
+}
+
+int allocExpConnects(void *pCpu, int *pSynapsesDst, int *notUsed1, int *notUsed2, int notUsed3)
+{
+	GAlphaSynapses *p = (GAlphaSynapses*)pCpu;
+	p->pDst = pSynapsesDst;
 
 	return 0;
 }

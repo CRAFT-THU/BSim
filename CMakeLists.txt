@@ -15,8 +15,8 @@ SET(CUDA_PROPAGATE_HOST_FLAGS OFF)
 SET(CUDA_NVCC_FLAGS_DEBUG "-std=c++11 -g -G")
 SET(CUDA_NVCC_FLAGS_RELEASE "-std=c++11 -O3")
 
-FILE(GLOB_RECURSE CPU_SRC "src/*.cpp" "src/*.c")
-FILE(GLOB_RECURSE GPU_SRC ${CPU_SRC} "src/*.cu")
+FILE(GLOB_RECURSE CPU_SRC "src/[^G]*.cpp" "src/[^G]*.c")
+FILE(GLOB_RECURSE GPU_SRC "src/*.cpp" "src/*.c" "src/*.cu")
 
 SET(CPU_LIB bsim)
 SET(GPU_LIB bsim_gpu)

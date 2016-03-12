@@ -13,6 +13,7 @@
 #include "Synapse.h"
 #include "Population.h"
 #include "GNetwork.h"
+//#include "GFunc.h"
 
 using std::map;
 using std::pair;
@@ -36,6 +37,10 @@ public:
 	int connect(int populationIDSrc, int neuronIDSrc, int populationIDDst, int neuronIDDst, real weight, real delay, real tau = 0);
 	GNetwork* buildNetwork();
 
+	int addNeuronNum(Type type, int num);
+	int addConnectionNum(Type type, int num);
+	int addSynapseNum(Type type, int num);
+
 	int addMonitor(int populationIDSrc, int neuronIDSrc);
 	int addOutput(int populationIDSrc, int neuronIDSrc);
 	int addProbe(int populationIDSrc, int neuronIDSrc, double weight = 1);
@@ -49,11 +54,16 @@ public:
 	vector<NeuronBase*> pOutputs;
 	map<ID, vector<ID> > n2sNetwork;
 	map<ID, ID> s2nNetwork;
+	map<ID, int> id2idx;
+	map<int, ID> idx2id;
 	real maxDelay;
 	real maxFireRate;
+	vector<Type> nTypes;
+	vector<Type> sTypes;
 	int populationNum;
-	int neuronNum;
-	int synapseNum;
+	vector<int> neuronNums;
+	vector<int> connectNums;
+	vector<int> synapseNums;
 };
 
 template<class Neuron>
@@ -62,7 +72,7 @@ Neuron* Network::create(Neuron n1)
 	Neuron *pn1 = new Neuron(n1);
 	if (find(pNeurons.begin(), pNeurons.end(), pn1) == pNeurons.end()) {
 		pNeurons.push_back(pn1);
-		neuronNum++;
+		addNeuronNum(pn1->getType(), 1);
 	}
 
 	return pn1;
@@ -75,7 +85,7 @@ Population<Neuron>* Network::createPopulation(ID id, int num, Neuron tmpl)
 	if (find(pPopulations.begin(), pPopulations.end(), pp1) == pPopulations.end()) {
 		pPopulations.push_back(pp1);
 		populationNum++;
-		neuronNum += pp1->getNum();
+		addNeuronNum(pp1->getType(), pp1->getNum());
 	}
 
 	return pp1;
@@ -91,12 +101,14 @@ int Network::connect(Population<Neuron> *pSrc, Population<Neuron> *pDst, real *w
 	if (find(pPopulations.begin(), pPopulations.end(), pSrc) == pPopulations.end()) {
 		pPopulations.push_back(pSrc);
 		populationNum++;
-		neuronNum += pSrc->getNum();
+		//neuronNum += pSrc->getNum();
+		addNeuronNum(pSrc->getType(), pSrc->getNum());
 	}
 	if (find(pPopulations.begin(), pPopulations.end(), pDst) == pPopulations.end()) {
 		pNeurons.push_back(pDst);
 		populationNum++;
-		neuronNum += pDst->getNum();
+		//neuronNum += pDst->getNum();
+		addNeuronNum(pDst->getType(), pDst->getNum());
 	}
 
 	int count = 0;

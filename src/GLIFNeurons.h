@@ -8,10 +8,8 @@
 #include "ID.h"
 
 struct GLIFNeurons {
-	int num;
-	int synapsesNum;
 	ID *pID;
-	NeuronType* pType;
+	Type* pType;
 	real *p_v_init;
 	real *p_v_rest;
 	real *p_v_reset;
@@ -32,12 +30,15 @@ struct GLIFNeurons {
 	int *pSynapsesNum;
 	int *pSynapsesLoc;
 	int *pSynapsesIdx;
-
-	int allocNeurons(int N);
-	int allocConnects(int N);
-	int allocGNeurons(GLIFNeurons * pGpuNeurons);
+	int num;
+	int synapsesNum;
 };
 
-int freeGNeurons(GLIFNeurons * pGpuNeurons);
+void* createLIFNeurons();
+size_t getLIFSize();
+int allocLIFNeurons(void *pCpu, int N);
+int allocLIFConnects(void *pCpu, int *pSynapsesNum, int *pSynapsesLoc, int *pSynapsesIdx, int S);
+int cudaAllocLIFNeurons(void *pCpu, void *pGpu);
+int cudaFreeLIFNeurons(void *pGpu);
 
 #endif /* GLIFNEURON_H */

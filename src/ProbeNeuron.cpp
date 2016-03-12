@@ -12,6 +12,8 @@
 
 using std::vector;
 
+const Type ProbeNeuron::type = Probe;
+
 ProbeNeuron::ProbeNeuron(ID id, real tau_syn_E, real tau_syn_I)
 	:tau_syn_E(tau_syn_E), tau_syn_I(tau_syn_I)
 {
@@ -65,6 +67,11 @@ int ProbeNeuron::reset(SimInfo &info)
 ID ProbeNeuron::getID()
 {
 	return id;
+}
+
+Type ProbeNeuron::getType()
+{
+	return type;
 }
 
 real ProbeNeuron::get_vm()

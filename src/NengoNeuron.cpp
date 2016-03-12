@@ -11,6 +11,8 @@
 
 using std::vector;
 
+const Type NengoNeuron::type = Nengo;
+
 NengoNeuron::NengoNeuron(ID id, real v_init, real v_min, real v_reset, real cm, real tau_m, real tau_refrac, real tau_syn_E, real tau_syn_I, real v_thresh, real i_offset, real encoder)
 	:v_init(v_init), v_min(v_min), v_reset(v_reset), cm(cm), tau_m(tau_m), tau_refrac(tau_refrac), tau_syn_E(tau_syn_E), tau_syn_I(tau_syn_I), v_thresh(v_thresh), i_offset(i_offset), encoder(encoder)
 {
@@ -148,6 +150,11 @@ int NengoNeuron::reset(SimInfo &info)
 ID NengoNeuron::getID()
 {
 	return id;
+}
+
+Type NengoNeuron::getType()
+{
+	return type;
 }
 
 real NengoNeuron::get_vm()

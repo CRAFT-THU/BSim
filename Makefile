@@ -265,7 +265,6 @@ src/GAlphaSynapses.o: src/GAlphaSynapses.cpp.o
 
 # target to build an object file
 src/GAlphaSynapses.cpp.o:
-	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/GAlphaSynapses.cpp.o
 	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/GAlphaSynapses.cpp.o
 .PHONY : src/GAlphaSynapses.cpp.o
 
@@ -274,7 +273,6 @@ src/GAlphaSynapses.i: src/GAlphaSynapses.cpp.i
 
 # target to preprocess a source file
 src/GAlphaSynapses.cpp.i:
-	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/GAlphaSynapses.cpp.i
 	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/GAlphaSynapses.cpp.i
 .PHONY : src/GAlphaSynapses.cpp.i
 
@@ -283,7 +281,6 @@ src/GAlphaSynapses.s: src/GAlphaSynapses.cpp.s
 
 # target to generate assembly for a file
 src/GAlphaSynapses.cpp.s:
-	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/GAlphaSynapses.cpp.s
 	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/GAlphaSynapses.cpp.s
 .PHONY : src/GAlphaSynapses.cpp.s
 
@@ -292,7 +289,6 @@ src/GExpSynapses.o: src/GExpSynapses.cpp.o
 
 # target to build an object file
 src/GExpSynapses.cpp.o:
-	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/GExpSynapses.cpp.o
 	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/GExpSynapses.cpp.o
 .PHONY : src/GExpSynapses.cpp.o
 
@@ -301,7 +297,6 @@ src/GExpSynapses.i: src/GExpSynapses.cpp.i
 
 # target to preprocess a source file
 src/GExpSynapses.cpp.i:
-	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/GExpSynapses.cpp.i
 	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/GExpSynapses.cpp.i
 .PHONY : src/GExpSynapses.cpp.i
 
@@ -310,7 +305,6 @@ src/GExpSynapses.s: src/GExpSynapses.cpp.s
 
 # target to generate assembly for a file
 src/GExpSynapses.cpp.s:
-	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/GExpSynapses.cpp.s
 	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/GExpSynapses.cpp.s
 .PHONY : src/GExpSynapses.cpp.s
 
@@ -319,7 +313,6 @@ src/GLIFNeurons.o: src/GLIFNeurons.cpp.o
 
 # target to build an object file
 src/GLIFNeurons.cpp.o:
-	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/GLIFNeurons.cpp.o
 	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/GLIFNeurons.cpp.o
 .PHONY : src/GLIFNeurons.cpp.o
 
@@ -328,7 +321,6 @@ src/GLIFNeurons.i: src/GLIFNeurons.cpp.i
 
 # target to preprocess a source file
 src/GLIFNeurons.cpp.i:
-	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/GLIFNeurons.cpp.i
 	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/GLIFNeurons.cpp.i
 .PHONY : src/GLIFNeurons.cpp.i
 
@@ -337,16 +329,38 @@ src/GLIFNeurons.s: src/GLIFNeurons.cpp.s
 
 # target to generate assembly for a file
 src/GLIFNeurons.cpp.s:
-	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/GLIFNeurons.cpp.s
 	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/GLIFNeurons.cpp.s
 .PHONY : src/GLIFNeurons.cpp.s
+
+src/GNetwork.o: src/GNetwork.cpp.o
+.PHONY : src/GNetwork.o
+
+# target to build an object file
+src/GNetwork.cpp.o:
+	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/GNetwork.cpp.o
+.PHONY : src/GNetwork.cpp.o
+
+src/GNetwork.i: src/GNetwork.cpp.i
+.PHONY : src/GNetwork.i
+
+# target to preprocess a source file
+src/GNetwork.cpp.i:
+	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/GNetwork.cpp.i
+.PHONY : src/GNetwork.cpp.i
+
+src/GNetwork.s: src/GNetwork.cpp.s
+.PHONY : src/GNetwork.s
+
+# target to generate assembly for a file
+src/GNetwork.cpp.s:
+	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/GNetwork.cpp.s
+.PHONY : src/GNetwork.cpp.s
 
 src/Generator.o: src/Generator.cpp.o
 .PHONY : src/Generator.o
 
 # target to build an object file
 src/Generator.cpp.o:
-	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/Generator.cpp.o
 	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/Generator.cpp.o
 .PHONY : src/Generator.cpp.o
 
@@ -355,7 +369,6 @@ src/Generator.i: src/Generator.cpp.i
 
 # target to preprocess a source file
 src/Generator.cpp.i:
-	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/Generator.cpp.i
 	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/Generator.cpp.i
 .PHONY : src/Generator.cpp.i
 
@@ -364,7 +377,6 @@ src/Generator.s: src/Generator.cpp.s
 
 # target to generate assembly for a file
 src/Generator.cpp.s:
-	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/Generator.cpp.s
 	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/Generator.cpp.s
 .PHONY : src/Generator.cpp.s
 
@@ -1029,6 +1041,9 @@ help:
 	@echo "... src/GLIFNeurons.o"
 	@echo "... src/GLIFNeurons.i"
 	@echo "... src/GLIFNeurons.s"
+	@echo "... src/GNetwork.o"
+	@echo "... src/GNetwork.i"
+	@echo "... src/GNetwork.s"
 	@echo "... src/Generator.o"
 	@echo "... src/Generator.i"
 	@echo "... src/Generator.s"

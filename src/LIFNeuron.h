@@ -16,6 +16,7 @@ public:
 	~LIFNeuron();
 
 	ID getID();
+	Type getType();
 
 	virtual real get_vm();
 	virtual int init(real dt);
@@ -32,9 +33,10 @@ public:
 	virtual size_t getSize();
 	virtual int getData(void *data);
 	virtual int hardCopy(void * data, int idx);
+
+	const static Type type;
 protected:
 	ID id;
-	NeuronType type;
 	real v_init;
 	real v_rest;
 	real v_reset;

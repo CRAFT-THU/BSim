@@ -8,9 +8,8 @@
 #include "ID.h"
 
 struct GAlphaSynapses {
-	int num;
 	ID *pID;
-	SpikeType *pType;
+	Type *pType;
 	real *p_weight;
 	real *p_delay;
 	real *p_C1;
@@ -21,14 +20,17 @@ struct GAlphaSynapses {
 	real *p_I_syn;
 	real *p_I_tmp;
 	real *p__dt;
-	int *pSrc;
+	//int *pSrc;
 	int *pDst;
-
-	int allocSynapses(int S);
-	int allocGSynapses(GAlphaSynapses *pGpuSynapses);
+	int num;
 };
 
-int freeGSynapses(GAlphaSynapses *pGpuSynapses);
+void *createAlphaSynapses();
+size_t getAlphaSize();
+int allocAlphaSynapses(void *pSynapses, int S);
+int allocAlphaConnects(void *pCpu, int *pSynapsesDst, int *notUsed1, int *notUsed2, int notUsed3);
+int cudaAllocAlphaSynapses(void *pCpu, void *pGpu);
+int cudaFreeAlphaSynapses(void *pGpu);
 
 #endif /* GALPHASYNAPSES_H */
 

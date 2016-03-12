@@ -8,14 +8,15 @@
 #include "constant.h"
 
 struct GNetwork {
-	void *pNeurons;
-	void *pSynapses;
-	//void *pPopulations;
-	//size_t neuronSize;
-	//size_t synapseSize;
-	//size_t populationSize;
-	int neuronNum;
-	int synapseNum;
+	void **pNeurons;
+	void **pSynapses;
+
+	int nTypeNum;
+	int sTypeNum;
+	Type * nTypes;
+	Type * sTypes;
+	int *neuronNums;
+	int *synapseNums;
 	real MAX_DELAY;
 };
 

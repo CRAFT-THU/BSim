@@ -15,6 +15,7 @@ using std::list;
 class ExpSynapse : public SynapseBase {
 public:
 	ID getID();
+	Type getType();
 
 	int init(real dt);
 	virtual int recv();
@@ -32,8 +33,8 @@ public:
 	ExpSynapse(ID id, real weight, real delay, real tau_syn);
 	~ExpSynapse(); 
 
+	const static Type type;
 protected:
-	SpikeType type;
 	real weight;
 	real delay;
 	real C1;

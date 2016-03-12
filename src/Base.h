@@ -11,6 +11,7 @@
 class Base {
 public:
 	virtual ID getID() = 0;
+	virtual Type getType() = 0;
 
 	virtual void monitorOn() = 0;
 	virtual int reset(SimInfo &info) = 0;

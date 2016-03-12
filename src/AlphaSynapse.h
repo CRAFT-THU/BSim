@@ -14,6 +14,8 @@ using std::list;
 class AlphaSynapse : SynapseBase {
 public:
 	ID getID();
+	Type getType();
+
 	int init(real dt);
 	virtual int recv();
 	virtual size_t getSize();
@@ -30,8 +32,8 @@ public:
 	AlphaSynapse(ID id, real weight, real delay, real tau_syn);
 	~AlphaSynapse();
 
+	const static Type type;
 protected:
-	SpikeType type;
 	real weight;
 	real delay;
 	real C1;

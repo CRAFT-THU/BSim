@@ -19,6 +19,8 @@ public:
 	~Population();
 
 	ID getID();
+	Type getType();
+
 	int getNum();
 	size_t getSize();
 
@@ -33,12 +35,17 @@ public:
 	NeuronBase* findNeuron(ID id);
 	NeuronBase* getNeuron(int idx);
 protected:
+	const static Type type;
+
 	ID id;
 	unsigned int N;
 	vector<Neuron> neurons;
 };
 
 #endif /* POPULATION_H */
+
+template<class Neuron>
+const Type Population<Neuron>::type = Neuron::type;
 
 template<class Neuron>
 Population<Neuron>::Population(ID _id, unsigned int N) : id(_id)
@@ -151,6 +158,11 @@ int Population<Neuron>::hardCopy(void *data, int idx)
 template<class Neuron>
 ID Population<Neuron>::getID() {
 	return id;
+}
+
+template<class Neuron>
+Type Population<Neuron>::getType() {
+	return type;
 }
 
 template<class Neuron>

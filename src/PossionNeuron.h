@@ -17,6 +17,7 @@ class PossionNeuron : public NeuronBase {
 	~PossionNeuron();
 
 	virtual ID getID();
+	virtual Type getType();
 
 	virtual int fire();
 	virtual bool isFired();
@@ -34,7 +35,8 @@ class PossionNeuron : public NeuronBase {
 
 	int possion(int input);
 
-private:
+	const static Type type;
+protected:
 	vector<SynapseBase*> pSynapses;
 	double m_rate;
 	double m_refract;

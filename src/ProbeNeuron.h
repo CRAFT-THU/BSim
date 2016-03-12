@@ -16,6 +16,7 @@ public:
 	~ProbeNeuron();
 
 	ID getID();
+	Type getType();
 
 	virtual real get_vm();
 	virtual int init(real dt);
@@ -34,9 +35,10 @@ public:
 	virtual int hardCopy(void * data, int idx);
 
 	int addProbe(NeuronBase *pNeuron, real weight); 
+
+	const static Type type;
 protected:
 	ID id;
-	NeuronType type;
 	real _dt;
 	real tau_syn_E;
 	real tau_syn_I;

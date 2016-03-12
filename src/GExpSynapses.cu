@@ -6,39 +6,44 @@
 #include "utils/cuda/helper_cuda.h"
 #include "GExpSynapses.h"
 
-int GExpSynapses::allocGSynapses(GExpSynapses *pGpuSynapses)
+int cudaAllocExpSynapses(void *pCpu, void *pGpu)
 {
-	checkCudaErrors(cudaMalloc((void**)&(pGpuSynapses->pID), sizeof(ID)*num));
-	checkCudaErrors(cudaMemcpy(pGpuSynapses->pID, pID, sizeof(ID)*num, cudaMemcpyHostToDevice));
+	GExpSynapses *pGpuSynapses = (GExpSynapses*)pGpu;
+	GExpSynapses *p = (GExpSynapses*)pCpu;
 
-	checkCudaErrors(cudaMalloc((void**)&(pGpuSynapses->pType), sizeof(NeuronType)*num));
-	checkCudaErrors(cudaMemcpy(pGpuSynapses->pType, pType, sizeof(NeuronType)*num, cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMalloc((void**)&(pGpuSynapses->pID), sizeof(ID)*p->num));
+	checkCudaErrors(cudaMemcpy(pGpuSynapses->pID, p->pID, sizeof(ID)*p->num, cudaMemcpyHostToDevice));
 
-	checkCudaErrors(cudaMalloc((void**)&(pGpuSynapses->p_weight), sizeof(real)*num));
-	checkCudaErrors(cudaMemcpy(pGpuSynapses->p_weight, p_weight, sizeof(real)*num, cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaMalloc((void**)&(pGpuSynapses->p_delay), sizeof(real)*num));
-	checkCudaErrors(cudaMemcpy(pGpuSynapses->p_delay, p_delay, sizeof(real)*num, cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaMalloc((void**)&(pGpuSynapses->p_C1), sizeof(real)*num));
-	checkCudaErrors(cudaMemcpy(pGpuSynapses->p_C1, p_C1, sizeof(real)*num, cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaMalloc((void**)&(pGpuSynapses->p__C1), sizeof(real)*num));
-	checkCudaErrors(cudaMemcpy(pGpuSynapses->p__C1, p__C1, sizeof(real)*num, cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaMalloc((void**)&(pGpuSynapses->p_tau_syn), sizeof(real)*num));
-	checkCudaErrors(cudaMemcpy(pGpuSynapses->p_tau_syn, p_tau_syn, sizeof(real)*num, cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaMalloc((void**)&(pGpuSynapses->p_I_syn), sizeof(real)*num));
-	checkCudaErrors(cudaMemcpy(pGpuSynapses->p_I_syn, p_I_syn, sizeof(real)*num, cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaMalloc((void**)&(pGpuSynapses->p__dt), sizeof(real)*num));
-	checkCudaErrors(cudaMemcpy(pGpuSynapses->p__dt, p__dt, sizeof(real)*num, cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMalloc((void**)&(pGpuSynapses->pType), sizeof(Type)*p->num));
+	checkCudaErrors(cudaMemcpy(pGpuSynapses->pType, p->pType, sizeof(Type)*p->num, cudaMemcpyHostToDevice));
 
-	checkCudaErrors(cudaMalloc((void**)&(pGpuSynapses->pSrc), sizeof(int)*num));
-	checkCudaErrors(cudaMemcpy(pGpuSynapses->pSrc, pSrc, sizeof(int)*num, cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaMalloc((void**)&(pGpuSynapses->pDst), sizeof(int)*num));
-	checkCudaErrors(cudaMemcpy(pGpuSynapses->pDst, pDst, sizeof(int)*num, cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMalloc((void**)&(pGpuSynapses->p_weight), sizeof(real)*p->num));
+	checkCudaErrors(cudaMemcpy(pGpuSynapses->p_weight, p->p_weight, sizeof(real)*p->num, cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMalloc((void**)&(pGpuSynapses->p_delay), sizeof(real)*p->num));
+	checkCudaErrors(cudaMemcpy(pGpuSynapses->p_delay, p->p_delay, sizeof(real)*p->num, cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMalloc((void**)&(pGpuSynapses->p_C1), sizeof(real)*p->num));
+	checkCudaErrors(cudaMemcpy(pGpuSynapses->p_C1, p->p_C1, sizeof(real)*p->num, cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMalloc((void**)&(pGpuSynapses->p__C1), sizeof(real)*p->num));
+	checkCudaErrors(cudaMemcpy(pGpuSynapses->p__C1, p->p__C1, sizeof(real)*p->num, cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMalloc((void**)&(pGpuSynapses->p_tau_syn), sizeof(real)*p->num));
+	checkCudaErrors(cudaMemcpy(pGpuSynapses->p_tau_syn, p->p_tau_syn, sizeof(real)*p->num, cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMalloc((void**)&(pGpuSynapses->p_I_syn), sizeof(real)*p->num));
+	checkCudaErrors(cudaMemcpy(pGpuSynapses->p_I_syn, p->p_I_syn, sizeof(real)*p->num, cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMalloc((void**)&(pGpuSynapses->p__dt), sizeof(real)*p->num));
+	checkCudaErrors(cudaMemcpy(pGpuSynapses->p__dt, p->p__dt, sizeof(real)*p->num, cudaMemcpyHostToDevice));
+
+	//checkCudaErrors(cudaMalloc((void**)&(pGpuSynapses->pSrc), sizeof(int)*p->num));
+	//checkCudaErrors(cudaMemcpy(pGpuSynapses->pSrc, p->pSrc, sizeof(int)*p->num, cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMalloc((void**)&(pGpuSynapses->pDst), sizeof(int)*p->num));
+	checkCudaErrors(cudaMemcpy(pGpuSynapses->pDst, p->pDst, sizeof(int)*p->num, cudaMemcpyHostToDevice));
 
 	return 0;
 }
 
-int freeGSynapses(GExpSynapses *pGpuSynapses)
+int cudaFreeExpSynapses(void *pGpu)
 {
+	GExpSynapses *pGpuSynapses = (GExpSynapses*)pGpu;
+
 	checkCudaErrors(cudaFree(pGpuSynapses->pID));
 
 	checkCudaErrors(cudaFree(pGpuSynapses->pType));
@@ -51,7 +56,7 @@ int freeGSynapses(GExpSynapses *pGpuSynapses)
 	checkCudaErrors(cudaFree(pGpuSynapses->p_I_syn));
 	checkCudaErrors(cudaFree(pGpuSynapses->p__dt));
 
-	checkCudaErrors(cudaFree(pGpuSynapses->pSrc));
+	//checkCudaErrors(cudaFree(pGpuSynapses->pSrc));
 	checkCudaErrors(cudaFree(pGpuSynapses->pDst));
 
 	return 0;

@@ -18,6 +18,8 @@ double uRandom()
 	return (double)f/RAND_MAX;
 }
 
+const Type PossionNeuron::type = Possion;
+
 PossionNeuron::PossionNeuron(ID id, double rate, double refract, double startTime)
 	:m_rate(rate), m_refract(refract), m_startTime(startTime), m_id(id)
 {
@@ -65,6 +67,11 @@ SynapseBase * PossionNeuron::addSynapse(real weight, real delay, SpikeType type,
 ID PossionNeuron::getID()
 {
 	return m_id;
+}
+
+Type PossionNeuron::getType()
+{
+	return type;
 }
 
 int PossionNeuron::update(SimInfo &info)

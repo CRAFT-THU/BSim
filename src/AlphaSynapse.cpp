@@ -10,6 +10,8 @@
 #include "AlphaSynapse.h"
 #include "GAlphaSynapses.h"
 
+const Type AlphaSynapse::type = Alpha;
+
 AlphaSynapse::AlphaSynapse(ID id, real weight, real delay = 0.0, real tau_syn = 0.0)
 {
 	this->weight = weight;
@@ -94,6 +96,11 @@ size_t AlphaSynapse::getSize()
 ID AlphaSynapse::getID()
 {
 	return id;
+}
+
+Type AlphaSynapse::getType()
+{
+	return type;
 }
 
 int AlphaSynapse::getData(void *data)

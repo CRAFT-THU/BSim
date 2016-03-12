@@ -15,6 +15,7 @@ using std::list;
 class LowpassSynapse : public SynapseBase {
 public:
 	ID getID();
+	Type getType();
 
 	int init(real dt);
 	virtual int recv();
@@ -32,8 +33,8 @@ public:
 	LowpassSynapse(ID id, real weight, real delay, real tau_syn);
 	~LowpassSynapse(); 
 
+	const static Type type;
 protected:
-	SpikeType type;
 	real weight;
 	real delay;
 	real C1;
