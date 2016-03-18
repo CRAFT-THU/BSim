@@ -7,7 +7,7 @@
 #include <fstream>
 #include <vector>
 
-#include "Generator.h"
+#include "generator.h"
 #include "utils/json/json.h"
 
 using std::vector;

@@ -13,7 +13,7 @@ enum Type {
 	LIF = 0, Alpha = 1, Exp,
 	Nengo, Lowpass, 
 	Input, Possion, 
-	Probe
+	Probe, TypeSize
 }; 
 
 enum SpikeType { Excitatory = 0, Inhibitory = 1, None = 2};

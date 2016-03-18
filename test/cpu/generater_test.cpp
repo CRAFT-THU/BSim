@@ -11,8 +11,8 @@ using namespace std;
 int main(int argc, char **argv)
 {
 	//void random(int populationNum, double connectionRate, double exciteRate, int minSize, double minWeight, double minDelay, int sizeRange = 0, double weightRange = 0, double delayRange = 0);
-	balanced(2, 0.8, 0.8, 2, 4.0e-3, 1.0e-3);
-	unbalanced(2, 0.8, 0.8, 2, 4.0e-3, 1.0e-3);
+	balanced(2, 0.8, 0.8, 2, 4.0e-3, 1,  10, 1.0e-3, 2);
+	unbalanced(2, 0.8, 0.8, 2, 4.0e-3, 1, 10, 1.0e-3, 2);
 	return 0;
 } 
 

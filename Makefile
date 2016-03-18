@@ -356,30 +356,6 @@ src/GNetwork.cpp.s:
 	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/GNetwork.cpp.s
 .PHONY : src/GNetwork.cpp.s
 
-src/Generator.o: src/Generator.cpp.o
-.PHONY : src/Generator.o
-
-# target to build an object file
-src/Generator.cpp.o:
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/Generator.cpp.o
-.PHONY : src/Generator.cpp.o
-
-src/Generator.i: src/Generator.cpp.i
-.PHONY : src/Generator.i
-
-# target to preprocess a source file
-src/Generator.cpp.i:
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/Generator.cpp.i
-.PHONY : src/Generator.cpp.i
-
-src/Generator.s: src/Generator.cpp.s
-.PHONY : src/Generator.s
-
-# target to generate assembly for a file
-src/Generator.cpp.s:
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/Generator.cpp.s
-.PHONY : src/Generator.cpp.s
-
 src/ID.o: src/ID.cpp.o
 .PHONY : src/ID.o
 
@@ -839,6 +815,60 @@ src/SynapseBase.cpp.s:
 	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/SynapseBase.cpp.s
 .PHONY : src/SynapseBase.cpp.s
 
+src/generator.o: src/generator.cpp.o
+.PHONY : src/generator.o
+
+# target to build an object file
+src/generator.cpp.o:
+	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/generator.cpp.o
+	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/generator.cpp.o
+.PHONY : src/generator.cpp.o
+
+src/generator.i: src/generator.cpp.i
+.PHONY : src/generator.i
+
+# target to preprocess a source file
+src/generator.cpp.i:
+	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/generator.cpp.i
+	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/generator.cpp.i
+.PHONY : src/generator.cpp.i
+
+src/generator.s: src/generator.cpp.s
+.PHONY : src/generator.s
+
+# target to generate assembly for a file
+src/generator.cpp.s:
+	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/generator.cpp.s
+	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/generator.cpp.s
+.PHONY : src/generator.cpp.s
+
+src/utils.o: src/utils.cpp.o
+.PHONY : src/utils.o
+
+# target to build an object file
+src/utils.cpp.o:
+	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/utils.cpp.o
+	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/utils.cpp.o
+.PHONY : src/utils.cpp.o
+
+src/utils.i: src/utils.cpp.i
+.PHONY : src/utils.i
+
+# target to preprocess a source file
+src/utils.cpp.i:
+	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/utils.cpp.i
+	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/utils.cpp.i
+.PHONY : src/utils.cpp.i
+
+src/utils.s: src/utils.cpp.s
+.PHONY : src/utils.s
+
+# target to generate assembly for a file
+src/utils.cpp.s:
+	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/utils.cpp.s
+	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/utils.cpp.s
+.PHONY : src/utils.cpp.s
+
 src/utils/json/json.o: src/utils/json/json.cpp.o
 .PHONY : src/utils/json/json.o
 
@@ -1044,9 +1074,6 @@ help:
 	@echo "... src/GNetwork.o"
 	@echo "... src/GNetwork.i"
 	@echo "... src/GNetwork.s"
-	@echo "... src/Generator.o"
-	@echo "... src/Generator.i"
-	@echo "... src/Generator.s"
 	@echo "... src/ID.o"
 	@echo "... src/ID.i"
 	@echo "... src/ID.s"
@@ -1098,6 +1125,12 @@ help:
 	@echo "... src/SynapseBase.o"
 	@echo "... src/SynapseBase.i"
 	@echo "... src/SynapseBase.s"
+	@echo "... src/generator.o"
+	@echo "... src/generator.i"
+	@echo "... src/generator.s"
+	@echo "... src/utils.o"
+	@echo "... src/utils.i"
+	@echo "... src/utils.s"
 	@echo "... src/utils/json/json.o"
 	@echo "... src/utils/json/json.i"
 	@echo "... src/utils/json/json.s"

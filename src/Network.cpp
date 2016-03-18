@@ -63,7 +63,7 @@ int Network::addNeuronNum(Type type, int num)
 		neuronNums.push_back(num);
 		connectNums.push_back(0);
 	} else {
-		int idx = std::distance(iter, nTypes.begin());
+		int idx = std::distance(nTypes.begin(), iter);
 		neuronNums[idx] += num;
 	}
 
@@ -78,7 +78,7 @@ int Network::addConnectionNum(Type type, int num)
 		neuronNums.push_back(num);
 		connectNums.push_back(0);
 	} else {
-		int idx = std::distance(iter, nTypes.begin());
+		int idx = std::distance(nTypes.begin(), iter);
 		connectNums[idx] += num;
 	}
 
@@ -92,7 +92,7 @@ int Network::addSynapseNum(Type type, int num)
 		sTypes.push_back(type);
 		synapseNums.push_back(num);
 	} else {
-		int idx = std::distance(iter, sTypes.begin());
+		int idx = std::distance(sTypes.begin(), iter);
 		synapseNums[idx] += num;
 	}
 	return num;

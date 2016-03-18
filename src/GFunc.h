@@ -9,23 +9,12 @@
 #include "GExpSynapses.h"
 #include "GAlphaSynapses.h"
 
-void* (*createType[])() = { createLIFNeurons, /*createNengoNeurons, createInputNeurons, createPossionNeurons, createProbeNeurons,*/ createAlphaSynapses, createExpSynapses/*, createLowpassSynapses*/ };
-
-size_t (*getSize[])() = { getLIFSize, /*getNengoSize, getInputSize, getPossionSize, getProbeSize,*/ getAlphaSize, getExpSize/*, getLowpassSize*/ };
-
-int (*allocType[])(void *, int) = { allocLIFNeurons, /*allocNengoNeurons, allocInputNeurons, allocPossionNeurons, allocProbeNeurons,*/ allocAlphaSynapses, allocExpSynapses/*, allocLowpassSynapses*/ };
-
-int (*allocConnect[])(void *, int *, int *, int *, int) = { allocLIFConnects, /*allocNengoConnects, allocInputConnects, allocPossionConnects, allocProbeConnects,*/ allocAlphaConnects, allocExpConnects/*, allocLowpassConnects*/ };
-
-int (*cudaAllocType[])(void *, void *) = { cudaAllocLIFNeurons, /*cudaAllocNengoNeurons, cudaAllocInputNeurons, cudaAllocPossionNeurons, cudaAllocProbeNeurons,*/ cudaAllocAlphaSynapses, cudaAllocExpSynapses/*, cudaAllocLowpassSynapses*/ };
-
-int (*cudaFreeType[])(void *) = { cudaFreeLIFNeurons, /*cudaFreeNengoNeurons, cudaFreeInputNeurons, cudaFreePossionNeurons, cudaFreeProbeNeurons,*/ cudaFreeAlphaSynapses, cudaFreeExpSynapses/*, cudaFreeLowpassSynapses*/ };
-
-int updateLIFNeuron(void *, int, int);
-int updateAlphaSynapses(void *, int, int);
-int updateExpSynapses(void *, int, int);
-
-int (*updateType[])(void *, int, int) = {updateLIFNeuron, /*updateNengoNeurons, updateInputNeurons, updatePossionNeurons, updateProbeNeurons,*/ updateAlphaSynapses, updateExpSynapses/*, updateLowpassSynapses*/ };
+extern void* (*createType[TypeSize])();
+extern size_t (*getSize[TypeSize])();
+extern int (*allocType[TypeSize])(void *, int);
+extern int (*allocConnect[TypeSize])(void *, int *, int *, int *, int);
+extern int (*cudaAllocType[TypeSize])(void *, void *);
+extern int (*cudaFreeType[TypeSize])(void *);
+extern int (*updateType[TypeSize])(void *, int, int);
 
 #endif /* GFUNC_H */
-

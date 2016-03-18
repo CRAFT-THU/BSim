@@ -4,6 +4,9 @@
  */
 
 #include "Network.h"
+#include "GNetwork.h"
+#include "GFunc.h"
+#include "utils.h"
 
 GNetwork* Network::buildNetwork()
 {

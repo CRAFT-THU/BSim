@@ -39,7 +39,7 @@ int allocAlphaSynapses(void *pSynapses, int S)
 	return 0;
 }
 
-int allocExpConnects(void *pCpu, int *pSynapsesDst, int *notUsed1, int *notUsed2, int notUsed3)
+int allocAlphaConnects(void *pCpu, int *pSynapsesDst, int *notUsed1, int *notUsed2, int notUsed3)
 {
 	GAlphaSynapses *p = (GAlphaSynapses*)pCpu;
 	p->pDst = pSynapsesDst;
