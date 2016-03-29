@@ -194,6 +194,19 @@ snn_from_file/fast:
 .PHONY : snn_from_file/fast
 
 #=============================================================================
+# Target rules for targets named snn_from_file_nengo
+
+# Build rule for target.
+snn_from_file_nengo: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 snn_from_file_nengo
+.PHONY : snn_from_file_nengo
+
+# fast build rule for target.
+snn_from_file_nengo/fast:
+	$(MAKE) -f CMakeFiles/snn_from_file_nengo.dir/build.make CMakeFiles/snn_from_file_nengo.dir/build
+.PHONY : snn_from_file_nengo/fast
+
+#=============================================================================
 # Target rules for targets named synapse_test
 
 # Build rule for target.
@@ -842,6 +855,222 @@ src/generator.cpp.s:
 	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/generator.cpp.s
 .PHONY : src/generator.cpp.s
 
+src/nengo/InputPopulation.o: src/nengo/InputPopulation.cpp.o
+.PHONY : src/nengo/InputPopulation.o
+
+# target to build an object file
+src/nengo/InputPopulation.cpp.o:
+	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/nengo/InputPopulation.cpp.o
+	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/nengo/InputPopulation.cpp.o
+.PHONY : src/nengo/InputPopulation.cpp.o
+
+src/nengo/InputPopulation.i: src/nengo/InputPopulation.cpp.i
+.PHONY : src/nengo/InputPopulation.i
+
+# target to preprocess a source file
+src/nengo/InputPopulation.cpp.i:
+	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/nengo/InputPopulation.cpp.i
+	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/nengo/InputPopulation.cpp.i
+.PHONY : src/nengo/InputPopulation.cpp.i
+
+src/nengo/InputPopulation.s: src/nengo/InputPopulation.cpp.s
+.PHONY : src/nengo/InputPopulation.s
+
+# target to generate assembly for a file
+src/nengo/InputPopulation.cpp.s:
+	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/nengo/InputPopulation.cpp.s
+	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/nengo/InputPopulation.cpp.s
+.PHONY : src/nengo/InputPopulation.cpp.s
+
+src/nengo/NengoBase.o: src/nengo/NengoBase.cpp.o
+.PHONY : src/nengo/NengoBase.o
+
+# target to build an object file
+src/nengo/NengoBase.cpp.o:
+	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/nengo/NengoBase.cpp.o
+	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/nengo/NengoBase.cpp.o
+.PHONY : src/nengo/NengoBase.cpp.o
+
+src/nengo/NengoBase.i: src/nengo/NengoBase.cpp.i
+.PHONY : src/nengo/NengoBase.i
+
+# target to preprocess a source file
+src/nengo/NengoBase.cpp.i:
+	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/nengo/NengoBase.cpp.i
+	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/nengo/NengoBase.cpp.i
+.PHONY : src/nengo/NengoBase.cpp.i
+
+src/nengo/NengoBase.s: src/nengo/NengoBase.cpp.s
+.PHONY : src/nengo/NengoBase.s
+
+# target to generate assembly for a file
+src/nengo/NengoBase.cpp.s:
+	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/nengo/NengoBase.cpp.s
+	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/nengo/NengoBase.cpp.s
+.PHONY : src/nengo/NengoBase.cpp.s
+
+src/nengo/NengoLowpass.o: src/nengo/NengoLowpass.cpp.o
+.PHONY : src/nengo/NengoLowpass.o
+
+# target to build an object file
+src/nengo/NengoLowpass.cpp.o:
+	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/nengo/NengoLowpass.cpp.o
+	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/nengo/NengoLowpass.cpp.o
+.PHONY : src/nengo/NengoLowpass.cpp.o
+
+src/nengo/NengoLowpass.i: src/nengo/NengoLowpass.cpp.i
+.PHONY : src/nengo/NengoLowpass.i
+
+# target to preprocess a source file
+src/nengo/NengoLowpass.cpp.i:
+	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/nengo/NengoLowpass.cpp.i
+	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/nengo/NengoLowpass.cpp.i
+.PHONY : src/nengo/NengoLowpass.cpp.i
+
+src/nengo/NengoLowpass.s: src/nengo/NengoLowpass.cpp.s
+.PHONY : src/nengo/NengoLowpass.s
+
+# target to generate assembly for a file
+src/nengo/NengoLowpass.cpp.s:
+	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/nengo/NengoLowpass.cpp.s
+	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/nengo/NengoLowpass.cpp.s
+.PHONY : src/nengo/NengoLowpass.cpp.s
+
+src/nengo/NengoNetwork.o: src/nengo/NengoNetwork.cpp.o
+.PHONY : src/nengo/NengoNetwork.o
+
+# target to build an object file
+src/nengo/NengoNetwork.cpp.o:
+	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/nengo/NengoNetwork.cpp.o
+	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/nengo/NengoNetwork.cpp.o
+.PHONY : src/nengo/NengoNetwork.cpp.o
+
+src/nengo/NengoNetwork.i: src/nengo/NengoNetwork.cpp.i
+.PHONY : src/nengo/NengoNetwork.i
+
+# target to preprocess a source file
+src/nengo/NengoNetwork.cpp.i:
+	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/nengo/NengoNetwork.cpp.i
+	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/nengo/NengoNetwork.cpp.i
+.PHONY : src/nengo/NengoNetwork.cpp.i
+
+src/nengo/NengoNetwork.s: src/nengo/NengoNetwork.cpp.s
+.PHONY : src/nengo/NengoNetwork.s
+
+# target to generate assembly for a file
+src/nengo/NengoNetwork.cpp.s:
+	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/nengo/NengoNetwork.cpp.s
+	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/nengo/NengoNetwork.cpp.s
+.PHONY : src/nengo/NengoNetwork.cpp.s
+
+src/nengo/NengoPopulation.o: src/nengo/NengoPopulation.cpp.o
+.PHONY : src/nengo/NengoPopulation.o
+
+# target to build an object file
+src/nengo/NengoPopulation.cpp.o:
+	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/nengo/NengoPopulation.cpp.o
+	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/nengo/NengoPopulation.cpp.o
+.PHONY : src/nengo/NengoPopulation.cpp.o
+
+src/nengo/NengoPopulation.i: src/nengo/NengoPopulation.cpp.i
+.PHONY : src/nengo/NengoPopulation.i
+
+# target to preprocess a source file
+src/nengo/NengoPopulation.cpp.i:
+	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/nengo/NengoPopulation.cpp.i
+	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/nengo/NengoPopulation.cpp.i
+.PHONY : src/nengo/NengoPopulation.cpp.i
+
+src/nengo/NengoPopulation.s: src/nengo/NengoPopulation.cpp.s
+.PHONY : src/nengo/NengoPopulation.s
+
+# target to generate assembly for a file
+src/nengo/NengoPopulation.cpp.s:
+	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/nengo/NengoPopulation.cpp.s
+	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/nengo/NengoPopulation.cpp.s
+.PHONY : src/nengo/NengoPopulation.cpp.s
+
+src/nengo/NengoProbe.o: src/nengo/NengoProbe.cpp.o
+.PHONY : src/nengo/NengoProbe.o
+
+# target to build an object file
+src/nengo/NengoProbe.cpp.o:
+	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/nengo/NengoProbe.cpp.o
+	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/nengo/NengoProbe.cpp.o
+.PHONY : src/nengo/NengoProbe.cpp.o
+
+src/nengo/NengoProbe.i: src/nengo/NengoProbe.cpp.i
+.PHONY : src/nengo/NengoProbe.i
+
+# target to preprocess a source file
+src/nengo/NengoProbe.cpp.i:
+	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/nengo/NengoProbe.cpp.i
+	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/nengo/NengoProbe.cpp.i
+.PHONY : src/nengo/NengoProbe.cpp.i
+
+src/nengo/NengoProbe.s: src/nengo/NengoProbe.cpp.s
+.PHONY : src/nengo/NengoProbe.s
+
+# target to generate assembly for a file
+src/nengo/NengoProbe.cpp.s:
+	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/nengo/NengoProbe.cpp.s
+	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/nengo/NengoProbe.cpp.s
+.PHONY : src/nengo/NengoProbe.cpp.s
+
+src/nengo/NengoReader.o: src/nengo/NengoReader.cpp.o
+.PHONY : src/nengo/NengoReader.o
+
+# target to build an object file
+src/nengo/NengoReader.cpp.o:
+	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/nengo/NengoReader.cpp.o
+	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/nengo/NengoReader.cpp.o
+.PHONY : src/nengo/NengoReader.cpp.o
+
+src/nengo/NengoReader.i: src/nengo/NengoReader.cpp.i
+.PHONY : src/nengo/NengoReader.i
+
+# target to preprocess a source file
+src/nengo/NengoReader.cpp.i:
+	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/nengo/NengoReader.cpp.i
+	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/nengo/NengoReader.cpp.i
+.PHONY : src/nengo/NengoReader.cpp.i
+
+src/nengo/NengoReader.s: src/nengo/NengoReader.cpp.s
+.PHONY : src/nengo/NengoReader.s
+
+# target to generate assembly for a file
+src/nengo/NengoReader.cpp.s:
+	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/nengo/NengoReader.cpp.s
+	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/nengo/NengoReader.cpp.s
+.PHONY : src/nengo/NengoReader.cpp.s
+
+src/nengo/SingleNengoSimulator.o: src/nengo/SingleNengoSimulator.cpp.o
+.PHONY : src/nengo/SingleNengoSimulator.o
+
+# target to build an object file
+src/nengo/SingleNengoSimulator.cpp.o:
+	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/nengo/SingleNengoSimulator.cpp.o
+	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/nengo/SingleNengoSimulator.cpp.o
+.PHONY : src/nengo/SingleNengoSimulator.cpp.o
+
+src/nengo/SingleNengoSimulator.i: src/nengo/SingleNengoSimulator.cpp.i
+.PHONY : src/nengo/SingleNengoSimulator.i
+
+# target to preprocess a source file
+src/nengo/SingleNengoSimulator.cpp.i:
+	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/nengo/SingleNengoSimulator.cpp.i
+	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/nengo/SingleNengoSimulator.cpp.i
+.PHONY : src/nengo/SingleNengoSimulator.cpp.i
+
+src/nengo/SingleNengoSimulator.s: src/nengo/SingleNengoSimulator.cpp.s
+.PHONY : src/nengo/SingleNengoSimulator.s
+
+# target to generate assembly for a file
+src/nengo/SingleNengoSimulator.cpp.s:
+	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/nengo/SingleNengoSimulator.cpp.s
+	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/nengo/SingleNengoSimulator.cpp.s
+.PHONY : src/nengo/SingleNengoSimulator.cpp.s
+
 src/utils.o: src/utils.cpp.o
 .PHONY : src/utils.o
 
@@ -992,6 +1221,30 @@ test/cpu/snn_from_file.cpp.s:
 	$(MAKE) -f CMakeFiles/snn_from_file.dir/build.make CMakeFiles/snn_from_file.dir/test/cpu/snn_from_file.cpp.s
 .PHONY : test/cpu/snn_from_file.cpp.s
 
+test/cpu/snn_from_file_nengo.o: test/cpu/snn_from_file_nengo.cpp.o
+.PHONY : test/cpu/snn_from_file_nengo.o
+
+# target to build an object file
+test/cpu/snn_from_file_nengo.cpp.o:
+	$(MAKE) -f CMakeFiles/snn_from_file_nengo.dir/build.make CMakeFiles/snn_from_file_nengo.dir/test/cpu/snn_from_file_nengo.cpp.o
+.PHONY : test/cpu/snn_from_file_nengo.cpp.o
+
+test/cpu/snn_from_file_nengo.i: test/cpu/snn_from_file_nengo.cpp.i
+.PHONY : test/cpu/snn_from_file_nengo.i
+
+# target to preprocess a source file
+test/cpu/snn_from_file_nengo.cpp.i:
+	$(MAKE) -f CMakeFiles/snn_from_file_nengo.dir/build.make CMakeFiles/snn_from_file_nengo.dir/test/cpu/snn_from_file_nengo.cpp.i
+.PHONY : test/cpu/snn_from_file_nengo.cpp.i
+
+test/cpu/snn_from_file_nengo.s: test/cpu/snn_from_file_nengo.cpp.s
+.PHONY : test/cpu/snn_from_file_nengo.s
+
+# target to generate assembly for a file
+test/cpu/snn_from_file_nengo.cpp.s:
+	$(MAKE) -f CMakeFiles/snn_from_file_nengo.dir/build.make CMakeFiles/snn_from_file_nengo.dir/test/cpu/snn_from_file_nengo.cpp.s
+.PHONY : test/cpu/snn_from_file_nengo.cpp.s
+
 test/cpu/synapse_test.o: test/cpu/synapse_test.cpp.o
 .PHONY : test/cpu/synapse_test.o
 
@@ -1055,6 +1308,7 @@ help:
 	@echo "... read_write_test"
 	@echo "... rebuild_cache"
 	@echo "... snn_from_file"
+	@echo "... snn_from_file_nengo"
 	@echo "... synapse_test"
 	@echo "... src/AlphaSynapse.o"
 	@echo "... src/AlphaSynapse.i"
@@ -1128,6 +1382,30 @@ help:
 	@echo "... src/generator.o"
 	@echo "... src/generator.i"
 	@echo "... src/generator.s"
+	@echo "... src/nengo/InputPopulation.o"
+	@echo "... src/nengo/InputPopulation.i"
+	@echo "... src/nengo/InputPopulation.s"
+	@echo "... src/nengo/NengoBase.o"
+	@echo "... src/nengo/NengoBase.i"
+	@echo "... src/nengo/NengoBase.s"
+	@echo "... src/nengo/NengoLowpass.o"
+	@echo "... src/nengo/NengoLowpass.i"
+	@echo "... src/nengo/NengoLowpass.s"
+	@echo "... src/nengo/NengoNetwork.o"
+	@echo "... src/nengo/NengoNetwork.i"
+	@echo "... src/nengo/NengoNetwork.s"
+	@echo "... src/nengo/NengoPopulation.o"
+	@echo "... src/nengo/NengoPopulation.i"
+	@echo "... src/nengo/NengoPopulation.s"
+	@echo "... src/nengo/NengoProbe.o"
+	@echo "... src/nengo/NengoProbe.i"
+	@echo "... src/nengo/NengoProbe.s"
+	@echo "... src/nengo/NengoReader.o"
+	@echo "... src/nengo/NengoReader.i"
+	@echo "... src/nengo/NengoReader.s"
+	@echo "... src/nengo/SingleNengoSimulator.o"
+	@echo "... src/nengo/SingleNengoSimulator.i"
+	@echo "... src/nengo/SingleNengoSimulator.s"
 	@echo "... src/utils.o"
 	@echo "... src/utils.i"
 	@echo "... src/utils.s"
@@ -1146,6 +1424,9 @@ help:
 	@echo "... test/cpu/snn_from_file.o"
 	@echo "... test/cpu/snn_from_file.i"
 	@echo "... test/cpu/snn_from_file.s"
+	@echo "... test/cpu/snn_from_file_nengo.o"
+	@echo "... test/cpu/snn_from_file_nengo.i"
+	@echo "... test/cpu/snn_from_file_nengo.s"
 	@echo "... test/cpu/synapse_test.o"
 	@echo "... test/cpu/synapse_test.i"
 	@echo "... test/cpu/synapse_test.s"

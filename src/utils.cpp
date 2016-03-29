@@ -3,6 +3,8 @@
  * Mon March 14 2016
  */
 
+#include <iostream>
+
 #include "utils.h"
 
 //int id2idx(ID* array, int num, ID id) {
@@ -37,4 +39,21 @@ int getOffset(int *array, int size, int index)
 
 	printf("ERROR: Cannot find index %d !!!\n", index);
 	return 0;
+}
+
+Json::Value testValue(Json::Value value, unsigned int idx)
+{
+	if (value.type() == Json::nullValue) {
+		return 0;
+	}
+
+	if (value.type() == Json::arrayValue) {
+		if (idx < value.size()) {
+			return value[idx];
+		} else {
+			std::cout  << "Not enough parameters:" << value << "@" << idx << std::endl;
+		}
+	} 
+
+	return value;
 }

@@ -184,7 +184,7 @@ int Network::addOutput(int populationIDSrc, int neuronIDSrc)
 {
 	NeuronBase *pN = findNeuron(populationIDSrc, neuronIDSrc);
 	if (pN == NULL) {
-		printf("Cann't find neuron: %d:%d\n", populationIDSrc, neuronIDSrc);
+		printf("OUTPUT Cann't find neuron: %d:%d\n", populationIDSrc, neuronIDSrc);
 		return -1;
 	} else {
 		pOutputs.push_back(pN);
@@ -197,7 +197,7 @@ int Network::addProbe(int populationIDSrc, int neuronIDSrc, double weight)
 {
 	NeuronBase *pN = findNeuron(populationIDSrc, neuronIDSrc);
 	if (pN == NULL) {
-		printf("Cann't find neuron: %d:%d\n", populationIDSrc, neuronIDSrc);
+		printf("PROBE NEURON Cann't find neuron: %d:%d\n", populationIDSrc, neuronIDSrc);
 		return -1;
 	}
 
@@ -211,7 +211,7 @@ int Network::addProbe(int populationIDSrc, int neuronIDSrc, double weight)
 		pNewP->addNeuron(ProbeNeuron(ID(-2, populationIDSrc), 0.01, 0.01));
 		probe = findNeuron(-2, populationIDSrc);
 		if (probe == NULL) {
-			printf("Cann't find neuron: %d:%d\n", -2, populationIDSrc);
+			printf("PROBE Cann't find neuron: %d:%d\n", -2, populationIDSrc);
 			return -1;
 		}
 		probe->monitorOn();
@@ -225,7 +225,7 @@ int Network::addMonitor(int populationIDSrc, int neuronIDSrc)
 {
 	NeuronBase *pN = findNeuron(populationIDSrc, neuronIDSrc);
 	if (pN == NULL) {
-		printf("Cann't find neuron: %d:%d\n", populationIDSrc, neuronIDSrc);
+		printf("MONITOR Cann't find neuron: %d:%d\n", populationIDSrc, neuronIDSrc);
 		return -1;
 	} else {
 		pN->monitorOn();
@@ -267,12 +267,12 @@ int Network::connect(int populationIDSrc, int neuronIDSrc, int populationIDDst, 
 	pnDst = findNeuron(populationIDDst, neuronIDDst);
 
 	if (pnSrc == NULL) {
-		printf("Cann't find neuron: %d:%d\n", populationIDSrc, neuronIDSrc);
+		printf("CONNECTION SRC Cann't find neuron: %d:%d\n", populationIDSrc, neuronIDSrc);
 		return -1;
 	}
 
 	if (pnDst == NULL) {
-		printf("Cann't find neuron: %d:%d\n", populationIDDst, neuronIDDst);
+		printf("CONNECTION DST Cann't find neuron: %d:%d\n", populationIDDst, neuronIDDst);
 		return -2;
 	}
 	

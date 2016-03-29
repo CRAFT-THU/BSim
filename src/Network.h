@@ -105,7 +105,7 @@ int Network::connect(Population<Neuron> *pSrc, Population<Neuron> *pDst, real *w
 		addNeuronNum(pSrc->getType(), pSrc->getNum());
 	}
 	if (find(pPopulations.begin(), pPopulations.end(), pDst) == pPopulations.end()) {
-		pNeurons.push_back(pDst);
+		pPopulations.push_back(pDst);
 		populationNum++;
 		//neuronNum += pDst->getNum();
 		addNeuronNum(pDst->getType(), pDst->getNum());

@@ -9,8 +9,9 @@
 #include <cassert>
 
 #include "./utils/json/json.h"
-#include "SNNReader.h"
+#include "utils.h"
 #include "Neuron.h"
+#include "SNNReader.h"
 
 #define NEURONTYPE Nengo_lowpass
 //#define NEURONTYPE IF_curr_exp
@@ -18,23 +19,6 @@
 using std::ifstream;
 using std::cout;
 using std::endl;
-
-Json::Value testValue(Json::Value value, unsigned int idx)
-{
-	if (value.type() == Json::nullValue) {
-		return idx;
-	}
-
-	if (value.type() == Json::arrayValue) {
-		if (idx < value.size()) {
-			return value[idx];
-		} else {
-			cout << "Not enough parameters:" << value << "@" << idx << endl;
-		}
-	} 
-
-	return value;
-}
 
 Network * readNetwork(string filename)
 {
@@ -85,7 +69,21 @@ Network * readNetwork(string filename)
 		for (int j=0; j<num; j++) {
 			Json::Value para = population[i]["parameters"];
 			//NEURONTYPE n(ID(id, testValue(para["id"], j).asInt()), testValue(para["voltage"], j).asDouble(), testValue(para["v_rest"], j).asDouble(), testValue(para["reset"], j).asDouble(), testValue(para["cm"], j).asDouble(), testValue(para["tau_rc"], j).asDouble(), testValue(para["tau_ref"], j).asDouble(), testValue(para["tau_syn_E"], j).asDouble(), testValue(para["tau_syn_I"], j).asDouble(), testValue(para["threshold"], j).asDouble(), testValue(para["bias"], j).asDouble());
-			Nengo_lowpass2 n(NengoNeuron(ID(0), testValue(para["voltage"], j).asDouble(), testValue(para["min_voltage"], j).asDouble(), testValue(para["reset"], j).asDouble(), testValue(para["cm"], j).asDouble(), testValue(para["tau_rc"], j).asDouble(), testValue(para["tau_ref"], j).asDouble(), testValue(para["tau_syn_E"], j).asDouble(), testValue(para["tau_syn_I"], j).asDouble(), testValue(para["threshold"], j).asDouble(), testValue(para["bias"], j).asDouble(), testValue(para["scaled_encoders"], j)[0].asDouble()), ID(id, testValue(para["id"], j).asInt()));
+			Nengo_lowpass2 n(NengoNeuron(ID(0), 
+						testValue(para["voltage"], j).asDouble(),
+						testValue(para["min_voltage"], j).asDouble(), 
+						testValue(para["reset"], j).asDouble(), 
+						testValue(para["cm"], j).asDouble(), 
+						testValue(para["tau_rc"], j).asDouble(), 
+						testValue(para["tau_ref"], j).asDouble(), 
+						testValue(para["tau_syn_E"], j).asDouble(), 
+						testValue(para["tau_syn_I"], j).asDouble(), 
+						testValue(para["threshold"], j).asDouble(), 
+						testValue(para["bias"], j).asDouble(), 
+						testValue(para["scaled_encoders"], j)[0].asDouble()
+						), 
+					ID(id, j)
+					);
 			popu->addNeuron(n);
 		}
 	}
