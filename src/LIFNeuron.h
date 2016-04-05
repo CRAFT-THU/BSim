@@ -15,7 +15,6 @@ public:
 	LIFNeuron(const LIFNeuron &neuron, ID id);
 	~LIFNeuron();
 
-	ID getID();
 	Type getType();
 
 	virtual real get_vm();
@@ -36,7 +35,6 @@ public:
 
 	const static Type type;
 protected:
-	ID id;
 	real v_init;
 	real v_rest;
 	real v_reset;

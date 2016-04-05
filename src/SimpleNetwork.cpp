@@ -4,9 +4,9 @@
  */
 
 #include "utils.h"
-#include "Network.h"
+#include "SimpleNetwork.h"
 
-Network::Network()
+SimpleNetwork::SimpleNetwork()
 {
 	pPopulations.clear();
 	pNeurons.clear();
@@ -14,12 +14,6 @@ Network::Network()
 	pOutputs.clear();
 	n2sNetwork.clear();
 	s2nNetwork.clear();
-	id2neuron.clear();
-	id2synapse.clear();
-	nid2idx.clear();
-	idx2nid.clear();
-	sid2idx.clear();
-	idx2sid.clear();
 	maxDelay = 0;
 	maxFireRate = 0;
 	populationNum = 0;
@@ -30,7 +24,7 @@ Network::Network()
 	sTypes.clear();
 }
 
-Network::~Network()
+SimpleNetwork::~SimpleNetwork()
 {
 	if (!pPopulations.empty()) {
 		vector<PopulationBase*>::iterator iter;
@@ -61,7 +55,7 @@ Network::~Network()
 	pSynapses.clear();
 }
 
-int Network::addNeuronNum(Type type, int num)
+int SimpleNetwork::addNeuronNum(Type type, int num)
 {
 	vector<Type>::iterator iter = find(nTypes.begin(), nTypes.end(), type);
 	if (iter == nTypes.end()) {
@@ -76,7 +70,7 @@ int Network::addNeuronNum(Type type, int num)
 	return num;
 }
 
-int Network::addConnectionNum(Type type, int num)
+int SimpleNetwork::addConnectionNum(Type type, int num)
 {
 	vector<Type>::iterator iter = find(nTypes.begin(), nTypes.end(), type);
 	if (iter == nTypes.end()) {
@@ -91,7 +85,7 @@ int Network::addConnectionNum(Type type, int num)
 	return num;
 }
 
-int Network::addSynapseNum(Type type, int num)
+int SimpleNetwork::addSynapseNum(Type type, int num)
 {
 	vector<Type>::iterator iter = find(sTypes.begin(), sTypes.end(), type);
 	if (iter == sTypes.end()) {
@@ -104,7 +98,7 @@ int Network::addSynapseNum(Type type, int num)
 	return num;
 }
 
-SynapseBase* Network::connect(NeuronBase *pn1, NeuronBase *pn2, real weight, real delay, SpikeType type, real tau, bool store)
+SynapseBase* SimpleNetwork::connect(NeuronBase *pn1, NeuronBase *pn2, real weight, real delay, SpikeType type, real tau, bool store)
 {
 	if (store) {
 		if (find(pNeurons.begin(), pNeurons.end(), pn1) == pNeurons.end()) {
@@ -117,20 +111,10 @@ SynapseBase* Network::connect(NeuronBase *pn1, NeuronBase *pn2, real weight, rea
 		}
 	}
 
-	if (id2neuron.find(pn1->getID()) == id2neuron.end()) {
-		id2neuron[pn1->getID()] = pn1;
-	}
-	if (id2neuron.find(pn2->getID()) == id2neuron.end()) {
-		id2neuron[pn2->getID()] = pn2;
-	}
-
 	SynapseBase * p = pn1->addSynapse(weight, delay, type, tau, pn2);
 
-	if (id2synapse.find(p->getID()) == id2synapse.end()) {
-		id2synapse[p->getID()] = p;
-	}
-
 	pSynapses.push_back(p);
+	//synapseNum++;
 	addConnectionNum(pn1->getType(), 1);
 	addSynapseNum(p->getType(), 1);
 
@@ -144,7 +128,7 @@ SynapseBase* Network::connect(NeuronBase *pn1, NeuronBase *pn2, real weight, rea
 	return p;
 }
 
-PopulationBase* Network::findPopulation(int populationID)
+PopulationBase* SimpleNetwork::findPopulation(int populationID)
 {
 	PopulationBase *pP= NULL;
 	vector<PopulationBase*>::iterator iter;
@@ -166,7 +150,7 @@ PopulationBase* Network::findPopulation(int populationID)
 	return pP;
 }
 
-NeuronBase* Network::findNeuron(int populationIDSrc, int neuronIDSrc)
+NeuronBase* SimpleNetwork::findNeuron(int populationIDSrc, int neuronIDSrc)
 {
 	//PopulationBase *pP= NULL;
 	//vector<PopulationBase*>::iterator iter;
@@ -196,7 +180,7 @@ NeuronBase* Network::findNeuron(int populationIDSrc, int neuronIDSrc)
 	return pN;
 }
 
-int Network::addOutput(int populationIDSrc, int neuronIDSrc)
+int SimpleNetwork::addOutput(int populationIDSrc, int neuronIDSrc)
 {
 	NeuronBase *pN = findNeuron(populationIDSrc, neuronIDSrc);
 	if (pN == NULL) {
@@ -209,7 +193,7 @@ int Network::addOutput(int populationIDSrc, int neuronIDSrc)
 	return 0;
 }
 
-int Network::addProbe(int populationIDSrc, int neuronIDSrc, double weight)
+int SimpleNetwork::addProbe(int populationIDSrc, int neuronIDSrc, double weight)
 {
 	NeuronBase *pN = findNeuron(populationIDSrc, neuronIDSrc);
 	if (pN == NULL) {
@@ -237,7 +221,7 @@ int Network::addProbe(int populationIDSrc, int neuronIDSrc, double weight)
 	return 0;
 }
 
-int Network::addMonitor(int populationIDSrc, int neuronIDSrc)
+int SimpleNetwork::addMonitor(int populationIDSrc, int neuronIDSrc)
 {
 	NeuronBase *pN = findNeuron(populationIDSrc, neuronIDSrc);
 	if (pN == NULL) {
@@ -250,7 +234,7 @@ int Network::addMonitor(int populationIDSrc, int neuronIDSrc)
 	return 0;
 }
 
-int Network::connect(int populationIDSrc, int neuronIDSrc, int populationIDDst, int neuronIDDst, real weight, real delay, real tau)
+int SimpleNetwork::connect(int populationIDSrc, int neuronIDSrc, int populationIDDst, int neuronIDDst, real weight, real delay, real tau)
 {
 	//PopulationBase *ppSrc = NULL, *ppDst = NULL;
 	//vector<PopulationBase*>::iterator iter;
@@ -301,7 +285,7 @@ int Network::connect(int populationIDSrc, int neuronIDSrc, int populationIDDst, 
 	return 0;
 }
 
-int Network::reset(SimInfo &info)
+int SimpleNetwork::reset(SimInfo &info)
 {
 	vector<SynapseBase*>::iterator iterS;
 	vector<NeuronBase*>::iterator iterN;
@@ -322,7 +306,7 @@ int Network::reset(SimInfo &info)
 	return 0;
 }
 
-int Network::update(SimInfo &info)
+int SimpleNetwork::update(SimInfo &info)
 {
 	vector<SynapseBase*>::iterator iterS;
 	vector<NeuronBase*>::iterator iterN;
@@ -346,7 +330,7 @@ int Network::update(SimInfo &info)
 	return 0;
 }
 
-void Network::monitor(SimInfo &info)
+void SimpleNetwork::monitor(SimInfo &info)
 {
 	vector<SynapseBase*>::iterator iterS;
 	vector<NeuronBase*>::iterator iterN;
@@ -368,4 +352,3 @@ void Network::monitor(SimInfo &info)
 		p->monitor(info);
 	}
 }
-

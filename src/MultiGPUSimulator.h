@@ -1,0 +1,22 @@
+/* This header file is writen by qp09
+ * usually just for fun
+ * Sun December 13 2015
+ */
+#ifndef MULTIGPUSIMULATOR_H
+#define MULTIGPUSIMULATOR_H
+
+#include "SimulatorBase.h"
+
+class MultiGPUSimulator : public SimulatorBase {
+public:
+	MultiGPUSimulator(Network *network, real dt);
+	~MultiGPUSimulator();
+	virtual int run(real time);
+	int init(int argc, char**argv);
+protected:
+	int rank;
+	int size;
+};
+
+#endif /* MULTIGPUSIMULATOR_H */
+

@@ -8,15 +8,29 @@
 #include "constant.h"
 
 struct GNetwork {
+	//Local Info
+	//Pointers to neurons
 	void **pNeurons;
+	//Pointers to synapses
 	void **pSynapses;
-
-	int nTypeNum;
-	int sTypeNum;
-	Type * nTypes;
-	Type * sTypes;
+	//Local machine offsets
+	int *nOffsets;
+	int *sOffsets;
+	//Local index for each type
 	int *neuronNums;
 	int *synapseNums;
+
+	//Global Info
+	//Numbers of types
+	int nTypeNum;
+	int sTypeNum;
+	//Type 
+	Type * nTypes;
+	Type * sTypes;
+	//Global index for each type
+	int *gNeuronNums;
+	int *gSynapseNums;
+
 	real MAX_DELAY;
 };
 

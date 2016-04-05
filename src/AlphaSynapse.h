@@ -13,7 +13,6 @@ using std::list;
 
 class AlphaSynapse : SynapseBase {
 public:
-	ID getID();
 	Type getType();
 
 	int init(real dt);
@@ -44,7 +43,6 @@ protected:
 	real I_syn;
 	real I_tmp;
 	real _dt;
-	ID id;
 	bool monitored;
 	list<int> delay_step;
 	NeuronBase *pDest;

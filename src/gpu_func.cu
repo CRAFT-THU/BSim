@@ -5,7 +5,7 @@
 
 #include "Neuron.h"
 #include "gpu_kernel.h"
-#include "GFunc.h"
+#include "gpu_func.h"
 
 int updateLIFNeuron(void *, int, int);
 int updateAlphaSynapses(void *, int, int);

@@ -16,9 +16,9 @@ template<class Neuron>
 class Population : public PopulationBase {
 public:
 	Population(ID _id, unsigned int N);
+	Population(ID _id, unsigned int N, Neuron templ);
 	~Population();
 
-	ID getID();
 	Type getType();
 
 	int getNum();
@@ -37,7 +37,6 @@ public:
 protected:
 	const static Type type;
 
-	ID id;
 	unsigned int N;
 	vector<Neuron> neurons;
 };
@@ -48,9 +47,21 @@ template<class Neuron>
 const Type Population<Neuron>::type = Neuron::type;
 
 template<class Neuron>
-Population<Neuron>::Population(ID _id, unsigned int N) : id(_id)
+Population<Neuron>::Population(ID _id, unsigned int N) 
 {
+	this->id = _id;
 	neurons.reserve(N);
+	this->N = N;
+}
+
+template<class Neuron>
+Population<Neuron>::Population(ID _id, unsigned int N, Neuron templ)
+{
+	this->id = _id;
+	neurons.resize(N, templ);
+	for (unsigned int i=0; i<N; i++) {
+		neurons[i].setID(ID(id.id, i));
+	}
 	this->N = N;
 }
 
@@ -153,11 +164,6 @@ int Population<Neuron>::hardCopy(void *data, int idx)
 		copiedIdxs += copied;
 	}
 	return copiedIdxs;
-}
-
-template<class Neuron>
-ID Population<Neuron>::getID() {
-	return id;
 }
 
 template<class Neuron>

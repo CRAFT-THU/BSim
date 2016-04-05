@@ -15,7 +15,6 @@ public:
 	NengoNeuron(const NengoNeuron &neuron, ID id);
 	~NengoNeuron();
 
-	ID getID();
 	Type getType();
 
 	virtual int fire();
@@ -35,7 +34,6 @@ public:
 
 	const static Type type;
 protected:
-	ID id;
 	real v_init;
 	real v_min;
 	real v_reset;

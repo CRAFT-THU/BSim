@@ -14,7 +14,6 @@ using std::list;
 
 class LowpassSynapse : public SynapseBase {
 public:
-	ID getID();
 	Type getType();
 
 	int init(real dt);
@@ -42,7 +41,6 @@ protected:
 	real tau_syn;
 	real I_syn;
 	real _dt;
-	ID id;
 	list<int> delay_step;
 	NeuronBase *pDest;
 	bool monitored;

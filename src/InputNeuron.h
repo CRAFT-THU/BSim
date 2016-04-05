@@ -20,7 +20,6 @@ public:
 	InputNeuron(const InputNeuron &templ, ID id);
 	~InputNeuron();
 
-	virtual ID getID();
 	virtual Type getType();
 
 	virtual int fire();
@@ -44,7 +43,6 @@ protected:
 	real tau_syn_E;
 	real tau_syn_I;
 	FILE *file;
-	ID m_id;
 };
 
 #endif /* INPUTNEURON_H */

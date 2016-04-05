@@ -11,8 +11,8 @@
 const Type InputNeuron::type = Input;
 
 InputNeuron::InputNeuron(ID id)
-	:m_id(id)
 {
+	this->id = id;
 	file = NULL;
 	fired = false;
 	monitored = false;
@@ -22,8 +22,8 @@ InputNeuron::InputNeuron(ID id)
 }
 
 InputNeuron::InputNeuron(const InputNeuron &templ, ID id)
-	:m_id(id)
 {
+	this->id = id;
 	file = NULL;
 	fired = false;
 	monitored = templ.monitored;
@@ -59,11 +59,6 @@ int InputNeuron::fire()
 	return 0;
 }
 
-ID InputNeuron::getID()
-{
-	return m_id;
-}
-
 Type InputNeuron::getType()
 {
 	return type;
@@ -87,7 +82,7 @@ int InputNeuron::update(SimInfo &info)
 		while (fireTime.front() <= info.currCycle) {
 			fired = true;
 			fire();
-			info.fired.push_back(this->m_id);
+			info.fired.push_back(this->id);
 			fireTime.pop_front();
 			if (fireTime.empty()) {
 				break;
@@ -104,7 +99,7 @@ void InputNeuron::monitor(SimInfo &info)
 			int size = fireTime.size();
 			if (size > 0) {
 				char filename[128];
-				sprintf(filename, "InputNeuron_%d_%d.log", this->m_id.groupId, this->m_id.id);
+				sprintf(filename, "InputNeuron_%d_%d.log", this->id.groupId, this->id.id);
 				file = fopen(filename, "w+");
 				if (file == NULL) {
 					printf("Open File: %s failed\n", filename);

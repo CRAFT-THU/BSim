@@ -246,6 +246,33 @@ src/AlphaSynapse.cpp.s:
 	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/AlphaSynapse.cpp.s
 .PHONY : src/AlphaSynapse.cpp.s
 
+src/Base.o: src/Base.cpp.o
+.PHONY : src/Base.o
+
+# target to build an object file
+src/Base.cpp.o:
+	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/Base.cpp.o
+	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/Base.cpp.o
+.PHONY : src/Base.cpp.o
+
+src/Base.i: src/Base.cpp.i
+.PHONY : src/Base.i
+
+# target to preprocess a source file
+src/Base.cpp.i:
+	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/Base.cpp.i
+	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/Base.cpp.i
+.PHONY : src/Base.cpp.i
+
+src/Base.s: src/Base.cpp.s
+.PHONY : src/Base.s
+
+# target to generate assembly for a file
+src/Base.cpp.s:
+	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/Base.cpp.s
+	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/Base.cpp.s
+.PHONY : src/Base.cpp.s
+
 src/ExpSynapse.o: src/ExpSynapse.cpp.o
 .PHONY : src/ExpSynapse.o
 
@@ -344,30 +371,6 @@ src/GLIFNeurons.s: src/GLIFNeurons.cpp.s
 src/GLIFNeurons.cpp.s:
 	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/GLIFNeurons.cpp.s
 .PHONY : src/GLIFNeurons.cpp.s
-
-src/GNetwork.o: src/GNetwork.cpp.o
-.PHONY : src/GNetwork.o
-
-# target to build an object file
-src/GNetwork.cpp.o:
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/GNetwork.cpp.o
-.PHONY : src/GNetwork.cpp.o
-
-src/GNetwork.i: src/GNetwork.cpp.i
-.PHONY : src/GNetwork.i
-
-# target to preprocess a source file
-src/GNetwork.cpp.i:
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/GNetwork.cpp.i
-.PHONY : src/GNetwork.cpp.i
-
-src/GNetwork.s: src/GNetwork.cpp.s
-.PHONY : src/GNetwork.s
-
-# target to generate assembly for a file
-src/GNetwork.cpp.s:
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/GNetwork.cpp.s
-.PHONY : src/GNetwork.cpp.s
 
 src/ID.o: src/ID.cpp.o
 .PHONY : src/ID.o
@@ -746,6 +749,33 @@ src/SNNWriter.cpp.s:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/SNNWriter.cpp.s
 	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/SNNWriter.cpp.s
 .PHONY : src/SNNWriter.cpp.s
+
+src/SimpleNetwork.o: src/SimpleNetwork.cpp.o
+.PHONY : src/SimpleNetwork.o
+
+# target to build an object file
+src/SimpleNetwork.cpp.o:
+	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/SimpleNetwork.cpp.o
+	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/SimpleNetwork.cpp.o
+.PHONY : src/SimpleNetwork.cpp.o
+
+src/SimpleNetwork.i: src/SimpleNetwork.cpp.i
+.PHONY : src/SimpleNetwork.i
+
+# target to preprocess a source file
+src/SimpleNetwork.cpp.i:
+	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/SimpleNetwork.cpp.i
+	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/SimpleNetwork.cpp.i
+.PHONY : src/SimpleNetwork.cpp.i
+
+src/SimpleNetwork.s: src/SimpleNetwork.cpp.s
+.PHONY : src/SimpleNetwork.s
+
+# target to generate assembly for a file
+src/SimpleNetwork.cpp.s:
+	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/SimpleNetwork.cpp.s
+	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/SimpleNetwork.cpp.s
+.PHONY : src/SimpleNetwork.cpp.s
 
 src/SimulatorBase.o: src/SimulatorBase.cpp.o
 .PHONY : src/SimulatorBase.o
@@ -1313,6 +1343,9 @@ help:
 	@echo "... src/AlphaSynapse.o"
 	@echo "... src/AlphaSynapse.i"
 	@echo "... src/AlphaSynapse.s"
+	@echo "... src/Base.o"
+	@echo "... src/Base.i"
+	@echo "... src/Base.s"
 	@echo "... src/ExpSynapse.o"
 	@echo "... src/ExpSynapse.i"
 	@echo "... src/ExpSynapse.s"
@@ -1325,9 +1358,6 @@ help:
 	@echo "... src/GLIFNeurons.o"
 	@echo "... src/GLIFNeurons.i"
 	@echo "... src/GLIFNeurons.s"
-	@echo "... src/GNetwork.o"
-	@echo "... src/GNetwork.i"
-	@echo "... src/GNetwork.s"
 	@echo "... src/ID.o"
 	@echo "... src/ID.i"
 	@echo "... src/ID.s"
@@ -1370,6 +1400,9 @@ help:
 	@echo "... src/SNNWriter.o"
 	@echo "... src/SNNWriter.i"
 	@echo "... src/SNNWriter.s"
+	@echo "... src/SimpleNetwork.o"
+	@echo "... src/SimpleNetwork.i"
+	@echo "... src/SimpleNetwork.s"
 	@echo "... src/SimulatorBase.o"
 	@echo "... src/SimulatorBase.i"
 	@echo "... src/SimulatorBase.s"

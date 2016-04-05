@@ -92,11 +92,6 @@ int LowpassSynapse::recv()
 	return 0;
 }
 
-ID LowpassSynapse::getID()
-{
-	return id;
-}
-
 Type LowpassSynapse::getType()
 {
 	return type;

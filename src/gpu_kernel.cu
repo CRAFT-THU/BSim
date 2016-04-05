@@ -31,11 +31,24 @@ __device__ int get_type(int *array, int num, int value, int *offset)
 	return 0;
 }
 
-__device__ int get_gid(int *array, Type *types, int num, int type, int offset)
+//int gnid = get_gid(gGpuNet->neuronNums, gGpuNet->nTypes, gGpuNet->nTypeNum, LIF, nid);
+//__device__ int get_gid(int *array, Type *types, int num, int type, int offset)
+__device__ int get_gnid(GNetwork *net, int type, int offset)
 {
-	for (int i=0; i<num; i++) {
-		if (types[i] == type) {
-			return array[i] + offset;
+	for (int i=0; i<net->nTypeNum; i++) {
+		if (net->nTypes[i] == type) {
+			return (net->gNeuronNums[i] + net->nOffsets[i] + offset);
+		}
+	}
+
+	return 0;
+}
+
+__device__ int get_gsid(GNetwork *net, int type, int offset)
+{
+	for (int i=0; i<net->sTypeNum; i++) {
+		if (net->sTypes[i] == type) {
+			return (net->gSynapseNums[i] + net->sOffsets[i] + offset);
 		}
 	}
 
@@ -165,9 +178,10 @@ __global__ void update_pre_synapse(GNetwork *d_net, int simTime)
 		int start_t = gTimeTable[time];
 		for (int idx = tid; idx < gFiredTableSize; idx += blockDim.x*gridDim.x) {
 			int nid = idx;
-			if (gFiredTable[time*gFiredTableSize + nid] > 0) {
-				int offset = 0;
-				int type = get_type(d_net->neuronNums, d_net->nTypeNum+1, nid, &offset);
+			int offset = 0;
+			int type = get_type(d_net->neuronNums, d_net->nTypeNum+1, nid, &offset);
+			int gnid = get_gnid(d_net, type, offset);
+			if (gFiredTable[time*gFiredTableSize + gnid] > 0) {
 				update_spike[type](d_net->pNeurons[type], d_net->neuronNums[type+1]-d_net->neuronNums[type], offset, start_t, simTime);
 			}
 		}
@@ -180,11 +194,12 @@ __global__ void update_post_synapse(GNetwork *d_net, int simTime)
 	int num = d_net->synapseNums[d_net->sTypeNum+1];
 	for (int idx = tid; idx<num; idx += blockDim.x*gridDim.x) {
 		int sid = idx;
-		if (gSynapsesFiredTable[sid]) {
-			int offset = 0;
-			int type = get_type(d_net->synapseNums, d_net->sTypeNum+1, tid, &offset);
+		int offset = 0;
+		int type = get_type(d_net->synapseNums, d_net->sTypeNum+1, tid, &offset);
+		int gsid = get_gsid(d_net, type, offset);
+		if (gSynapsesFiredTable[gsid]) {
 			update_spike[type](d_net->pSynapses[type], d_net->synapseNums[type+1]-d_net->neuronNums[type], offset, 0, simTime);
-			gSynapsesFiredTable[sid] = false;
+			gSynapsesFiredTable[gsid] = false;
 		}
 	}
 }
@@ -218,7 +233,7 @@ __global__ void update_lif_neuron(GLIFNeurons *d_neurons, int num, int simTime)
 		if (nid < num) {
 			int fired = 0;
 			//real I = d_neurons->p_i_syn[nid] + d_neurons->p_i_tmp[nid];
-			int gnid = get_gid(gGpuNet->neuronNums, gGpuNet->nTypes, gGpuNet->nTypeNum, LIF, nid);
+			int gnid = get_gnid(gGpuNet, LIF, nid);
 			real I = gNeuronInput[gnid] + d_neurons->p_i_tmp[nid];
 			d_neurons->p_vm[nid] = d_neurons->p_vm[nid] * d_neurons->p_C1[nid] + d_neurons->p_C2[nid] * I;
 			//d_neurons->p_i_syn[nid] = 0;

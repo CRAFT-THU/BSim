@@ -93,11 +93,6 @@ size_t AlphaSynapse::getSize()
 	return sizeof(GAlphaSynapses);
 }
 
-ID AlphaSynapse::getID()
-{
-	return id;
-}
-
 Type AlphaSynapse::getType()
 {
 	return type;

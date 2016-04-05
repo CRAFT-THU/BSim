@@ -117,10 +117,6 @@ int LIFNeuron::reset(SimInfo &info)
 	return init(info.dt);
 }
 
-ID LIFNeuron::getID()
-{
-	return id;
-}
 
 Type LIFNeuron::getType()
 {

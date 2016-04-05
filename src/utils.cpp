@@ -4,8 +4,13 @@
  */
 
 #include <iostream>
-
 #include "utils.h"
+
+double realRandom(double range)
+{
+	long f = rand();
+	return (double)(f/RAND_MAX)*range;
+}
 
 //int id2idx(ID* array, int num, ID id) {
 //	for (int i=0; i<num; i++) {

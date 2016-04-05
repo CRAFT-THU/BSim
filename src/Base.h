@@ -10,7 +10,11 @@
 
 class Base {
 public:
-	virtual ID getID() = 0;
+	Base();
+	virtual ~Base();
+
+	virtual ID getID();
+	virtual void setID(ID id);
 	virtual Type getType() = 0;
 
 	virtual void monitorOn() = 0;
@@ -21,6 +25,9 @@ public:
 	virtual size_t getSize() = 0;
 	virtual int getData(void *data) = 0;
 	virtual int hardCopy(void *data, int idx) = 0;
+	
+protected:
+	ID id;
 };
 
 #endif /* BASE_H */

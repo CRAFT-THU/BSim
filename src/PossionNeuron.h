@@ -16,7 +16,6 @@ class PossionNeuron : public NeuronBase {
 	PossionNeuron(ID id, double rate, double refract, double startTime = 0);
 	~PossionNeuron();
 
-	virtual ID getID();
 	virtual Type getType();
 
 	virtual int fire();
@@ -48,7 +47,6 @@ protected:
 	int m_startCycle;
 	int m_fireCycle;
 	FILE *file;
-	ID m_id;
 };
 
 #endif /* POSSIONNEURON_H */

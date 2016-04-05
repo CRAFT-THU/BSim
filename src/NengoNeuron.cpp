@@ -147,11 +147,6 @@ int NengoNeuron::reset(SimInfo &info)
 	return init(info.dt);
 }
 
-ID NengoNeuron::getID()
-{
-	return id;
-}
-
 Type NengoNeuron::getType()
 {
 	return type;

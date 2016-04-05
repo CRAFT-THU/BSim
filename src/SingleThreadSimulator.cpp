@@ -3,6 +3,7 @@
  * Sat October 24 2015
  */
 
+#include <sys/time.h>
 #include <stdio.h>
 #include "SingleThreadSimulator.h"
 
@@ -47,6 +48,8 @@ int SingleThreadSimulator::run(real time)
 	info.dt = dt;
 
 	printf("Start runing for %d cycles\n", sim_cycle);
+	struct timeval ts, te;
+	gettimeofday(&ts, NULL);
 	for (int cycle=0; cycle<sim_cycle; cycle++) {
 		printf("\rCycle: %d", cycle);
 		fflush(stdout);
@@ -55,60 +58,45 @@ int SingleThreadSimulator::run(real time)
 		info.fired.clear();
 
 		//Update
-		for (iterP=network->pPopulations.begin(); iterP!=network->pPopulations.end(); iterP++) {
-			PopulationBase * p = *iterP;
-			p->update(info);
-		}
-
-		for (iterN=network->pNeurons.begin(); iterN!=network->pNeurons.end(); iterN++) {
-			NeuronBase * p = *iterN;
-			p->update(info);
-		}
-
-		for (iterS=network->pSynapses.begin(); iterS!=network->pSynapses.end(); iterS++) {
-			SynapseBase *p = *iterS;
-			p->update(info);
-		}
+		network->update(info);
 
 		//Log info
-		for (iterP=network->pPopulations.begin(); iterP!=network->pPopulations.end(); iterP++) {
-			PopulationBase * p = *iterP;
-			p->monitorOn();
-			p->monitor(info);
-		}
-
-		//for (iterN=network->pNeurons.begin(); iterN!=network->pNeurons.end(); iterN++) {
-		//	NeuronBase * p = *iterN;
-		//	p->monitor(info);
-		//}
-
-		for (iterS=network->pSynapses.begin(); iterS!=network->pSynapses.end(); iterS++) {
-			SynapseBase *p = *iterS;
-			p->monitor(info);
-		}
+		network->monitor(info);
 
 		int size = info.fired.size();
+		fprintf(logFile, "Cycle %d: ", info.currCycle);
 		if (size > 0) {
-			fprintf(logFile, "Cycle %d: ", info.currCycle);
 			fprintf(logFile, "%d_%d", info.fired[0].groupId, info.fired[0].id);
 			for (int i=1; i<size; i++) {
 				fprintf(logFile, ", %d_%d", info.fired[i].groupId, info.fired[i].id);
 			}
-			fprintf(logFile, "\n");
 		}
+		fprintf(logFile, "\n");
+
 		size = network->pOutputs.size();
+		fprintf(outFile, "%d", info.currCycle);
 		if (size > 0) {
-			fprintf(outFile, "%d", info.currCycle);
 			fprintf(outFile, ",%d", network->pOutputs[0]->isFired());
 			for (int i=1; i<size; i++) {
 				fprintf(outFile, ",%d", network->pOutputs[i]->isFired());
 			}
-			fprintf(outFile, "\n");
 		}
+		fprintf(outFile, "\n");
+	}
+	gettimeofday(&te, NULL);
+	long seconds = te.tv_sec - ts.tv_sec;
+	long hours = seconds/3600;
+	seconds = seconds%3600;
+	long minutes = seconds/60;
+	seconds = seconds%60;
+	long uSeconds = te.tv_usec - ts.tv_usec;
+	if (uSeconds < 0) {
+		uSeconds += 1000000;
+		seconds = seconds - 1;
 	}
 
 	fclose(logFile);
-	printf("\nFinish runing\n");
+	printf("\nSimulation finesed in %ld:%ld:%ld.%06lds\n", hours, minutes, seconds, uSeconds);
 
 	return 0;
 }

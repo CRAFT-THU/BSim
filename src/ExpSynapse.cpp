@@ -81,11 +81,6 @@ int ExpSynapse::recv()
 	return 0;
 }
 
-ID ExpSynapse::getID()
-{
-	return id;
-}
-
 Type ExpSynapse::getType()
 {
 	return type;

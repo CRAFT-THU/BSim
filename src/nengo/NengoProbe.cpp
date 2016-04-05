@@ -60,7 +60,7 @@ int NengoProbe::update(SimInfo &info)
 	real C1 = -0.90483742;
 	real _C1 = 0.09516258;
 	vm =  -C1 * vm + w_t * _C1;
-	fprintf(file, " %f\n", vm); 
+	fprintf(file, "%f\n", vm); 
 
 	return 0;
 }

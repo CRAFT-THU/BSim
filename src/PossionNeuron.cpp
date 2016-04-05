@@ -4,6 +4,7 @@
  */
 
 #include <stdlib.h>
+#include <time.h>
 #include <math.h>
 
 #include "PossionNeuron.h"
@@ -21,13 +22,15 @@ double uRandom()
 const Type PossionNeuron::type = Possion;
 
 PossionNeuron::PossionNeuron(ID id, double rate, double refract, double startTime)
-	:m_rate(rate), m_refract(refract), m_startTime(startTime), m_id(id)
+	:m_rate(rate), m_refract(refract), m_startTime(startTime)
 {
+	this->id = id;
 	file = NULL;
 	fired = false;
 	monitored = false;
 	m_fireCycle= 0;
 	m_startCycle = 0;
+	srand(time(NULL));
 }
 
 PossionNeuron::~PossionNeuron()
@@ -64,11 +67,6 @@ SynapseBase * PossionNeuron::addSynapse(real weight, real delay, SpikeType type,
 	return ret;
 }
 
-ID PossionNeuron::getID()
-{
-	return m_id;
-}
-
 Type PossionNeuron::getType()
 {
 	return type;
@@ -95,7 +93,7 @@ void PossionNeuron::monitor(SimInfo &info)
 	if (monitored) {
 		if (file == NULL) {
 			char filename[128];
-			sprintf(filename, "PossionNeuron_%d_%d.log", this->m_id.groupId, this->m_id.id);
+			sprintf(filename, "PossionNeuron_%d_%d.log", this->id.groupId, this->id.id);
 			file = fopen(filename, "w+");
 		}
 		fprintf(file, "%d\n", m_fireCycle); 

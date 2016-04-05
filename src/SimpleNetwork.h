@@ -2,8 +2,8 @@
  * usually just for fun
  * Sat October 24 2015
  */
-#ifndef NETWORK_H
-#define NETWORK_H
+#ifndef SIMPLENETWORK_H
+#define SIMPLENETWORK_H
 
 #include <vector>
 #include <map>
@@ -22,15 +22,15 @@ using std::find;
 using std::vector;
 
 
-class Network {
+class SimpleNetwork {
 public:
-	Network();
-	~Network();
+	SimpleNetwork();
+	~SimpleNetwork();
 
 	template<class Neuron>
 	Neuron* create(Neuron n1);
 	template<class Neuron>
-	Population<Neuron>* createPopulation(ID id, int num, Neuron templ, bool empty = false);
+	Population<Neuron>* createPopulation(ID id, int num, Neuron templ);
 	template<class Neuron>
 	int connect(Population<Neuron> *pSrc, Population<Neuron> *pDst, real *weight, real *delay, SpikeType *type, int size);
 	
@@ -52,21 +52,15 @@ public:
 	int update(SimInfo &info);
 	void monitor(SimInfo &info);
 
-public:
-	vector<NeuronBase*> pOutputs;
-
 //protected:
 	vector<PopulationBase*> pPopulations;
 	vector<NeuronBase*> pNeurons;
 	vector<SynapseBase*> pSynapses;
+	vector<NeuronBase*> pOutputs;
 	map<ID, vector<ID> > n2sNetwork;
 	map<ID, ID> s2nNetwork;
-	map<ID, NeuronBase*> id2neuron;
-	map<ID, SynapseBase*> id2synapse;
-	map<ID, int> nid2idx;
-	map<ID, int> sid2idx;
-	map<int, ID> idx2nid;
-	map<int, ID> idx2sid;
+	map<ID, int> id2idx;
+	map<int, ID> idx2id;
 	real maxDelay;
 	real maxFireRate;
 	vector<Type> nTypes;
@@ -78,7 +72,7 @@ public:
 };
 
 template<class Neuron>
-Neuron* Network::create(Neuron n1)
+Neuron* SimpleNetwork::create(Neuron n1)
 {
 	Neuron *pn1 = new Neuron(n1);
 	if (find(pNeurons.begin(), pNeurons.end(), pn1) == pNeurons.end()) {
@@ -90,16 +84,9 @@ Neuron* Network::create(Neuron n1)
 }
 
 template<class Neuron>
-Population<Neuron>* Network::createPopulation(ID id, int num, Neuron templ, bool empty)
+Population<Neuron>* SimpleNetwork::createPopulation(ID id, int num, Neuron tmpl)
 {
-	
-	Population<Neuron> * pp1 = NULL;
-	if (empty) {
-		pp1 = new Population<Neuron>(id, num);
-	} else {
-		pp1 = new Population<Neuron>(id, num, templ);
-	}
-
+	Population<Neuron> * pp1 = new Population<Neuron>(id, num);
 	if (find(pPopulations.begin(), pPopulations.end(), pp1) == pPopulations.end()) {
 		pPopulations.push_back(pp1);
 		populationNum++;
@@ -110,11 +97,10 @@ Population<Neuron>* Network::createPopulation(ID id, int num, Neuron templ, bool
 }
 
 template<class Neuron>
-int Network::connect(Population<Neuron> *pSrc, Population<Neuron> *pDst, real *weight, real *delay, SpikeType *type, int size) {
-	int srcSize = pSrc->getNum();
-	int dstSize = pDst->getNum();
+int SimpleNetwork::connect(Population<Neuron> *pSrc, Population<Neuron> *pDst, real *weight, real *delay, SpikeType *type, int size) {
+	int srcSize = pSrc->getSize();
+	int dstSize = pDst->getSize();
 	if (size != srcSize * dstSize) {
-		printf("ERROR: size not match!");
 		return -1;
 	}	
 	if (find(pPopulations.begin(), pPopulations.end(), pSrc) == pPopulations.end()) {
@@ -134,17 +120,12 @@ int Network::connect(Population<Neuron> *pSrc, Population<Neuron> *pDst, real *w
 	for (int i=0; i<size; i++) {
 		int iSrc = i/dstSize;
 		int iDst = i%dstSize;
-		        //connect(NeuronBase *pn1, NeuronBase *pn2, real weight, real delay, SpikeType type, real tau, bool store)
-		if (type == NULL) {
-			connect(pSrc->getNeuron(iSrc), pDst->getNeuron(iDst), weight[i], delay[i], Excitatory, 0.0, false);
-		} else {
-			connect(pSrc->getNeuron(iSrc), pDst->getNeuron(iDst), weight[i], delay[i], type[i], 0.0, false);
-		}
+		connect(pSrc->getNeuron(iSrc), pDst->getNeuron(iDst), weight[i], delay[i], type[i], false);
 		count++;
 	}
 
 	return count;
 }
 
-#endif /* NETWORK_H */
+#endif /* SIMPLENETWORK_H */
 
