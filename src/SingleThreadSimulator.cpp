@@ -21,9 +21,14 @@ int SingleThreadSimulator::run(real time)
 	int sim_cycle =  round((time)/dt);
 
 	FILE *logFile = fopen("Sim.log", "w+");
+	FILE *dataFile = fopen("Sim.data", "w+");
 	FILE *outFile = fopen("Output.csv", "w+");
 	if (logFile == NULL) {
 		printf("Open file Sim.log failed\n");
+		return -1;
+	}
+	if (dataFile == NULL) {
+		printf("Open file Sim.data failed\n");
 		return -1;
 	}
 	if (outFile == NULL) {
@@ -56,12 +61,22 @@ int SingleThreadSimulator::run(real time)
 
 		info.currCycle = cycle;
 		info.fired.clear();
+		info.input.clear();
 
 		//Update
 		network->update(info);
 
 		//Log info
 		network->monitor(info);
+
+
+		int isize = info.input.size();
+		fprintf(dataFile, "%d", info.currCycle);
+		for (int i=0; i<isize; i++) {
+			fprintf(dataFile, ", %lf", info.input[i]);
+		}
+
+		fprintf(dataFile, "\n");
 
 		int size = info.fired.size();
 		fprintf(logFile, "Cycle %d: ", info.currCycle);

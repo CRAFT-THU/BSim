@@ -16,6 +16,7 @@ struct SimInfo {
 	int currCycle;
 	real dt;
 	vector<ID> fired;
+	vector<real> input;
 };
 
 #endif /* SIMINFO_H */

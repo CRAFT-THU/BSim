@@ -9,7 +9,7 @@
 double realRandom(double range)
 {
 	long f = rand();
-	return (double)(f/RAND_MAX)*range;
+	return ((double)f/RAND_MAX)*range;
 }
 
 //int id2idx(ID* array, int num, ID id) {
@@ -24,7 +24,7 @@ double realRandom(double range)
 
 int getType(int *array, int size, int index)
 {
-	for (int i=0; i<size-1; i++) {
+	for (int i=0; i<size; i++) {
 		if (array[i+1] > index) {
 			return i;
 		}
@@ -36,7 +36,7 @@ int getType(int *array, int size, int index)
 
 int getOffset(int *array, int size, int index)
 {
-	for (int i=0; i<size-1; i++) {
+	for (int i=0; i<size; i++) {
 		if (array[i+1] > index) {
 			return (index - array[i]);
 		}

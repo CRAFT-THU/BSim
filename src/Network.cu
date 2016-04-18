@@ -15,19 +15,19 @@ GNetwork* Network::buildNetwork()
 
 	void **pAllNeurons = (void**)malloc(sizeof(void*)*neuronTypeNum);
 	void **pAllSynapses = (void**)malloc(sizeof(void*)*synapseTypeNum);
-	Type *pNTypes = (Type*)malloc(sizeof(Type)*neuronTypeNum);
-	Type *pSTypes = (Type*)malloc(sizeof(Type)*synapseTypeNum);
+	int *pNOffsets = (int*)malloc(sizeof(int)*(neuronTypeNum));
+	int *pSOffsets = (int*)malloc(sizeof(int)*(synapseTypeNum));
 	int *pNeuronsNum = (int*)malloc(sizeof(int)*(neuronTypeNum + 1));
 	int *pSynapsesNum = (int*)malloc(sizeof(int)*(synapseTypeNum + 1));
 	pNeuronsNum[0] = 0;
 	pSynapsesNum[0] = 0;
 
-	int *pNOffsets = (int*)malloc(sizeof(int)*(neuronTypeNum));
-	int *pSOffsets = (int*)malloc(sizeof(int)*(synapseTypeNum));
-	int *pNNums = (int*)malloc(sizeof(int)*(neuronTypeNum + 1));
-	int *pSNums = (int*)malloc(sizeof(int)*(synapseTypeNum + 1));
-	pNNums[0] = 0;
-	pSNums[0] = 0;
+	Type *pNTypes = (Type*)malloc(sizeof(Type)*neuronTypeNum);
+	Type *pSTypes = (Type*)malloc(sizeof(Type)*synapseTypeNum);
+	int *pGNeuronNums = (int*)malloc(sizeof(int)*(neuronTypeNum + 1));
+	int *pGSynapseNums = (int*)malloc(sizeof(int)*(synapseTypeNum + 1));
+	pGNeuronNums[0] = 0;
+	pGSynapseNums[0] = 0;
 
 	for (int i=0; i<neuronTypeNum; i++) {
 		pNTypes[i] = nTypes[i];
@@ -59,7 +59,7 @@ GNetwork* Network::buildNetwork()
 
 		pNOffsets[i] = 0;
 		pNeuronsNum[i+1] = idx + pNeuronsNum[i];
-		pNNums[i+1] = pNeuronsNum[i+1];
+		pGNeuronNums[i+1] = pNeuronsNum[i+1];
 		pAllNeurons[i] = pN;
 
 	}
@@ -87,7 +87,7 @@ GNetwork* Network::buildNetwork()
 
 		pSOffsets[i] = 0;
 		pSynapsesNum[i+1] = idx + pSynapsesNum[i];
-		pSNums[i+1] = pSynapsesNum[i+1];
+		pGSynapseNums[i+1] = pSynapsesNum[i+1];
 		pAllSynapses[i] = pS;
 	}
 
@@ -103,10 +103,10 @@ GNetwork* Network::buildNetwork()
 			if (iter == nid2idx.end()) {
 				printf("Can't find ID %d_%d\n", n2sIter->first.groupId, n2sIter->first.id);
 			}
-			if (i != getType(pNeuronsNum, neuronTypeNum+1, iter->second)) {
+			if (i != getType(pNeuronsNum, neuronTypeNum, iter->second)) {
 				continue;
 			}
-			int idx = getOffset(pNeuronsNum, neuronTypeNum+1, iter->second);
+			int idx = getOffset(pNeuronsNum, neuronTypeNum, iter->second);
 			pSynapsesNum[idx] = n2sIter->second.size();
 			pSynapsesLoc[idx] = loc;
 			for (int i = 0; i<pSynapsesNum[idx]; i++) {
@@ -131,10 +131,10 @@ GNetwork* Network::buildNetwork()
 			if (iter == sid2idx.end()) {
 				printf("Can't find ID %d_%d\n", s2nIter->first.groupId, s2nIter->first.id);
 			}
-			if (i != getType(pSynapsesNum, synapseTypeNum+1, iter->second)) {
+			if (i != getType(pSynapsesNum, synapseTypeNum, iter->second)) {
 				continue;
 			}
-			int idx = getOffset(pSynapsesNum, synapseTypeNum+1, iter->second);
+			int idx = getOffset(pSynapsesNum, synapseTypeNum, iter->second);
 			iter = nid2idx.find(s2nIter->second);
 			if (iter == nid2idx.end()) {
 				printf("Can't find ID %d_%d\n", s2nIter->second.groupId, s2nIter->second.id);
@@ -155,8 +155,8 @@ GNetwork* Network::buildNetwork()
 	ret->pSynapses = pAllSynapses;
 	ret->nOffsets = pNOffsets;
 	ret->sOffsets = pSOffsets;
-	ret->gNeuronNums = pNNums;
-	ret->gSynapseNums = pSNums;
+	ret->gNeuronNums = pGNeuronNums;
+	ret->gSynapseNums = pGSynapseNums;
 
 	ret->nTypeNum = neuronTypeNum;
 	ret->sTypeNum = synapseTypeNum;

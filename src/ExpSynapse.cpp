@@ -65,6 +65,7 @@ int ExpSynapse::update(SimInfo &info)
 		I_syn += weight/_C1;
 		pDest->recv(I_syn);
 		delay_step.pop_front();
+		info.fired.push_back(id);
 	}
 
 	for (iter = delay_step.begin(); iter != delay_step.end(); iter++) {
@@ -88,7 +89,7 @@ Type ExpSynapse::getType()
 
 void ExpSynapse::monitorOn() 
 {
-	monitored = false;
+	monitored = true;
 }
 
 void ExpSynapse::monitor(SimInfo &info)

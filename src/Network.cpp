@@ -354,7 +354,7 @@ void Network::monitor(SimInfo &info)
 
 	for (iterP=pPopulations.begin(); iterP!=pPopulations.end(); iterP++) {
 		PopulationBase * p = *iterP;
-		p->monitorOn();
+		//p->monitorOn();
 		p->monitor(info);
 	}
 
@@ -365,6 +365,7 @@ void Network::monitor(SimInfo &info)
 
 	for (iterS=pSynapses.begin(); iterS!=pSynapses.end(); iterS++) {
 		SynapseBase *p = *iterS;
+		//p->monitorOn();
 		p->monitor(info);
 	}
 }
