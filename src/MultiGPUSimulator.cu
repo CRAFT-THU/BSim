@@ -25,7 +25,8 @@ MultiGPUSimulator::~MultiGPUSimulator()
 {
 }
 
-GNetwork* getGlobalData(GNetwork *, int, int);
+GNetwork* getGlobalMdata(GNetwork *, int, int);
+void getLocalMdata(GNetwork *, int, int);
 GNetwork* splitNetwork(GNetwork *, GNetwork *, int, int);
 
 int MultiGPUSimulator::init(int argc, char**argv)
@@ -64,13 +65,10 @@ int MultiGPUSimulator::run(real time)
 		pAllNet = network->buildNetwork();
 	}
 
-	pCpuNet = getGlobalData(pAllNet, size, rank);
+	pCpuNet = getGlobalData(pAllNet, rank, size);
 	MPI_Bcast(pCpuNet, sizeof(GNetwork), MPI_BYTE, 0, MPI_COMM_WORLD);
-	MPI_Bcast(pCpuNet->nTypes, sizeof(Type)*pCpuNet->nTypeNum, MPI_BYTE, 0, MPI_COMM_WORLD);
-	MPI_Bcast(pCpuNet->sTypes, sizeof(Type)*pCpuNet->sTypeNum, MPI_BYTE, 0, MPI_COMM_WORLD);
-	MPI_Bcast(pCpuNet->gNeuronNums, sizeof(int)*(pCpuNet->nTypeNum+1), MPI_BYTE, 0, MPI_COMM_WORLD);
-	MPI_Bcast(pCpuNet->gSynapseNums, sizeof(int)*(pCpuNet->sTypeNum+1), MPI_BYTE, 0, MPI_COMM_WORLD);
-	splitNetwork(pCpuNet, pAllNet, size, rank);
+	getLocalMdata(pCpuNet, rank, size);
+	splitNetwork(pCpuNet, pAllNet, rank, size);
 
 
 	GNetwork *c_pGpuNet = copyDataToGPU(pCpuNet);
@@ -229,13 +227,30 @@ int MultiGPUSimulator::run(real time)
 	return 0;
 }
 
-GNetwork* getGlobalData(GNetwork *network, int rankSize, int rank)
+GNetwork* getGlobalMdata(GNetwork *network, int rank, int rankSize)
+{
+
+	GNetwork *ret = (GNetwork *)malloc(sizeof(GNetwork));
+	if (network != NULL) {
+		memcpy(ret, network, sizeof(GNetwork));
+	}
+
+
+	if (rank == 0) {
+		memcpy(ret->nTypes, network->nTypes, sizeof(Type)*nTypeNum);
+		memcpy(ret->sTypes, network->sTypes, sizeof(Type)*sTypeNum);
+		memcpy(ret->gNeuronNums, network->gNeuronNums, sizeof(int)*(nTypeNum+1));
+		memcpy(ret->gSynapseNums, network->gSynapseNums, sizeof(int)*(sTypeNum+1));
+	}
+
+	return ret;
+}
+
+
+void getLocalMdata(GNetwork *network, int rank, int rankSize)
 {
 	int nTypeNum = network->nTypeNum;
 	int sTypeNum = network->sTypeNum;
-
-	GNetwork *ret = (GNetwork *)malloc(sizeof(GNetwork));
-	memcpy(ret, network, sizeof(GNetwork));
 
 	ret->pNeurons = (void**)malloc(sizeof(void*)*nTypeNum);
 	ret->pSynapses = (void**)malloc(sizeof(void*)*sTypeNum);
@@ -251,12 +266,10 @@ GNetwork* getGlobalData(GNetwork *network, int rankSize, int rank)
 	ret->gNeuronNums = (int*)malloc(sizeof(int)*(nTypeNum + 1));
 	ret->gSynapseNums = (int*)malloc(sizeof(int)*(sTypeNum + 1));
 
-	if (rank == 0) {
-		memcpy(ret->nTypes, network->nTypes, sizeof(Type)*nTypeNum);
-		memcpy(ret->sTypes, network->sTypes, sizeof(Type)*sTypeNum);
-		memcpy(ret->gNeuronNums, network->gNeuronNums, sizeof(int)*(nTypeNum+1));
-		memcpy(ret->gSynapseNums, network->gSynapseNums, sizeof(int)*(sTypeNum+1));
-	}
+	MPI_Bcast(network->nTypes, sizeof(Type)*pCpuNet->nTypeNum, MPI_BYTE, 0, MPI_COMM_WORLD);
+	MPI_Bcast(network->sTypes, sizeof(Type)*pCpuNet->sTypeNum, MPI_BYTE, 0, MPI_COMM_WORLD);
+	MPI_Bcast(network->gNeuronNums, sizeof(int)*(pCpuNet->nTypeNum+1), MPI_BYTE, 0, MPI_COMM_WORLD);
+	MPI_Bcast(network->gSynapseNums, sizeof(int)*(pCpuNet->sTypeNum+1), MPI_BYTE, 0, MPI_COMM_WORLD);
 
 	for (int i=0; i<nTypeNum; i++) {
 		int num_i = network->gNeuronNums[i+1] - network->gNeuronNums[i];
@@ -286,12 +299,9 @@ GNetwork* getGlobalData(GNetwork *network, int rankSize, int rank)
 
 		network->synapseNums[i+1] = network->synapseNums[i] + size_tt;
 	}
-
-
-	return ret;
 }
 
-GNetwork* splitNetwork(GNetwork *network, GNetwork *allNet, int rankSize, int rank)
+GNetwork* splitNetwork(GNetwork *network, GNetwork *allNet, int rank, int rankSize)
 {
 	int nTypeNum = network->nTypeNum;
 	int sTypeNum = network->sTypeNum;
@@ -302,47 +312,10 @@ GNetwork* splitNetwork(GNetwork *network, GNetwork *allNet, int rankSize, int ra
 	printf("MAX_DELAY: %lf\n", network->MAX_DELAY);
 
 	if (rank == 0) {
-		for (int i=0; i<nTypeNum; i++) {
-			int size = network->neuronNums[i+1] - network->neuronNums[i];
-
-			network->nOffsets[i] = 0;
-			//Copy neurons
-			//copyNeurons[i](network, allNet, i, size);
-		}
-		for (int i=0; i<sTypeNum; i++) {
-			int size = network->neuronNums[i+1] - network->neuronNums[i];
-
-			network->sOffsets[i] = 0;
-			//Copy neurons
-			//copySynapse[i](network, allNet, i, size);
-		}
+		copyNetwork(network, allNet, 0, rankSize); 
+		mpiSendNetwork(network, allNet, 0, rankSize);
 	} else {
-		for (int i=0; i<nTypeNum; i++) {
-			int num_i = network->gNeuronNums[i+1] - network->gNeuronNums[i];
-			int size = num_i/rankSize;
-			int range = num_i%size;
-
-			if (i < range) {
-				network->nOffsets[i] = (size+1)*range;
-			} else {
-				network->nOffsets[i] = (size+1)*range + size*(i-range);
-			}
-			//Copy neurons
-			//mpiSendNeurons(network, allNet, i, size);
-		}
-		for (int i=0; i<sTypeNum; i++) {
-			int num_i = network->gNeuronNums[i+1] - network->gNeuronNums[i];
-			int size = num_i/rankSize;
-			int range = num_i%size;
-
-			if (i < range) {
-				network->nOffsets[i] = (size+1)*range;
-			} else {
-				network->nOffsets[i] = (size+1)*range + size*(i-range);
-			}
-			//Copy neurons
-			//mpiSendSynapse(network, allNet, i, size);
-		}
+		mpiReceiveNetwork(network, 0, rankSize);
 	}
 
 	return network;

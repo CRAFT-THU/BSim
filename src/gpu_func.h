@@ -17,6 +17,7 @@ extern int (*allocConnect[TypeSize])(void *, int *, int *, int *, int);
 extern int (*cudaAllocType[TypeSize])(void *, void *);
 extern int (*cudaFreeType[TypeSize])(void *);
 extern int (*updateType[TypeSize])(void *, int, int, BlockSize *pSize);
+extern int (*copyType[TypeSize])(void *, void *, int, int);
 
 extern BlockSize * getBlockSize(int nSize, int sSize);
 
