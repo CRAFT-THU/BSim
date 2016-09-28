@@ -111,7 +111,7 @@ int SingleThreadSimulator::run(real time)
 	}
 
 	fclose(logFile);
-	printf("\nSimulation finesed in %ld:%ld:%ld.%06lds\n", hours, minutes, seconds, uSeconds);
+	printf("\nSimulation finished in %ld:%ld:%ld.%06lds\n", hours, minutes, seconds, uSeconds);
 
 	return 0;
 }

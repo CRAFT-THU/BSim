@@ -15,7 +15,7 @@ public:
 	int init(int argc, char**argv);
 protected:
 	int rank;
-	int size;
+	int rankSize;
 };
 
 #endif /* MULTIGPUSIMULATOR_H */

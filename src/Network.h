@@ -31,8 +31,8 @@ public:
 	Neuron* create(Neuron n1);
 	template<class Neuron>
 	Population<Neuron>* createPopulation(ID id, int num, Neuron templ, bool empty = false);
-	template<class Neuron>
-	int connect(Population<Neuron> *pSrc, Population<Neuron> *pDst, real *weight, real *delay, SpikeType *type, int size);
+	template<class Neuron1, class Neuron2>
+	int connect(Population<Neuron1> *pSrc, Population<Neuron2> *pDst, real *weight, real *delay, SpikeType *type, int size);
 	
 	SynapseBase* connect(NeuronBase *pSrc, NeuronBase *pDst, real weight, real delay, SpikeType type = Excitatory, real tau = 0, bool store = true);
 	int connect(int populationIDSrc, int neuronIDSrc, int populationIDDst, int neuronIDDst, real weight, real delay, real tau = 0);
@@ -109,8 +109,8 @@ Population<Neuron>* Network::createPopulation(ID id, int num, Neuron templ, bool
 	return pp1;
 }
 
-template<class Neuron>
-int Network::connect(Population<Neuron> *pSrc, Population<Neuron> *pDst, real *weight, real *delay, SpikeType *type, int size) {
+template<class Neuron1, class Neuron2>
+int Network::connect(Population<Neuron1> *pSrc, Population<Neuron2> *pDst, real *weight, real *delay, SpikeType *type, int size) {
 	int srcSize = pSrc->getNum();
 	int dstSize = pDst->getNum();
 	if (size != srcSize * dstSize) {

@@ -34,5 +34,11 @@ struct GNetwork {
 	real MAX_DELAY;
 };
 
+int copyNetwork(GNetwork *dNet, GNetwork *sNet, int rank, int rankSize);
+int mpiSendNetwork(GNetwork *network, int rank, int rankSize);
+int mpiRecvNetwork(GNetwork *network, int rank, int rankSize);
+
+int printNetwork(GNetwork *net, int rank = 0);
+
 #endif /* GNETWORK_H */
 

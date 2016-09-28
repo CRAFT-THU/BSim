@@ -13,6 +13,7 @@
 using std::vector;
 
 class PossionNeuron : public NeuronBase {
+public:
 	PossionNeuron(ID id, double rate, double refract, double startTime = 0);
 	~PossionNeuron();
 
@@ -28,9 +29,11 @@ class PossionNeuron : public NeuronBase {
 
 	virtual int recv(real I);
 
+	virtual int getData(void*);
+
 	virtual size_t getSize();
 	virtual int hardCopy(void *data, int idx);
-	virtual SynapseBase *addSynapse(real weight, real delay, SpikeType type, NeuronBase *pDest);
+	virtual SynapseBase *addSynapse(real weight, real delay, SpikeType type, real tau, NeuronBase *pDest);
 
 	int possion(int input);
 

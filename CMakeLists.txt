@@ -49,3 +49,9 @@ FOREACH(exec_path ${GPU_TEST})
 	CUDA_ADD_EXECUTABLE(${exec_file} ${exec_path})
 	TARGET_LINK_LIBRARIES(${exec_file} ${GPU_LIB} ${MPI_LIBRARIES})
 ENDFOREACH()
+
+ADD_CUSTOM_COMMAND(TARGET multi-gpusim_test
+	POST_BUILD
+	COMMAND cp ${CMAKE_BINARY_DIR}/bin/multi-gpusim_test ${CMAKE_BINARY_DIR}/../shared
+	COMMENT "Copy multi-gpusim_test to shared dir"  
+	)

@@ -26,6 +26,10 @@ void *createExpSynapses();
 size_t getExpSize();
 int allocExpSynapses(void *pSynapses, int S);
 int allocExpConnects(void *pCpu, int *pSynapsesDst, int *notUsed1, int *notUsed2, int notUsed3);
+
+void sendExpSynapses(void *data, int rank, int offset, int size);
+void recvExpSynapses(void **data, int rank, int size);
+
 int cudaAllocExpSynapses(void *pCpu, void *pGpu);
 int cudaFreeExpSynapses(void *pGpu);
 

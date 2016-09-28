@@ -7,6 +7,8 @@
 
 IDPool sidPool;
 IDPool nidPool;
+IDPool sendTag;
+IDPool recvTag;
 
 IDPool::IDPool()
 {

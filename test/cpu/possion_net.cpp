@@ -10,23 +10,21 @@ using namespace std;
 
 int main()
 {
-	const int N = 100;
+	const int N = 1000;
 	Network c;
+	Population<PossionNeuron> *pn0 = c.createPopulation(nidPool.getID(), N, PossionNeuron(ID(0, 0), 0.3, 1e-3));
+	pn0->monitorOn();
         //LIFNeuron::LIFNeuron(ID id, real v_init, real v_rest, real v_reset, real cm, real tau_m, real tau_refrac, real tau_syn_E, real tau_syn_I, real v_thresh, real i_offset)
-	Population<IF_curr_exp> *pn1 = c.createPopulation(nidPool.getID(), N, IF_curr_exp(ID(0, 0), 0.0f, 0.0f, 0.0f, 1.0e-1f, 50.0e-4f, 0.0f, 1.0f, 1.0f, 15.0e-3f, 10.0e-1f));
+	Population<IF_curr_exp> *pn1 = c.createPopulation(nidPool.getID(), N, IF_curr_exp(ID(0, 0), 0.0f, 0.0f, 0.0f, 1.0e-1f, 50.0e-4f, 0.0f, 1.0f, 1.0f, 15.0e-3f, 0));
 	Population<IF_curr_exp> *pn2 = c.createPopulation(nidPool.getID(), N, IF_curr_exp(ID(0, 0), 0.0f, 0.0f, 0.0f, 1.0e-1f, 50.0e-4f, 0.0f, 1.0f, 1.0f, 15.0e-3f, 0));
-	Population<IF_curr_exp> *pn3 = c.createPopulation(nidPool.getID(), N, IF_curr_exp(ID(0, 0), 0.0f, 0.0f, 0.0f, 1.0e-1f, 50.0e-4f, 0.0f, 1.0f, 1.0f, 15.0e-3f, 0));
-	Population<IF_curr_exp> *pn4 = c.createPopulation(nidPool.getID(), N, IF_curr_exp(ID(0, 0), 0.0f, 0.0f, 0.0f, 1.0e-1f, 50.0e-4f, 0.0f, 1.0f, 1.0f, 15.0e-3f, 0));
-	real * weight = getRandomArray((real)20e-3, N*N);
-	real * weight2 = getRandomArray((real)15e-3, N*N);
+	real * weight = getRandomArray((real)15e-3, N*N);
 	real * delay = getConstArray((real)1e-3, N*N);
+	c.connect(pn0, pn1, weight, delay, NULL, N*N);
 	c.connect(pn1, pn2, weight, delay, NULL, N*N);
-	c.connect(pn2, pn3, weight2, delay, NULL, N*N);
-	c.connect(pn3, pn4, weight2, delay, NULL, N*N);
 	STSim st(&c, 1.0e-3f);
-	SGSim sg(&c, 1.0e-3f);
+	//SGSim sg(&c, 1.0e-3f);
 	st.run(0.1f);
-	sg.run(0.1f);
+	//sg.run(0.1f);
 	
 	FILE *logFile = fopen("weight.csv", "w+");
 	if (logFile == NULL) {

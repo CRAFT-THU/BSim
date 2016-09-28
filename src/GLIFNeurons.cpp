@@ -4,7 +4,9 @@
  */
 
 #include <stdlib.h>
+#include "mpi.h"
 
+#include "IDPool.h"
 #include "GLIFNeurons.h"
 
 void* createLIFNeurons()
@@ -60,78 +62,78 @@ int allocLIFConnects(void *pCpu, int *pSynapsesNum, int *pSynapsesLoc, int *pSyn
 void sendLIFNeurons(void *data, int rank, int offset, int size)
 {
 	GLIFNeurons *neurons = (GLIFNeurons *)data;
-	MPI_Send(&(size), 1, MPI_INT, rank, 0, MPI_COMM_WORLD);
-	MPI_Send(&(neurons->synapsesNum), 1, MPI_INT, rank, 1, MPI_COMM_WORLD);
-	MPI_Send(&(neurons->pID[offset]), sizeof(ID)*size, MPI_BYTE, rank, 2, MPI_COMM_WORLD);
-	MPI_Send(&(neurons->pType[offset]), sizeof(Type)*size, MPI_BYTE, rank, 3, MPI_COMM_WORLD);
-	MPI_Send(&(neurons->p_v_init[offset]), sizeof(real)*size, MPI_BYTE, rank, 4, MPI_COMM_WORLD);
-	MPI_Send(&(neurons->p_v_rest[offset]), sizeof(real)*size, MPI_BYTE, rank, 5, MPI_COMM_WORLD);
-	MPI_Send(&(neurons->p_v_reset[offset]), sizeof(real)*size, MPI_BYTE, rank, 6, MPI_COMM_WORLD);
+	MPI_Send(&(size), 1, MPI_INT, rank, sendTag.getID().id, MPI_COMM_WORLD);
+	MPI_Send(&(neurons->synapsesNum), 1, MPI_INT, rank, sendTag.getID().id, MPI_COMM_WORLD);
+	MPI_Send(&(neurons->pID[offset]), sizeof(ID)*size, MPI_BYTE, rank, sendTag.getID().id, MPI_COMM_WORLD);
+	MPI_Send(&(neurons->pType[offset]), sizeof(Type)*size, MPI_BYTE, rank, sendTag.getID().id, MPI_COMM_WORLD);
+	MPI_Send(&(neurons->p_v_init[offset]), sizeof(real)*size, MPI_BYTE, rank, sendTag.getID().id, MPI_COMM_WORLD);
+	MPI_Send(&(neurons->p_v_rest[offset]), sizeof(real)*size, MPI_BYTE, rank, sendTag.getID().id, MPI_COMM_WORLD);
+	MPI_Send(&(neurons->p_v_reset[offset]), sizeof(real)*size, MPI_BYTE, rank, sendTag.getID().id, MPI_COMM_WORLD);
 
-	MPI_Send(&(neurons->p_cm[offset]), sizeof(real)*size, MPI_BYTE, rank, 7, MPI_COMM_WORLD);
-	MPI_Send(&(neurons->p_tau_m[offset]), sizeof(real)*size, MPI_BYTE, rank, 8, MPI_COMM_WORLD);
-	MPI_Send(&(neurons->p_tau_refrac[offset]), sizeof(real)*size, MPI_BYTE, rank, 9, MPI_COMM_WORLD);
-	MPI_Send(&(neurons->p_tau_syn_E[offset]), sizeof(real)*size, MPI_BYTE, rank, 10, MPI_COMM_WORLD);
-	MPI_Send(&(neurons->p_tau_syn_I[offset]), sizeof(real)*size, MPI_BYTE, rank, 11, MPI_COMM_WORLD);
+	MPI_Send(&(neurons->p_cm[offset]), sizeof(real)*size, MPI_BYTE, rank, sendTag.getID().id, MPI_COMM_WORLD);
+	MPI_Send(&(neurons->p_tau_m[offset]), sizeof(real)*size, MPI_BYTE, rank, sendTag.getID().id, MPI_COMM_WORLD);
+	MPI_Send(&(neurons->p_tau_refrac[offset]), sizeof(real)*size, MPI_BYTE, rank, sendTag.getID().id, MPI_COMM_WORLD);
+	MPI_Send(&(neurons->p_tau_syn_E[offset]), sizeof(real)*size, MPI_BYTE, rank, sendTag.getID().id, MPI_COMM_WORLD);
+	MPI_Send(&(neurons->p_tau_syn_I[offset]), sizeof(real)*size, MPI_BYTE, rank, sendTag.getID().id, MPI_COMM_WORLD);
 
-	MPI_Send(&(neurons->p_v_thresh[offset]), sizeof(real)*size, MPI_BYTE, rank, 12, MPI_COMM_WORLD);
-	MPI_Send(&(neurons->p_i_offset[offset]), sizeof(real)*size, MPI_BYTE, rank, 13, MPI_COMM_WORLD);
-	MPI_Send(&(neurons->p_i_syn[offset]), sizeof(real)*size, MPI_BYTE, rank, 14, MPI_COMM_WORLD);
+	MPI_Send(&(neurons->p_v_thresh[offset]), sizeof(real)*size, MPI_BYTE, rank, sendTag.getID().id, MPI_COMM_WORLD);
+	MPI_Send(&(neurons->p_i_offset[offset]), sizeof(real)*size, MPI_BYTE, rank, sendTag.getID().id, MPI_COMM_WORLD);
+	MPI_Send(&(neurons->p_i_syn[offset]), sizeof(real)*size, MPI_BYTE, rank, sendTag.getID().id, MPI_COMM_WORLD);
 
-	MPI_Send(&(neurons->p_vm[offset]), sizeof(real)*size, MPI_BYTE, rank, 15, MPI_COMM_WORLD);
-	MPI_Send(&(neurons->p__dt[offset]), sizeof(real)*size, MPI_BYTE, rank, 16, MPI_COMM_WORLD);
-	MPI_Send(&(neurons->p_C1[offset]), sizeof(real)*size, MPI_BYTE, rank, 17, MPI_COMM_WORLD);
-	MPI_Send(&(neurons->p_C2[offset]), sizeof(real)*size, MPI_BYTE, rank, 18, MPI_COMM_WORLD);
-	MPI_Send(&(neurons->p_i_tmp[offset]), sizeof(real)*size, MPI_BYTE, rank, 19, MPI_COMM_WORLD);
-	MPI_Send(&(neurons->p_refrac_step[offset]), size, MPI_INT, rank, 20, MPI_COMM_WORLD);
+	MPI_Send(&(neurons->p_vm[offset]), sizeof(real)*size, MPI_BYTE, rank, sendTag.getID().id, MPI_COMM_WORLD);
+	MPI_Send(&(neurons->p__dt[offset]), sizeof(real)*size, MPI_BYTE, rank, sendTag.getID().id, MPI_COMM_WORLD);
+	MPI_Send(&(neurons->p_C1[offset]), sizeof(real)*size, MPI_BYTE, rank, sendTag.getID().id, MPI_COMM_WORLD);
+	MPI_Send(&(neurons->p_C2[offset]), sizeof(real)*size, MPI_BYTE, rank, sendTag.getID().id, MPI_COMM_WORLD);
+	MPI_Send(&(neurons->p_i_tmp[offset]), sizeof(real)*size, MPI_BYTE, rank, sendTag.getID().id, MPI_COMM_WORLD);
+	MPI_Send(&(neurons->p_refrac_step[offset]), size, MPI_INT, rank, sendTag.getID().id, MPI_COMM_WORLD);
 
-	MPI_Send(&(neurons->pSynapsesNum[offset]), size, MPI_INT, rank, 21, MPI_COMM_WORLD);
-	MPI_Send(&(neurons->pSynapsesLoc[offset]), size, MPI_INT, rank, 22, MPI_COMM_WORLD);
-	MPI_Send(neurons->pSynapsesIdx, neurons->synapsesNum, MPI_INT, rank, 23, MPI_COMM_WORLD);
+	MPI_Send(&(neurons->pSynapsesNum[offset]), size, MPI_INT, rank, sendTag.getID().id, MPI_COMM_WORLD);
+	MPI_Send(&(neurons->pSynapsesLoc[offset]), size, MPI_INT, rank, sendTag.getID().id, MPI_COMM_WORLD);
+	MPI_Send(neurons->pSynapsesIdx, neurons->synapsesNum, MPI_INT, rank, sendTag.getID().id, MPI_COMM_WORLD);
 }
 
-void recvLIFNeurons(void **data, int rank, int size)
+void recvLIFNeurons(void **data, int rank, int rankSize)
 {
 	GLIFNeurons *neurons = (GLIFNeurons *)malloc(sizeof(GLIFNeurons));
 
 	MPI_Status status;
-	MPI_Recv((&neurons->num), 1, MPI_INT, rank, 0, MPI_COMM_WORLD, &status);
-	MPI_Recv(&(neurons->synapsesNum), 1, MPI_INT, rank, 1, MPI_COMM_WORLD, &status);
+	MPI_Recv((&neurons->num), 1, MPI_INT, rank, recvTag.getID().id, MPI_COMM_WORLD, &status);
+	MPI_Recv(&(neurons->synapsesNum), 1, MPI_INT, rank, recvTag.getID().id, MPI_COMM_WORLD, &status);
 	allocLIFNeurons(neurons, neurons->num);
 
 	int size = neurons->num;
 
-	MPI_Recv(neurons->pID, sizeof(ID)*size, MPI_BYTE, rank, 2, MPI_COMM_WORLD, &status);
-	MPI_Recv(neurons->pType, sizeof(Type)*size, MPI_BYTE, rank, 3, MPI_COMM_WORLD, &status);
-	MPI_Recv(neurons->p_v_init, sizeof(real)*size, MPI_BYTE, rank, 4, MPI_COMM_WORLD, &status);
-	MPI_Recv(neurons->p_v_rest, sizeof(real)*size, MPI_BYTE, rank, 5, MPI_COMM_WORLD, &status);
-	MPI_Recv(neurons->p_v_reset, sizeof(real)*size, MPI_BYTE, rank, 6, MPI_COMM_WORLD, &status);
+	MPI_Recv(neurons->pID, sizeof(ID)*size, MPI_BYTE, rank, recvTag.getID().id, MPI_COMM_WORLD, &status);
+	MPI_Recv(neurons->pType, sizeof(Type)*size, MPI_BYTE, rank, recvTag.getID().id, MPI_COMM_WORLD, &status);
+	MPI_Recv(neurons->p_v_init, sizeof(real)*size, MPI_BYTE, rank, recvTag.getID().id, MPI_COMM_WORLD, &status);
+	MPI_Recv(neurons->p_v_rest, sizeof(real)*size, MPI_BYTE, rank, recvTag.getID().id, MPI_COMM_WORLD, &status);
+	MPI_Recv(neurons->p_v_reset, sizeof(real)*size, MPI_BYTE, rank, recvTag.getID().id, MPI_COMM_WORLD, &status);
 
-	MPI_Recv(neurons->p_cm, sizeof(real)*size, MPI_BYTE, rank, 7, MPI_COMM_WORLD, &status);
-	MPI_Recv(neurons->p_tau_m, sizeof(real)*size, MPI_BYTE, rank, 8, MPI_COMM_WORLD, &status);
-	MPI_Recv(neurons->p_tau_refrac, sizeof(real)*size, MPI_BYTE, rank, 9, MPI_COMM_WORLD, &status);
-	MPI_Recv(neurons->p_tau_syn_E, sizeof(real)*size, MPI_BYTE, rank, 10, MPI_COMM_WORLD, &status);
-	MPI_Recv(neurons->p_tau_syn_I, sizeof(real)*size, MPI_BYTE, rank, 11, MPI_COMM_WORLD, &status);
+	MPI_Recv(neurons->p_cm, sizeof(real)*size, MPI_BYTE, rank, recvTag.getID().id, MPI_COMM_WORLD, &status);
+	MPI_Recv(neurons->p_tau_m, sizeof(real)*size, MPI_BYTE, rank, recvTag.getID().id, MPI_COMM_WORLD, &status);
+	MPI_Recv(neurons->p_tau_refrac, sizeof(real)*size, MPI_BYTE, rank, recvTag.getID().id, MPI_COMM_WORLD, &status);
+	MPI_Recv(neurons->p_tau_syn_E, sizeof(real)*size, MPI_BYTE, rank, recvTag.getID().id, MPI_COMM_WORLD, &status);
+	MPI_Recv(neurons->p_tau_syn_I, sizeof(real)*size, MPI_BYTE, rank, recvTag.getID().id, MPI_COMM_WORLD, &status);
 
-	MPI_Recv(neurons->p_v_thresh, sizeof(real)*size, MPI_BYTE, rank, 12, MPI_COMM_WORLD, &status);
-	MPI_Recv(neurons->p_i_, sizeof(real)*size, MPI_BYTE, rank, 13, MPI_COMM_WORLD, &status);
-	MPI_Recv(neurons->p_i_syn, sizeof(real)*size, MPI_BYTE, rank, 14, MPI_COMM_WORLD, &status);
+	MPI_Recv(neurons->p_v_thresh, sizeof(real)*size, MPI_BYTE, rank, recvTag.getID().id, MPI_COMM_WORLD, &status);
+	MPI_Recv(neurons->p_i_offset, sizeof(real)*size, MPI_BYTE, rank, recvTag.getID().id, MPI_COMM_WORLD, &status);
+	MPI_Recv(neurons->p_i_syn, sizeof(real)*size, MPI_BYTE, rank, recvTag.getID().id, MPI_COMM_WORLD, &status);
 
-	MPI_Recv(neurons->p_vm, sizeof(real)*size, MPI_BYTE, rank, 15, MPI_COMM_WORLD, &status);
-	MPI_Recv(neurons->p__dt, sizeof(real)*size, MPI_BYTE, rank, 16, MPI_COMM_WORLD, &status);
-	MPI_Recv(neurons->p_C1, sizeof(real)*size, MPI_BYTE, rank, 17, MPI_COMM_WORLD, &status);
-	MPI_Recv(neurons->p_C2, sizeof(real)*size, MPI_BYTE, rank, 18, MPI_COMM_WORLD, &status);
-	MPI_Recv(neurons->p_i_tmp, sizeof(real)*size, MPI_BYTE, rank, 19, MPI_COMM_WORLD, &status);
-	MPI_Recv(neurons->p_refrac_step, size, MPI_INT, rank, 20, MPI_COMM_WORLD, &status);
+	MPI_Recv(neurons->p_vm, sizeof(real)*size, MPI_BYTE, rank, recvTag.getID().id, MPI_COMM_WORLD, &status);
+	MPI_Recv(neurons->p__dt, sizeof(real)*size, MPI_BYTE, rank, recvTag.getID().id, MPI_COMM_WORLD, &status);
+	MPI_Recv(neurons->p_C1, sizeof(real)*size, MPI_BYTE, rank, recvTag.getID().id, MPI_COMM_WORLD, &status);
+	MPI_Recv(neurons->p_C2, sizeof(real)*size, MPI_BYTE, rank, recvTag.getID().id, MPI_COMM_WORLD, &status);
+	MPI_Recv(neurons->p_i_tmp, sizeof(real)*size, MPI_BYTE, rank, recvTag.getID().id, MPI_COMM_WORLD, &status);
+	MPI_Recv(neurons->p_refrac_step, size, MPI_INT, rank, recvTag.getID().id, MPI_COMM_WORLD, &status);
 
 	int *synapsesNum = (int*)malloc(sizeof(int) * neurons->num);
 	int *synapsesLoc = (int*)malloc(sizeof(int) * neurons->num);
 	int *synapsesIdx = (int*)malloc(sizeof(int) * neurons->synapsesNum);
-	MPI_Recv(synapsesNum, size, MPI_INT, rank, 21, MPI_COMM_WORLD, &status);
-	MPI_Recv(synapsesLoc, size, MPI_INT, rank, 22, MPI_COMM_WORLD, &status);
-	MPI_Recv(synapsesIdx, neurons->synapsesNum, MPI_INT, rank, 23, MPI_COMM_WORLD, &status);
+	MPI_Recv(synapsesNum, size, MPI_INT, rank, recvTag.getID().id, MPI_COMM_WORLD, &status);
+	MPI_Recv(synapsesLoc, size, MPI_INT, rank, recvTag.getID().id, MPI_COMM_WORLD, &status);
+	MPI_Recv(synapsesIdx, neurons->synapsesNum, MPI_INT, rank, recvTag.getID().id, MPI_COMM_WORLD, &status);
 
 	allocLIFConnects(neurons, synapsesNum, synapsesLoc, synapsesIdx, neurons->synapsesNum);
 
-	data = &neurons;
+	*data = (void*)neurons;
 }

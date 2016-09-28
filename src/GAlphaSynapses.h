@@ -29,6 +29,10 @@ void *createAlphaSynapses();
 size_t getAlphaSize();
 int allocAlphaSynapses(void *pSynapses, int S);
 int allocAlphaConnects(void *pCpu, int *pSynapsesDst, int *notUsed1, int *notUsed2, int notUsed3);
+
+void sendAlphaSynapses(void *data, int rank, int offset, int size);
+void recvAlphaSynapses(void **data, int rank, int size);
+
 int cudaAllocAlphaSynapses(void *pCpu, void *pGpu);
 int cudaFreeAlphaSynapses(void *pGpu);
 

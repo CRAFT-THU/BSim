@@ -28,7 +28,7 @@ PossionNeuron::PossionNeuron(ID id, double rate, double refract, double startTim
 	file = NULL;
 	fired = false;
 	monitored = false;
-	m_fireCycle= 0;
+	m_fireCycle= possion(0);
 	m_startCycle = 0;
 	srand(time(NULL));
 }
@@ -43,7 +43,7 @@ int PossionNeuron::reset(SimInfo &info)
 	fired = false;
 	_dt = info.dt;
 	m_startCycle = m_startTime/info.dt;
-	m_fireCycle = m_startCycle;
+	m_fireCycle = possion(m_startCycle);
 	return 0;
 }
 
@@ -57,7 +57,7 @@ int PossionNeuron::fire()
 	return 0;
 }
 
-SynapseBase * PossionNeuron::addSynapse(real weight, real delay, SpikeType type, NeuronBase *pDest)
+SynapseBase * PossionNeuron::addSynapse(real weight, real delay, SpikeType type, real tau, NeuronBase *pDest)
 {
 	ExpSynapse *tmp = new ExpSynapse(sidPool.getID(), weight, delay, 1e-3);
 	tmp->setDst(pDest);
@@ -75,11 +75,13 @@ Type PossionNeuron::getType()
 int PossionNeuron::update(SimInfo &info)
 {
 	fired = false;
-	if (info.currCycle == m_fireCycle && info.currCycle > m_startCycle) {
+	info.input.push_back(m_fireCycle);
+	if (info.currCycle == m_fireCycle && info.currCycle >= m_startCycle) {
 		fired = true;
 		m_fireCycle = possion(m_fireCycle);
 		fire();
-	}
+		info.fired.push_back(this->id);
+	} 
 	return 0;
 }
 
@@ -96,7 +98,7 @@ void PossionNeuron::monitor(SimInfo &info)
 			sprintf(filename, "PossionNeuron_%d_%d.log", this->id.groupId, this->id.id);
 			file = fopen(filename, "w+");
 		}
-		fprintf(file, "%d\n", m_fireCycle); 
+		fprintf(file, "%d:%d:%d:%d\n", info.currCycle, m_fireCycle, m_startCycle, fired);
 	}
 	return;
 }
@@ -129,9 +131,13 @@ int PossionNeuron::possion(int input)
 		int advance = -log(tmpVal)/m_rate;
 		if (advance >= (int)(m_refract/_dt)) {
 			finished = true;
-			ret = input + advance;
+			ret = input + 1 + advance;
 		}
 	}
 	return ret;
 }
 
+int PossionNeuron::getData(void *p)
+{
+	return 0;
+}

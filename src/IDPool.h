@@ -18,6 +18,8 @@ private:
 
 extern IDPool nidPool;
 extern IDPool sidPool;
+extern IDPool sendTag;
+extern IDPool recvTag;
 
 #endif /* IDPOOL_H */
 

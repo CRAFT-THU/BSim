@@ -6,14 +6,16 @@
 #define SIMULATOR_H
 
 //CPU SIM
-#include "SingleGPUSimulator.h"
+#include "SingleThreadSimulator.h"
 
 //GPU SIM
-#include "SingleThreadSimulator.h"
+#include "SingleGPUSimulator.h"
+#include "MultiGPUSimulator.h"
 
 typedef SingleThreadSimulator STSim;
 
 typedef SingleGPUSimulator SGSim;
+typedef MultiGPUSimulator MGSim;
 
 #endif /* SIMULATOR_H */
 

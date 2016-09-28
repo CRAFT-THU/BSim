@@ -7,6 +7,7 @@
 #include <sys/time.h>
 #include <stdio.h>
 
+#include "IDPool.h"
 #include "utils/cuda/helper_cuda.h"
 #include "gpu_utils.h"
 #include "gpu_func.h"
@@ -18,24 +19,24 @@
 MultiGPUSimulator::MultiGPUSimulator(Network *network, real dt) : SimulatorBase(network, dt)
 {
 	rank = -1;
-	size = -1;
+	rankSize = -1;
 }
 
 MultiGPUSimulator::~MultiGPUSimulator()
 {
 }
 
-GNetwork* getGlobalMdata(GNetwork *, int, int);
+void getGlobalMdata(GNetwork *, int, int);
 void getLocalMdata(GNetwork *, int, int);
 GNetwork* splitNetwork(GNetwork *, GNetwork *, int, int);
 
 int MultiGPUSimulator::init(int argc, char**argv)
 {
-	MPI_Init(&argc, &argv);
-	MPI_Comm_size(MPI_COMM_WORLD, &size);
+	//MPI_Init(&argc, &argv);
+	MPI_Comm_size(MPI_COMM_WORLD, &rankSize);
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-	return size;
+	return rankSize;
 }
 
 int MultiGPUSimulator::run(real time)
@@ -65,13 +66,44 @@ int MultiGPUSimulator::run(real time)
 		pAllNet = network->buildNetwork();
 	}
 
-	pCpuNet = getGlobalData(pAllNet, rank, size);
+	pCpuNet = (GNetwork *)malloc(sizeof(GNetwork));
+	if (rank == 0) {
+		memcpy(pCpuNet, pAllNet, sizeof(GNetwork));
+	}
 	MPI_Bcast(pCpuNet, sizeof(GNetwork), MPI_BYTE, 0, MPI_COMM_WORLD);
-	getLocalMdata(pCpuNet, rank, size);
-	splitNetwork(pCpuNet, pAllNet, rank, size);
 
+	getGlobalMdata(pCpuNet, rank, rankSize);
+	if (rank == 0) {
+		memcpy(pCpuNet->nTypes, pAllNet->nTypes, sizeof(Type)*pAllNet->nTypeNum);
+		memcpy(pCpuNet->sTypes, pAllNet->sTypes, sizeof(Type)*pAllNet->sTypeNum);
+		memcpy(pCpuNet->gNeuronNums, pAllNet->gNeuronNums, sizeof(int)*(pAllNet->nTypeNum+1));
+		memcpy(pCpuNet->gSynapseNums, pAllNet->gSynapseNums, sizeof(int)*(pAllNet->sTypeNum+1));
+	}
+	MPI_Bcast(pCpuNet->nTypes, sizeof(Type)*pCpuNet->nTypeNum, MPI_BYTE, 0, MPI_COMM_WORLD);
+	MPI_Bcast(pCpuNet->sTypes, sizeof(Type)*pCpuNet->sTypeNum, MPI_BYTE, 0, MPI_COMM_WORLD);
+	MPI_Bcast(pCpuNet->gNeuronNums, sizeof(int)*(pCpuNet->nTypeNum+1), MPI_BYTE, 0, MPI_COMM_WORLD);
+	MPI_Bcast(pCpuNet->gSynapseNums, sizeof(int)*(pCpuNet->sTypeNum+1), MPI_BYTE, 0, MPI_COMM_WORLD);
+
+	getLocalMdata(pCpuNet, rank, rankSize);
+
+	splitNetwork(pCpuNet, pAllNet, rank, rankSize);
+
+	//int sync = 0;
+	//if (rank == 0) {
+	//	printNetwork(pCpuNet, rank);
+	//	sync = 1;
+	//	for (int idx = 1; idx < rankSize; idx++) {
+	//		MPI_Send(&sync, 1, MPI_INT, idx, idx, MPI_COMM_WORLD);
+	//	}
+	//} else {
+	//	MPI_Status Status;
+	//	MPI_Recv(&sync, 1, MPI_INT, 0, rank, MPI_COMM_WORLD, &Status);
+	//	printNetwork(pCpuNet, rank);
+	//}
 
 	GNetwork *c_pGpuNet = copyDataToGPU(pCpuNet);
+	printf("Server %d: FINISH COPY\n", rank);
+
 	GNetwork *pGpuNet;
 	void **c_pNeurons;
 	void **c_pSynapses;
@@ -86,13 +118,10 @@ int MultiGPUSimulator::run(real time)
 	int thisSynapseNum = pCpuNet->synapseNums[sTypeNum];
 	int totalNeuronNum = pCpuNet->gNeuronNums[nTypeNum];
 	int totalSynapseNum = pCpuNet->gSynapseNums[sTypeNum];
-	printf("NeuronTypeNum: %d, SynapseTypeNum: %d\n", nTypeNum, sTypeNum);
-	printf("NeuronNum: %d, SynapseNum: %d\n", thisNeuronNum, thisSynapseNum);
-	printf("NeuronNum: %d, SynapseNum: %d\n", totalNeuronNum, totalSynapseNum);
-
 	int MAX_DELAY = (int)(pCpuNet->MAX_DELAY/dt);
-	printf("MAX_DELAY: %lf %lf %lf\n", network->maxDelay, pCpuNet->MAX_DELAY, dt);
-	printf("MAX_DELAY: %u\n", MAX_DELAY);
+	printf("SERVER: %d, NeuronTypeNum: %d, SynapseTypeNum: %d NeuronNum: %d, SynapseNum: %d, MAX_DELAY: %d\n", rank, nTypeNum, sTypeNum, thisNeuronNum, thisSynapseNum, MAX_DELAY);
+	//printf("MAX_DELAY: %lf %lf %lf\n", network->maxDelay, pCpuNet->MAX_DELAY, dt);
+	//printf("MAX_DELAY: %u\n", MAX_DELAY);
 
 	int * c_n_fired = (int*)malloc(sizeof(int)*((totalNeuronNum)));
 	bool * c_s_fired = (bool*)malloc(sizeof(bool)*((totalSynapseNum)));
@@ -122,19 +151,29 @@ int MultiGPUSimulator::run(real time)
 	BlockSize postSize = { 0, 0, 0};
 	cudaOccupancyMaxPotentialBlockSize(&(preSize.minGridSize), &(preSize.blockSize), update_lif_neuron, 0, totalNeuronNum); 
 	preSize.gridSize = (totalNeuronNum + (preSize.blockSize) - 1) / (preSize.blockSize);
-	cudaOccupancyMaxPotentialBlockSize(&(postSize.minGridSize), &(postSize.blockSize), update_lif_neuron, 0, totalSynapseNum); 
+	cudaOccupancyMaxPotentialBlockSize(&(postSize.minGridSize), &(postSize.blockSize), update_exp_synapse, 0, totalSynapseNum); 
 	postSize.gridSize = (totalSynapseNum + (postSize.blockSize) - 1) / (postSize.blockSize);
 
 	vector<int> firedInfo;
-	printf("Start runing for %d cycles\n", sim_cycle);
-	struct timeval ts, te;
-	gettimeofday(&ts, NULL);
+	printf("SERVER %d: Start runing for %d cycles\n", rank, sim_cycle);
+
+	double start, end;
+	MPI_Barrier(MPI_COMM_WORLD);
+	start = MPI_Wtime();
+
 	for (int time=0; time<sim_cycle; time++) {
-		printf("\rCycle: %d", time);
+		if (rank == 0) {
+			printf("\rCycle %d\n", time);
+		}
 
 		checkCudaErrors(cudaMemcpy(c_n_input, c_gNeuronInput, sizeof(real)*(totalNeuronNum), cudaMemcpyDeviceToHost));
+		//printf("SERVER %d: %p\n", rank, c_n_input);
+		//printf("SERVER %d: C_N_INPUT %p\n", rank, c_n_input);
 		MPI_Allreduce(MPI_IN_PLACE, c_n_input, totalNeuronNum, MPI_CREAL, MPI_SUM, MPI_COMM_WORLD);
 		checkCudaErrors(cudaMemcpy(c_gNeuronInput, c_n_input, sizeof(real)*(totalNeuronNum), cudaMemcpyHostToDevice));
+
+		//checkCudaErrors(cudaMemset(c_gFiredTable, 0, sizeof(int)*(totalNeuronNum)*(MAX_DELAY+1)));
+		checkCudaErrors(cudaMemset(c_gSynapsesFiredTable, 0, sizeof(bool)*(totalSynapseNum)));
 
 		for (int i=0; i<nTypeNum; i++) {
 			updateType[pCpuNet->nTypes[i]](c_pNeurons[i], pCpuNet->neuronNums[i+1]-pCpuNet->neuronNums[i], time, &updateSize[pCpuNet->nTypes[i]]);
@@ -143,8 +182,11 @@ int MultiGPUSimulator::run(real time)
 		update_pre_synapse<<<preSize.gridSize, preSize.blockSize>>>(pGpuNet, time);
 
 		checkCudaErrors(cudaMemcpy(c_s_fired, c_gSynapsesFiredTable, sizeof(bool)*(totalSynapseNum), cudaMemcpyDeviceToHost));
-		MPI_Allreduce(MPI_IN_PLACE, c_s_fired, sizeof(bool)*totalSynapseNum, MPI_BYTE, MPI_SUM, MPI_COMM_WORLD);
+		//printf("SERVER %d: C_S_FIRED %p\n", rank, c_s_fired);
+		MPI_Allreduce(MPI_IN_PLACE, c_s_fired, sizeof(bool)*totalSynapseNum, MPI_BYTE, MPI_BOR, MPI_COMM_WORLD);
 		checkCudaErrors(cudaMemcpy(c_gSynapsesFiredTable, c_s_fired, sizeof(bool)*(totalSynapseNum), cudaMemcpyHostToDevice));
+
+		checkCudaErrors(cudaMemset(c_gNeuronInput, 0, sizeof(real)*(totalNeuronNum)));
 
 		for (int i=0; i<sTypeNum; i++) {
 			updateType[pCpuNet->sTypes[i]](c_pSynapses[i], pCpuNet->synapseNums[i+1]-pCpuNet->synapseNums[i], time, &updateSize[pCpuNet->nTypes[i]]);
@@ -154,24 +196,25 @@ int MultiGPUSimulator::run(real time)
 
 		int currentIdx = time%(MAX_DELAY+1);
 		checkCudaErrors(cudaMemcpy(c_n_fired, c_gFiredTable + totalNeuronNum*currentIdx, sizeof(int)*(totalNeuronNum), cudaMemcpyDeviceToHost));
+		//printf("SERVER %d: C_N_FIRED %p\n", rank, c_n_fired);
 		MPI_Allreduce(MPI_IN_PLACE, c_n_fired, totalNeuronNum, MPI_CREAL, MPI_SUM, MPI_COMM_WORLD);
 
 		//int count = 0;
-		fprintf(dataFile, "%d", time);
-		for (int i=0; i<pCpuNet->neuronNums[nTypeNum]; i++) {
-			fprintf(dataFile, ", %lf", c_n_input[i]);
-		}
-		fprintf(dataFile, "\n");
-
-		fprintf(logFile, "Cycle %d: ", time);
-		firedInfo.clear();
-		for (int i=0; i<pCpuNet->neuronNums[nTypeNum]; i++) {
-			if (c_n_fired[i] > 0) {
-				firedInfo.push_back(i);
-			}
-		}
-
 		if (rank == 0) {
+			fprintf(dataFile, "%d", time);
+			for (int i=0; i<pCpuNet->gNeuronNums[nTypeNum]; i++) {
+				fprintf(dataFile, ", %lf", c_n_input[i]);
+			}
+			fprintf(dataFile, "\n");
+
+			fprintf(logFile, "Cycle %d: ", time);
+			firedInfo.clear();
+			for (int i=0; i<pCpuNet->gNeuronNums[nTypeNum]; i++) {
+				if (c_n_fired[i] > 0) {
+					firedInfo.push_back(i);
+				}
+			}
+
 			int size = firedInfo.size();
 			if (size > 0) {
 				fprintf(logFile, "%d_%d", network->idx2nid[firedInfo[0]].groupId, network->idx2nid[firedInfo[0]].id);
@@ -180,7 +223,7 @@ int MultiGPUSimulator::run(real time)
 				}
 			}
 			firedInfo.clear();
-			for (int i=0; i<pCpuNet->synapseNums[sTypeNum]; i++) {
+			for (int i=0; i<pCpuNet->gSynapseNums[sTypeNum]; i++) {
 				if (c_s_fired[i]) {
 					firedInfo.push_back(i);
 				}
@@ -198,13 +241,16 @@ int MultiGPUSimulator::run(real time)
 			fprintf(logFile, "\n");
 		}
 	}
-	gettimeofday(&te, NULL);
-	long seconds = te.tv_sec - ts.tv_sec;
+
+	MPI_Barrier(MPI_COMM_WORLD);
+	end = MPI_Wtime();
+
+	long seconds = end - start;
 	long hours = seconds/3600;
 	seconds = seconds%3600;
 	long minutes = seconds/60;
 	seconds = seconds%60;
-	long uSeconds = te.tv_usec - ts.tv_usec;
+	long uSeconds = ((long)((end-start)*1000000))%1000000;
 	if (uSeconds < 0) {
 		uSeconds += 1000000;
 		seconds = seconds - 1;
@@ -226,24 +272,26 @@ int MultiGPUSimulator::run(real time)
 
 	return 0;
 }
-
-GNetwork* getGlobalMdata(GNetwork *network, int rank, int rankSize)
+ 
+void getGlobalMdata(GNetwork *network, int rank, int rankSize)
 {
+	int nTypeNum = network->nTypeNum;
+	int sTypeNum = network->sTypeNum;
 
-	GNetwork *ret = (GNetwork *)malloc(sizeof(GNetwork));
-	if (network != NULL) {
-		memcpy(ret, network, sizeof(GNetwork));
-	}
+	network->pNeurons = (void**)malloc(sizeof(void*)*nTypeNum);
+	network->pSynapses = (void**)malloc(sizeof(void*)*sTypeNum);
+	network->nOffsets = (int*)malloc(sizeof(int)*(nTypeNum));
+	network->sOffsets = (int*)malloc(sizeof(int)*(sTypeNum));
+	network->neuronNums = (int*)malloc(sizeof(int)*(nTypeNum + 1));
+	network->synapseNums = (int*)malloc(sizeof(int)*(sTypeNum + 1));
+	network->neuronNums[0] = 0;
+	network->synapseNums[0] = 0;
 
+	network->nTypes = (Type*)malloc(sizeof(Type)*network->nTypeNum);
+	network->sTypes = (Type*)malloc(sizeof(Type)*network->sTypeNum);
+	network->gNeuronNums = (int*)malloc(sizeof(int)*(network->nTypeNum + 1));
+	network->gSynapseNums = (int*)malloc(sizeof(int)*(network->sTypeNum + 1));
 
-	if (rank == 0) {
-		memcpy(ret->nTypes, network->nTypes, sizeof(Type)*nTypeNum);
-		memcpy(ret->sTypes, network->sTypes, sizeof(Type)*sTypeNum);
-		memcpy(ret->gNeuronNums, network->gNeuronNums, sizeof(int)*(nTypeNum+1));
-		memcpy(ret->gSynapseNums, network->gSynapseNums, sizeof(int)*(sTypeNum+1));
-	}
-
-	return ret;
 }
 
 
@@ -251,25 +299,6 @@ void getLocalMdata(GNetwork *network, int rank, int rankSize)
 {
 	int nTypeNum = network->nTypeNum;
 	int sTypeNum = network->sTypeNum;
-
-	ret->pNeurons = (void**)malloc(sizeof(void*)*nTypeNum);
-	ret->pSynapses = (void**)malloc(sizeof(void*)*sTypeNum);
-	ret->nOffsets = (int*)malloc(sizeof(int)*(nTypeNum));
-	ret->sOffsets = (int*)malloc(sizeof(int)*(sTypeNum));
-	ret->neuronNums = (int*)malloc(sizeof(int)*(nTypeNum + 1));
-	ret->synapseNums = (int*)malloc(sizeof(int)*(sTypeNum + 1));
-	ret->neuronNums[0] = 0;
-	ret->synapseNums[0] = 0;
-
-	ret->nTypes = (Type*)malloc(sizeof(Type)*nTypeNum);
-	ret->sTypes = (Type*)malloc(sizeof(Type)*sTypeNum);
-	ret->gNeuronNums = (int*)malloc(sizeof(int)*(nTypeNum + 1));
-	ret->gSynapseNums = (int*)malloc(sizeof(int)*(sTypeNum + 1));
-
-	MPI_Bcast(network->nTypes, sizeof(Type)*pCpuNet->nTypeNum, MPI_BYTE, 0, MPI_COMM_WORLD);
-	MPI_Bcast(network->sTypes, sizeof(Type)*pCpuNet->sTypeNum, MPI_BYTE, 0, MPI_COMM_WORLD);
-	MPI_Bcast(network->gNeuronNums, sizeof(int)*(pCpuNet->nTypeNum+1), MPI_BYTE, 0, MPI_COMM_WORLD);
-	MPI_Bcast(network->gSynapseNums, sizeof(int)*(pCpuNet->sTypeNum+1), MPI_BYTE, 0, MPI_COMM_WORLD);
 
 	for (int i=0; i<nTypeNum; i++) {
 		int num_i = network->gNeuronNums[i+1] - network->gNeuronNums[i];
@@ -305,17 +334,18 @@ GNetwork* splitNetwork(GNetwork *network, GNetwork *allNet, int rank, int rankSi
 {
 	int nTypeNum = network->nTypeNum;
 	int sTypeNum = network->sTypeNum;
-	int totalNeuronNum = network->gNeuronNums[nTypeNum];
-	int totalSynapseNum = network->gSynapseNums[sTypeNum];
-	printf("NeuronTypeNum: %d, SynapseTypeNum: %d\n", nTypeNum, sTypeNum);
-	printf("NeuronNum: %d, SynapseNum: %d\n", totalNeuronNum, totalSynapseNum);
-	printf("MAX_DELAY: %lf\n", network->MAX_DELAY);
+	int totalNeuronNum = network->neuronNums[nTypeNum];
+	int totalSynapseNum = network->synapseNums[sTypeNum];
+	printf("BEFORE SPLITNET SERVER: %d, NeuronTypeNum: %d, SynapseTypeNum: %d NeuronNum: %d, SynapseNum: %d, MAX_DELAY: %f\n", rank, nTypeNum, sTypeNum, totalNeuronNum, totalSynapseNum, network->MAX_DELAY);
+	//printf("NeuronTypeNum: %d, SynapseTypeNum: %d\n", nTypeNum, sTypeNum);
+	//printf("NeuronNum: %d, SynapseNum: %d\n", totalNeuronNum, totalSynapseNum);
+	//printf("MAX_DELAY: %lf\n", network->MAX_DELAY);
 
 	if (rank == 0) {
 		copyNetwork(network, allNet, 0, rankSize); 
-		mpiSendNetwork(network, allNet, 0, rankSize);
+		mpiSendNetwork(allNet, rank, rankSize);
 	} else {
-		mpiReceiveNetwork(network, 0, rankSize);
+		mpiRecvNetwork(network, rank, rankSize);
 	}
 
 	return network;

@@ -25,6 +25,7 @@ $(BIN_DIR)/%.cpu.out: $(OBJ_DIR)/%.cpu.o ../lib/libsnnsim.a
 
 $(BIN_DIR)/%.gpu.out: $(OBJ_DIR)/%.gpu.o ../lib/libsnnsim_gpu.a
 	$(CXX) $^ -o $@ -lcudart -L$(CUDA_HOME)/lib64
+	cp $(BIN_DIR)/multi-gpusim_test ../../shared
 
 $(OBJ_DIR)/%.cpu.o: $(CPU_DIR)/%.cpp 
 	$(CXX) $(CFLAGS) -o $@ -c $^ -I$(INC_DIR) -L$(LIB_DIR)

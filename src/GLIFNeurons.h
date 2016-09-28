@@ -39,6 +39,7 @@ size_t getLIFSize();
 int allocLIFNeurons(void *pCpu, int N);
 int allocLIFConnects(void *pCpu, int *pSynapsesNum, int *pSynapsesLoc, int *pSynapsesIdx, int S);
 void sendLIFNeurons(void *data, int rank, int offset, int size);
+void recvLIFNeurons(void **data, int rank, int size);
 
 int cudaAllocLIFNeurons(void *pCpu, void *pGpu);
 int cudaFreeLIFNeurons(void *pGpu);
