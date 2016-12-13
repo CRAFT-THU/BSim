@@ -56,17 +56,6 @@ CMAKE_BINARY_DIR = /home/snn/BSim
 #=============================================================================
 # Targets provided globally by CMake.
 
-# Special rule for the target rebuild_cache
-rebuild_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
-	/usr/bin/cmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
-.PHONY : rebuild_cache
-
-# Special rule for the target rebuild_cache
-rebuild_cache/fast: rebuild_cache
-
-.PHONY : rebuild_cache/fast
-
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
@@ -77,6 +66,17 @@ edit_cache:
 edit_cache/fast: edit_cache
 
 .PHONY : edit_cache/fast
+
+# Special rule for the target rebuild_cache
+rebuild_cache:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
+	/usr/bin/cmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+.PHONY : rebuild_cache
+
+# Special rule for the target rebuild_cache
+rebuild_cache/fast: rebuild_cache
+
+.PHONY : rebuild_cache/fast
 
 # The main all target
 all: cmake_check_build_system
@@ -150,19 +150,6 @@ possion_net/fast:
 .PHONY : possion_net/fast
 
 #=============================================================================
-# Target rules for targets named bsim
-
-# Build rule for target.
-bsim: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 bsim
-.PHONY : bsim
-
-# fast build rule for target.
-bsim/fast:
-	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/build
-.PHONY : bsim/fast
-
-#=============================================================================
 # Target rules for targets named snn_from_file_nengo
 
 # Build rule for target.
@@ -176,6 +163,19 @@ snn_from_file_nengo/fast:
 .PHONY : snn_from_file_nengo/fast
 
 #=============================================================================
+# Target rules for targets named bsim
+
+# Build rule for target.
+bsim: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 bsim
+.PHONY : bsim
+
+# fast build rule for target.
+bsim/fast:
+	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/build
+.PHONY : bsim/fast
+
+#=============================================================================
 # Target rules for targets named neural_test
 
 # Build rule for target.
@@ -187,19 +187,6 @@ neural_test: cmake_check_build_system
 neural_test/fast:
 	$(MAKE) -f CMakeFiles/neural_test.dir/build.make CMakeFiles/neural_test.dir/build
 .PHONY : neural_test/fast
-
-#=============================================================================
-# Target rules for targets named bsim_gpu
-
-# Build rule for target.
-bsim_gpu: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 bsim_gpu
-.PHONY : bsim_gpu
-
-# fast build rule for target.
-bsim_gpu/fast:
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/build
-.PHONY : bsim_gpu/fast
 
 #=============================================================================
 # Target rules for targets named synapse_test
@@ -241,6 +228,19 @@ multi-gpusim_test/fast:
 .PHONY : multi-gpusim_test/fast
 
 #=============================================================================
+# Target rules for targets named snn_from_file
+
+# Build rule for target.
+snn_from_file: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 snn_from_file
+.PHONY : snn_from_file
+
+# fast build rule for target.
+snn_from_file/fast:
+	$(MAKE) -f CMakeFiles/snn_from_file.dir/build.make CMakeFiles/snn_from_file.dir/build
+.PHONY : snn_from_file/fast
+
+#=============================================================================
 # Target rules for targets named read_write_test
 
 # Build rule for target.
@@ -254,17 +254,17 @@ read_write_test/fast:
 .PHONY : read_write_test/fast
 
 #=============================================================================
-# Target rules for targets named snn_from_file
+# Target rules for targets named bsim_gpu
 
 # Build rule for target.
-snn_from_file: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 snn_from_file
-.PHONY : snn_from_file
+bsim_gpu: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 bsim_gpu
+.PHONY : bsim_gpu
 
 # fast build rule for target.
-snn_from_file/fast:
-	$(MAKE) -f CMakeFiles/snn_from_file.dir/build.make CMakeFiles/snn_from_file.dir/build
-.PHONY : snn_from_file/fast
+bsim_gpu/fast:
+	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/build
+.PHONY : bsim_gpu/fast
 
 src/AlphaSynapse.o: src/AlphaSynapse.cpp.o
 
@@ -1643,17 +1643,17 @@ help:
 	@echo "... gpusim_test2"
 	@echo "... gpusim_test"
 	@echo "... possion_net"
-	@echo "... bsim"
 	@echo "... snn_from_file_nengo"
+	@echo "... bsim"
 	@echo "... neural_test"
-	@echo "... rebuild_cache"
-	@echo "... bsim_gpu"
 	@echo "... synapse_test"
 	@echo "... generater_test"
 	@echo "... multi-gpusim_test"
 	@echo "... edit_cache"
-	@echo "... read_write_test"
 	@echo "... snn_from_file"
+	@echo "... read_write_test"
+	@echo "... rebuild_cache"
+	@echo "... bsim_gpu"
 	@echo "... src/AlphaSynapse.o"
 	@echo "... src/AlphaSynapse.i"
 	@echo "... src/AlphaSynapse.s"
