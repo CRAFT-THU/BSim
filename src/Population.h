@@ -29,7 +29,7 @@ public:
 	void monitor(SimInfo &info);
 
 	int getData(void *data);
-	int hardCopy(void *data, int idx);
+	virtual int hardCopy(void *data, int idx, int base, map<ID, int> &id2idx, map<int, ID> &idx2id);
 
 	int addNeuron(Neuron templ);
 	NeuronBase* findNeuron(ID id);
@@ -155,12 +155,13 @@ int Population<Neuron>::addNeuron(Neuron templ)
 }
 
 template<class Neuron>
-int Population<Neuron>::hardCopy(void *data, int idx)
+int Population<Neuron>::hardCopy(void *data, int idx, int base, map<ID, int> &id2idx, map<int, ID> &idx2id)
+//int Population<Neuron>::hardCopy(void *data, int idx)
 {
 	size_t copiedIdxs = 0;
 	typename vector<Neuron>::iterator iter;
 	for (iter = neurons.begin(); iter != neurons.end(); iter++) {
-		size_t copied = iter->hardCopy(data, idx+copiedIdxs);
+		size_t copied = iter->hardCopy(data, idx+copiedIdxs, base, id2idx, idx2id);
 		copiedIdxs += copied;
 	}
 	return copiedIdxs;

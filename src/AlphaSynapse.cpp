@@ -23,7 +23,7 @@ AlphaSynapse::AlphaSynapse(ID id, real weight, real delay = 0.0, real tau_syn = 
 
 AlphaSynapse::~AlphaSynapse()
 {
-	delay_step.clear();
+	delay_queue.clear();
 }
 
 void AlphaSynapse::setDst(NeuronBase *p) {
@@ -60,15 +60,15 @@ int AlphaSynapse::update(SimInfo &info)
 
 	list<int>::iterator iter;
 
-	if (!delay_step.empty() && delay_step.front() <= 0) {
+	if (!delay_queue.empty() && delay_queue.front() <= 0) {
 		double I_t = _C2 * I_syn + _C2 * I_tmp;
 		I_tmp += weight/_C1;
 		I_syn = (I_t - _C2 * I_tmp)/_C1;
 		pDest->recv(I_syn);
-		delay_step.pop_front();
+		delay_queue.pop_front();
 	}
 
-	for (iter = delay_step.begin(); iter != delay_step.end(); iter++) {
+	for (iter = delay_queue.begin(); iter != delay_queue.end(); iter++) {
 		*iter = *iter - 1;
 	}
 
@@ -77,7 +77,7 @@ int AlphaSynapse::update(SimInfo &info)
 
 int AlphaSynapse::recv()
 {
-	delay_step.push_back((int)(delay/_dt));
+	delay_queue.push_back((int)(delay/_dt));
 
 	return 0;
 }

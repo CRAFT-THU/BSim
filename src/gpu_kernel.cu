@@ -119,7 +119,7 @@ __device__ int get_alpha_delay(void *data, int num, int sid)
 __device__ int get_exp_delay(void *data, int num, int sid)
 {
 	GExpSynapses *d_synapses = (GExpSynapses*)data;
-	return (int)(d_synapses->p_delay[sid]/d_synapses->p__dt[sid]);
+	return (int)(d_synapses->p_delay_steps[sid]);
 }
 
 __device__ int (*get_delay[])(void *, int, int) = { NULL, get_alpha_delay, get_exp_delay };
@@ -221,7 +221,7 @@ __global__ void update_pre_synapse(GLIFNeurons *d_neurons, GExpSynapses* d_synap
 				for (int i=0; i<d_neurons->pSynapsesNum[nid]; i++) {
 					int loc = d_neurons->pSynapsesLoc[nid];
 					int sid = d_neurons->pSynapsesIdx[i+loc];
-					if (simTime == start_t +(int)(d_synapses->p_delay[sid]/d_synapses->p__dt[sid]))
+					if (simTime == start_t + d_synapses->p_delay_steps[sid])
 						gSynapsesFiredTable[d_neurons->pSynapsesIdx[i+loc]] = true;
 				}
 			}
@@ -250,7 +250,7 @@ __global__ void update_lif_neuron(GLIFNeurons *d_neurons, int num, int simTime)
 				d_neurons->p_vm[nid] = d_neurons->p_v_reset[nid];
 			} else if (d_neurons->p_vm[nid] >= d_neurons->p_v_thresh[nid]) {
 				fired = 1;
-				d_neurons->p_refrac_step[nid] = (int)(d_neurons->p_tau_refrac[nid]/d_neurons->p__dt[nid]) - 1;
+				d_neurons->p_refrac_step[nid] = d_neurons->p_refrac_time[nid] - 1;
 				d_neurons->p_vm[nid] = d_neurons->p_v_reset[nid];
 			}
 

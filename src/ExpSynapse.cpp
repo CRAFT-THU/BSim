@@ -4,12 +4,15 @@
  */
 
 #include <math.h>
+#include <map>
 
 #include "utils/json/json.h"
 #include "ExpSynapse.h"
 #include "GExpSynapses.h"
 
 const Type ExpSynapse::type = Exp;
+
+using std::map;
 
 ExpSynapse::ExpSynapse(ID id, real weight, real delay = 0, real tau_syn = 0)
 {
@@ -28,7 +31,7 @@ ExpSynapse::~ExpSynapse()
 		fclose(file);
 	}
 
-	delay_step.clear();
+	delay_queue.clear();
 }
 
 void ExpSynapse::setDst(NeuronBase *p) {
@@ -43,7 +46,7 @@ int ExpSynapse::reset(SimInfo &info) {
 }
 
 int ExpSynapse::init(real dt) {
-	_dt = dt;
+	//_dt = dt;
 	if (tau_syn > 0) {
 		C1 = expf(-dt/tau_syn);
 		_C1 = expf(-(delay-dt*(int)(delay/dt))/tau_syn);
@@ -61,14 +64,14 @@ int ExpSynapse::update(SimInfo &info)
 	
 	list<int>::iterator iter;
 
-	while (!delay_step.empty() && (delay_step.front() <= 0)) {
+	while (!delay_queue.empty() && (delay_queue.front() <= 0)) {
 		I_syn += weight/_C1;
 		pDest->recv(I_syn);
-		delay_step.pop_front();
+		delay_queue.pop_front();
 		info.fired.push_back(id);
 	}
 
-	for (iter = delay_step.begin(); iter != delay_step.end(); iter++) {
+	for (iter = delay_queue.begin(); iter != delay_queue.end(); iter++) {
 		*iter = *iter - 1;
 	}
 
@@ -77,7 +80,7 @@ int ExpSynapse::update(SimInfo &info)
 
 int ExpSynapse::recv()
 {
-	delay_step.push_back((int)(delay/_dt));
+	delay_queue.push_back((int)(delay/_dt));
 
 	return 0;
 }
@@ -127,17 +130,20 @@ int ExpSynapse::getData(void *data)
 	return 0;
 }
 
-int ExpSynapse::hardCopy(void *data, int idx)
+int ExpSynapse::hardCopy(void *data, int idx, int base, map<ID, int> &id2idx, map<int, ID> &idx2id)
 {
 	GExpSynapses *p = (GExpSynapses *)data;
-	p->pID[idx] = id;
-	p->pType[idx] = type;
+	id2idx[id] = idx + base;
+	idx2id[idx+base] = id;
+	//p->pID[idx] = id;
+	//p->pType[idx] = type;
 	p->p_weight[idx] = weight;
-	p->p_delay[idx] = delay;
+	p->p_delay_steps[idx] = delay_steps;
+	//p->p_delay[idx] = delay;
 	p->p_C1[idx] = C1;
 	p->p__C1[idx] = _C1;
-	p->p_tau_syn[idx] = tau_syn;
+	//p->p_tau_syn[idx] = tau_syn;
 	p->p_I_syn[idx] = I_syn;
-	p->p__dt[idx] = _dt;
+	//p->p__dt[idx] = _dt;
 	return 1;
 }

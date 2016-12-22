@@ -8,15 +8,16 @@
 #include "ID.h"
 
 struct GExpSynapses {
-	ID *pID;
-	Type *pType;
+	//ID *pID;
+	//Type *pType;
 	real *p_weight;
-	real *p_delay;
+	int *p_delay_steps;
+	//real *p_delay;
 	real *p_C1;
 	real *p__C1;
-	real *p_tau_syn;
+	//real *p_tau_syn;
 	real *p_I_syn;
-	real *p__dt;
+	//real *p__dt;
 	//int *pSrc;
 	int *pDst;
 	int num;

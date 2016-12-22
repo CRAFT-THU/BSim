@@ -31,7 +31,7 @@ public:
 
 	virtual size_t getSize();
 	virtual int getData(void *data);
-	virtual int hardCopy(void * data, int idx);
+	virtual int hardCopy(void * data, int idx, int base, map<ID, int> &id2idx, map<int, ID> &idx2id);
 
 	const static Type type;
 protected:
@@ -47,10 +47,11 @@ protected:
 	real i_offset;
 	real i_syn;
 	real vm;
-	real _dt;
+	//real _dt;
 	real C1;
 	real C2;
 	real i_tmp;
+	int refrac_time;
 	int refrac_step;
 	FILE* file;
 };

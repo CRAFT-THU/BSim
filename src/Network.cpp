@@ -209,33 +209,33 @@ int Network::addOutput(int populationIDSrc, int neuronIDSrc)
 	return 0;
 }
 
-int Network::addProbe(int populationIDSrc, int neuronIDSrc, double weight)
-{
-	NeuronBase *pN = findNeuron(populationIDSrc, neuronIDSrc);
-	if (pN == NULL) {
-		printf("PROBE NEURON Cann't find neuron: %d:%d\n", populationIDSrc, neuronIDSrc);
-		return -1;
-	}
-
-	NeuronBase *probe = findNeuron(-2, populationIDSrc);
-	if (probe == NULL) {
-		PopulationBase *pP = findPopulation(-2);
-		if (pP == NULL) {
-			pP = createPopulation(ID(0, -2), 1, ProbeNeuron(ID(0, 0), 0.01, 0.01));
-		}
-		Population<ProbeNeuron> *pNewP = (Population<ProbeNeuron>*)pP;
-		pNewP->addNeuron(ProbeNeuron(ID(-2, populationIDSrc), 0.01, 0.01));
-		probe = findNeuron(-2, populationIDSrc);
-		if (probe == NULL) {
-			printf("PROBE Cann't find neuron: %d:%d\n", -2, populationIDSrc);
-			return -1;
-		}
-		probe->monitorOn();
-	}
-	((ProbeNeuron*)probe)->addProbe(pN, weight);
-
-	return 0;
-}
+//int Network::addProbe(int populationIDSrc, int neuronIDSrc, double weight)
+//{
+//	NeuronBase *pN = findNeuron(populationIDSrc, neuronIDSrc);
+//	if (pN == NULL) {
+//		printf("PROBE NEURON Cann't find neuron: %d:%d\n", populationIDSrc, neuronIDSrc);
+//		return -1;
+//	}
+//
+//	NeuronBase *probe = findNeuron(-2, populationIDSrc);
+//	if (probe == NULL) {
+//		PopulationBase *pP = findPopulation(-2);
+//		if (pP == NULL) {
+//			pP = createPopulation(ID(0, -2), 1, ProbeNeuron(ID(0, 0), 0.01, 0.01));
+//		}
+//		Population<ProbeNeuron> *pNewP = (Population<ProbeNeuron>*)pP;
+//		pNewP->addNeuron(ProbeNeuron(ID(-2, populationIDSrc), 0.01, 0.01));
+//		probe = findNeuron(-2, populationIDSrc);
+//		if (probe == NULL) {
+//			printf("PROBE Cann't find neuron: %d:%d\n", -2, populationIDSrc);
+//			return -1;
+//		}
+//		probe->monitorOn();
+//	}
+//	((ProbeNeuron*)probe)->addProbe(pN, weight);
+//
+//	return 0;
+//}
 
 int Network::addMonitor(int populationIDSrc, int neuronIDSrc)
 {

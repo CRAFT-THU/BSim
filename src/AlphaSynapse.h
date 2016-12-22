@@ -44,7 +44,7 @@ protected:
 	real I_tmp;
 	real _dt;
 	bool monitored;
-	list<int> delay_step;
+	list<int> delay_queue;
 	NeuronBase *pDest;
 };
 

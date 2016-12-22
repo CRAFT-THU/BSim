@@ -39,23 +39,23 @@ GNetwork* Network::buildNetwork()
 		for (piter = pPopulations.begin(); piter != pPopulations.end();  piter++) {
 			PopulationBase * p = *piter;
 			if (p->getType() == nTypes[i]) {
-				size_t copied = p->hardCopy(pN, idx);
+				size_t copied = p->hardCopy(pN, idx, pNeuronsNum[i], nid2idx, idx2nid);
 				idx += copied;
 			}
 		}
 		for (niter = pNeurons.begin(); niter != pNeurons.end();  niter++) {
 			NeuronBase * p = *niter;
 			if (p->getType() == nTypes[i]) {
-				size_t copied = p->hardCopy(pN, idx);
+				size_t copied = p->hardCopy(pN, idx, pNeuronsNum[i], nid2idx, idx2nid);
 				idx += copied;
 			}
 		}
 
-		ID *pId = *(ID**)pN;
-		for (int t=0; t<idx; t++) {
-			nid2idx[pId[t]] = t + pNeuronsNum[i];
-			idx2nid[t+pNeuronsNum[i]] = pId[t];
-		}
+		//ID *pId = *(ID**)pN;
+		//for (int t=0; t<idx; t++) {
+		//	nid2idx[pId[t]] = t + pNeuronsNum[i];
+		//	idx2nid[t+pNeuronsNum[i]] = pId[t];
+		//}
 
 		pNOffsets[i] = 0;
 		pNeuronsNum[i+1] = idx + pNeuronsNum[i];
@@ -74,16 +74,16 @@ GNetwork* Network::buildNetwork()
 		for (siter = pSynapses.begin(); siter != pSynapses.end();  siter++) {
 			SynapseBase * p = *siter;
 			if (p->getType() == sTypes[i]) {
-				int copied = p->hardCopy(pS, idx);
+				int copied = p->hardCopy(pS, idx, pSynapsesNum[i], sid2idx, idx2sid);
 				idx += copied;
 			}
 		}
 
-		ID *pId = *(ID**)pS;
-		for (int t=0; t<idx; t++) {
-			sid2idx[pId[t]] = t + pSynapsesNum[i];
-			idx2sid[t+pSynapsesNum[i]] = pId[t];
-		}
+		//ID *pId = *(ID**)pS;
+		//for (int t=0; t<idx; t++) {
+		//	sid2idx[pId[t]] = t + pSynapsesNum[i];
+		//	idx2sid[t+pSynapsesNum[i]] = pId[t];
+		//}
 
 		pSOffsets[i] = 0;
 		pSynapsesNum[i+1] = idx + pSynapsesNum[i];

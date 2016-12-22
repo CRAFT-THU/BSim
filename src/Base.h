@@ -5,8 +5,12 @@
 #ifndef BASE_H
 #define BASE_H
 
+#include <map>
+
 #include "IDPool.h"
 #include "SimInfo.h"
+
+using std::map;
 
 class Base {
 public:
@@ -24,7 +28,7 @@ public:
 
 	virtual size_t getSize() = 0;
 	virtual int getData(void *data) = 0;
-	virtual int hardCopy(void *data, int idx) = 0;
+	virtual int hardCopy(void *data, int idx, int base, map<ID, int> &id2idx, map<int, ID> &idx2id) = 0;
 	
 protected:
 	ID id;

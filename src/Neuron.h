@@ -10,6 +10,8 @@
 #include "NeuronBase.h"
 #include "PossionNeuron.h"
 #include "InputNeuron.h"
+#include "LIFNeuron.h"
+//#include "MaxNeuron.h"
 #include "GLIFNeurons.h"
 #include "IF_curr_exp.h"
 #include "NengoNeuron.h"
@@ -17,9 +19,12 @@
 
 #include "CompositeNeuron.h"
 
-typedef CompositeNeuron<InputNeuron, LowpassSynapse> Input_lowpass;
-typedef CompositeNeuron<ProbeNeuron, LowpassSynapse> Probe_lowpass;
-typedef CompositeNeuron<NengoNeuron, LowpassSynapse> Nengo_lowpass2;
+//typedef CompositeNeuron<InputNeuron, LowpassSynapse> Input_lowpass;
+//typedef CompositeNeuron<ProbeNeuron, LowpassSynapse> Probe_lowpass;
+//typedef CompositeNeuron<NengoNeuron, LowpassSynapse> Nengo_lowpass2;
+
+//typedef CompositeNeuron<LIFNeuron, BasicSynapse> IF_curr_basic;
+//typedef CompositeNeuron<MaxNeuron, BasicSynapse> MAX_curr_basic;
 
 #endif /* NEURON_H */
 

@@ -48,10 +48,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/snn/BSim
+CMAKE_SOURCE_DIR = /home/yhx/BSim
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/snn/BSim
+CMAKE_BINARY_DIR = /home/yhx/BSim
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -80,9 +80,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/snn/BSim/CMakeFiles /home/snn/BSim/CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/yhx/BSim/CMakeFiles /home/yhx/BSim/CMakeFiles/progress.marks
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/snn/BSim/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/yhx/BSim/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -111,97 +111,6 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named gpusim_test2
-
-# Build rule for target.
-gpusim_test2: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 gpusim_test2
-.PHONY : gpusim_test2
-
-# fast build rule for target.
-gpusim_test2/fast:
-	$(MAKE) -f CMakeFiles/gpusim_test2.dir/build.make CMakeFiles/gpusim_test2.dir/build
-.PHONY : gpusim_test2/fast
-
-#=============================================================================
-# Target rules for targets named gpusim_test
-
-# Build rule for target.
-gpusim_test: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 gpusim_test
-.PHONY : gpusim_test
-
-# fast build rule for target.
-gpusim_test/fast:
-	$(MAKE) -f CMakeFiles/gpusim_test.dir/build.make CMakeFiles/gpusim_test.dir/build
-.PHONY : gpusim_test/fast
-
-#=============================================================================
-# Target rules for targets named possion_net
-
-# Build rule for target.
-possion_net: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 possion_net
-.PHONY : possion_net
-
-# fast build rule for target.
-possion_net/fast:
-	$(MAKE) -f CMakeFiles/possion_net.dir/build.make CMakeFiles/possion_net.dir/build
-.PHONY : possion_net/fast
-
-#=============================================================================
-# Target rules for targets named snn_from_file_nengo
-
-# Build rule for target.
-snn_from_file_nengo: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 snn_from_file_nengo
-.PHONY : snn_from_file_nengo
-
-# fast build rule for target.
-snn_from_file_nengo/fast:
-	$(MAKE) -f CMakeFiles/snn_from_file_nengo.dir/build.make CMakeFiles/snn_from_file_nengo.dir/build
-.PHONY : snn_from_file_nengo/fast
-
-#=============================================================================
-# Target rules for targets named bsim
-
-# Build rule for target.
-bsim: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 bsim
-.PHONY : bsim
-
-# fast build rule for target.
-bsim/fast:
-	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/build
-.PHONY : bsim/fast
-
-#=============================================================================
-# Target rules for targets named neural_test
-
-# Build rule for target.
-neural_test: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 neural_test
-.PHONY : neural_test
-
-# fast build rule for target.
-neural_test/fast:
-	$(MAKE) -f CMakeFiles/neural_test.dir/build.make CMakeFiles/neural_test.dir/build
-.PHONY : neural_test/fast
-
-#=============================================================================
-# Target rules for targets named synapse_test
-
-# Build rule for target.
-synapse_test: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 synapse_test
-.PHONY : synapse_test
-
-# fast build rule for target.
-synapse_test/fast:
-	$(MAKE) -f CMakeFiles/synapse_test.dir/build.make CMakeFiles/synapse_test.dir/build
-.PHONY : synapse_test/fast
-
-#=============================================================================
 # Target rules for targets named generater_test
 
 # Build rule for target.
@@ -228,30 +137,82 @@ multi-gpusim_test/fast:
 .PHONY : multi-gpusim_test/fast
 
 #=============================================================================
-# Target rules for targets named snn_from_file
+# Target rules for targets named synapse_test
 
 # Build rule for target.
-snn_from_file: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 snn_from_file
-.PHONY : snn_from_file
+synapse_test: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 synapse_test
+.PHONY : synapse_test
 
 # fast build rule for target.
-snn_from_file/fast:
-	$(MAKE) -f CMakeFiles/snn_from_file.dir/build.make CMakeFiles/snn_from_file.dir/build
-.PHONY : snn_from_file/fast
+synapse_test/fast:
+	$(MAKE) -f CMakeFiles/synapse_test.dir/build.make CMakeFiles/synapse_test.dir/build
+.PHONY : synapse_test/fast
 
 #=============================================================================
-# Target rules for targets named read_write_test
+# Target rules for targets named gpusim_test2
 
 # Build rule for target.
-read_write_test: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 read_write_test
-.PHONY : read_write_test
+gpusim_test2: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 gpusim_test2
+.PHONY : gpusim_test2
 
 # fast build rule for target.
-read_write_test/fast:
-	$(MAKE) -f CMakeFiles/read_write_test.dir/build.make CMakeFiles/read_write_test.dir/build
-.PHONY : read_write_test/fast
+gpusim_test2/fast:
+	$(MAKE) -f CMakeFiles/gpusim_test2.dir/build.make CMakeFiles/gpusim_test2.dir/build
+.PHONY : gpusim_test2/fast
+
+#=============================================================================
+# Target rules for targets named neural_test
+
+# Build rule for target.
+neural_test: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 neural_test
+.PHONY : neural_test
+
+# fast build rule for target.
+neural_test/fast:
+	$(MAKE) -f CMakeFiles/neural_test.dir/build.make CMakeFiles/neural_test.dir/build
+.PHONY : neural_test/fast
+
+#=============================================================================
+# Target rules for targets named gpusim_test
+
+# Build rule for target.
+gpusim_test: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 gpusim_test
+.PHONY : gpusim_test
+
+# fast build rule for target.
+gpusim_test/fast:
+	$(MAKE) -f CMakeFiles/gpusim_test.dir/build.make CMakeFiles/gpusim_test.dir/build
+.PHONY : gpusim_test/fast
+
+#=============================================================================
+# Target rules for targets named bsim
+
+# Build rule for target.
+bsim: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 bsim
+.PHONY : bsim
+
+# fast build rule for target.
+bsim/fast:
+	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/build
+.PHONY : bsim/fast
+
+#=============================================================================
+# Target rules for targets named snn_from_file_nengo
+
+# Build rule for target.
+snn_from_file_nengo: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 snn_from_file_nengo
+.PHONY : snn_from_file_nengo
+
+# fast build rule for target.
+snn_from_file_nengo/fast:
+	$(MAKE) -f CMakeFiles/snn_from_file_nengo.dir/build.make CMakeFiles/snn_from_file_nengo.dir/build
+.PHONY : snn_from_file_nengo/fast
 
 #=============================================================================
 # Target rules for targets named bsim_gpu
@@ -325,6 +286,36 @@ src/Base.cpp.s:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/Base.cpp.s
 	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/Base.cpp.s
 .PHONY : src/Base.cpp.s
+
+src/ConstantNeuron.o: src/ConstantNeuron.cpp.o
+
+.PHONY : src/ConstantNeuron.o
+
+# target to build an object file
+src/ConstantNeuron.cpp.o:
+	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/ConstantNeuron.cpp.o
+	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/ConstantNeuron.cpp.o
+.PHONY : src/ConstantNeuron.cpp.o
+
+src/ConstantNeuron.i: src/ConstantNeuron.cpp.i
+
+.PHONY : src/ConstantNeuron.i
+
+# target to preprocess a source file
+src/ConstantNeuron.cpp.i:
+	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/ConstantNeuron.cpp.i
+	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/ConstantNeuron.cpp.i
+.PHONY : src/ConstantNeuron.cpp.i
+
+src/ConstantNeuron.s: src/ConstantNeuron.cpp.s
+
+.PHONY : src/ConstantNeuron.s
+
+# target to generate assembly for a file
+src/ConstantNeuron.cpp.s:
+	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/ConstantNeuron.cpp.s
+	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/ConstantNeuron.cpp.s
+.PHONY : src/ConstantNeuron.cpp.s
 
 src/ExpSynapse.o: src/ExpSynapse.cpp.o
 
@@ -614,35 +605,35 @@ src/LIFNeuron.cpp.s:
 	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/LIFNeuron.cpp.s
 .PHONY : src/LIFNeuron.cpp.s
 
-src/LowpassSynapse.o: src/LowpassSynapse.cpp.o
+src/MaxNeuron.o: src/MaxNeuron.cpp.o
 
-.PHONY : src/LowpassSynapse.o
+.PHONY : src/MaxNeuron.o
 
 # target to build an object file
-src/LowpassSynapse.cpp.o:
-	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/LowpassSynapse.cpp.o
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/LowpassSynapse.cpp.o
-.PHONY : src/LowpassSynapse.cpp.o
+src/MaxNeuron.cpp.o:
+	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/MaxNeuron.cpp.o
+	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/MaxNeuron.cpp.o
+.PHONY : src/MaxNeuron.cpp.o
 
-src/LowpassSynapse.i: src/LowpassSynapse.cpp.i
+src/MaxNeuron.i: src/MaxNeuron.cpp.i
 
-.PHONY : src/LowpassSynapse.i
+.PHONY : src/MaxNeuron.i
 
 # target to preprocess a source file
-src/LowpassSynapse.cpp.i:
-	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/LowpassSynapse.cpp.i
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/LowpassSynapse.cpp.i
-.PHONY : src/LowpassSynapse.cpp.i
+src/MaxNeuron.cpp.i:
+	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/MaxNeuron.cpp.i
+	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/MaxNeuron.cpp.i
+.PHONY : src/MaxNeuron.cpp.i
 
-src/LowpassSynapse.s: src/LowpassSynapse.cpp.s
+src/MaxNeuron.s: src/MaxNeuron.cpp.s
 
-.PHONY : src/LowpassSynapse.s
+.PHONY : src/MaxNeuron.s
 
 # target to generate assembly for a file
-src/LowpassSynapse.cpp.s:
-	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/LowpassSynapse.cpp.s
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/LowpassSynapse.cpp.s
-.PHONY : src/LowpassSynapse.cpp.s
+src/MaxNeuron.cpp.s:
+	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/MaxNeuron.cpp.s
+	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/MaxNeuron.cpp.s
+.PHONY : src/MaxNeuron.cpp.s
 
 src/NengoNeuron.o: src/NengoNeuron.cpp.o
 
@@ -824,36 +815,6 @@ src/ProbeNeuron.cpp.s:
 	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/ProbeNeuron.cpp.s
 .PHONY : src/ProbeNeuron.cpp.s
 
-src/SNNReader.o: src/SNNReader.cpp.o
-
-.PHONY : src/SNNReader.o
-
-# target to build an object file
-src/SNNReader.cpp.o:
-	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/SNNReader.cpp.o
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/SNNReader.cpp.o
-.PHONY : src/SNNReader.cpp.o
-
-src/SNNReader.i: src/SNNReader.cpp.i
-
-.PHONY : src/SNNReader.i
-
-# target to preprocess a source file
-src/SNNReader.cpp.i:
-	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/SNNReader.cpp.i
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/SNNReader.cpp.i
-.PHONY : src/SNNReader.cpp.i
-
-src/SNNReader.s: src/SNNReader.cpp.s
-
-.PHONY : src/SNNReader.s
-
-# target to generate assembly for a file
-src/SNNReader.cpp.s:
-	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/SNNReader.cpp.s
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/SNNReader.cpp.s
-.PHONY : src/SNNReader.cpp.s
-
 src/SNNWriter.o: src/SNNWriter.cpp.o
 
 .PHONY : src/SNNWriter.o
@@ -883,36 +844,6 @@ src/SNNWriter.cpp.s:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/SNNWriter.cpp.s
 	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/SNNWriter.cpp.s
 .PHONY : src/SNNWriter.cpp.s
-
-src/SimpleNetwork.o: src/SimpleNetwork.cpp.o
-
-.PHONY : src/SimpleNetwork.o
-
-# target to build an object file
-src/SimpleNetwork.cpp.o:
-	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/SimpleNetwork.cpp.o
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/SimpleNetwork.cpp.o
-.PHONY : src/SimpleNetwork.cpp.o
-
-src/SimpleNetwork.i: src/SimpleNetwork.cpp.i
-
-.PHONY : src/SimpleNetwork.i
-
-# target to preprocess a source file
-src/SimpleNetwork.cpp.i:
-	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/SimpleNetwork.cpp.i
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/SimpleNetwork.cpp.i
-.PHONY : src/SimpleNetwork.cpp.i
-
-src/SimpleNetwork.s: src/SimpleNetwork.cpp.s
-
-.PHONY : src/SimpleNetwork.s
-
-# target to generate assembly for a file
-src/SimpleNetwork.cpp.s:
-	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/SimpleNetwork.cpp.s
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/SimpleNetwork.cpp.s
-.PHONY : src/SimpleNetwork.cpp.s
 
 src/SimulatorBase.o: src/SimulatorBase.cpp.o
 
@@ -1418,87 +1349,6 @@ test/cpu/neural_test.cpp.s:
 	$(MAKE) -f CMakeFiles/neural_test.dir/build.make CMakeFiles/neural_test.dir/test/cpu/neural_test.cpp.s
 .PHONY : test/cpu/neural_test.cpp.s
 
-test/cpu/possion_net.o: test/cpu/possion_net.cpp.o
-
-.PHONY : test/cpu/possion_net.o
-
-# target to build an object file
-test/cpu/possion_net.cpp.o:
-	$(MAKE) -f CMakeFiles/possion_net.dir/build.make CMakeFiles/possion_net.dir/test/cpu/possion_net.cpp.o
-.PHONY : test/cpu/possion_net.cpp.o
-
-test/cpu/possion_net.i: test/cpu/possion_net.cpp.i
-
-.PHONY : test/cpu/possion_net.i
-
-# target to preprocess a source file
-test/cpu/possion_net.cpp.i:
-	$(MAKE) -f CMakeFiles/possion_net.dir/build.make CMakeFiles/possion_net.dir/test/cpu/possion_net.cpp.i
-.PHONY : test/cpu/possion_net.cpp.i
-
-test/cpu/possion_net.s: test/cpu/possion_net.cpp.s
-
-.PHONY : test/cpu/possion_net.s
-
-# target to generate assembly for a file
-test/cpu/possion_net.cpp.s:
-	$(MAKE) -f CMakeFiles/possion_net.dir/build.make CMakeFiles/possion_net.dir/test/cpu/possion_net.cpp.s
-.PHONY : test/cpu/possion_net.cpp.s
-
-test/cpu/read_write_test.o: test/cpu/read_write_test.cpp.o
-
-.PHONY : test/cpu/read_write_test.o
-
-# target to build an object file
-test/cpu/read_write_test.cpp.o:
-	$(MAKE) -f CMakeFiles/read_write_test.dir/build.make CMakeFiles/read_write_test.dir/test/cpu/read_write_test.cpp.o
-.PHONY : test/cpu/read_write_test.cpp.o
-
-test/cpu/read_write_test.i: test/cpu/read_write_test.cpp.i
-
-.PHONY : test/cpu/read_write_test.i
-
-# target to preprocess a source file
-test/cpu/read_write_test.cpp.i:
-	$(MAKE) -f CMakeFiles/read_write_test.dir/build.make CMakeFiles/read_write_test.dir/test/cpu/read_write_test.cpp.i
-.PHONY : test/cpu/read_write_test.cpp.i
-
-test/cpu/read_write_test.s: test/cpu/read_write_test.cpp.s
-
-.PHONY : test/cpu/read_write_test.s
-
-# target to generate assembly for a file
-test/cpu/read_write_test.cpp.s:
-	$(MAKE) -f CMakeFiles/read_write_test.dir/build.make CMakeFiles/read_write_test.dir/test/cpu/read_write_test.cpp.s
-.PHONY : test/cpu/read_write_test.cpp.s
-
-test/cpu/snn_from_file.o: test/cpu/snn_from_file.cpp.o
-
-.PHONY : test/cpu/snn_from_file.o
-
-# target to build an object file
-test/cpu/snn_from_file.cpp.o:
-	$(MAKE) -f CMakeFiles/snn_from_file.dir/build.make CMakeFiles/snn_from_file.dir/test/cpu/snn_from_file.cpp.o
-.PHONY : test/cpu/snn_from_file.cpp.o
-
-test/cpu/snn_from_file.i: test/cpu/snn_from_file.cpp.i
-
-.PHONY : test/cpu/snn_from_file.i
-
-# target to preprocess a source file
-test/cpu/snn_from_file.cpp.i:
-	$(MAKE) -f CMakeFiles/snn_from_file.dir/build.make CMakeFiles/snn_from_file.dir/test/cpu/snn_from_file.cpp.i
-.PHONY : test/cpu/snn_from_file.cpp.i
-
-test/cpu/snn_from_file.s: test/cpu/snn_from_file.cpp.s
-
-.PHONY : test/cpu/snn_from_file.s
-
-# target to generate assembly for a file
-test/cpu/snn_from_file.cpp.s:
-	$(MAKE) -f CMakeFiles/snn_from_file.dir/build.make CMakeFiles/snn_from_file.dir/test/cpu/snn_from_file.cpp.s
-.PHONY : test/cpu/snn_from_file.cpp.s
-
 test/cpu/snn_from_file_nengo.o: test/cpu/snn_from_file_nengo.cpp.o
 
 .PHONY : test/cpu/snn_from_file_nengo.o
@@ -1640,26 +1490,26 @@ help:
 	@echo "... all (the default if no target is provided)"
 	@echo "... clean"
 	@echo "... depend"
-	@echo "... gpusim_test2"
-	@echo "... gpusim_test"
-	@echo "... possion_net"
-	@echo "... snn_from_file_nengo"
-	@echo "... bsim"
-	@echo "... neural_test"
-	@echo "... synapse_test"
+	@echo "... edit_cache"
 	@echo "... generater_test"
 	@echo "... multi-gpusim_test"
-	@echo "... edit_cache"
-	@echo "... snn_from_file"
-	@echo "... read_write_test"
-	@echo "... rebuild_cache"
+	@echo "... synapse_test"
+	@echo "... gpusim_test2"
+	@echo "... neural_test"
+	@echo "... gpusim_test"
+	@echo "... bsim"
+	@echo "... snn_from_file_nengo"
 	@echo "... bsim_gpu"
+	@echo "... rebuild_cache"
 	@echo "... src/AlphaSynapse.o"
 	@echo "... src/AlphaSynapse.i"
 	@echo "... src/AlphaSynapse.s"
 	@echo "... src/Base.o"
 	@echo "... src/Base.i"
 	@echo "... src/Base.s"
+	@echo "... src/ConstantNeuron.o"
+	@echo "... src/ConstantNeuron.i"
+	@echo "... src/ConstantNeuron.s"
 	@echo "... src/ExpSynapse.o"
 	@echo "... src/ExpSynapse.i"
 	@echo "... src/ExpSynapse.s"
@@ -1690,9 +1540,9 @@ help:
 	@echo "... src/LIFNeuron.o"
 	@echo "... src/LIFNeuron.i"
 	@echo "... src/LIFNeuron.s"
-	@echo "... src/LowpassSynapse.o"
-	@echo "... src/LowpassSynapse.i"
-	@echo "... src/LowpassSynapse.s"
+	@echo "... src/MaxNeuron.o"
+	@echo "... src/MaxNeuron.i"
+	@echo "... src/MaxNeuron.s"
 	@echo "... src/NengoNeuron.o"
 	@echo "... src/NengoNeuron.i"
 	@echo "... src/NengoNeuron.s"
@@ -1711,15 +1561,9 @@ help:
 	@echo "... src/ProbeNeuron.o"
 	@echo "... src/ProbeNeuron.i"
 	@echo "... src/ProbeNeuron.s"
-	@echo "... src/SNNReader.o"
-	@echo "... src/SNNReader.i"
-	@echo "... src/SNNReader.s"
 	@echo "... src/SNNWriter.o"
 	@echo "... src/SNNWriter.i"
 	@echo "... src/SNNWriter.s"
-	@echo "... src/SimpleNetwork.o"
-	@echo "... src/SimpleNetwork.i"
-	@echo "... src/SimpleNetwork.s"
 	@echo "... src/SimulatorBase.o"
 	@echo "... src/SimulatorBase.i"
 	@echo "... src/SimulatorBase.s"
@@ -1771,15 +1615,6 @@ help:
 	@echo "... test/cpu/neural_test.o"
 	@echo "... test/cpu/neural_test.i"
 	@echo "... test/cpu/neural_test.s"
-	@echo "... test/cpu/possion_net.o"
-	@echo "... test/cpu/possion_net.i"
-	@echo "... test/cpu/possion_net.s"
-	@echo "... test/cpu/read_write_test.o"
-	@echo "... test/cpu/read_write_test.i"
-	@echo "... test/cpu/read_write_test.s"
-	@echo "... test/cpu/snn_from_file.o"
-	@echo "... test/cpu/snn_from_file.i"
-	@echo "... test/cpu/snn_from_file.s"
 	@echo "... test/cpu/snn_from_file_nengo.o"
 	@echo "... test/cpu/snn_from_file_nengo.i"
 	@echo "... test/cpu/snn_from_file_nengo.s"

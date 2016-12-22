@@ -2,8 +2,8 @@
  * usually just for fun
  * Fri October 23 2015
  */
-#ifndef EXPSYNAPSE_H
-#define EXPSYNAPSE_H
+#ifndef BASICSYNAPSE_H
+#define BASICSYNAPSE_H
 
 #include <list>
 #include <stdio.h>
@@ -12,7 +12,7 @@
 
 using std::list;
 
-class ExpSynapse : public SynapseBase {
+class BasicSynapse : public SynapseBase {
 public:
 	Type getType();
 
@@ -27,20 +27,15 @@ public:
 
 	virtual size_t getSize();
 	virtual int getData(void *data);
-	virtual int hardCopy(void *data, int idx, int base, map<ID, int> &id2idx, map<int, ID> &idx2id);
+	virtual int hardCopy(void *data, int idx);
 
-	ExpSynapse(ID id, real weight, real delay, real tau_syn);
-	~ExpSynapse(); 
+	BasicSynapse(ID id, real weight, real delay);
+	~BasicSynapse(); 
 
 	const static Type type;
 protected:
 	real weight;
 	real delay;
-	int delay_steps;
-	real C1;
-	real _C1;
-	real tau_syn;
-	real I_syn;
 	real _dt;
 	list<int> delay_queue;
 	NeuronBase *pDest;
@@ -48,5 +43,5 @@ protected:
 	FILE* file;
 };
 
-#endif /* EXPSYNAPSE_H */
+#endif /* BASICSYNAPSE_H */
 
