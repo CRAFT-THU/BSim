@@ -227,6 +227,19 @@ bsim_gpu/fast:
 	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/build
 .PHONY : bsim_gpu/fast
 
+#=============================================================================
+# Target rules for targets named gpusim_test0
+
+# Build rule for target.
+gpusim_test0: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 gpusim_test0
+.PHONY : gpusim_test0
+
+# fast build rule for target.
+gpusim_test0/fast:
+	$(MAKE) -f CMakeFiles/gpusim_test0.dir/build.make CMakeFiles/gpusim_test0.dir/build
+.PHONY : gpusim_test0/fast
+
 src/AlphaSynapse.o: src/AlphaSynapse.cpp.o
 
 .PHONY : src/AlphaSynapse.o
@@ -1430,6 +1443,33 @@ test/gpu/gpusim_test.cpp.s:
 	$(MAKE) -f CMakeFiles/gpusim_test.dir/build.make CMakeFiles/gpusim_test.dir/test/gpu/gpusim_test.cpp.s
 .PHONY : test/gpu/gpusim_test.cpp.s
 
+test/gpu/gpusim_test0.o: test/gpu/gpusim_test0.cpp.o
+
+.PHONY : test/gpu/gpusim_test0.o
+
+# target to build an object file
+test/gpu/gpusim_test0.cpp.o:
+	$(MAKE) -f CMakeFiles/gpusim_test0.dir/build.make CMakeFiles/gpusim_test0.dir/test/gpu/gpusim_test0.cpp.o
+.PHONY : test/gpu/gpusim_test0.cpp.o
+
+test/gpu/gpusim_test0.i: test/gpu/gpusim_test0.cpp.i
+
+.PHONY : test/gpu/gpusim_test0.i
+
+# target to preprocess a source file
+test/gpu/gpusim_test0.cpp.i:
+	$(MAKE) -f CMakeFiles/gpusim_test0.dir/build.make CMakeFiles/gpusim_test0.dir/test/gpu/gpusim_test0.cpp.i
+.PHONY : test/gpu/gpusim_test0.cpp.i
+
+test/gpu/gpusim_test0.s: test/gpu/gpusim_test0.cpp.s
+
+.PHONY : test/gpu/gpusim_test0.s
+
+# target to generate assembly for a file
+test/gpu/gpusim_test0.cpp.s:
+	$(MAKE) -f CMakeFiles/gpusim_test0.dir/build.make CMakeFiles/gpusim_test0.dir/test/gpu/gpusim_test0.cpp.s
+.PHONY : test/gpu/gpusim_test0.cpp.s
+
 test/gpu/gpusim_test2.o: test/gpu/gpusim_test2.cpp.o
 
 .PHONY : test/gpu/gpusim_test2.o
@@ -1499,8 +1539,9 @@ help:
 	@echo "... gpusim_test"
 	@echo "... bsim"
 	@echo "... snn_from_file_nengo"
-	@echo "... bsim_gpu"
 	@echo "... rebuild_cache"
+	@echo "... bsim_gpu"
+	@echo "... gpusim_test0"
 	@echo "... src/AlphaSynapse.o"
 	@echo "... src/AlphaSynapse.i"
 	@echo "... src/AlphaSynapse.s"
@@ -1624,6 +1665,9 @@ help:
 	@echo "... test/gpu/gpusim_test.o"
 	@echo "... test/gpu/gpusim_test.i"
 	@echo "... test/gpu/gpusim_test.s"
+	@echo "... test/gpu/gpusim_test0.o"
+	@echo "... test/gpu/gpusim_test0.i"
+	@echo "... test/gpu/gpusim_test0.s"
 	@echo "... test/gpu/gpusim_test2.o"
 	@echo "... test/gpu/gpusim_test2.i"
 	@echo "... test/gpu/gpusim_test2.s"

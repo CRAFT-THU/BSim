@@ -152,7 +152,7 @@ int SingleGPUSimulator::run(real time)
 		}
 		int size2 = firedInfo.size();
 		if (size2 > 0) {
-			if (size > 0) {
+			if (size2 > 0) {
 				printf(", ");
 			}
 			fprintf(logFile, "%d_%d", network->idx2sid[firedInfo[0]].groupId, network->idx2sid[firedInfo[0]].id);

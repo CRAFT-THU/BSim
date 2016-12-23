@@ -113,7 +113,7 @@ __global__ void init_global(int max_delay, int *c_gTimeTable, real *c_gNeuronInp
 __device__ int get_alpha_delay(void *data, int num, int sid)
 {
 	GAlphaSynapses *d_synapses = (GAlphaSynapses*)data;
-	return (int)(d_synapses->p_delay[sid]/d_synapses->p__dt[sid]);
+	return (int)(d_synapses->p_delay_steps[sid]);
 }
 
 __device__ int get_exp_delay(void *data, int num, int sid)

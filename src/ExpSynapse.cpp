@@ -47,9 +47,10 @@ int ExpSynapse::reset(SimInfo &info) {
 
 int ExpSynapse::init(real dt) {
 	//_dt = dt;
+	delay_steps = static_cast<int>(delay/dt);
 	if (tau_syn > 0) {
 		C1 = expf(-dt/tau_syn);
-		_C1 = expf(-(delay-dt*(int)(delay/dt))/tau_syn);
+		_C1 = expf(-(delay-dt*delay_steps)/tau_syn);
 	} else {
 		printf("Wrong tau!\n");
 		return -1;
@@ -80,7 +81,7 @@ int ExpSynapse::update(SimInfo &info)
 
 int ExpSynapse::recv()
 {
-	delay_queue.push_back((int)(delay/_dt));
+	delay_queue.push_back(delay_steps);
 
 	return 0;
 }
@@ -108,7 +109,6 @@ void ExpSynapse::monitor(SimInfo &info)
 			}
 			fprintf(file, "W: %f, D: %f, T:%f\n", weight, delay, tau_syn);
 			fprintf(file, "C1: %f, ", C1);
-			fprintf(file, "dt: %f\n", _dt);
 		}
 		fprintf(file, "Cycle %d: %f\n", info.currCycle, this->I_syn); 
 	}

@@ -39,7 +39,8 @@ int AlphaSynapse::reset(SimInfo &info) {
 }
 
 int AlphaSynapse::init(real dt) {
-	_dt = dt;
+	//_dt = dt;
+	delay_steps = static_cast<int>(delay/dt);
 	if (tau_syn > 0) {
 		C1 = expf(-dt/tau_syn);
 		C2 = (dt/tau_syn) * expf(1.0f - dt/tau_syn);
@@ -77,7 +78,7 @@ int AlphaSynapse::update(SimInfo &info)
 
 int AlphaSynapse::recv()
 {
-	delay_queue.push_back((int)(delay/_dt));
+	delay_queue.push_back(delay_steps);
 
 	return 0;
 }
@@ -107,20 +108,23 @@ int AlphaSynapse::getData(void *data)
 	return 0;
 }
 
-int AlphaSynapse::hardCopy(void *data, int idx)
+int AlphaSynapse::hardCopy(void *data, int idx, int base, map<ID, int> &id2idx, map<int, ID> &idx2id)
 {
 	GAlphaSynapses *p = (GAlphaSynapses*)data;
-	p->pType[idx] = type;
+	id2idx[id] = idx+base;
+	idx2id[idx+base] = id;
+	//p->pID[idx] = id;
+	//p->pType[idx] = type;
 	p->p_weight[idx] = weight;
-	p->p_delay[idx] = delay;
+	//p->p_delay[idx] = delay;
+	p->p_delay_steps[idx] = delay_steps;
 	p->p_C1[idx]= C1;
 	p->p_C2[idx] = C2;
 	p->p__C1[idx] = _C1;
 	p->p__C2[idx] = _C2;
-	p->p_tau_syn[idx] = tau_syn;
+	//p->p_tau_syn[idx] = tau_syn;
 	p->p_I_syn[idx] = I_syn;
 	p->p_I_tmp[idx] = I_tmp;
-	p->p__dt[idx] = _dt;
-	p->pID[idx] = id;
+	//p->p__dt[idx] = _dt;
 	return 1;
 }

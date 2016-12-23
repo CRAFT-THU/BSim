@@ -42,7 +42,7 @@ int ConstantNeuron::reset(SimInfo &info)
 {
 	fired = false;
 	this->_dt = info.dt;
-	this->fire_count = (int)(1.0/(this->_dt)*(this->fire_rate));
+	this->fire_count = 0;
 	
 	return 0;
 }
@@ -76,8 +76,9 @@ SynapseBase * ConstantNeuron::addSynapse(real weight, real delay, SpikeType type
 int ConstantNeuron::update(SimInfo &info)
 {
 	fired = false;
-	if (info.currCycle < fire_count) {
+	if (info.currCycle * fire_rate > fire_count) {
 		fired = true;
+		fire_count++;
 		fire();
 		info.fired.push_back(this->id);
 	}
@@ -97,7 +98,7 @@ void ConstantNeuron::monitor(SimInfo &info)
 			}
 		} else {
 			if (fired) {
-				fprintf(file, "%d\n", info.currCycle);
+				fprintf(file, "%d:%d\n", info.currCycle, fire_count);
 			}
 		}
 	}
@@ -112,7 +113,7 @@ size_t ConstantNeuron::getSize() {
 	return 0;
 }
 
-int ConstantNeuron::hardCopy(void *data, int idx)
+int ConstantNeuron::hardCopy(void *data, int idx, int base, map<ID, int> &id2idx, map<int, ID> &idx2id)
 {
 	return 0;
 }

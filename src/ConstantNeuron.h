@@ -2,8 +2,8 @@
  * usually just for fun
  * Wed January 06 2016
  */
-#ifndef INPUTNEURON_H
-#define INPUTNEURON_H
+#ifndef CONSTANTNEURON_H
+#define CONSTANTNEURON_H
 
 #include <stdio.h>
 #include <vector>
@@ -29,7 +29,7 @@ public:
 
 	virtual size_t getSize();
 	virtual int getData(void *data);
-	virtual int hardCopy(void *data, int idx);
+	virtual int hardCopy(void *data, int idx, int base, map<ID, int> &id2idx, map<int, ID> &idx2id) = 0;
 	virtual SynapseBase *addSynapse(real weight, real delay, SpikeType type, real tau, NeuronBase *pDest);
 
 	int addFireTime(int cycle);
@@ -42,5 +42,4 @@ protected:
 	FILE *file;
 };
 
-#endif /* INPUTNEURON_H */
-
+#endif /* CONSTANTNEURON_H */

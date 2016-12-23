@@ -26,7 +26,7 @@ public:
 
 	virtual int getData(void *data);
 	virtual void setDst(NeuronBase *p);
-	virtual int hardCopy(void *data, int idx);
+	virtual int hardCopy(void *data, int idx, int base, map<ID, int> &id2idx, map<int, ID> &idx2id) = 0;
 
 	AlphaSynapse(ID id, real weight, real delay, real tau_syn);
 	~AlphaSynapse();
@@ -35,6 +35,7 @@ public:
 protected:
 	real weight;
 	real delay;
+	int delay_steps;
 	real C1;
 	real C2;
 	real _C1;
@@ -42,8 +43,8 @@ protected:
 	real tau_syn;
 	real I_syn;
 	real I_tmp;
-	real _dt;
-	bool monitored;
+	//real _dt;
+	//bool monitored;
 	list<int> delay_queue;
 	NeuronBase *pDest;
 };

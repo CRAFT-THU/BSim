@@ -41,7 +41,7 @@ protected:
 	real _C1;
 	real tau_syn;
 	real I_syn;
-	real _dt;
+	//real _dt;
 	list<int> delay_queue;
 	NeuronBase *pDest;
 	bool monitored;
