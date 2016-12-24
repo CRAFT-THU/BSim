@@ -13,11 +13,13 @@
 #include "LIFNeuron.h"
 //#include "MaxNeuron.h"
 #include "GLIFNeurons.h"
-#include "IF_curr_exp.h"
+//#include "IF_curr_exp.h"
 #include "NengoNeuron.h"
 #include "ProbeNeuron.h"
 
 #include "CompositeNeuron.h"
+
+typedef CompositeNeuron<LIFNeuron, ExpSynapse> IF_curr_exp;
 
 //typedef CompositeNeuron<InputNeuron, LowpassSynapse> Input_lowpass;
 //typedef CompositeNeuron<ProbeNeuron, LowpassSynapse> Probe_lowpass;

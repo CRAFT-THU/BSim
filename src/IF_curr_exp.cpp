@@ -16,6 +16,10 @@ IF_curr_exp::IF_curr_exp(const IF_curr_exp &neuron, ID id) : LIFNeuron(id, neuro
 {
 }
 
+IF_curr_exp::IF_curr_exp(const LIFNeuron &templ, ID id) : LIFNeuron(templ, id)
+{
+}
+
 IF_curr_exp::~IF_curr_exp()
 {
 	pSynapses.clear();

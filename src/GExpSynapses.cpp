@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include "mpi.h"
 
+#include "macros.h"
 #include "IDPool.h"
 #include "GExpSynapses.h"
 
@@ -17,6 +18,14 @@ void *createExpSynapses()
 size_t getExpSize()
 {
 	return sizeof(GExpSynapses);
+}
+
+int allocExpConnects(void *pCpu, int *pSynapsesDst, int *notUsed1, int *notUsed2, int notUsed3)
+{
+	GExpSynapses *p = (GExpSynapses*)pCpu;
+	p->pDst = pSynapsesDst;
+
+	return 0;
 }
 
 int allocExpSynapses(void *pSynapses, int S)
@@ -35,14 +44,6 @@ int allocExpSynapses(void *pSynapses, int S)
 	//p->p__dt = (real*)malloc(S*sizeof(real));
 	//p->pSrc = (int *)malloc(S*sizeof(int));
 	//p->pDst = (int *)malloc(S*sizeof(int));
-
-	return 0;
-}
-
-int allocExpConnects(void *pCpu, int *pSynapsesDst, int *notUsed1, int *notUsed2, int notUsed3)
-{
-	GExpSynapses *p = (GExpSynapses*)pCpu;
-	p->pDst = pSynapsesDst;
 
 	return 0;
 }

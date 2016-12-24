@@ -6,18 +6,29 @@
 #include <stdlib.h>
 #include "mpi.h"
 
+#include "macros.h"
 #include "IDPool.h"
 #include "GAlphaSynapses.h"
 
-void *createAlphaSynapses()
-{
-	return malloc(sizeof(GAlphaSynapses));
-}
+//void *createAlphaSynapses()
+//{
+//	return malloc(sizeof(GAlphaSynapses));
+//}
+//
+//size_t getAlphaSize()
+//{
+//	return sizeof(GAlphaSynapses);
+//}
+//
+//int allocAlphaConnects(void *pCpu, int *pSynapsesDst, int *notUsed1, int *notUsed2, int notUsed3)
+//{
+//	GAlphaSynapses *p = (GAlphaSynapses*)pCpu;
+//	p->pDst = pSynapsesDst;
+//
+//	return 0;
+//}
 
-size_t getAlphaSize()
-{
-	return sizeof(GAlphaSynapses);
-}
+SYNAPSE_GPU_FUNC_BASIC(Alpha)
 
 int allocAlphaSynapses(void *pSynapses, int S)
 {
@@ -42,13 +53,6 @@ int allocAlphaSynapses(void *pSynapses, int S)
 	return 0;
 }
 
-int allocAlphaConnects(void *pCpu, int *pSynapsesDst, int *notUsed1, int *notUsed2, int notUsed3)
-{
-	GAlphaSynapses *p = (GAlphaSynapses*)pCpu;
-	p->pDst = pSynapsesDst;
-
-	return 0;
-}
 void sendAlphaSynapses(void *data, int rank, int offset, int size)
 {
 	GAlphaSynapses *synapses = (GAlphaSynapses *)data;

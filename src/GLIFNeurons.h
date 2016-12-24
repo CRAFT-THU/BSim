@@ -5,7 +5,9 @@
 #ifndef GLIFNEURON_H
 #define GLIFNEURON_H
 
-#include "ID.h"
+#include "macros.h"
+#include "constant.h"
+//#include "ID.h"
 
 struct GLIFNeurons {
 	//ID *pID;
@@ -28,21 +30,24 @@ struct GLIFNeurons {
 	real *p_i_tmp;
 	int *p_refrac_step;
 	int *p_refrac_time;
-	int *pSynapsesNum;
-	int *pSynapsesLoc;
-	int *pSynapsesIdx;
-	int num;
-	int synapsesNum;
+
+	//int *pSynapsesNum;
+	//int *pSynapsesLoc;
+	//int *pSynapsesIdx;
+	//int num;
+	//int synapsesNum;
+	NEURON_CONNECT_PARA
 };
 
-void* createLIFNeurons();
-size_t getLIFSize();
-int allocLIFNeurons(void *pCpu, int N);
-int allocLIFConnects(void *pCpu, int *pSynapsesNum, int *pSynapsesLoc, int *pSynapsesIdx, int S);
-void sendLIFNeurons(void *data, int rank, int offset, int size);
-void recvLIFNeurons(void **data, int rank, int size);
-
-int cudaAllocLIFNeurons(void *pCpu, void *pGpu);
-int cudaFreeLIFNeurons(void *pGpu);
+//void* createLIFNeurons();
+//size_t getLIFSize();
+//int allocLIFNeurons(void *pCpu, int N);
+//int allocLIFConnects(void *pCpu, int *pSynapsesNum, int *pSynapsesLoc, int *pSynapsesIdx, int S);
+//void sendLIFNeurons(void *data, int rank, int offset, int size);
+//void recvLIFNeurons(void **data, int rank, int size);
+//
+//int cudaAllocLIFNeurons(void *pCpu, void *pGpu);
+//int cudaFreeLIFNeurons(void *pGpu);
+NEURON_GPU_FUNC_DEFINE(LIF)
 
 #endif /* GLIFNEURON_H */

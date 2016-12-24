@@ -6,18 +6,31 @@
 #include <stdlib.h>
 #include "mpi.h"
 
+#include "macros.h"
 #include "IDPool.h"
 #include "GLIFNeurons.h"
 
-void* createLIFNeurons()
-{
-	return malloc(sizeof(GLIFNeurons));
-}
-
-size_t getLIFSize()
-{
-	return sizeof(GLIFNeurons);
-}
+NEURON_GPU_FUNC_BASIC(LIF)
+//void* createLIFNeurons()
+//{
+//	return malloc(sizeof(GLIFNeurons));
+//}
+//
+//size_t getLIFSize()
+//{
+//	return sizeof(GLIFNeurons);
+//}
+//
+//int allocLIFConnects(void *pCpu, int *pSynapsesNum, int *pSynapsesLoc, int *pSynapsesIdx, int S)
+//{
+//	GLIFNeurons *p = (GLIFNeurons *)pCpu;
+//	p->synapsesNum = S;
+//	p->pSynapsesIdx = pSynapsesIdx;
+//	p->pSynapsesNum = pSynapsesNum;
+//	p->pSynapsesLoc = pSynapsesLoc;
+//
+//	return 0;
+//}
 
 int allocLIFNeurons(void *pCpu, int N)
 {
@@ -46,17 +59,6 @@ int allocLIFNeurons(void *pCpu, int N)
 	//p->pSynapsesNum = (int*)malloc(N*sizeof(int));
 	//p->pSynapsesLoc = (int*)malloc(N*sizeof(int));
 	
-	return 0;
-}
-
-int allocLIFConnects(void *pCpu, int *pSynapsesNum, int *pSynapsesLoc, int *pSynapsesIdx, int S)
-{
-	GLIFNeurons *p = (GLIFNeurons *)pCpu;
-	p->synapsesNum = S;
-	p->pSynapsesIdx = pSynapsesIdx;
-	p->pSynapsesNum = pSynapsesNum;
-	p->pSynapsesLoc = pSynapsesLoc;
-
 	return 0;
 }
 

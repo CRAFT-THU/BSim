@@ -22,3 +22,7 @@ bool NeuronBase::isFired() {
 void NeuronBase::monitorOn() {
 	monitored = true;
 }
+
+SynapseBase * NeuronBase::addSynapse(real weight, real delay, SpikeType type, real tau, NeuronBase *dst) {
+	return NULL;
+}

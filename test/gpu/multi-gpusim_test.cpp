@@ -27,8 +27,8 @@ int main(int argc, char **argv)
 
 	Network c;
 	if (rank == 0) {
-		Population<IF_curr_exp> *pn1 = c.createPopulation(nidPool.getID(), SIZE, IF_curr_exp(ID(0, 0), 0.0f, 0.0f, 0.0f, 1.0e-1f, 10.0e-3f, 0.0f, 1.0f, 1.0f, 15.0e-3f, 10.0e-1f));
-		Population<IF_curr_exp> *pn2 = c.createPopulation(nidPool.getID(), SIZE, IF_curr_exp(ID(0, 0), 0.0f, 0.0f, 0.0f, 1.0e-1f, 10.0e-3f, 0.0f, 1.0f, 1.0f, 15.0e-3f, 0));
+		Population<IF_curr_exp> *pn1 = c.createPopulation(nidPool.getID(), SIZE, IF_curr_exp(LIFNeuron(ID(0, 0), 0.0f, 0.0f, 0.0f, 1.0e-1f, 10.0e-3f, 0.0f, 1.0f, 1.0f, 15.0e-3f, 10.0e-1f), ID(0, 0)));
+		Population<IF_curr_exp> *pn2 = c.createPopulation(nidPool.getID(), SIZE, IF_curr_exp(LIFNeuron(ID(0, 0), 0.0f, 0.0f, 0.0f, 1.0e-1f, 10.0e-3f, 0.0f, 1.0f, 1.0f, 15.0e-3f, 0), ID(0,0)));
 		real * weight = getRandomArray((real)5e-3, SIZE*SIZE);
 		real * delay = getConstArray((real)1e-3, SIZE*SIZE);
 		c.connect(pn1, pn2, weight, delay, NULL, SIZE*SIZE);

@@ -247,7 +247,6 @@ src/AlphaSynapse.o: src/AlphaSynapse.cpp.o
 # target to build an object file
 src/AlphaSynapse.cpp.o:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/AlphaSynapse.cpp.o
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/AlphaSynapse.cpp.o
 .PHONY : src/AlphaSynapse.cpp.o
 
 src/AlphaSynapse.i: src/AlphaSynapse.cpp.i
@@ -257,7 +256,6 @@ src/AlphaSynapse.i: src/AlphaSynapse.cpp.i
 # target to preprocess a source file
 src/AlphaSynapse.cpp.i:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/AlphaSynapse.cpp.i
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/AlphaSynapse.cpp.i
 .PHONY : src/AlphaSynapse.cpp.i
 
 src/AlphaSynapse.s: src/AlphaSynapse.cpp.s
@@ -267,7 +265,6 @@ src/AlphaSynapse.s: src/AlphaSynapse.cpp.s
 # target to generate assembly for a file
 src/AlphaSynapse.cpp.s:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/AlphaSynapse.cpp.s
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/AlphaSynapse.cpp.s
 .PHONY : src/AlphaSynapse.cpp.s
 
 src/Base.o: src/Base.cpp.o
@@ -277,7 +274,6 @@ src/Base.o: src/Base.cpp.o
 # target to build an object file
 src/Base.cpp.o:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/Base.cpp.o
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/Base.cpp.o
 .PHONY : src/Base.cpp.o
 
 src/Base.i: src/Base.cpp.i
@@ -287,7 +283,6 @@ src/Base.i: src/Base.cpp.i
 # target to preprocess a source file
 src/Base.cpp.i:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/Base.cpp.i
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/Base.cpp.i
 .PHONY : src/Base.cpp.i
 
 src/Base.s: src/Base.cpp.s
@@ -297,7 +292,6 @@ src/Base.s: src/Base.cpp.s
 # target to generate assembly for a file
 src/Base.cpp.s:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/Base.cpp.s
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/Base.cpp.s
 .PHONY : src/Base.cpp.s
 
 src/ConstantNeuron.o: src/ConstantNeuron.cpp.o
@@ -307,7 +301,6 @@ src/ConstantNeuron.o: src/ConstantNeuron.cpp.o
 # target to build an object file
 src/ConstantNeuron.cpp.o:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/ConstantNeuron.cpp.o
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/ConstantNeuron.cpp.o
 .PHONY : src/ConstantNeuron.cpp.o
 
 src/ConstantNeuron.i: src/ConstantNeuron.cpp.i
@@ -317,7 +310,6 @@ src/ConstantNeuron.i: src/ConstantNeuron.cpp.i
 # target to preprocess a source file
 src/ConstantNeuron.cpp.i:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/ConstantNeuron.cpp.i
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/ConstantNeuron.cpp.i
 .PHONY : src/ConstantNeuron.cpp.i
 
 src/ConstantNeuron.s: src/ConstantNeuron.cpp.s
@@ -327,7 +319,6 @@ src/ConstantNeuron.s: src/ConstantNeuron.cpp.s
 # target to generate assembly for a file
 src/ConstantNeuron.cpp.s:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/ConstantNeuron.cpp.s
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/ConstantNeuron.cpp.s
 .PHONY : src/ConstantNeuron.cpp.s
 
 src/ExpSynapse.o: src/ExpSynapse.cpp.o
@@ -337,7 +328,6 @@ src/ExpSynapse.o: src/ExpSynapse.cpp.o
 # target to build an object file
 src/ExpSynapse.cpp.o:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/ExpSynapse.cpp.o
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/ExpSynapse.cpp.o
 .PHONY : src/ExpSynapse.cpp.o
 
 src/ExpSynapse.i: src/ExpSynapse.cpp.i
@@ -347,7 +337,6 @@ src/ExpSynapse.i: src/ExpSynapse.cpp.i
 # target to preprocess a source file
 src/ExpSynapse.cpp.i:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/ExpSynapse.cpp.i
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/ExpSynapse.cpp.i
 .PHONY : src/ExpSynapse.cpp.i
 
 src/ExpSynapse.s: src/ExpSynapse.cpp.s
@@ -357,7 +346,6 @@ src/ExpSynapse.s: src/ExpSynapse.cpp.s
 # target to generate assembly for a file
 src/ExpSynapse.cpp.s:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/ExpSynapse.cpp.s
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/ExpSynapse.cpp.s
 .PHONY : src/ExpSynapse.cpp.s
 
 src/GAlphaSynapses.o: src/GAlphaSynapses.cpp.o
@@ -475,7 +463,6 @@ src/ID.o: src/ID.cpp.o
 # target to build an object file
 src/ID.cpp.o:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/ID.cpp.o
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/ID.cpp.o
 .PHONY : src/ID.cpp.o
 
 src/ID.i: src/ID.cpp.i
@@ -485,7 +472,6 @@ src/ID.i: src/ID.cpp.i
 # target to preprocess a source file
 src/ID.cpp.i:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/ID.cpp.i
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/ID.cpp.i
 .PHONY : src/ID.cpp.i
 
 src/ID.s: src/ID.cpp.s
@@ -495,7 +481,6 @@ src/ID.s: src/ID.cpp.s
 # target to generate assembly for a file
 src/ID.cpp.s:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/ID.cpp.s
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/ID.cpp.s
 .PHONY : src/ID.cpp.s
 
 src/IDPool.o: src/IDPool.cpp.o
@@ -505,7 +490,6 @@ src/IDPool.o: src/IDPool.cpp.o
 # target to build an object file
 src/IDPool.cpp.o:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/IDPool.cpp.o
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/IDPool.cpp.o
 .PHONY : src/IDPool.cpp.o
 
 src/IDPool.i: src/IDPool.cpp.i
@@ -515,7 +499,6 @@ src/IDPool.i: src/IDPool.cpp.i
 # target to preprocess a source file
 src/IDPool.cpp.i:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/IDPool.cpp.i
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/IDPool.cpp.i
 .PHONY : src/IDPool.cpp.i
 
 src/IDPool.s: src/IDPool.cpp.s
@@ -525,7 +508,6 @@ src/IDPool.s: src/IDPool.cpp.s
 # target to generate assembly for a file
 src/IDPool.cpp.s:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/IDPool.cpp.s
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/IDPool.cpp.s
 .PHONY : src/IDPool.cpp.s
 
 src/IF_curr_exp.o: src/IF_curr_exp.cpp.o
@@ -535,7 +517,6 @@ src/IF_curr_exp.o: src/IF_curr_exp.cpp.o
 # target to build an object file
 src/IF_curr_exp.cpp.o:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/IF_curr_exp.cpp.o
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/IF_curr_exp.cpp.o
 .PHONY : src/IF_curr_exp.cpp.o
 
 src/IF_curr_exp.i: src/IF_curr_exp.cpp.i
@@ -545,7 +526,6 @@ src/IF_curr_exp.i: src/IF_curr_exp.cpp.i
 # target to preprocess a source file
 src/IF_curr_exp.cpp.i:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/IF_curr_exp.cpp.i
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/IF_curr_exp.cpp.i
 .PHONY : src/IF_curr_exp.cpp.i
 
 src/IF_curr_exp.s: src/IF_curr_exp.cpp.s
@@ -555,7 +535,6 @@ src/IF_curr_exp.s: src/IF_curr_exp.cpp.s
 # target to generate assembly for a file
 src/IF_curr_exp.cpp.s:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/IF_curr_exp.cpp.s
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/IF_curr_exp.cpp.s
 .PHONY : src/IF_curr_exp.cpp.s
 
 src/InputNeuron.o: src/InputNeuron.cpp.o
@@ -565,7 +544,6 @@ src/InputNeuron.o: src/InputNeuron.cpp.o
 # target to build an object file
 src/InputNeuron.cpp.o:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/InputNeuron.cpp.o
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/InputNeuron.cpp.o
 .PHONY : src/InputNeuron.cpp.o
 
 src/InputNeuron.i: src/InputNeuron.cpp.i
@@ -575,7 +553,6 @@ src/InputNeuron.i: src/InputNeuron.cpp.i
 # target to preprocess a source file
 src/InputNeuron.cpp.i:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/InputNeuron.cpp.i
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/InputNeuron.cpp.i
 .PHONY : src/InputNeuron.cpp.i
 
 src/InputNeuron.s: src/InputNeuron.cpp.s
@@ -585,7 +562,6 @@ src/InputNeuron.s: src/InputNeuron.cpp.s
 # target to generate assembly for a file
 src/InputNeuron.cpp.s:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/InputNeuron.cpp.s
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/InputNeuron.cpp.s
 .PHONY : src/InputNeuron.cpp.s
 
 src/LIFNeuron.o: src/LIFNeuron.cpp.o
@@ -595,7 +571,6 @@ src/LIFNeuron.o: src/LIFNeuron.cpp.o
 # target to build an object file
 src/LIFNeuron.cpp.o:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/LIFNeuron.cpp.o
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/LIFNeuron.cpp.o
 .PHONY : src/LIFNeuron.cpp.o
 
 src/LIFNeuron.i: src/LIFNeuron.cpp.i
@@ -605,7 +580,6 @@ src/LIFNeuron.i: src/LIFNeuron.cpp.i
 # target to preprocess a source file
 src/LIFNeuron.cpp.i:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/LIFNeuron.cpp.i
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/LIFNeuron.cpp.i
 .PHONY : src/LIFNeuron.cpp.i
 
 src/LIFNeuron.s: src/LIFNeuron.cpp.s
@@ -615,7 +589,6 @@ src/LIFNeuron.s: src/LIFNeuron.cpp.s
 # target to generate assembly for a file
 src/LIFNeuron.cpp.s:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/LIFNeuron.cpp.s
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/LIFNeuron.cpp.s
 .PHONY : src/LIFNeuron.cpp.s
 
 src/MaxNeuron.o: src/MaxNeuron.cpp.o
@@ -625,7 +598,6 @@ src/MaxNeuron.o: src/MaxNeuron.cpp.o
 # target to build an object file
 src/MaxNeuron.cpp.o:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/MaxNeuron.cpp.o
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/MaxNeuron.cpp.o
 .PHONY : src/MaxNeuron.cpp.o
 
 src/MaxNeuron.i: src/MaxNeuron.cpp.i
@@ -635,7 +607,6 @@ src/MaxNeuron.i: src/MaxNeuron.cpp.i
 # target to preprocess a source file
 src/MaxNeuron.cpp.i:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/MaxNeuron.cpp.i
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/MaxNeuron.cpp.i
 .PHONY : src/MaxNeuron.cpp.i
 
 src/MaxNeuron.s: src/MaxNeuron.cpp.s
@@ -645,7 +616,6 @@ src/MaxNeuron.s: src/MaxNeuron.cpp.s
 # target to generate assembly for a file
 src/MaxNeuron.cpp.s:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/MaxNeuron.cpp.s
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/MaxNeuron.cpp.s
 .PHONY : src/MaxNeuron.cpp.s
 
 src/NengoNeuron.o: src/NengoNeuron.cpp.o
@@ -655,7 +625,6 @@ src/NengoNeuron.o: src/NengoNeuron.cpp.o
 # target to build an object file
 src/NengoNeuron.cpp.o:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/NengoNeuron.cpp.o
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/NengoNeuron.cpp.o
 .PHONY : src/NengoNeuron.cpp.o
 
 src/NengoNeuron.i: src/NengoNeuron.cpp.i
@@ -665,7 +634,6 @@ src/NengoNeuron.i: src/NengoNeuron.cpp.i
 # target to preprocess a source file
 src/NengoNeuron.cpp.i:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/NengoNeuron.cpp.i
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/NengoNeuron.cpp.i
 .PHONY : src/NengoNeuron.cpp.i
 
 src/NengoNeuron.s: src/NengoNeuron.cpp.s
@@ -675,7 +643,6 @@ src/NengoNeuron.s: src/NengoNeuron.cpp.s
 # target to generate assembly for a file
 src/NengoNeuron.cpp.s:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/NengoNeuron.cpp.s
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/NengoNeuron.cpp.s
 .PHONY : src/NengoNeuron.cpp.s
 
 src/Network.o: src/Network.cpp.o
@@ -685,7 +652,6 @@ src/Network.o: src/Network.cpp.o
 # target to build an object file
 src/Network.cpp.o:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/Network.cpp.o
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/Network.cpp.o
 .PHONY : src/Network.cpp.o
 
 src/Network.i: src/Network.cpp.i
@@ -695,7 +661,6 @@ src/Network.i: src/Network.cpp.i
 # target to preprocess a source file
 src/Network.cpp.i:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/Network.cpp.i
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/Network.cpp.i
 .PHONY : src/Network.cpp.i
 
 src/Network.s: src/Network.cpp.s
@@ -705,7 +670,6 @@ src/Network.s: src/Network.cpp.s
 # target to generate assembly for a file
 src/Network.cpp.s:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/Network.cpp.s
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/Network.cpp.s
 .PHONY : src/Network.cpp.s
 
 src/NeuronBase.o: src/NeuronBase.cpp.o
@@ -715,7 +679,6 @@ src/NeuronBase.o: src/NeuronBase.cpp.o
 # target to build an object file
 src/NeuronBase.cpp.o:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/NeuronBase.cpp.o
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/NeuronBase.cpp.o
 .PHONY : src/NeuronBase.cpp.o
 
 src/NeuronBase.i: src/NeuronBase.cpp.i
@@ -725,7 +688,6 @@ src/NeuronBase.i: src/NeuronBase.cpp.i
 # target to preprocess a source file
 src/NeuronBase.cpp.i:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/NeuronBase.cpp.i
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/NeuronBase.cpp.i
 .PHONY : src/NeuronBase.cpp.i
 
 src/NeuronBase.s: src/NeuronBase.cpp.s
@@ -735,7 +697,6 @@ src/NeuronBase.s: src/NeuronBase.cpp.s
 # target to generate assembly for a file
 src/NeuronBase.cpp.s:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/NeuronBase.cpp.s
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/NeuronBase.cpp.s
 .PHONY : src/NeuronBase.cpp.s
 
 src/PopulationBase.o: src/PopulationBase.cpp.o
@@ -745,7 +706,6 @@ src/PopulationBase.o: src/PopulationBase.cpp.o
 # target to build an object file
 src/PopulationBase.cpp.o:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/PopulationBase.cpp.o
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/PopulationBase.cpp.o
 .PHONY : src/PopulationBase.cpp.o
 
 src/PopulationBase.i: src/PopulationBase.cpp.i
@@ -755,7 +715,6 @@ src/PopulationBase.i: src/PopulationBase.cpp.i
 # target to preprocess a source file
 src/PopulationBase.cpp.i:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/PopulationBase.cpp.i
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/PopulationBase.cpp.i
 .PHONY : src/PopulationBase.cpp.i
 
 src/PopulationBase.s: src/PopulationBase.cpp.s
@@ -765,7 +724,6 @@ src/PopulationBase.s: src/PopulationBase.cpp.s
 # target to generate assembly for a file
 src/PopulationBase.cpp.s:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/PopulationBase.cpp.s
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/PopulationBase.cpp.s
 .PHONY : src/PopulationBase.cpp.s
 
 src/PossionNeuron.o: src/PossionNeuron.cpp.o
@@ -775,7 +733,6 @@ src/PossionNeuron.o: src/PossionNeuron.cpp.o
 # target to build an object file
 src/PossionNeuron.cpp.o:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/PossionNeuron.cpp.o
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/PossionNeuron.cpp.o
 .PHONY : src/PossionNeuron.cpp.o
 
 src/PossionNeuron.i: src/PossionNeuron.cpp.i
@@ -785,7 +742,6 @@ src/PossionNeuron.i: src/PossionNeuron.cpp.i
 # target to preprocess a source file
 src/PossionNeuron.cpp.i:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/PossionNeuron.cpp.i
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/PossionNeuron.cpp.i
 .PHONY : src/PossionNeuron.cpp.i
 
 src/PossionNeuron.s: src/PossionNeuron.cpp.s
@@ -795,7 +751,6 @@ src/PossionNeuron.s: src/PossionNeuron.cpp.s
 # target to generate assembly for a file
 src/PossionNeuron.cpp.s:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/PossionNeuron.cpp.s
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/PossionNeuron.cpp.s
 .PHONY : src/PossionNeuron.cpp.s
 
 src/ProbeNeuron.o: src/ProbeNeuron.cpp.o
@@ -805,7 +760,6 @@ src/ProbeNeuron.o: src/ProbeNeuron.cpp.o
 # target to build an object file
 src/ProbeNeuron.cpp.o:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/ProbeNeuron.cpp.o
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/ProbeNeuron.cpp.o
 .PHONY : src/ProbeNeuron.cpp.o
 
 src/ProbeNeuron.i: src/ProbeNeuron.cpp.i
@@ -815,7 +769,6 @@ src/ProbeNeuron.i: src/ProbeNeuron.cpp.i
 # target to preprocess a source file
 src/ProbeNeuron.cpp.i:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/ProbeNeuron.cpp.i
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/ProbeNeuron.cpp.i
 .PHONY : src/ProbeNeuron.cpp.i
 
 src/ProbeNeuron.s: src/ProbeNeuron.cpp.s
@@ -825,7 +778,6 @@ src/ProbeNeuron.s: src/ProbeNeuron.cpp.s
 # target to generate assembly for a file
 src/ProbeNeuron.cpp.s:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/ProbeNeuron.cpp.s
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/ProbeNeuron.cpp.s
 .PHONY : src/ProbeNeuron.cpp.s
 
 src/SNNWriter.o: src/SNNWriter.cpp.o
@@ -835,7 +787,6 @@ src/SNNWriter.o: src/SNNWriter.cpp.o
 # target to build an object file
 src/SNNWriter.cpp.o:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/SNNWriter.cpp.o
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/SNNWriter.cpp.o
 .PHONY : src/SNNWriter.cpp.o
 
 src/SNNWriter.i: src/SNNWriter.cpp.i
@@ -845,7 +796,6 @@ src/SNNWriter.i: src/SNNWriter.cpp.i
 # target to preprocess a source file
 src/SNNWriter.cpp.i:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/SNNWriter.cpp.i
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/SNNWriter.cpp.i
 .PHONY : src/SNNWriter.cpp.i
 
 src/SNNWriter.s: src/SNNWriter.cpp.s
@@ -855,7 +805,6 @@ src/SNNWriter.s: src/SNNWriter.cpp.s
 # target to generate assembly for a file
 src/SNNWriter.cpp.s:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/SNNWriter.cpp.s
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/SNNWriter.cpp.s
 .PHONY : src/SNNWriter.cpp.s
 
 src/SimulatorBase.o: src/SimulatorBase.cpp.o
@@ -865,7 +814,6 @@ src/SimulatorBase.o: src/SimulatorBase.cpp.o
 # target to build an object file
 src/SimulatorBase.cpp.o:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/SimulatorBase.cpp.o
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/SimulatorBase.cpp.o
 .PHONY : src/SimulatorBase.cpp.o
 
 src/SimulatorBase.i: src/SimulatorBase.cpp.i
@@ -875,7 +823,6 @@ src/SimulatorBase.i: src/SimulatorBase.cpp.i
 # target to preprocess a source file
 src/SimulatorBase.cpp.i:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/SimulatorBase.cpp.i
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/SimulatorBase.cpp.i
 .PHONY : src/SimulatorBase.cpp.i
 
 src/SimulatorBase.s: src/SimulatorBase.cpp.s
@@ -885,7 +832,6 @@ src/SimulatorBase.s: src/SimulatorBase.cpp.s
 # target to generate assembly for a file
 src/SimulatorBase.cpp.s:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/SimulatorBase.cpp.s
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/SimulatorBase.cpp.s
 .PHONY : src/SimulatorBase.cpp.s
 
 src/SingleThreadSimulator.o: src/SingleThreadSimulator.cpp.o
@@ -895,7 +841,6 @@ src/SingleThreadSimulator.o: src/SingleThreadSimulator.cpp.o
 # target to build an object file
 src/SingleThreadSimulator.cpp.o:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/SingleThreadSimulator.cpp.o
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/SingleThreadSimulator.cpp.o
 .PHONY : src/SingleThreadSimulator.cpp.o
 
 src/SingleThreadSimulator.i: src/SingleThreadSimulator.cpp.i
@@ -905,7 +850,6 @@ src/SingleThreadSimulator.i: src/SingleThreadSimulator.cpp.i
 # target to preprocess a source file
 src/SingleThreadSimulator.cpp.i:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/SingleThreadSimulator.cpp.i
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/SingleThreadSimulator.cpp.i
 .PHONY : src/SingleThreadSimulator.cpp.i
 
 src/SingleThreadSimulator.s: src/SingleThreadSimulator.cpp.s
@@ -915,7 +859,6 @@ src/SingleThreadSimulator.s: src/SingleThreadSimulator.cpp.s
 # target to generate assembly for a file
 src/SingleThreadSimulator.cpp.s:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/SingleThreadSimulator.cpp.s
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/SingleThreadSimulator.cpp.s
 .PHONY : src/SingleThreadSimulator.cpp.s
 
 src/SynapseBase.o: src/SynapseBase.cpp.o
@@ -925,7 +868,6 @@ src/SynapseBase.o: src/SynapseBase.cpp.o
 # target to build an object file
 src/SynapseBase.cpp.o:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/SynapseBase.cpp.o
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/SynapseBase.cpp.o
 .PHONY : src/SynapseBase.cpp.o
 
 src/SynapseBase.i: src/SynapseBase.cpp.i
@@ -935,7 +877,6 @@ src/SynapseBase.i: src/SynapseBase.cpp.i
 # target to preprocess a source file
 src/SynapseBase.cpp.i:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/SynapseBase.cpp.i
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/SynapseBase.cpp.i
 .PHONY : src/SynapseBase.cpp.i
 
 src/SynapseBase.s: src/SynapseBase.cpp.s
@@ -945,7 +886,6 @@ src/SynapseBase.s: src/SynapseBase.cpp.s
 # target to generate assembly for a file
 src/SynapseBase.cpp.s:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/SynapseBase.cpp.s
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/SynapseBase.cpp.s
 .PHONY : src/SynapseBase.cpp.s
 
 src/generator.o: src/generator.cpp.o
@@ -955,7 +895,6 @@ src/generator.o: src/generator.cpp.o
 # target to build an object file
 src/generator.cpp.o:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/generator.cpp.o
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/generator.cpp.o
 .PHONY : src/generator.cpp.o
 
 src/generator.i: src/generator.cpp.i
@@ -965,7 +904,6 @@ src/generator.i: src/generator.cpp.i
 # target to preprocess a source file
 src/generator.cpp.i:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/generator.cpp.i
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/generator.cpp.i
 .PHONY : src/generator.cpp.i
 
 src/generator.s: src/generator.cpp.s
@@ -975,7 +913,6 @@ src/generator.s: src/generator.cpp.s
 # target to generate assembly for a file
 src/generator.cpp.s:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/generator.cpp.s
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/generator.cpp.s
 .PHONY : src/generator.cpp.s
 
 src/mpi_func.o: src/mpi_func.cpp.o
@@ -985,7 +922,6 @@ src/mpi_func.o: src/mpi_func.cpp.o
 # target to build an object file
 src/mpi_func.cpp.o:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/mpi_func.cpp.o
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/mpi_func.cpp.o
 .PHONY : src/mpi_func.cpp.o
 
 src/mpi_func.i: src/mpi_func.cpp.i
@@ -995,7 +931,6 @@ src/mpi_func.i: src/mpi_func.cpp.i
 # target to preprocess a source file
 src/mpi_func.cpp.i:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/mpi_func.cpp.i
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/mpi_func.cpp.i
 .PHONY : src/mpi_func.cpp.i
 
 src/mpi_func.s: src/mpi_func.cpp.s
@@ -1005,7 +940,6 @@ src/mpi_func.s: src/mpi_func.cpp.s
 # target to generate assembly for a file
 src/mpi_func.cpp.s:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/mpi_func.cpp.s
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/mpi_func.cpp.s
 .PHONY : src/mpi_func.cpp.s
 
 src/nengo/InputPopulation.o: src/nengo/InputPopulation.cpp.o
@@ -1015,7 +949,6 @@ src/nengo/InputPopulation.o: src/nengo/InputPopulation.cpp.o
 # target to build an object file
 src/nengo/InputPopulation.cpp.o:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/nengo/InputPopulation.cpp.o
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/nengo/InputPopulation.cpp.o
 .PHONY : src/nengo/InputPopulation.cpp.o
 
 src/nengo/InputPopulation.i: src/nengo/InputPopulation.cpp.i
@@ -1025,7 +958,6 @@ src/nengo/InputPopulation.i: src/nengo/InputPopulation.cpp.i
 # target to preprocess a source file
 src/nengo/InputPopulation.cpp.i:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/nengo/InputPopulation.cpp.i
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/nengo/InputPopulation.cpp.i
 .PHONY : src/nengo/InputPopulation.cpp.i
 
 src/nengo/InputPopulation.s: src/nengo/InputPopulation.cpp.s
@@ -1035,7 +967,6 @@ src/nengo/InputPopulation.s: src/nengo/InputPopulation.cpp.s
 # target to generate assembly for a file
 src/nengo/InputPopulation.cpp.s:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/nengo/InputPopulation.cpp.s
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/nengo/InputPopulation.cpp.s
 .PHONY : src/nengo/InputPopulation.cpp.s
 
 src/nengo/NengoBase.o: src/nengo/NengoBase.cpp.o
@@ -1045,7 +976,6 @@ src/nengo/NengoBase.o: src/nengo/NengoBase.cpp.o
 # target to build an object file
 src/nengo/NengoBase.cpp.o:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/nengo/NengoBase.cpp.o
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/nengo/NengoBase.cpp.o
 .PHONY : src/nengo/NengoBase.cpp.o
 
 src/nengo/NengoBase.i: src/nengo/NengoBase.cpp.i
@@ -1055,7 +985,6 @@ src/nengo/NengoBase.i: src/nengo/NengoBase.cpp.i
 # target to preprocess a source file
 src/nengo/NengoBase.cpp.i:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/nengo/NengoBase.cpp.i
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/nengo/NengoBase.cpp.i
 .PHONY : src/nengo/NengoBase.cpp.i
 
 src/nengo/NengoBase.s: src/nengo/NengoBase.cpp.s
@@ -1065,7 +994,6 @@ src/nengo/NengoBase.s: src/nengo/NengoBase.cpp.s
 # target to generate assembly for a file
 src/nengo/NengoBase.cpp.s:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/nengo/NengoBase.cpp.s
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/nengo/NengoBase.cpp.s
 .PHONY : src/nengo/NengoBase.cpp.s
 
 src/nengo/NengoLowpass.o: src/nengo/NengoLowpass.cpp.o
@@ -1075,7 +1003,6 @@ src/nengo/NengoLowpass.o: src/nengo/NengoLowpass.cpp.o
 # target to build an object file
 src/nengo/NengoLowpass.cpp.o:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/nengo/NengoLowpass.cpp.o
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/nengo/NengoLowpass.cpp.o
 .PHONY : src/nengo/NengoLowpass.cpp.o
 
 src/nengo/NengoLowpass.i: src/nengo/NengoLowpass.cpp.i
@@ -1085,7 +1012,6 @@ src/nengo/NengoLowpass.i: src/nengo/NengoLowpass.cpp.i
 # target to preprocess a source file
 src/nengo/NengoLowpass.cpp.i:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/nengo/NengoLowpass.cpp.i
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/nengo/NengoLowpass.cpp.i
 .PHONY : src/nengo/NengoLowpass.cpp.i
 
 src/nengo/NengoLowpass.s: src/nengo/NengoLowpass.cpp.s
@@ -1095,7 +1021,6 @@ src/nengo/NengoLowpass.s: src/nengo/NengoLowpass.cpp.s
 # target to generate assembly for a file
 src/nengo/NengoLowpass.cpp.s:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/nengo/NengoLowpass.cpp.s
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/nengo/NengoLowpass.cpp.s
 .PHONY : src/nengo/NengoLowpass.cpp.s
 
 src/nengo/NengoNetwork.o: src/nengo/NengoNetwork.cpp.o
@@ -1105,7 +1030,6 @@ src/nengo/NengoNetwork.o: src/nengo/NengoNetwork.cpp.o
 # target to build an object file
 src/nengo/NengoNetwork.cpp.o:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/nengo/NengoNetwork.cpp.o
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/nengo/NengoNetwork.cpp.o
 .PHONY : src/nengo/NengoNetwork.cpp.o
 
 src/nengo/NengoNetwork.i: src/nengo/NengoNetwork.cpp.i
@@ -1115,7 +1039,6 @@ src/nengo/NengoNetwork.i: src/nengo/NengoNetwork.cpp.i
 # target to preprocess a source file
 src/nengo/NengoNetwork.cpp.i:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/nengo/NengoNetwork.cpp.i
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/nengo/NengoNetwork.cpp.i
 .PHONY : src/nengo/NengoNetwork.cpp.i
 
 src/nengo/NengoNetwork.s: src/nengo/NengoNetwork.cpp.s
@@ -1125,7 +1048,6 @@ src/nengo/NengoNetwork.s: src/nengo/NengoNetwork.cpp.s
 # target to generate assembly for a file
 src/nengo/NengoNetwork.cpp.s:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/nengo/NengoNetwork.cpp.s
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/nengo/NengoNetwork.cpp.s
 .PHONY : src/nengo/NengoNetwork.cpp.s
 
 src/nengo/NengoPopulation.o: src/nengo/NengoPopulation.cpp.o
@@ -1135,7 +1057,6 @@ src/nengo/NengoPopulation.o: src/nengo/NengoPopulation.cpp.o
 # target to build an object file
 src/nengo/NengoPopulation.cpp.o:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/nengo/NengoPopulation.cpp.o
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/nengo/NengoPopulation.cpp.o
 .PHONY : src/nengo/NengoPopulation.cpp.o
 
 src/nengo/NengoPopulation.i: src/nengo/NengoPopulation.cpp.i
@@ -1145,7 +1066,6 @@ src/nengo/NengoPopulation.i: src/nengo/NengoPopulation.cpp.i
 # target to preprocess a source file
 src/nengo/NengoPopulation.cpp.i:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/nengo/NengoPopulation.cpp.i
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/nengo/NengoPopulation.cpp.i
 .PHONY : src/nengo/NengoPopulation.cpp.i
 
 src/nengo/NengoPopulation.s: src/nengo/NengoPopulation.cpp.s
@@ -1155,7 +1075,6 @@ src/nengo/NengoPopulation.s: src/nengo/NengoPopulation.cpp.s
 # target to generate assembly for a file
 src/nengo/NengoPopulation.cpp.s:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/nengo/NengoPopulation.cpp.s
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/nengo/NengoPopulation.cpp.s
 .PHONY : src/nengo/NengoPopulation.cpp.s
 
 src/nengo/NengoProbe.o: src/nengo/NengoProbe.cpp.o
@@ -1165,7 +1084,6 @@ src/nengo/NengoProbe.o: src/nengo/NengoProbe.cpp.o
 # target to build an object file
 src/nengo/NengoProbe.cpp.o:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/nengo/NengoProbe.cpp.o
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/nengo/NengoProbe.cpp.o
 .PHONY : src/nengo/NengoProbe.cpp.o
 
 src/nengo/NengoProbe.i: src/nengo/NengoProbe.cpp.i
@@ -1175,7 +1093,6 @@ src/nengo/NengoProbe.i: src/nengo/NengoProbe.cpp.i
 # target to preprocess a source file
 src/nengo/NengoProbe.cpp.i:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/nengo/NengoProbe.cpp.i
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/nengo/NengoProbe.cpp.i
 .PHONY : src/nengo/NengoProbe.cpp.i
 
 src/nengo/NengoProbe.s: src/nengo/NengoProbe.cpp.s
@@ -1185,7 +1102,6 @@ src/nengo/NengoProbe.s: src/nengo/NengoProbe.cpp.s
 # target to generate assembly for a file
 src/nengo/NengoProbe.cpp.s:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/nengo/NengoProbe.cpp.s
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/nengo/NengoProbe.cpp.s
 .PHONY : src/nengo/NengoProbe.cpp.s
 
 src/nengo/NengoReader.o: src/nengo/NengoReader.cpp.o
@@ -1195,7 +1111,6 @@ src/nengo/NengoReader.o: src/nengo/NengoReader.cpp.o
 # target to build an object file
 src/nengo/NengoReader.cpp.o:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/nengo/NengoReader.cpp.o
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/nengo/NengoReader.cpp.o
 .PHONY : src/nengo/NengoReader.cpp.o
 
 src/nengo/NengoReader.i: src/nengo/NengoReader.cpp.i
@@ -1205,7 +1120,6 @@ src/nengo/NengoReader.i: src/nengo/NengoReader.cpp.i
 # target to preprocess a source file
 src/nengo/NengoReader.cpp.i:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/nengo/NengoReader.cpp.i
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/nengo/NengoReader.cpp.i
 .PHONY : src/nengo/NengoReader.cpp.i
 
 src/nengo/NengoReader.s: src/nengo/NengoReader.cpp.s
@@ -1215,7 +1129,6 @@ src/nengo/NengoReader.s: src/nengo/NengoReader.cpp.s
 # target to generate assembly for a file
 src/nengo/NengoReader.cpp.s:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/nengo/NengoReader.cpp.s
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/nengo/NengoReader.cpp.s
 .PHONY : src/nengo/NengoReader.cpp.s
 
 src/nengo/SingleNengoSimulator.o: src/nengo/SingleNengoSimulator.cpp.o
@@ -1225,7 +1138,6 @@ src/nengo/SingleNengoSimulator.o: src/nengo/SingleNengoSimulator.cpp.o
 # target to build an object file
 src/nengo/SingleNengoSimulator.cpp.o:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/nengo/SingleNengoSimulator.cpp.o
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/nengo/SingleNengoSimulator.cpp.o
 .PHONY : src/nengo/SingleNengoSimulator.cpp.o
 
 src/nengo/SingleNengoSimulator.i: src/nengo/SingleNengoSimulator.cpp.i
@@ -1235,7 +1147,6 @@ src/nengo/SingleNengoSimulator.i: src/nengo/SingleNengoSimulator.cpp.i
 # target to preprocess a source file
 src/nengo/SingleNengoSimulator.cpp.i:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/nengo/SingleNengoSimulator.cpp.i
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/nengo/SingleNengoSimulator.cpp.i
 .PHONY : src/nengo/SingleNengoSimulator.cpp.i
 
 src/nengo/SingleNengoSimulator.s: src/nengo/SingleNengoSimulator.cpp.s
@@ -1245,7 +1156,6 @@ src/nengo/SingleNengoSimulator.s: src/nengo/SingleNengoSimulator.cpp.s
 # target to generate assembly for a file
 src/nengo/SingleNengoSimulator.cpp.s:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/nengo/SingleNengoSimulator.cpp.s
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/nengo/SingleNengoSimulator.cpp.s
 .PHONY : src/nengo/SingleNengoSimulator.cpp.s
 
 src/utils.o: src/utils.cpp.o
@@ -1255,7 +1165,6 @@ src/utils.o: src/utils.cpp.o
 # target to build an object file
 src/utils.cpp.o:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/utils.cpp.o
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/utils.cpp.o
 .PHONY : src/utils.cpp.o
 
 src/utils.i: src/utils.cpp.i
@@ -1265,7 +1174,6 @@ src/utils.i: src/utils.cpp.i
 # target to preprocess a source file
 src/utils.cpp.i:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/utils.cpp.i
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/utils.cpp.i
 .PHONY : src/utils.cpp.i
 
 src/utils.s: src/utils.cpp.s
@@ -1275,7 +1183,6 @@ src/utils.s: src/utils.cpp.s
 # target to generate assembly for a file
 src/utils.cpp.s:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/utils.cpp.s
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/utils.cpp.s
 .PHONY : src/utils.cpp.s
 
 src/utils/json/json.o: src/utils/json/json.cpp.o
@@ -1285,7 +1192,6 @@ src/utils/json/json.o: src/utils/json/json.cpp.o
 # target to build an object file
 src/utils/json/json.cpp.o:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/utils/json/json.cpp.o
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/utils/json/json.cpp.o
 .PHONY : src/utils/json/json.cpp.o
 
 src/utils/json/json.i: src/utils/json/json.cpp.i
@@ -1295,7 +1201,6 @@ src/utils/json/json.i: src/utils/json/json.cpp.i
 # target to preprocess a source file
 src/utils/json/json.cpp.i:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/utils/json/json.cpp.i
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/utils/json/json.cpp.i
 .PHONY : src/utils/json/json.cpp.i
 
 src/utils/json/json.s: src/utils/json/json.cpp.s
@@ -1305,7 +1210,6 @@ src/utils/json/json.s: src/utils/json/json.cpp.s
 # target to generate assembly for a file
 src/utils/json/json.cpp.s:
 	$(MAKE) -f CMakeFiles/bsim.dir/build.make CMakeFiles/bsim.dir/src/utils/json/json.cpp.s
-	$(MAKE) -f CMakeFiles/bsim_gpu.dir/build.make CMakeFiles/bsim_gpu.dir/src/utils/json/json.cpp.s
 .PHONY : src/utils/json/json.cpp.s
 
 test/cpu/generater_test.o: test/cpu/generater_test.cpp.o

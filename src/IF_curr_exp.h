@@ -16,6 +16,7 @@ class IF_curr_exp : public LIFNeuron {
 public:
 	IF_curr_exp(ID id, real v_init, real v_rest, real v_reset, real cm, real tau_m, real tau_refrac, real tau_syn_E, real tau_syn_I, real v_thresh, real i_offset);
 	IF_curr_exp(const IF_curr_exp &neuron, ID id);
+	IF_curr_exp(const LIFNeuron &templ, ID id);
 	~IF_curr_exp();
 
 	SynapseBase* addSynapse(real weight, real delay, SpikeType type, real tau, NeuronBase *pDest);

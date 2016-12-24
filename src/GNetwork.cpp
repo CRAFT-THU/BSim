@@ -74,6 +74,8 @@ int mpiSendNetwork(GNetwork *network, int rank, int rankSize)
 		}
 		printf("SERVER: %d SENDED SYNAPSES\n", rank);
 	}
+
+	return 0;
 }
 
 int mpiRecvNetwork(GNetwork *network, int rank, int rankSize) 
@@ -103,6 +105,8 @@ int mpiRecvNetwork(GNetwork *network, int rank, int rankSize)
 		recvType[network->sTypes[i]](&(network->pSynapses[i]), 0, size);
 	}
 	printf("SERVER: %d RECEIVED SYNAPSES\n", rank);
+
+	return 0;
 }
 
 
@@ -169,4 +173,6 @@ int printNetwork(GNetwork *net, int rank)
 	printf("\n");
 
 	printf("NETWORK PRINT END...\n");
+
+	return 0;
 }
