@@ -10,23 +10,25 @@
 #include "IDPool.h"
 #include "GExpSynapses.h"
 
-void *createExpSynapses()
-{
-	return malloc(sizeof(GExpSynapses));
-}
+//void *createExpSynapses()
+//{
+//	return malloc(sizeof(GExpSynapses));
+//}
+//
+//size_t getExpSize()
+//{
+//	return sizeof(GExpSynapses);
+//}
+//
+//int allocExpConnects(void *pCpu, int *pSynapsesDst, int *notUsed1, int *notUsed2, int notUsed3)
+//{
+//	GExpSynapses *p = (GExpSynapses*)pCpu;
+//	p->pDst = pSynapsesDst;
+//
+//	return 0;
+//}
 
-size_t getExpSize()
-{
-	return sizeof(GExpSynapses);
-}
-
-int allocExpConnects(void *pCpu, int *pSynapsesDst, int *notUsed1, int *notUsed2, int notUsed3)
-{
-	GExpSynapses *p = (GExpSynapses*)pCpu;
-	p->pDst = pSynapsesDst;
-
-	return 0;
-}
+SYNAPSE_GPU_FUNC_BASIC(Exp)
 
 int allocExpSynapses(void *pSynapses, int S)
 {

@@ -7,13 +7,16 @@
 #include <math.h>
 
 #include "ConstantNeuron.h"
+#include "GConstantNeurons.h"
 
 const Type ConstantNeuron::type = Constant;
 
-ConstantNeuron::ConstantNeuron(ID id, real fire_rate)
+ConstantNeuron::ConstantNeuron(ID id, real fire_rate, real tau_syn_E, real tau_syn_I)
 {
 	this->id = id;
 	this->fire_rate = fire_rate;
+	this->tau_syn_E = tau_syn_E;
+	this->tau_syn_I = tau_syn_I;
 	file = NULL;
 	fired = false;
 	monitored = false;
@@ -41,36 +44,18 @@ ConstantNeuron::~ConstantNeuron()
 int ConstantNeuron::reset(SimInfo &info)
 {
 	fired = false;
-	this->_dt = info.dt;
 	this->fire_count = 0;
 	
 	return 0;
 }
 
-int ConstantNeuron::fire()
-{
-	//vector<SynapseBase*>::iterator iter;
-	//for (iter=pSynapses.begin(); iter!=pSynapses.end(); iter++) {
-	//	(*iter)->recv();
-	//}
-
+int ConstantNeuron::recv(real I) {
 	return 0;
 }
 
 Type ConstantNeuron::getType()
 {
 	return type;
-}
-
-SynapseBase * ConstantNeuron::addSynapse(real weight, real delay, SpikeType type, real tau, NeuronBase *pDest)
-{
-	//ExpSynapse *tmp = new ExpSynapse(sidPool.getID(), weight, delay, 1e-3);
-	//tmp->setDst(pDest);
-
-	//SynapseBase *ret = (SynapseBase *)tmp;
-	//pSynapses.push_back(ret);
-	//return ret;
-	return NULL;
 }
 
 int ConstantNeuron::update(SimInfo &info)
@@ -105,20 +90,25 @@ void ConstantNeuron::monitor(SimInfo &info)
 	return;
 }
 
-int ConstantNeuron::recv(real I) {
-	return 0;
-}
-
 size_t ConstantNeuron::getSize() {
-	return 0;
-}
-
-int ConstantNeuron::hardCopy(void *data, int idx, int base, map<ID, int> &id2idx, map<int, ID> &idx2id)
-{
-	return 0;
+	return sizeof(GConstantNeurons);
 }
 
 int ConstantNeuron::getData(void *data)
 {
 	return 0;
 }
+
+int ConstantNeuron::hardCopy(void *data, int idx, int base, map<ID, int> &id2idx, map<int, ID> &idx2id)
+{
+	GConstantNeurons *p = (GConstantNeurons*) data;
+	id2idx[id] = idx + base;
+	idx2id[idx+base] = id;
+
+	p->p_fire_rate[idx] = fire_rate;
+	p->p_fire_count[idx] = fire_count;
+
+
+	return 1;
+}
+

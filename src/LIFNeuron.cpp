@@ -122,7 +122,6 @@ int LIFNeuron::reset(SimInfo &info)
 	return init(info.dt);
 }
 
-
 Type LIFNeuron::getType()
 {
 	return type;
@@ -206,14 +205,4 @@ int LIFNeuron::hardCopy(void *data, int idx, int base, map<ID, int> &id2idx, map
 	p->p_refrac_time[idx] = refrac_time;
 	
 	return 1;
-}
-
-int LIFNeuron::fire()
-{
-	return 0;
-}	
-
-SynapseBase* LIFNeuron::addSynapse(real weight, real delay, SpikeType type, NeuronBase *pDest)
-{
-	return NULL;
 }

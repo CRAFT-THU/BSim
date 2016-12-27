@@ -5,18 +5,17 @@
 #ifndef GCONSTANTNEURONS_H
 #define GCONSTANTNEURONS_H
 
+#include "macros.h"
 #include "constant.h"
 
 struct GConstantNeurons {
-	real *fire_rate;
-	int *fire_count;
+	real *p_fire_rate;
+	int *p_fire_count;
 
-	int *pSynapsesNum;
-	int *pSynapsesLoc;
-	int *pSynapsesIdx;
-	int num;
-	int synapsesNum;
+	NEURON_CONNECT_PARA
 };
+
+NEURON_GPU_FUNC_DEFINE(Constant)
 
 #endif /* GCONSTANTNEURONS_H */
 

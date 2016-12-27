@@ -57,12 +57,13 @@ int cudaAllocLIFNeurons(void *pCpu, void *pGpu)
 	checkCudaErrors(cudaMalloc((void**)&(pGpuNeurons->p_refrac_time), sizeof(int)*p->num));
 	checkCudaErrors(cudaMemcpy(pGpuNeurons->p_refrac_time, p->p_refrac_time, sizeof(int)*p->num, cudaMemcpyHostToDevice));
 
-	checkCudaErrors(cudaMalloc((void**)&(pGpuNeurons->pSynapsesNum), sizeof(int)*p->num));
-	checkCudaErrors(cudaMemcpy(pGpuNeurons->pSynapsesNum, p->pSynapsesNum, sizeof(int)*p->num, cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaMalloc((void**)&(pGpuNeurons->pSynapsesLoc), sizeof(int)*p->num));
-	checkCudaErrors(cudaMemcpy(pGpuNeurons->pSynapsesLoc, p->pSynapsesLoc, sizeof(int)*p->num, cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaMalloc((void**)&(pGpuNeurons->pSynapsesIdx), sizeof(int)*p->synapsesNum));
-	checkCudaErrors(cudaMemcpy(pGpuNeurons->pSynapsesIdx, p->pSynapsesIdx, sizeof(int)*p->synapsesNum, cudaMemcpyHostToDevice));
+	//checkCudaErrors(cudaMalloc((void**)&(pGpuNeurons->pSynapsesNum), sizeof(int)*p->num));
+	//checkCudaErrors(cudaMemcpy(pGpuNeurons->pSynapsesNum, p->pSynapsesNum, sizeof(int)*p->num, cudaMemcpyHostToDevice));
+	//checkCudaErrors(cudaMalloc((void**)&(pGpuNeurons->pSynapsesLoc), sizeof(int)*p->num));
+	//checkCudaErrors(cudaMemcpy(pGpuNeurons->pSynapsesLoc, p->pSynapsesLoc, sizeof(int)*p->num, cudaMemcpyHostToDevice));
+	//checkCudaErrors(cudaMalloc((void**)&(pGpuNeurons->pSynapsesIdx), sizeof(int)*p->synapsesNum));
+	//checkCudaErrors(cudaMemcpy(pGpuNeurons->pSynapsesIdx, p->pSynapsesIdx, sizeof(int)*p->synapsesNum, cudaMemcpyHostToDevice));
+	NEURON_CONNECT_PARA_ALLOC(pGpuNeurons, p)
 
 	return 0;
 }
@@ -94,9 +95,10 @@ int cudaFreeLIFNeurons(void *pGpu)
 	checkCudaErrors(cudaFree(pGpuNeurons->p_refrac_step));
 	checkCudaErrors(cudaFree(pGpuNeurons->p_refrac_time));
 
-	checkCudaErrors(cudaFree(pGpuNeurons->pSynapsesNum));
-	checkCudaErrors(cudaFree(pGpuNeurons->pSynapsesLoc));
-	checkCudaErrors(cudaFree(pGpuNeurons->pSynapsesIdx));
+	//checkCudaErrors(cudaFree(pGpuNeurons->pSynapsesNum));
+	//checkCudaErrors(cudaFree(pGpuNeurons->pSynapsesLoc));
+	//checkCudaErrors(cudaFree(pGpuNeurons->pSynapsesIdx));
+	NEURON_CONNECT_PARA_FREE(pGpuNeurons)
 
 	return 0;
 }

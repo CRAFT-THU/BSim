@@ -16,7 +16,6 @@ class BasicSynapse : public SynapseBase {
 public:
 	Type getType();
 
-	int init(real dt);
 	virtual int recv();
 	virtual void setDst(NeuronBase *p);
 
@@ -27,16 +26,17 @@ public:
 
 	virtual size_t getSize();
 	virtual int getData(void *data);
-	virtual int hardCopy(void *data, int idx);
+	virtual int hardCopy(void *data, int idx, int base, map<ID, int> &id2idx, map<int, ID> &idx2id);
 
-	BasicSynapse(ID id, real weight, real delay);
+	BasicSynapse(ID id, real weight, real delay, real tau_syn);
 	~BasicSynapse(); 
 
 	const static Type type;
 protected:
 	real weight;
 	real delay;
-	real _dt;
+	int delay_steps;
+
 	list<int> delay_queue;
 	NeuronBase *pDest;
 	bool monitored;

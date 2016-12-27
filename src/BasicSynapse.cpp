@@ -7,15 +7,16 @@
 
 #include "utils/json/json.h"
 #include "BasicSynapse.h"
-//#include "GBasicSynapses.h"
+#include "GBasicSynapses.h"
 
 const Type BasicSynapse::type = Basic;
 
-BasicSynapse::BasicSynapse(ID id, real weight, real delay = 0)
+BasicSynapse::BasicSynapse(ID id, real weight, real delay, real tau_syn)
 {
 	this->weight = weight;
 	this->delay = delay;
 	this->id = id;
+	//this->bias = bias;
 	this->monitored = false;
 	file = NULL;
 }
@@ -35,13 +36,7 @@ void BasicSynapse::setDst(NeuronBase *p) {
 }
 
 int BasicSynapse::reset(SimInfo &info) {
-	init(info.dt);
-
-	return 0;
-}
-
-int BasicSynapse::init(real dt) {
-	_dt = dt;
+	delay_steps = static_cast<int>(delay/(info.dt));
 
 	return 0;
 }
@@ -66,7 +61,7 @@ int BasicSynapse::update(SimInfo &info)
 
 int BasicSynapse::recv()
 {
-	delay_queue.push_back((int)(delay/_dt));
+	delay_queue.push_back(delay_steps);
 
 	return 0;
 }
@@ -113,13 +108,14 @@ int BasicSynapse::getData(void *data)
 	return 0;
 }
 
-int BasicSynapse::hardCopy(void *data, int idx)
+int BasicSynapse::hardCopy(void *data, int idx, int base, map<ID, int> &id2idx, map<int, ID> &idx2id)
 {
 	GBasicSynapses *p = (GBasicSynapses *)data;
-	p->pID[idx] = id;
-	p->pType[idx] = type;
+	id2idx[id] = idx + base;
+	idx2id[idx+base] = id;
+
 	p->p_weight[idx] = weight;
-	p->p_delay[idx] = delay;
-	p->p__dt[idx] = _dt;
+	p->p_delay_steps[idx] = delay_steps;
+
 	return 1;
 }

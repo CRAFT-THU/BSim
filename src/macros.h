@@ -77,5 +77,18 @@ int alloc##name##Connects(void *pCpu, int *pSynapsesDst, int *notUsed1, int *not
 	return 0; \
 }
 
+#define NEURON_CONNECT_PARA_FREE(para) \
+	checkCudaErrors(cudaFree(para->pSynapsesNum)); \
+	checkCudaErrors(cudaFree(para->pSynapsesLoc)); \
+	checkCudaErrors(cudaFree(para->pSynapsesIdx));
+
+#define NEURON_CONNECT_PARA_ALLOC(gpu, cpu) \
+	checkCudaErrors(cudaMalloc((void**)&(gpu->pSynapsesNum), sizeof(int)*(cpu->num))); \
+	checkCudaErrors(cudaMemcpy(gpu->pSynapsesNum, cpu->pSynapsesNum, sizeof(int)*(cpu->num), cudaMemcpyHostToDevice)); \
+	checkCudaErrors(cudaMalloc((void**)&(gpu->pSynapsesLoc), sizeof(int)*(cpu->num))); \
+	checkCudaErrors(cudaMemcpy(gpu->pSynapsesLoc, cpu->pSynapsesLoc, sizeof(int)*(cpu->num), cudaMemcpyHostToDevice)); \
+	checkCudaErrors(cudaMalloc((void**)&(gpu->pSynapsesIdx), sizeof(int)*(cpu->synapsesNum))); \
+	checkCudaErrors(cudaMemcpy(gpu->pSynapsesIdx, cpu->pSynapsesIdx, sizeof(int)*(cpu->synapsesNum), cudaMemcpyHostToDevice)); 
+
 #endif /* MACROS_H */
 

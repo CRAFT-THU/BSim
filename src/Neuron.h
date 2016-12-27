@@ -8,17 +8,20 @@
 #include "Synapse.h"
 
 #include "NeuronBase.h"
+#include "ConstantNeuron.h"
 #include "PossionNeuron.h"
 #include "InputNeuron.h"
 #include "LIFNeuron.h"
 //#include "MaxNeuron.h"
-#include "GLIFNeurons.h"
 //#include "IF_curr_exp.h"
 #include "NengoNeuron.h"
 #include "ProbeNeuron.h"
+#include "GNeuron.h"
+
 
 #include "CompositeNeuron.h"
 
+typedef CompositeNeuron<ConstantNeuron, ExpSynapse> Constant_curr_exp;
 typedef CompositeNeuron<LIFNeuron, ExpSynapse> IF_curr_exp;
 
 //typedef CompositeNeuron<InputNeuron, LowpassSynapse> Input_lowpass;
