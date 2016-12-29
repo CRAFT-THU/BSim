@@ -6,7 +6,7 @@
 #include <vector>
 #include <math.h>
 
-#include "../utils.h"
+#include "../utils/utils.h"
 #include "NengoPopulation.h"
 
 using std::vector;

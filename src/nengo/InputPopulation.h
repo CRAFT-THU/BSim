@@ -9,7 +9,7 @@
 #include <vector>
 #include <deque>
 
-#include "../utils/json/json.h"
+#include "../third_party/json/json.h"
 #include "NengoBase.h"
 
 using std::vector;

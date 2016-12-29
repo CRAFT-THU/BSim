@@ -6,7 +6,6 @@
 #include "mpi.h"
 #include "unistd.h"
 #include "../../include/BSim.h"
-#include "../../src/utils.h"
 
 using namespace std;
 

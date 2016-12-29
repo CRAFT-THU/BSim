@@ -5,9 +5,9 @@
 
 #include <math.h>
 
-#include "../utils/json/json.h"
+#include "../base/constant.h"
+#include "../third_party/json/json.h"
 #include "NengoLowpass.h"
-#include "../constant.h"
 
 const Type NengoLowpass::type = Lowpass;
 

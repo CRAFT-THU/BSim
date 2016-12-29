@@ -8,7 +8,7 @@
 #include <iostream>
 #include <cassert>
 
-#include "../utils/json/json.h"
+#include "../third_party/json/json.h"
 #include "NengoReader.h"
 
 #define NEURONTYPE Nengo_lowpass

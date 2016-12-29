@@ -7,7 +7,7 @@
 
 #include <stdio.h>
 
-#include "../utils/json/json.h"
+#include "../third_party/json/json.h"
 #include "NengoBase.h"
 
 class NengoPopulation : public NengoBase {

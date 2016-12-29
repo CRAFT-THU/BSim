@@ -5,8 +5,8 @@
 #ifndef NENGOBASE_H
 #define NENGOBASE_H
 
-#include "../IDPool.h"
-#include "../SimInfo.h"
+#include "../utils/IDPool.h"
+#include "../base/SimInfo.h"
 
 class NengoBase {
 public:
