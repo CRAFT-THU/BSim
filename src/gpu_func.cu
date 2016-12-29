@@ -37,7 +37,7 @@ int updateExpSynapses(void *data, int num, int simTime, BlockSize *pSize)
 
 int updateBasicSynapses(void *data, int num, int simTime, BlockSize *pSize)
 {
-	update_basic_synapse<<<pSize->gridSize, pSize->blockSize>>>((GExpSynapses*)data, num, simTime);
+	update_basic_synapse<<<pSize->gridSize, pSize->blockSize>>>((GBasicSynapses*)data, num, simTime);
 
 	return 0;
 }

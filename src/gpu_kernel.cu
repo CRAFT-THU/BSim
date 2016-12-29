@@ -172,7 +172,7 @@ __device__ int update_lif_spike(void *data, int num, int nid, int start_t, int s
 //UPDATE_NEURON_SPIKE(constant, Constant)
 //UPDATE_NEURON_SPIKE(lif, LIF)
 
-__device__ int update_exp_spike(void *data, int num, int sid, int start_t, int simTime)
+__device__ int update_basic_spike(void *data, int num, int sid, int start_t, int simTime)
 {
 	if (sid >= num) {
 		return -1;
@@ -321,7 +321,7 @@ __global__ void update_lif_neuron(GLIFNeurons *d_neurons, int num, int simTime)
 	__syncthreads();
 }
 
-__global__ void update_basic_synapse(GExpSynapses *d_synapses, int num, int simTime)
+__global__ void update_basic_synapse(GBasicSynapses *d_synapses, int num, int simTime)
 {
 	__syncthreads();
 }
