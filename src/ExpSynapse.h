@@ -27,7 +27,7 @@ public:
 
 	virtual size_t getSize();
 	virtual int getData(void *data);
-	virtual int hardCopy(void *data, int idx);
+	virtual int hardCopy(void *data, int idx, int base, map<ID, int> &id2idx, map<int, ID> &idx2id);
 
 	ExpSynapse(ID id, real weight, real delay, real tau_syn);
 	~ExpSynapse(); 
@@ -36,12 +36,13 @@ public:
 protected:
 	real weight;
 	real delay;
+	int delay_steps;
 	real C1;
 	real _C1;
 	real tau_syn;
 	real I_syn;
-	real _dt;
-	list<int> delay_step;
+	//real _dt;
+	list<int> delay_queue;
 	NeuronBase *pDest;
 	bool monitored;
 	FILE* file;

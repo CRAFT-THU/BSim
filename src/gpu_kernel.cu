@@ -1,4 +1,5 @@
 
+#include "gpu_macros.h"
 #include "gpu_kernel.h"
 
 #define MAX_FIRED 512
@@ -110,19 +111,43 @@ __global__ void init_global(int max_delay, int *c_gTimeTable, real *c_gNeuronInp
 }
 
 
-__device__ int get_alpha_delay(void *data, int num, int sid)
-{
-	GAlphaSynapses *d_synapses = (GAlphaSynapses*)data;
-	return (int)(d_synapses->p_delay[sid]/d_synapses->p__dt[sid]);
-}
+//__device__ int get_alpha_delay(void *data, int num, int sid)
+//{
+//	GAlphaSynapses *d_synapses = (GAlphaSynapses*)data;
+//	return (int)(d_synapses->p_delay_steps[sid]);
+//}
+//
+//__device__ int get_exp_delay(void *data, int num, int sid)
+//{
+//	GExpSynapses *d_synapses = (GExpSynapses*)data;
+//	return (int)(d_synapses->p_delay_steps[sid]);
+//}
 
-__device__ int get_exp_delay(void *data, int num, int sid)
-{
-	GExpSynapses *d_synapses = (GExpSynapses*)data;
-	return (int)(d_synapses->p_delay[sid]/d_synapses->p__dt[sid]);
-}
+GET_DELAY(basic, Basic)
+GET_DELAY(alpha, Alpha)
+GET_DELAY(exp, Exp)
 
-__device__ int (*get_delay[])(void *, int, int) = { NULL, get_alpha_delay, get_exp_delay };
+__device__ int (*get_delay[])(void *, int, int) = { NULL, NULL, get_basic_delay, get_alpha_delay, get_exp_delay };
+
+__device__ int update_constant_spike(void *data, int num, int nid, int start_t, int simTime)
+{
+	if (nid >= num) {
+		return -1;
+	}
+
+	GConstantNeurons *d_neurons = (GConstantNeurons*)data;
+	for (int i=0; i<d_neurons->pSynapsesNum[nid]; i++) {
+		int loc = d_neurons->pSynapsesLoc[nid];
+		int sid = d_neurons->pSynapsesIdx[i+loc];
+		int offset = 0;
+		int type = get_type(gGpuNet->synapseNums, gGpuNet->sTypeNum, sid, &offset);
+		//if (simTime == start_t + get_delay(d_synapses->p_delay[sid]/d_synapses->p__dt[sid]))
+		if (simTime == start_t + get_delay[gGpuNet->sTypes[type]](gGpuNet->pSynapses[type], gGpuNet->synapseNums[type+1]-gGpuNet->synapseNums[type], offset))
+			gSynapsesFiredTable[d_neurons->pSynapsesIdx[i+loc]] = true;
+	}
+
+	return 0;
+}
 
 __device__ int update_lif_spike(void *data, int num, int nid, int start_t, int simTime)
 {
@@ -140,6 +165,21 @@ __device__ int update_lif_spike(void *data, int num, int nid, int start_t, int s
 		if (simTime == start_t + get_delay[gGpuNet->sTypes[type]](gGpuNet->pSynapses[type], gGpuNet->synapseNums[type+1]-gGpuNet->synapseNums[type], offset))
 			gSynapsesFiredTable[d_neurons->pSynapsesIdx[i+loc]] = true;
 	}
+
+	return 0;
+}
+
+//UPDATE_NEURON_SPIKE(constant, Constant)
+//UPDATE_NEURON_SPIKE(lif, LIF)
+
+__device__ int update_basic_spike(void *data, int num, int sid, int start_t, int simTime)
+{
+	if (sid >= num) {
+		return -1;
+	}
+
+	GBasicSynapses *d_synapses = (GBasicSynapses*)data;
+	atomicAdd(&(gNeuronInput[d_synapses->pDst[sid]]), d_synapses->p_weight[sid]);
 
 	return 0;
 }
@@ -175,7 +215,7 @@ __device__ int update_exp_spike(void *data, int num, int sid, int start_t, int s
 }
 
 
-__device__ int (*update_spike[])(void*, int, int, int, int) = { update_lif_spike, update_alpha_spike, update_exp_spike };
+__device__ int (*update_spike[])(void*, int, int, int, int) = { update_constant_spike, update_lif_spike, update_basic_spike, update_alpha_spike, update_exp_spike };
 
 __global__ void update_pre_synapse(GNetwork *d_net, int simTime)
 {
@@ -194,6 +234,7 @@ __global__ void update_pre_synapse(GNetwork *d_net, int simTime)
 	}
 	__syncthreads();
 }
+
 __global__ void update_post_synapse(GNetwork *d_net, int simTime)
 {
 	int tid = blockIdx.x * blockDim.x + threadIdx.x;
@@ -221,13 +262,30 @@ __global__ void update_pre_synapse(GLIFNeurons *d_neurons, GExpSynapses* d_synap
 				for (int i=0; i<d_neurons->pSynapsesNum[nid]; i++) {
 					int loc = d_neurons->pSynapsesLoc[nid];
 					int sid = d_neurons->pSynapsesIdx[i+loc];
-					if (simTime == start_t +(int)(d_synapses->p_delay[sid]/d_synapses->p__dt[sid]))
+					if (simTime == start_t + d_synapses->p_delay_steps[sid])
 						gSynapsesFiredTable[d_neurons->pSynapsesIdx[i+loc]] = true;
 				}
 			}
 		}
 	}
 	__syncthreads();
+}
+
+__global__ void update_constant_neuron(GConstantNeurons *d_neurons, int num, int simTime)
+{
+	int tid = blockIdx.x * blockDim.x + threadIdx.x;
+	int nid = 0;
+	for (int idx = tid; idx < num; idx += blockDim.x * gridDim.x) {
+		nid = idx;
+		if (nid < num) {
+			int fired = (simTime * d_neurons->p_fire_rate[nid]) > (d_neurons->p_fire_count[nid]);
+			int gnid = type2gnid(gGpuNet, Constant, nid);
+			if (fired) {
+				d_neurons->p_fire_count[nid]++;
+			}
+			updateFiredTable(gnid, fired, simTime);
+		}
+	}
 }
 
 __global__ void update_lif_neuron(GLIFNeurons *d_neurons, int num, int simTime)
@@ -246,11 +304,11 @@ __global__ void update_lif_neuron(GLIFNeurons *d_neurons, int num, int simTime)
 			gNeuronInput[gnid] = 0;
 
 			if (d_neurons->p_refrac_step[nid] > 0) {
-				d_neurons->p_refrac_step[nid] --;
+				d_neurons->p_refrac_step[nid] = d_neurons->p_refrac_time[nid] - 1;
 				d_neurons->p_vm[nid] = d_neurons->p_v_reset[nid];
 			} else if (d_neurons->p_vm[nid] >= d_neurons->p_v_thresh[nid]) {
 				fired = 1;
-				d_neurons->p_refrac_step[nid] = (int)(d_neurons->p_tau_refrac[nid]/d_neurons->p__dt[nid]) - 1;
+				d_neurons->p_refrac_step[nid] = d_neurons->p_refrac_time[nid] - 1;
 				d_neurons->p_vm[nid] = d_neurons->p_v_reset[nid];
 			}
 
@@ -260,6 +318,11 @@ __global__ void update_lif_neuron(GLIFNeurons *d_neurons, int num, int simTime)
 	__syncthreads();
 
 	updateTimeTable(simTime);
+	__syncthreads();
+}
+
+__global__ void update_basic_synapse(GBasicSynapses *d_synapses, int num, int simTime)
+{
 	__syncthreads();
 }
 

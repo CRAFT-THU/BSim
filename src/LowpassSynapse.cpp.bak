@@ -27,7 +27,7 @@ LowpassSynapse::~LowpassSynapse()
 		fclose(file);
 	}
 
-	delay_step.clear();
+	delay_queue.clear();
 }
 
 void LowpassSynapse::setDst(NeuronBase *p) {
@@ -59,7 +59,7 @@ int LowpassSynapse::update(SimInfo &info)
 	
 	list<int>::iterator iter;
 
-	while (!delay_step.empty()) /* && (delay_step.front() <= 0)) */ {
+	while (!delay_queue.empty()) /* && (delay_queue.front() <= 0)) */ {
 		real i_tmp = weight/_dt;
 		I_syn = -C1 * I_syn;
 		I_syn += weight/_dt*_C1;
@@ -69,10 +69,10 @@ int LowpassSynapse::update(SimInfo &info)
 			}
 		}
 		pDest->recv(I_syn);
-		delay_step.pop_front();
+		delay_queue.pop_front();
 	}
 
-	//for (iter = delay_step.begin(); iter != delay_step.end(); iter++) {
+	//for (iter = delay_queue.begin(); iter != delay_queue.end(); iter++) {
 	//	*iter = *iter - 1;
 	//}
 
@@ -82,7 +82,7 @@ int LowpassSynapse::update(SimInfo &info)
 int LowpassSynapse::recv()
 {
 	//printf("Syn: %d_%d\n", this->getID().groupId, this->getID().id);
-	delay_step.push_back((int)(delay/_dt));
+	delay_queue.push_back((int)(delay/_dt));
 	if (monitored) {
 		if (file != NULL) {
 			fprintf(file, "recived %d\n", (int)(delay/_dt)); 

@@ -19,9 +19,10 @@ public:
 
 	virtual bool isFired();
 
-	virtual int fire() = 0;
+	virtual int fire();
 	virtual int recv(real I) = 0;
-	virtual SynapseBase *addSynapse(real weight, real delay, SpikeType type, real tau, NeuronBase *dst) = 0;
+
+	virtual SynapseBase *addSynapse(real weight, real delay, SpikeType type, real tau, NeuronBase *dst);
 protected:
 	bool fired;
 	bool monitored;

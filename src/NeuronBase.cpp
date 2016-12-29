@@ -15,10 +15,22 @@ NeuronBase::NeuronBase()
 
 NeuronBase::~NeuronBase() {}
 
-bool NeuronBase::isFired() {
+bool NeuronBase::isFired() 
+{
 	return fired;
 }
 
-void NeuronBase::monitorOn() {
+void NeuronBase::monitorOn() 
+{
 	monitored = true;
+}
+
+int NeuronBase::fire() 
+{
+	return 0;
+}
+
+SynapseBase * NeuronBase::addSynapse(real weight, real delay, SpikeType type, real tau, NeuronBase *dst) 
+{
+	return NULL;
 }

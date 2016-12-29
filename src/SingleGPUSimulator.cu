@@ -12,17 +12,6 @@
 #include "gpu_kernel.h"
 #include "SingleGPUSimulator.h"
 
-#define TEST
-
-SingleGPUSimulator::SingleGPUSimulator(Network *network, real dt) : SimulatorBase(network, dt)
-{
-}
-
-SingleGPUSimulator::~SingleGPUSimulator()
-{
-}
-
-
 int SingleGPUSimulator::run(real time)
 {
 	findCudaDevice(0, NULL);
@@ -101,6 +90,7 @@ int SingleGPUSimulator::run(real time)
 	gettimeofday(&ts, NULL);
 	for (int time=0; time<sim_cycle; time++) {
 		printf("\rCycle: %d", time);
+		fflush(stdout);
 		//update_pre_neuron<<<1, 1, 0>>>(pGpuNet, simTime);
 		//update_lif_neuron<<<3, 2, 0>>>((GLIFNeurons*)c_pGpuNet->pNeurons, c_pGpuNet->neuronNum, time);
 
@@ -153,7 +143,7 @@ int SingleGPUSimulator::run(real time)
 		int size2 = firedInfo.size();
 		if (size2 > 0) {
 			if (size > 0) {
-				printf(", ");
+				fprintf(logFile, ", ");
 			}
 			fprintf(logFile, "%d_%d", network->idx2sid[firedInfo[0]].groupId, network->idx2sid[firedInfo[0]].id);
 			for (int i=1; i<size2; i++) {

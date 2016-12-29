@@ -20,8 +20,8 @@ SET(CUDA_PROPAGATE_HOST_FLAGS OFF)
 SET(CUDA_NVCC_FLAGS_DEBUG "-std=c++11 -g -G")
 SET(CUDA_NVCC_FLAGS_RELEASE "-std=c++11 -O3")
 
-FILE(GLOB_RECURSE CPU_SRC "src/[^G]*.cpp" "src/[^G]*.c")
-FILE(GLOB_RECURSE GPU_SRC "src/*.cpp" "src/*.c" "src/*.cu")
+FILE(GLOB_RECURSE CPU_SRC "src/*.cpp" "src/*.c")
+FILE(GLOB_RECURSE GPU_SRC "src/*.cu")
 
 SET(CPU_LIB bsim)
 SET(GPU_LIB bsim_gpu)
@@ -47,7 +47,7 @@ FOREACH(exec_path ${GPU_TEST})
 	GET_FILENAME_COMPONENT(exec_file ${exec_path} NAME_WE)
 	#MESSAGE("EXEC_FILE: ${exec_file}")
 	CUDA_ADD_EXECUTABLE(${exec_file} ${exec_path})
-	TARGET_LINK_LIBRARIES(${exec_file} ${GPU_LIB} ${MPI_LIBRARIES})
+	TARGET_LINK_LIBRARIES(${exec_file} ${GPU_LIB} ${CPU_LIB} ${MPI_LIBRARIES})
 ENDFOREACH()
 
 ADD_CUSTOM_COMMAND(TARGET multi-gpusim_test

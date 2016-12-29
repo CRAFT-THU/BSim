@@ -10,8 +10,8 @@
 #include <algorithm>
 
 #include "SimInfo.h"
-#include "Neuron.h"
-#include "Synapse.h"
+#include "NeuronBase.h"
+#include "SynapseBase.h"
 #include "Population.h"
 #include "GNetwork.h"
 //#include "GFunc.h"
@@ -20,7 +20,6 @@ using std::map;
 using std::pair;
 using std::find;
 using std::vector;
-
 
 class Network {
 public:

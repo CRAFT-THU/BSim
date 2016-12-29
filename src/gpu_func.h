@@ -2,8 +2,8 @@
  * usually just for fun
  * Wed March 09 2016
  */
-#ifndef GFUNC_H
-#define GFUNC_H
+#ifndef GPU_FUNC_H
+#define GPU_FUNC_H
 
 #include "BlockSize.h"
 #include "GLIFNeurons.h"

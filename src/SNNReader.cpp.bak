@@ -13,8 +13,8 @@
 #include "Neuron.h"
 #include "SNNReader.h"
 
-#define NEURONTYPE Nengo_lowpass
-//#define NEURONTYPE IF_curr_exp
+//#define NEURONTYPE Nengo_lowpass
+#define NEURONTYPE IF_curr_exp
 
 using std::ifstream;
 using std::cout;
@@ -64,26 +64,26 @@ Network * readNetwork(string filename)
 	for (int i=0; i<populationSize; i++) {
 		int num = population[i]["size"].asInt();
 		int id = population[i]["id"].asInt();
-		//Population<NEURONTYPE> *popu =  res->createPopulation(ID(id), num, NEURONTYPE(ID(0), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
-		Population<Nengo_lowpass2> *popu =  res->createPopulation(ID(id), num, Nengo_lowpass2(NengoNeuron(ID(0), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), ID(0)));
+		Population<NEURONTYPE> *popu =  res->createPopulation(ID(id), num, NEURONTYPE(ID(0), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
+		//Population<Nengo_lowpass2> *popu =  res->createPopulation(ID(id), num, Nengo_lowpass2(NengoNeuron(ID(0), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), ID(0)));
 		for (int j=0; j<num; j++) {
 			Json::Value para = population[i]["parameters"];
-			//NEURONTYPE n(ID(id, testValue(para["id"], j).asInt()), testValue(para["voltage"], j).asDouble(), testValue(para["v_rest"], j).asDouble(), testValue(para["reset"], j).asDouble(), testValue(para["cm"], j).asDouble(), testValue(para["tau_rc"], j).asDouble(), testValue(para["tau_ref"], j).asDouble(), testValue(para["tau_syn_E"], j).asDouble(), testValue(para["tau_syn_I"], j).asDouble(), testValue(para["threshold"], j).asDouble(), testValue(para["bias"], j).asDouble());
-			Nengo_lowpass2 n(NengoNeuron(ID(0), 
-						testValue(para["voltage"], j).asDouble(),
-						testValue(para["min_voltage"], j).asDouble(), 
-						testValue(para["reset"], j).asDouble(), 
-						testValue(para["cm"], j).asDouble(), 
-						testValue(para["tau_rc"], j).asDouble(), 
-						testValue(para["tau_ref"], j).asDouble(), 
-						testValue(para["tau_syn_E"], j).asDouble(), 
-						testValue(para["tau_syn_I"], j).asDouble(), 
-						testValue(para["threshold"], j).asDouble(), 
-						testValue(para["bias"], j).asDouble(), 
-						testValue(para["scaled_encoders"], j)[0].asDouble()
-						), 
-					ID(id, j)
-					);
+			NEURONTYPE n(ID(id, testValue(para["id"], j).asInt()), testValue(para["voltage"], j).asDouble(), testValue(para["v_rest"], j).asDouble(), testValue(para["reset"], j).asDouble(), testValue(para["cm"], j).asDouble(), testValue(para["tau_rc"], j).asDouble(), testValue(para["tau_ref"], j).asDouble(), testValue(para["tau_syn_E"], j).asDouble(), testValue(para["tau_syn_I"], j).asDouble(), testValue(para["threshold"], j).asDouble(), testValue(para["bias"], j).asDouble());
+			//Nengo_lowpass2 n(NengoNeuron(ID(0), 
+			//			testValue(para["voltage"], j).asDouble(),
+			//			testValue(para["min_voltage"], j).asDouble(), 
+			//			testValue(para["reset"], j).asDouble(), 
+			//			testValue(para["cm"], j).asDouble(), 
+			//			testValue(para["tau_rc"], j).asDouble(), 
+			//			testValue(para["tau_ref"], j).asDouble(), 
+			//			testValue(para["tau_syn_E"], j).asDouble(), 
+			//			testValue(para["tau_syn_I"], j).asDouble(), 
+			//			testValue(para["threshold"], j).asDouble(), 
+			//			testValue(para["bias"], j).asDouble(), 
+			//			testValue(para["scaled_encoders"], j)[0].asDouble()
+			//			), 
+			//		ID(id, j)
+			//		);
 			popu->addNeuron(n);
 		}
 	}

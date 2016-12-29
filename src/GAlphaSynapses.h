@@ -5,36 +5,43 @@
 #ifndef GALPHASYNAPSES_H
 #define GALPHASYNAPSES_H
 
-#include "ID.h"
+#include "macros.h"
+#include "constant.h"
+//#include "ID.h"
 
 struct GAlphaSynapses {
-	ID *pID;
-	Type *pType;
+	//ID *pID;
+	//Type *pType;
 	real *p_weight;
-	real *p_delay;
+	//real *p_delay;
+	int *p_delay_steps;
 	real *p_C1;
 	real *p_C2;
 	real *p__C1;
 	real *p__C2;
-	real *p_tau_syn;
+	//real *p_tau_syn;
 	real *p_I_syn;
 	real *p_I_tmp;
-	real *p__dt;
+	//real *p__dt;
 	//int *pSrc;
-	int *pDst;
-	int num;
+	
+	//int *pDst;
+	//int num;
+	SYNAPSE_CONNECT_PARA
 };
 
-void *createAlphaSynapses();
-size_t getAlphaSize();
-int allocAlphaSynapses(void *pSynapses, int S);
-int allocAlphaConnects(void *pCpu, int *pSynapsesDst, int *notUsed1, int *notUsed2, int notUsed3);
+//void *createAlphaSynapses();
+//size_t getAlphaSize();
+//int allocAlphaSynapses(void *pSynapses, int S);
+//int allocAlphaConnects(void *pCpu, int *pSynapsesDst, int *notUsed1, int *notUsed2, int notUsed3);
+//
+//void sendAlphaSynapses(void *data, int rank, int offset, int size);
+//void recvAlphaSynapses(void **data, int rank, int size);
+//
+//int cudaAllocAlphaSynapses(void *pCpu, void *pGpu);
+//int cudaFreeAlphaSynapses(void *pGpu);
 
-void sendAlphaSynapses(void *data, int rank, int offset, int size);
-void recvAlphaSynapses(void **data, int rank, int size);
-
-int cudaAllocAlphaSynapses(void *pCpu, void *pGpu);
-int cudaFreeAlphaSynapses(void *pGpu);
+SYNAPSE_GPU_FUNC_DEFINE(Alpha)
 
 #endif /* GALPHASYNAPSES_H */
 

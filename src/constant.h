@@ -15,10 +15,12 @@ const int MAXBLOCKSIZE = 1024;
 const int WARPSIZE = 32;
 
 enum Type { 
-	LIF = 0, Alpha = 1, Exp,
-	Nengo, Lowpass, 
-	Input, Possion, 
-	Probe, TypeSize
+	Constant = 0, LIF = 1, 
+	Basic, Alpha, Exp, 
+	Possion, Input,
+	Nengo, Probe, 
+	Lowpass, 
+	TypeSize
 }; 
 
 enum SpikeType { Excitatory = 0, Inhibitory = 1, None = 2};

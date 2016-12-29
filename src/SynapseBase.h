@@ -16,7 +16,7 @@ public:
 	virtual int recv() = 0;
 	virtual void monitorOn() = 0;
 	virtual void setDst(NeuronBase *p) = 0;
-private:
+protected:
 	bool monitored;
 };
 

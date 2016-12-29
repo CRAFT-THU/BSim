@@ -5,6 +5,9 @@
 #ifndef SIMULATOR_H
 #define SIMULATOR_H
 
+#include "Neuron.h"
+#include "Synapse.h"
+
 //CPU SIM
 #include "SingleThreadSimulator.h"
 

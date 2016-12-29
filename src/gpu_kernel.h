@@ -5,9 +5,8 @@
 #ifndef GPU_KERNEL_H
 #define GPU_KERNEL_H
 
-#include "GLIFNeurons.h"
-#include "GExpSynapses.h"
-#include "GAlphaSynapses.h"
+#include "GNeuron.h"
+#include "GSynapse.h"
 #include "GNetwork.h"
 
 __global__ void init_global(int max_delay, int *c_gTimeTable, real *c_gNeuronInput, int *c_gFiredTable, int c_gFiredTableSize, bool *c_gSynapsesFiredTable, int c_gSynapsesFiredTableSize, GNetwork* network);
@@ -19,8 +18,11 @@ __global__ void update_post_synapse(GNetwork *d_net, int simTime);
 
 __global__ void update_pre_synapse(GLIFNeurons *d_neurons, GExpSynapses* d_synapses, int simTime);
 
+__global__ void update_constant_neuron(GConstantNeurons *d_neurons, int num, int simTime);
+
 __global__ void update_lif_neuron(GLIFNeurons *d_neurons, int num, int simTime);
 
+__global__ void update_basic_synapse(GBasicSynapses *d_synapses, int num, int simTime);
 __global__ void update_alpha_synapse(GAlphaSynapses *d_synapses, int num, int simTime);
 
 __global__ void update_exp_synapse(GExpSynapses *d_synapses, int num, int simTime);
