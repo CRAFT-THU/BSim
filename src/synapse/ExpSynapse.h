@@ -33,9 +33,9 @@ public:
 
 	const static Type type;
 protected:
-	real weight;
+	//real weight;
+	//int delay_setps;
 	real delay;
-	int delay_steps;
 	real C1;
 	real _C1;
 	real tau_syn;

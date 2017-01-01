@@ -16,8 +16,17 @@ public:
 	virtual int recv() = 0;
 	virtual void monitorOn() = 0;
 	virtual void setDst(NeuronBase *p) = 0;
+	virtual int getDelay();
 protected:
+	real weight;
+	int delay_steps;
 	bool monitored;
+};
+
+class Greater {
+	bool operator()(SynapseBase *a, SynapseBase *b) const {
+		return (a->getDelay()) > (b->getDelay());
+	}
 };
 
 #endif /* SYNAPSEBASE_H */

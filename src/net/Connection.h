@@ -5,11 +5,13 @@
 #ifndef CONNECTION_H
 #define CONNECTION_H
 
-struct Connection {
-	int *pSynapsesNum; 
-	int *pSynapsesLoc; 
+#include "../base/constant.h"
+
+struct N2SConnection {
 	int *pSynapsesIdx; 
 	int synapsesNum; 
+	int *delayStart;
+	int *delayEnd;
 };
 
 #endif /* CONNECTION_H */

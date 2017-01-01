@@ -66,6 +66,7 @@ public:
 	map<int, ID> idx2nid;
 	map<int, ID> idx2sid;
 	real maxDelay;
+	int maxDelaySteps;
 	real maxFireRate;
 	vector<Type> nTypes;
 	vector<Type> sTypes;
@@ -73,6 +74,8 @@ public:
 	vector<int> neuronNums;
 	vector<int> connectNums;
 	vector<int> synapseNums;
+	int totalNeuronNum;
+	int totalSynapseNum;
 };
 
 template<class Neuron>

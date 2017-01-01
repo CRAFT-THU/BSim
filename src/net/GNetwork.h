@@ -6,6 +6,7 @@
 #define GNETWORK_H
 
 #include "../base/constant.h"
+#include "Connection.h"
 
 struct GNetwork {
 	//Local Info
@@ -13,6 +14,8 @@ struct GNetwork {
 	void **pNeurons;
 	//Pointers to synapses
 	void **pSynapses;
+	//Pointer to neuron to synapse connections
+	N2SConnection *pN2SConnections;
 	//Local machine offsets
 	int *nOffsets;
 	int *sOffsets;

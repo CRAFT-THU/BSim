@@ -32,9 +32,9 @@ public:
 
 	const static Type type;
 protected:
-	real weight;
+	//real weight;
+	//int delay_steps;
 	real delay;
-	int delay_steps;
 
 	list<int> delay_queue;
 	NeuronBase *pDest;

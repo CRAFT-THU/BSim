@@ -7,6 +7,7 @@
 
 #include <math.h>
 #include <vector>
+#include <queue>
 
 #include "../utils/IDPool.h"
 #include "../synapse/SynapseBase.h"

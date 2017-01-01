@@ -16,3 +16,8 @@ void SynapseBase::monitorOn()
 {
 	monitored = false;
 }
+
+int SynapseBase::getDelay()
+{
+	return this->delay_steps;
+}

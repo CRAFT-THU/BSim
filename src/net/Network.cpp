@@ -20,8 +20,9 @@ Network::Network()
 	idx2nid.clear();
 	sid2idx.clear();
 	idx2sid.clear();
-	maxDelay = 0;
-	maxFireRate = 0;
+	maxDelay = 0.0;
+	maxDelaySteps = 0;
+	maxFireRate = 0.0;
 	populationNum = 0;
 	neuronNums.clear();
 	connectNums.clear();
@@ -72,17 +73,20 @@ int Network::addNeuronNum(Type type, int num)
 		int idx = std::distance(nTypes.begin(), iter);
 		neuronNums[idx] += num;
 	}
+	totalNeuronNum += num;
 
 	return num;
 }
 
 int Network::addConnectionNum(Type type, int num)
 {
+	// To be updated
 	vector<Type>::iterator iter = find(nTypes.begin(), nTypes.end(), type);
 	if (iter == nTypes.end()) {
-		nTypes.push_back(type);
-		neuronNums.push_back(num);
-		connectNums.push_back(0);
+		//nTypes.push_back(type);
+		//neuronNums.push_back(num);
+		//connectNums.push_back(0);
+		printf("This should not happed, when a connect is added, a pre-neuron must exist!");
 	} else {
 		int idx = std::distance(nTypes.begin(), iter);
 		connectNums[idx] += num;
@@ -101,6 +105,7 @@ int Network::addSynapseNum(Type type, int num)
 		int idx = std::distance(sTypes.begin(), iter);
 		synapseNums[idx] += num;
 	}
+	totalSynapseNum += num;
 	return num;
 }
 
@@ -303,6 +308,7 @@ int Network::connect(int populationIDSrc, int neuronIDSrc, int populationIDDst, 
 
 int Network::reset(SimInfo &info)
 {
+	maxDelaySteps = static_cast<int>(maxDelay/info.dt);
 	vector<SynapseBase*>::iterator iterS;
 	vector<NeuronBase*>::iterator iterN;
 	vector<PopulationBase*>::iterator iterP;
