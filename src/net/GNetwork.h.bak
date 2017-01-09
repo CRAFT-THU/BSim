@@ -14,8 +14,8 @@ struct GNetwork {
 	void **pNeurons;
 	//Pointers to synapses
 	void **pSynapses;
-	//Neuron to Synapse Connection
-	N2SConnection *pN2SConnection;
+	//Pointer to neuron to synapse connections
+	N2SConnection *pN2SConnections;
 	//Local machine offsets
 	int *nOffsets;
 	int *sOffsets;
@@ -34,7 +34,7 @@ struct GNetwork {
 	int *gNeuronNums;
 	int *gSynapseNums;
 
-	int MAX_DELAY;
+	real MAX_DELAY;
 };
 
 int copyNetwork(GNetwork *dNet, GNetwork *sNet, int rank, int rankSize);

@@ -4,7 +4,7 @@
 #include "gpu_func.h"
 #include "gpu_utils.h"
 
-GNetwork* copyDataToGPU(GNetwork *pCpuNet)
+GNetwork* copyNetworkToGPU(GNetwork *pCpuNet)
 {
 	if (pCpuNet == NULL) {
 		printf("NULL POINTER: GNETWORK\n");
@@ -16,30 +16,33 @@ GNetwork* copyDataToGPU(GNetwork *pCpuNet)
 
 	int nTypeNum = pCpuNet->nTypeNum;
 	int sTypeNum = pCpuNet->sTypeNum;
+	int totalNeuronNum = pCpuNet->neuronNums[pGpuNet->nTypeNum+1];
+	int totalSynapseNum = pCpuNet->synapseNums[pGpuNet->sTypeNum+1];
+	int MAX_DELAY = pCpuNet->MAX_DELAY;
 
-	Type *nTypes = NULL, *sTypes = NULL;
-	checkCudaErrors(cudaMalloc((void**)&(nTypes), sizeof(Type)*nTypeNum));
-	checkCudaErrors(cudaMemcpy(nTypes, pCpuNet->nTypes, sizeof(Type)*nTypeNum, cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaMalloc((void**)&(sTypes), sizeof(Type)*sTypeNum));
-	checkCudaErrors(cudaMemcpy(sTypes, pCpuNet->sTypes, sizeof(Type)*sTypeNum, cudaMemcpyHostToDevice));
+	//Type *g_nTypes = NULL, *g_sTypes = NULL;
+	//checkCudaErrors(cudaMalloc((void**)&(g_nTypes), sizeof(Type)*nTypeNum));
+	//checkCudaErrors(cudaMemcpy(g_nTypes, pCpuNet->nTypes, sizeof(Type)*nTypeNum, cudaMemcpyHostToDevice));
+	//checkCudaErrors(cudaMalloc((void**)&(sTypes), sizeof(Type)*sTypeNum));
+	//checkCudaErrors(cudaMemcpy(g_sTypes, pCpuNet->sTypes, sizeof(Type)*sTypeNum, cudaMemcpyHostToDevice));
 
-	int *neuronNums = NULL, *synapseNums = NULL;
-	checkCudaErrors(cudaMalloc((void**)&(neuronNums), sizeof(int)*(nTypeNum+1)));
-	checkCudaErrors(cudaMemcpy(neuronNums, pCpuNet->neuronNums, sizeof(int)*(nTypeNum+1), cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaMalloc((void**)&(synapseNums), sizeof(int)*(sTypeNum+1)));
-	checkCudaErrors(cudaMemcpy(synapseNums, pCpuNet->synapseNums, sizeof(int)*(sTypeNum+1), cudaMemcpyHostToDevice));
+	//int *g_neuronNums = NULL, *g_synapseNums = NULL;
+	//checkCudaErrors(cudaMalloc((void**)&(g_neuronNums), sizeof(int)*(nTypeNum+1)));
+	//checkCudaErrors(cudaMemcpy(g_neuronNums, pCpuNet->neuronNums, sizeof(int)*(nTypeNum+1), cudaMemcpyHostToDevice));
+	//checkCudaErrors(cudaMalloc((void**)&(g_synapseNums), sizeof(int)*(sTypeNum+1)));
+	//checkCudaErrors(cudaMemcpy(g_synapseNums, pCpuNet->synapseNums, sizeof(int)*(sTypeNum+1), cudaMemcpyHostToDevice));
 
-	int *gNeuronNums = NULL, *gSynapseNums = NULL;
-	checkCudaErrors(cudaMalloc((void**)&(gNeuronNums), sizeof(int)*(nTypeNum+1)));
-	checkCudaErrors(cudaMemcpy(gNeuronNums, pCpuNet->gNeuronNums, sizeof(int)*(nTypeNum+1), cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaMalloc((void**)&(gSynapseNums), sizeof(int)*(sTypeNum+1)));
-	checkCudaErrors(cudaMemcpy(gSynapseNums, pCpuNet->gSynapseNums, sizeof(int)*(sTypeNum+1), cudaMemcpyHostToDevice));
+	//int *g_gNeuronNums = NULL, *g_gSynapseNums = NULL;
+	//checkCudaErrors(cudaMalloc((void**)&(g_gNeuronNums), sizeof(int)*(nTypeNum+1)));
+	//checkCudaErrors(cudaMemcpy(g_gNeuronNums, pCpuNet->gNeuronNums, sizeof(int)*(nTypeNum+1), cudaMemcpyHostToDevice));
+	//checkCudaErrors(cudaMalloc((void**)&(g_gSynapseNums), sizeof(int)*(sTypeNum+1)));
+	//checkCudaErrors(cudaMemcpy(g_gSynapseNums, pCpuNet->gSynapseNums, sizeof(int)*(sTypeNum+1), cudaMemcpyHostToDevice));
 
-	int *nOffsets = NULL, *sOffsets = NULL;
-	checkCudaErrors(cudaMalloc((void**)&(nOffsets), sizeof(int)*(nTypeNum)));
-	checkCudaErrors(cudaMemcpy(nOffsets, pCpuNet->nOffsets, sizeof(int)*(nTypeNum), cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaMalloc((void**)&(sOffsets), sizeof(int)*(sTypeNum)));
-	checkCudaErrors(cudaMemcpy(sOffsets, pCpuNet->sOffsets, sizeof(int)*(sTypeNum), cudaMemcpyHostToDevice));
+	//int *nOffsets = NULL, *sOffsets = NULL;
+	//checkCudaErrors(cudaMalloc((void**)&(g_nOffsets), sizeof(int)*(nTypeNum)));
+	//checkCudaErrors(cudaMemcpy(g_nOffsets, pCpuNet->nOffsets, sizeof(int)*(nTypeNum), cudaMemcpyHostToDevice));
+	//checkCudaErrors(cudaMalloc((void**)&(g_sOffsets), sizeof(int)*(sTypeNum)));
+	//checkCudaErrors(cudaMemcpy(g_sOffsets, pCpuNet->sOffsets, sizeof(int)*(sTypeNum), cudaMemcpyHostToDevice));
 
 	//TODO support multitype N and S
 	void **pNs = (void**)malloc(sizeof(void*)*nTypeNum);
@@ -68,119 +71,94 @@ GNetwork* copyDataToGPU(GNetwork *pCpuNet)
 
 	}
 
-	//GLIFNeurons *pNTmp = (GLIFNeurons*)malloc(sizeof(GLIFNeurons));
-	//memcpy(pNTmp, pN, sizeof(GLIFNeurons));
-	//GExpSynapses *pSTmp = (GExpSynapses*)malloc(sizeof(GExpSynapses));
-	//memcpy(pSTmp, pS, sizeof(GExpSynapses));
+	N2SConnection * pConnection = (N2SConnection*)malloc(sizeof(N2SConnection));
+	N2SConnection * g_pConnection = NULL;
+	int *g_pSynapsesIdx = NULL, g_delayStart = NULL, g_delayNum = NULL;
+	checkCudaErrors(cudaMalloc((void**)&(g_pSynapsesIdx), sizeof(int)*totalSynapseNum);
+	checkCudaErrors(cudaMemcpy(g_pSynapsesIdx, pCpuNet->pN2SConnection->pSynapsesIdx, sizeof(int)*totalSynapseNum, cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMalloc((void**)&(g_delayStart), sizeof(int)*totalNeuronNum*MAX_DELAY);
+	checkCudaErrors(cudaMemcpy(g_delayStart, pCpuNet->pN2SConnection->delayStart, sizeof(int)*totalNeuronNum*MAX_DELAY, cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMalloc((void**)&(g_delayNum), sizeof(int)*totalNeuronNum*MAX_DELAY);
+	checkCudaErrors(cudaMemcpy(g_delayNum, pCpuNet->pN2SConnection->delayNum, sizeof(int)*totalNeuronNum*MAX_DELAY, cudaMemcpyHostToDevice));
+	pConnection->pSynapsesIdx = g_pSynapsesIdx;
+	pConnection->delayStart = g_delayStart;
+	pConnection->delayNum = g_delayNum;
+	checkCudaErrors(cudaMalloc((void**)&(g_pConnection), sizeof(N2SConnection));
+	checkCudaErrors(cudaMemcpy(g_pConnection, pConnection, sizeof(N2SConnection), cudaMemcpyHostToDevice));
+	free(pConnection);
 
-	//GLIFNeurons *pNGpu;
-	//GExpSynapses *pSGpu;
 
-	//pN->allocGNeurons((GLIFNeurons*)pNTmp);
-	//pS->allocGSynapses((GExpSynapses*)pSTmp);
-	
-	//checkCudaErrors(cudaMalloc((void**)&(pNGpu), sizeof(GLIFNeurons)));
-	//checkCudaErrors(cudaMemcpy(pNGpu, pNTmp, sizeof(GLIFNeurons), cudaMemcpyHostToDevice));
-	//checkCudaErrors(cudaMalloc((void**)&(pSGpu), sizeof(GExpSynapses)));
-	//checkCudaErrors(cudaMemcpy(pSGpu, pSTmp, sizeof(GExpSynapses), cudaMemcpyHostToDevice));
-	//free(pNTmp);
-	//free(pSTmp);
+	tmpNet->pNeurons = pNs;
+	tmpNet->pSynapses = pSs;
+	tmpNet->pN2SConnection = g_pConnection;
+	tmpNet->nOffsets = pCpuNet->noffsets;
+	tmpNet->sOffsets = pCpuNet->sOffsets;
+	tmpNet->neuronNums = pCpuNet->neuronNums;
+	tmpNet->synapseNums = pCpuNet->synapseNums;
 
-	void **pNeurons = NULL, **pSynapses = NULL;
-	checkCudaErrors(cudaMalloc((void**)&(pNeurons), sizeof(void*)*nTypeNum));
-	checkCudaErrors(cudaMemcpy(pNeurons, pNs, sizeof(void*)*nTypeNum, cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaMalloc((void**)&(pSynapses), sizeof(void*)*sTypeNum));
-	checkCudaErrors(cudaMemcpy(pSynapses, pSs, sizeof(void*)*sTypeNum, cudaMemcpyHostToDevice));
-	free(pNs);
-	free(pSs);
-
-	tmpNet->pNeurons = pNeurons;
-	tmpNet->pSynapses = pSynapses;
-	tmpNet->nOffsets = nOffsets;
-	tmpNet->sOffsets = sOffsets;
-	tmpNet->neuronNums = neuronNums;
-	tmpNet->synapseNums = synapseNums;
-
-	tmpNet->nTypes = nTypes;
-	tmpNet->sTypes = sTypes;
-	tmpNet->gNeuronNums = gNeuronNums;
-	tmpNet->gSynapseNums = gSynapseNums;
+	tmpNet->nTypes = pCpuNet->nTypes;
+	tmpNet->sTypes = pCpuNet->sTypes;
+	tmpNet->gNeuronNums = pCpuNet->gNeuronNums;
+	tmpNet->gSynapseNums = pCpuNet->gSynapseNums;
 
 	return tmpNet;
-
-	//GNetwork *pGpuNet;
-	//checkCudaErrors(cudaMalloc((void**)&(pGpuNet), sizeof(GNetwork)));
-	//checkCudaErrors(cudaMemcpy(pGpuNet, tmpNet, sizeof(GNetwork), cudaMemcpyHostToDevice));
-	//free(tmpNet);
-
-	//return pGpuNet;
 }
 
 
-int freeGPUData(GNetwork *pGpuNet)
+int freeGPUNetwork(GNetwork *pGpuNet)
 {
 	GNetwork *pTmpNet = pGpuNet;
-	//GNetwork *pTmpNet = (GNetwork*)malloc(sizeof(GNetwork));
-	//checkCudaErrors(cudaMemcpy(pTmpNet, pGpuNet, sizeof(GLIFNeurons), cudaMemcpyDeviceToHost));
 
 	int nTypeNum = pTmpNet->nTypeNum;
 	int sTypeNum = pTmpNet->sTypeNum;
 
-	void **pTmpNs = (void**)malloc(sizeof(void*) * nTypeNum);
-	checkCudaErrors(cudaMemcpy(pTmpNs, pTmpNet->pNeurons, sizeof(void*)*nTypeNum, cudaMemcpyDeviceToHost));
-	void **pTmpSs = (void**)malloc(sizeof(void*) * sTypeNum);
-	checkCudaErrors(cudaMemcpy(pTmpSs, pTmpNet->pSynapses, sizeof(void*)*sTypeNum, cudaMemcpyDeviceToHost));
-
-	Type * pTmpNT = (Type*)malloc(sizeof(Type)*nTypeNum);
-	checkCudaErrors(cudaMemcpy(pTmpNT, pTmpNet->nTypes, sizeof(Type)*nTypeNum, cudaMemcpyDeviceToHost));
-	Type * pTmpST = (Type*)malloc(sizeof(Type)*sTypeNum);
-	checkCudaErrors(cudaMemcpy(pTmpST, pTmpNet->sTypes, sizeof(Type)*sTypeNum, cudaMemcpyDeviceToHost));
+	//Type * pTmpNT = (Type*)malloc(sizeof(Type)*nTypeNum);
+	//checkCudaErrors(cudaMemcpy(pTmpNT, pTmpNet->nTypes, sizeof(Type)*nTypeNum, cudaMemcpyDeviceToHost));
+	//Type * pTmpST = (Type*)malloc(sizeof(Type)*sTypeNum);
+	//checkCudaErrors(cudaMemcpy(pTmpST, pTmpNet->sTypes, sizeof(Type)*sTypeNum, cudaMemcpyDeviceToHost));
 
 	for (int i=0; i<nTypeNum; i++) {
 		void *pTmpN = createType[pTmpNT[i]]();
-		checkCudaErrors(cudaMemcpy(pTmpN, pTmpNs[i], getSize[pTmpNT[i]](), cudaMemcpyDeviceToHost));
+		checkCudaErrors(cudaMemcpy(pTmpN, pTmpNet->pNeurons[i], getSize[pTmpNT[i]](), cudaMemcpyDeviceToHost));
 		cudaFreeType[pTmpNT[i]](pTmpN);
+		checkCudaErrors(cudaFree(pTmpNet->pNeurons[i]));
 		free(pTmpN);
 	}
 
 	for (int i=0; i<sTypeNum; i++) {
 		void *pTmpS = createType[pTmpST[i]]();
-		checkCudaErrors(cudaMemcpy(pTmpS, pTmpSs[i], getSize[pTmpST[i]](), cudaMemcpyDeviceToHost));
+		checkCudaErrors(cudaMemcpy(pTmpS, pTmpNet->pSynapses[i], getSize[pTmpST[i]](), cudaMemcpyDeviceToHost));
 		cudaFreeType[pTmpST[i]](pTmpS);
+		checkCudaErrors(cudaFree(pTmpNet->pSynapses[i]));
 		free(pTmpS);
 	}
 
-        //GLIFNeurons *pN = (GLIFNeurons*)pGpuNet->pNeurons;
-	//GExpSynapses *pS = (GExpSynapses*)pGpuNet->pSynapses;
+	N2SConnection * pConnection = (N2SConnection*)malloc(sizeof(N2SConnection));
+	checkCudaErrors(cudaMemcpy(pConnection, pTmpNet->pN2SConnection, sizeof(N2SConnection), cudaMemcpyDeviceToHost));
+	checkCudaErrors(cudaFree(pConnection->pSynapsesIdx));
+	checkCudaErrors(cudaFree(pConnection->delayStart));
+	checkCudaErrors(cudaFree(pConnection->delayNum));
+	checkCudaErrors(cudaFree(pTmpNet->pN2SConnection));
+	free(pConnection);
 
-	//GLIFNeurons *pNTmp = (GLIFNeurons*)malloc(sizeof(GLIFNeurons));
-	//GExpSynapses *pSTmp = (GExpSynapses*)malloc(sizeof(GExpSynapses));
-	//checkCudaErrors(cudaMemcpy(pNTmp, pN, sizeof(GLIFNeurons), cudaMemcpyDeviceToHost));
-	//checkCudaErrors(cudaMemcpy(pSTmp, pS, sizeof(GExpSynapses), cudaMemcpyDeviceToHost));
+	//checkCudaErrors(cudaFree(pTmpNet->nTypes));
+	//checkCudaErrors(cudaFree(pTmpNet->sTypes));
+	//free(pTmpNT);
+	//free(pTmpST);
 
-	//freeGNeurons(pNTmp);
-	//freeGSynapses(pSTmp);
+	//checkCudaErrors(cudaFree(pTmpNet->gNeuronNums));
+	//checkCudaErrors(cudaFree(pTmpNet->gSynapseNums));
 
+	//checkCudaErrors(cudaFree(pTmpNet->neuronNums));
+	//checkCudaErrors(cudaFree(pTmpNet->synapseNums));
 
-	checkCudaErrors(cudaFree(pTmpNet->nTypes));
-	checkCudaErrors(cudaFree(pTmpNet->sTypes));
-	free(pTmpNT);
-	free(pTmpST);
+	//checkCudaErrors(cudaFree(pTmpNet->nOffsets));
+	//checkCudaErrors(cudaFree(pTmpNet->sOffsets));
 
-	checkCudaErrors(cudaFree(pTmpNet->gNeuronNums));
-	checkCudaErrors(cudaFree(pTmpNet->gSynapseNums));
-
-	checkCudaErrors(cudaFree(pTmpNet->neuronNums));
-	checkCudaErrors(cudaFree(pTmpNet->synapseNums));
-
-	checkCudaErrors(cudaFree(pTmpNet->nOffsets));
-	checkCudaErrors(cudaFree(pTmpNet->sOffsets));
-
-	checkCudaErrors(cudaFree(pTmpNet->pNeurons));
-	checkCudaErrors(cudaFree(pTmpNet->pSynapses));
-	free(pTmpNs);
-	free(pTmpSs);
-	//checkCudaErrors(cudaFree(pGpuNet));
+	free(pTmpNet->pNeurons);
+	free(pTmpNet->pSynapses);
+	//free(pTmpNs);
+	//free(pTmpSs);
 	free(pTmpNet);
 
 	return 0;

@@ -9,9 +9,9 @@
 
 struct N2SConnection {
 	int *pSynapsesIdx; 
-	int synapsesNum; 
+	//int synapsesNum; 
 	int *delayStart;
-	int *delayEnd;
+	int *delayNum;
 };
 
 #endif /* CONNECTION_H */

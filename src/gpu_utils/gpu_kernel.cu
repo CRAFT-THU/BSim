@@ -9,21 +9,19 @@ __device__ int gCurrentTime;
 __device__ int *gTimeTable;
 __device__ int gTimeTableSize;
 __device__ real *gNeuronInput;
-__device__ int gNeuronNum;
 __device__ int *gFiredTable;
 __device__ int gFiredTableLoc;
 __device__ int gFiredTableSize;
-__device__ int gFiredCnt;
-__device__ int gFiredCntTest;
-//__device__ bool *gSynapsesFiredTable;
-//__device__ int gSynapsesFiredTableSize;
-__device__ GNetwork *gGpuNet;
+__device__ int *gActiveFiredTableSize;
 
 __device__ int *gActiveTable;
 __device__ int gActiveTableLoc;
 __device__ int *gSynapsesFiredTable;
+__device__ int gSynapsesFiredTableSize;
 __device__ int *gSynapsesLogTable;
 __device__ int gSynapsesLogTableSize;
+
+__device__ real *gNeuronInput;
 
 
 __device__ int commit2globalTable(int *shared_buf, volatile unsigned int size, int *global_buf, int * global_size, int offset) 
@@ -37,7 +35,6 @@ __device__ int commit2globalTable(int *shared_buf, volatile unsigned int size, i
 	for (int idx=threadIdx.x; idx<size; idx+=blockDim.x) {
 		global_buf[offset + start_loc + idx] = shared_buf[idx];
 	}
-
 }
 
 __device__ int updateTimeTable(int simTime)
@@ -47,13 +44,6 @@ __device__ int updateTimeTable(int simTime)
 		gCurrentTime = (gCurrentTime +1)%(MAX_DELAY + 1);
 	}
 	__syncthreads();
-	return 0;
-}
-
-__device__ int updateFiredTable(int firedID, int fired, int simTime)
-{
-	gFiredTable[gCurrentTime*gFiredTableSize + firedID] = fired;
-
 	return 0;
 }
 
@@ -231,81 +221,110 @@ __global__ void update_lif_neuron(GLIFNeurons *d_neurons, int num, int start_id,
 			}
 		}
 	}
-}
-__global__ void init_global(int max_delay, int *c_gTimeTable, real *c_gNeuronInput, int *c_gFiredTable, int c_gFiredTableSize, bool *c_gSynapsesFiredTable, int c_gSynapsesFiredTableSize, GNetwork* network) 
-{
-	if ((threadIdx.x == 0) && (blockIdx.x == 0)) {
-		MAX_DELAY = max_delay;
-		gCurrentTime = 0;
-		gTimeTable = c_gTimeTable;
-		gTimeTableSize = MAX_DELAY + 1;
-		gNeuronInput = c_gNeuronInput;
-		gNeuronNum = c_gFiredTableSize;
-		gFiredTable = c_gFiredTable;
-		gFiredTableLoc = 0;
-		gFiredTableSize = c_gFiredTableSize;
-		gSynapsesFiredTable = c_gSynapsesFiredTable;
-		gSynapsesFiredTableSize = c_gSynapsesFiredTableSize;
-		gFiredCnt = 0;
-		gFiredCntTest = 0;
-		gGpuNet = network;
+	__syncthreads();
+	if (threadIdx.x == 0 && blockIdx.x == 0) {
+		gActiveTableLoc = 0;
 	}
 }
 
 __global__ void update_pre_synapse(GNetwork *d_net, int simTime)
 {
+	updateTimeTable(simTime);
+	__syncthreads();
 	for (int time = 0; time<MAX_DELAY+1; time++) {
 		int tid = blockIdx.x * blockDim.x + threadIdx.x;
-		int start_t = gTimeTable[time];
-		for (int idx = tid; idx < gFiredTableSize; idx += blockDim.x*gridDim.x) {
-			int nid = idx;
-			int offset = 0;
-			int type = get_type(d_net->neuronNums, d_net->nTypeNum, nid, &offset);
-			int gnid = get_gnid(d_net, type, offset);
-			if (gFiredTable[time*gFiredTableSize + gnid] > 0) {
-				update_spike[d_net->nTypes[type]](d_net->pNeurons[type], d_net->neuronNums[type+1]-d_net->neuronNums[type], offset, start_t, simTime);
+		int firedSize = gActiveFiredTableSize[time];
+		int delta_t = simTime - gTimeTable[time]-1;
+		if (delta_t < 0) {
+			continue;
+		}
+		for (int idx = tid; idx < firedSize; idx += blockDim.x*gridDim.x) {
+			int nid = gFiredTable[time*gFiredTableSize + idx];
+			int start_loc = d_net->pN2SConnections[nid].delayStart[delta_t];
+			int synapseNum = d_net->pN2SConnections[nid].delayNum[delta_t];
+			int offset = atomicadd(&gActiveFiredTableLoc, synapseNum);
+			for (int i=0; i<synapseNum; i++) {
+				gSynapsesFiredTable[offset+i] = d_net->pN2SConnections[nid].pSynapsesIdx[i+start_loc];
 			}
 		}
 	}
 	__syncthreads();
 }
 
-__global__ void update_post_synapse(GNetwork *d_net, int simTime)
+__global__ void update_exp_hit(GExpSynapses *d_synapses, int num, int start_id, int simTime)
 {
 	int tid = blockIdx.x * blockDim.x + threadIdx.x;
-	int num = d_net->synapseNums[d_net->sTypeNum];
-	for (int idx = tid; idx<num; idx += blockDim.x*gridDim.x) {
-		int sid = idx;
-		int offset = 0;
-		int type = get_type(d_net->synapseNums, d_net->sTypeNum, sid, &offset);
-		int gsid = get_gsid(d_net, type, offset);
-		if (gSynapsesFiredTable[gsid]) {
-			update_spike[d_net->sTypes[type]](d_net->pSynapses[type], d_net->synapseNums[type+1]-d_net->neuronNums[type], offset, 0, simTime);
-			gSynapsesFiredTable[gsid] = false;
-		}
+	for (int idx = tid; idx < gSynapsesFiredTableLoc; idx += blockDim.x*gridDim.x) {
+		int sid = gSynapsesFiredTable[idx];
+		d_synapses->p_I_syn[sid] += d_synapses->p_weight[sid];
+		d_synapses->p_I_syn[sid] *= d_synapses->p_C1[sid];
+		gSynapsesLogTable[sid] = simTime;
+		atomicAdd(&(gNeuronInput[d_synapses->pDst[sid]]), d_synapses->p_I_syn[sid])
 	}
+	__syncthreads();
+
 }
 
-__global__ void update_pre_synapse(GLIFNeurons *d_neurons, GExpSynapses* d_synapses, int simTime)
+__global__ void find_exp_synapse(GLIFNeurons *d_neurons, int num, int start_id, int simTime)
 {
-	for (int time = 0; time<MAX_DELAY+1; time++) {
-		int tid = blockIdx.x * blockDim.x + threadIdx.x;
-		int start_t = gTimeTable[time];
-		for (int idx = tid; idx < gFiredTableSize; idx += blockDim.x*gridDim.x) {
-			int nid = idx;
-			if (gFiredTable[time*gFiredTableSize + nid]) {
-				for (int i=0; i<d_neurons->pSynapsesNum[nid]; i++) {
-					int loc = d_neurons->pSynapsesLoc[nid];
-					int sid = d_neurons->pSynapsesIdx[i+loc];
-					if (simTime == start_t + d_synapses->p_delay_steps[sid])
-						gSynapsesFiredTable[d_neurons->pSynapsesIdx[i+loc]] = true;
+	__shared__ int fire_table_t[SHARED_SIZE];
+	__shared__ volatile unsigned int fire_cnt;
+
+	if (threadIdx.x == 0) {
+		fire_cnt = 0;
+	}
+	__syncthreads();
+
+	int tid = blockIdx.x * blockDim.x + threadIdx.x;
+	for (int idx = tid; idx < num; idx += blockDim.x * gridDim.x) {
+		bool fired = false;
+		int test_loc = 0;
+
+		if (idx < num) {
+			fired = gSynapsesLogTable[start_id + idx] <= simTime;
+		}
+
+		for (int i=0; i<2; i++) {
+			if (fired) {
+				test_loc = atomicadd(fire_cnt, 1);
+				if (test_loc < SHARED_SIZE) {
+					fire_table_t[test_loc] = start_id + idx;
+					fired = false;
 				}
 			}
+			__syncthreads();
+
+			if (fire_cnt >= SHARED_SIZE) {
+				commit2globalTable(fire_table_t, SHARED_SIZE, gSynapsesFiredTable, &gSynapsesFiredTableLoc, 0);
+				if (threadIdx.x == 0) {
+					fire_cnt = 0;
+				}
+			}
+			__syncthreads();
+		}
+	}
+	
+	if (fire_cnt > 0) {
+		commit2globalTable(fire_table_t, fire_cnt, gSynapsesFiredTable, &gSynapsesFiredTableLoc, 0);
+		if (threadIdx.x == 0) {
+			fire_cnt = 0;
 		}
 	}
 	__syncthreads();
+
 }
 
+__global__ void update_exp_synapse(GExpSynapses *d_synapses, int num, int start_id, int simTime)
+{
+	int tid = blockIdx.x * blockDim.x + threadIdx.x;
+	for (int idx = tid; idx < gSynapsesFiredTableLoc; idx += blockDim.x*gridDim.x) {
+		int sid = gSynapsesFiredTable[idx];
+		d_synapses->p_I_syn[sid] *= d_synapses->p_C1[sid];
+		atomicAdd(&(gNeuronInput[d_synapses->pDst[sid]]), d_synapses->p_I_syn[sid])
+
+	}
+	__syncthreads();
+}
 
 __global__ void update_basic_synapse(GBasicSynapses *d_synapses, int num, int simTime)
 {
@@ -325,14 +344,23 @@ __global__ void update_alpha_synapse(GAlphaSynapses *d_synapses, int num, int si
 	__syncthreads();
 }
 
-__global__ void update_exp_synapse(GExpSynapses *d_synapses, int num, int simTime)
+
+__global__ void init_global(int max_delay, int *c_gTimeTable, real *c_gNeuronInput, int *c_gFiredTable, int c_gFiredTableSize, bool *c_gSynapsesFiredTable, int c_gSynapsesFiredTableSize, GNetwork* network) 
 {
-	int tid = blockIdx.x * blockDim.x + threadIdx.x;
-	for (int idx = tid; idx < num; idx += blockDim.x*gridDim.x) {
-		int sid = idx;
-		if (sid < num) {
-			d_synapses->p_I_syn[sid] *= d_synapses->p_C1[sid];
-		}
+	if ((threadIdx.x == 0) && (blockIdx.x == 0)) {
+		MAX_DELAY = max_delay;
+		gCurrentTime = 0;
+		gTimeTable = c_gTimeTable;
+		gTimeTableSize = MAX_DELAY + 1;
+		gNeuronInput = c_gNeuronInput;
+		gNeuronNum = c_gFiredTableSize;
+		gFiredTable = c_gFiredTable;
+		gFiredTableLoc = 0;
+		gFiredTableSize = c_gFiredTableSize;
+		gSynapsesFiredTable = c_gSynapsesFiredTable;
+		gSynapsesFiredTableSize = c_gSynapsesFiredTableSize;
+		gFiredCnt = 0;
+		gFiredCntTest = 0;
+		//gGpuNet = network;
 	}
-	__syncthreads();
 }
