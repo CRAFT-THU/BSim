@@ -12,6 +12,32 @@
 #include "../gpu_utils/gpu_kernel.h"
 #include "SingleGPUSimulator.h"
 
+struct gpu_buffers {
+	// Arrays
+	int *gTimeTable;
+
+	// Neuron Arrays
+	real *gNeuronInput;
+
+	// Neuron Tables
+	int *gFiredTable;
+	int *gFiredTableSizes;
+
+	int *gActiveTable;
+	int gActiveTableSize;
+
+	// Synapse Tables
+	int *gSynapsesActiveTable;
+	int *gSynapsesActiveTableSize;
+
+	int *gSynapsesLogTable;
+}
+
+int global_malloc()
+{
+
+}
+
 int SingleGPUSimulator::run(real time)
 {
 	findCudaDevice(0, NULL);

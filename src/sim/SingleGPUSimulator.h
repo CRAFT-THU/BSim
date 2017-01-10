@@ -12,6 +12,8 @@ public:
 	SingleGPUSimulator(Network *network, real dt);
 	~SingleGPUSimulator();
 	virtual int run(real time);
+	int cudaAllocGlobal();
+	int cudaFreeGlobal();
 };
 
 #endif /* SINGLEGPUSIMULATOR_H */

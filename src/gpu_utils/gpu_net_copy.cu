@@ -104,7 +104,6 @@ GNetwork* copyNetworkToGPU(GNetwork *pCpuNet)
 	return tmpNet;
 }
 
-
 int freeGPUNetwork(GNetwork *pGpuNet)
 {
 	GNetwork *pTmpNet = pGpuNet;
