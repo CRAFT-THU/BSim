@@ -97,10 +97,10 @@ GNetwork* Network::buildNetwork()
 
 		int synapsesNum_t = n2siter->second.size();
 		int synapseIdx = 0;
-		for (int delay_t =0; delay_t < maxDelaySteps; delay_t++) {
+		for (int delay_t=0; delay_t < maxDelaySteps; delay_t++) {
 			delayStart[delay_t + maxDelaySteps*nid] = synapseIdx;
 			for (int i=0; i<synapsesNum_t; i++) {
-				if (id2synapse[n2siter->second.at(i)]->getDelay() == delay_t) {
+				if (id2synapse[n2siter->second.at(i)]->getDelay() == delay_t+1) {
 					map<ID, int>::iterator sid2idxiter = sid2idx.find(n2siter->second.at(i));
 					if (sid2idxiter == sid2idx.end()) {
 						printf("Can't find synapse ID %d_%d\n", n2siter->second.at(i).groupId, n2siter->second.at(i).id);

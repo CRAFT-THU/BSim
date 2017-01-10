@@ -113,7 +113,7 @@ int mpiRecvNetwork(GNetwork *network, int rank, int rankSize)
 int printNetwork(GNetwork *net, int rank)
 {
 	printf("NETWORK PRINT START...\n");
-	printf("Server: %d, nTypeNum: %d, sTypeNum: %d, MAX_DELAY: %f\n", rank, net->nTypeNum, net->sTypeNum, net->MAX_DELAY);
+	printf("Server: %d, nTypeNum: %d, sTypeNum: %d, MAX_DELAY: %d\n", rank, net->nTypeNum, net->sTypeNum, net->MAX_DELAY);
 
 	printf("NTypes:");
 	for(int i=0; i<net->nTypeNum; i++) {

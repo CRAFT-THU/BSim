@@ -101,7 +101,7 @@ int MultiGPUSimulator::run(real time)
 	//	printNetwork(pCpuNet, rank);
 	//}
 
-	GNetwork *c_pGpuNet = copyDataToGPU(pCpuNet);
+	GNetwork *c_pGpuNet = copyNetworkToGPU(pCpuNet);
 	printf("Server %d: FINISH COPY\n", rank);
 
 	GNetwork *pGpuNet;
@@ -144,7 +144,8 @@ int MultiGPUSimulator::run(real time)
 	checkCudaErrors(cudaMalloc((void**)&c_gNeuronInput, sizeof(real)*(totalNeuronNum)));
 	checkCudaErrors(cudaMemset(c_gNeuronInput, 0, sizeof(real)*(totalNeuronNum)));
 
-	init_global<<<1, 1, 0>>>(MAX_DELAY, c_gTimeTable, c_gNeuronInput, c_gFiredTable, totalNeuronNum, c_gSynapsesFiredTable, totalSynapseNum, pGpuNet);
+	//TODO: Change to init buffers
+	//init_global<<<1, 1, 0>>>(MAX_DELAY, c_gTimeTable, c_gNeuronInput, c_gFiredTable, totalNeuronNum, c_gSynapsesFiredTable, totalSynapseNum, pGpuNet);
 
 	BlockSize *updateSize = getBlockSize(thisNeuronNum, thisSynapseNum);
 	BlockSize preSize = { 0, 0, 0};

@@ -17,8 +17,8 @@ SET(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -std=c++11 -O0 -Wall -g -ggdb")
 SET(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -std=c++11 -O3")
 
 SET(CUDA_PROPAGATE_HOST_FLAGS OFF)
-SET(CUDA_NVCC_FLAGS_DEBUG "-std=c++11 -g -G")
-SET(CUDA_NVCC_FLAGS_RELEASE "-std=c++11 -O3")
+SET(CUDA_NVCC_FLAGS_DEBUG "-arch=sm_30 -std=c++11 -g -G")
+SET(CUDA_NVCC_FLAGS_RELEASE "-arch=sm_30 -std=c++11 -O3")
 
 FILE(GLOB_RECURSE CPU_SRC "src/*.cpp" "src/*.c")
 FILE(GLOB_RECURSE GPU_SRC "src/*.cu")
@@ -50,8 +50,8 @@ FOREACH(exec_path ${GPU_TEST})
 	TARGET_LINK_LIBRARIES(${exec_file} ${GPU_LIB} ${CPU_LIB} ${MPI_LIBRARIES})
 ENDFOREACH()
 
-ADD_CUSTOM_COMMAND(TARGET multi-gpusim_test
-	POST_BUILD
-	COMMAND cp ${CMAKE_BINARY_DIR}/bin/multi-gpusim_test ${CMAKE_BINARY_DIR}/../shared
-	COMMENT "Copy multi-gpusim_test to shared dir"  
-	)
+#ADD_CUSTOM_COMMAND(TARGET multi-gpusim_test
+#	POST_BUILD
+#	COMMAND cp ${CMAKE_BINARY_DIR}/bin/multi-gpusim_test ${CMAKE_BINARY_DIR}/../shared
+#	COMMENT "Copy multi-gpusim_test to shared dir"  
+#	)

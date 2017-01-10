@@ -7,37 +7,39 @@
 #include "gpu_kernel.h"
 #include "gpu_func.h"
 
-int updateConstantNeuron(void *data, int num, int simTime, BlockSize *pSize)
+int updateConstantNeuron(void *data, int num, int start_id, BlockSize *pSize)
 {
-	update_constant_neuron<<<pSize->gridSize, pSize->blockSize>>>((GConstantNeurons*)data, num, simTime);
+	update_constant_neuron<<<pSize->gridSize, pSize->blockSize>>>((GConstantNeurons*)data, num, start_id);
 
 	return 0;
 }
 
-int updateLIFNeuron(void *data, int num, int simTime, BlockSize *pSize)
+int updateLIFNeuron(void *data, int num, int start_id, BlockSize *pSize)
 {
-	update_lif_neuron<<<pSize->gridSize, pSize->blockSize>>>((GLIFNeurons*)data, num, simTime);
+	find_lif_neuron<<<pSize->gridSize, pSize->blockSize>>>((GLIFNeurons*)data, num, start_id);
+	update_lif_neuron<<<pSize->gridSize, pSize->blockSize>>>((GLIFNeurons*)data, num, start_id);
 
 	return 0;
 }
 
-int updateAlphaSynapses(void *data, int num, int simTime, BlockSize *pSize)
+int updateExpSynapses(void *data, int num, int start_id, BlockSize *pSize)
 {
-	update_alpha_synapse<<<pSize->gridSize, pSize->blockSize>>>((GAlphaSynapses*)data, num, simTime);
+	update_exp_hit<<<pSize->gridSize, pSize->blockSize>>>((GExpSynapses*)data, num, start_id);
+	update_exp_synapse<<<pSize->gridSize, pSize->blockSize>>>((GExpSynapses*)data, num, start_id);
 
 	return 0;
 }
 
-int updateExpSynapses(void *data, int num, int simTime, BlockSize *pSize)
+int updateAlphaSynapses(void *data, int num, int start_id, BlockSize *pSize)
 {
-	update_exp_synapse<<<pSize->gridSize, pSize->blockSize>>>((GExpSynapses*)data, num, simTime);
+	update_alpha_synapse<<<pSize->gridSize, pSize->blockSize>>>((GAlphaSynapses*)data, num, start_id);
 
 	return 0;
 }
 
-int updateBasicSynapses(void *data, int num, int simTime, BlockSize *pSize)
+int updateBasicSynapses(void *data, int num, int start_id, BlockSize *pSize)
 {
-	update_basic_synapse<<<pSize->gridSize, pSize->blockSize>>>((GBasicSynapses*)data, num, simTime);
+	update_basic_synapse<<<pSize->gridSize, pSize->blockSize>>>((GBasicSynapses*)data, num, start_id);
 
 	return 0;
 }
