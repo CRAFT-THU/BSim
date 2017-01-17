@@ -5,9 +5,9 @@
 #ifndef GSYNAPSE_H
 #define GSYNAPSE_H
 
-#include "GBasicSynapses.h"
+//#include "GBasicSynapses.h"
 #include "GExpSynapses.h"
-#include "GAlphaSynapses.h"
+//#include "GAlphaSynapses.h"
 
 #endif /* GSYNAPSE_H */
 

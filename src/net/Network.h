@@ -15,10 +15,10 @@
 #include "../base/Population.h"
 #include "GNetwork.h"
 
-using std::map;
 using std::pair;
 using std::find;
 using std::vector;
+using std::map;
 
 class Network {
 public:

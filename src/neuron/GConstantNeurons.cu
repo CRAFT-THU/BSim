@@ -7,18 +7,16 @@
 #include "../third_party/cuda/helper_cuda.h"
 #include "GConstantNeurons.h"
 
-int cudaAllocConstantNeurons(void *pCpu, void *pGpu)
+int cudaAllocConstantNeurons(void *pCpu, void *pGpu, int num)
 {
 	GConstantNeurons *pGpuNeurons = (GConstantNeurons*)pGpu;
 	GConstantNeurons *p = (GConstantNeurons*)pCpu;
 
-	checkCudaErrors(cudaMalloc((void**)&(pGpuNeurons->p_fire_rate), sizeof(real)*p->num));
-	checkCudaErrors(cudaMemcpy(pGpuNeurons->p_fire_rate, p->p_fire_rate, sizeof(real)*p->num, cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMalloc((void**)&(pGpuNeurons->p_fire_rate), sizeof(real)*num));
+	checkCudaErrors(cudaMemcpy(pGpuNeurons->p_fire_rate, p->p_fire_rate, sizeof(real)*num, cudaMemcpyHostToDevice));
 
-	checkCudaErrors(cudaMalloc((void**)&(pGpuNeurons->p_fire_count), sizeof(int)*p->num));
-	checkCudaErrors(cudaMemcpy(pGpuNeurons->p_fire_count, p->p_fire_count, sizeof(int)*p->num, cudaMemcpyHostToDevice));
-
-	NEURON_CONNECT_PARA_ALLOC(pGpuNeurons, p)
+	checkCudaErrors(cudaMalloc((void**)&(pGpuNeurons->p_fire_count), sizeof(int)*num));
+	checkCudaErrors(cudaMemcpy(pGpuNeurons->p_fire_count, p->p_fire_count, sizeof(int)*num, cudaMemcpyHostToDevice));
 
 	return 0;
 }
@@ -29,8 +27,6 @@ int cudaFreeConstantNeurons(void *pGpu)
 
 	checkCudaErrors(cudaFree(pGpuNeurons->p_fire_rate));
 	checkCudaErrors(cudaFree(pGpuNeurons->p_fire_count));
-
-	NEURON_CONNECT_PARA_FREE(pGpuNeurons)
 
 	return 0;
 }

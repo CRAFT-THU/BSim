@@ -8,11 +8,10 @@
 #include "Gfunc.h"
 
 
-void* (*createType[])() = { createConstantNeurons, createLIFNeurons, /*createNengoNeurons, createInputNeurons, createPossionNeurons, createProbeNeurons,*/ createBasicSynapses, createAlphaSynapses, createExpSynapses/*, createLowpassSynapses*/ };
+void* (*createType[])() = { createConstantNeurons, createLIFNeurons, /*createNengoNeurons, createInputNeurons, createPossionNeurons, createProbeNeurons, createBasicSynapses, createAlphaSynapses,*/ createExpSynapses/*, createLowpassSynapses*/ };
 
-size_t (*getSize[])() = { getConstantSize, getLIFSize, /*getNengoSize, getInputSize, getPossionSize, getProbeSize,*/ getBasicSize, getAlphaSize, getExpSize/*, getLowpassSize*/ };
+size_t (*getSize[])() = { getConstantSize, getLIFSize, /*getNengoSize, getInputSize, getPossionSize, getProbeSize, getBasicSize, getAlphaSize,*/ getExpSize/*, getLowpassSize*/ };
 
-int (*allocType[])(void *, int) = { allocConstantNeurons, allocLIFNeurons, /*allocNengoNeurons, allocInputNeurons, allocPossionNeurons, allocProbeNeurons,*/ allocBasicSynapses, allocAlphaSynapses, allocExpSynapses/*, allocLowpassSynapses*/ };
+int (*allocType[])(void *, int) = { allocConstantNeurons, allocLIFNeurons, /*allocNengoNeurons, allocInputNeurons, allocPossionNeurons, allocProbeNeurons, allocBasicSynapses, allocAlphaSynapses,*/ allocExpSynapses/*, allocLowpassSynapses*/ };
 
-int (*allocConnect[])(void *, int *, int *, int *, int) = { allocConstantConnects, allocLIFConnects, /*allocNengoConnects, allocInputConnects, allocPossionConnects, allocProbeConnects,*/ allocBasicConnects, allocAlphaConnects, allocExpConnects/*, allocLowpassConnects*/ };
-
+int (*addConnection[])(void *, int *) = { NULL, NULL, /*NULL, NULL, NULL, NULL, addBasicConnection, addAlphaConnection,*/ addExpConnection/*, addLowpassConnection*/ };

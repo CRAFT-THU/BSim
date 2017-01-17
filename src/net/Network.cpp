@@ -24,6 +24,8 @@ Network::Network()
 	maxDelaySteps = 0;
 	maxFireRate = 0.0;
 	populationNum = 0;
+	totalNeuronNum = 0;
+	totalSynapseNum = 0;
 	neuronNums.clear();
 	connectNums.clear();
 	synapseNums.clear();

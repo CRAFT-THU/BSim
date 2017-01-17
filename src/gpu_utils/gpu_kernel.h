@@ -9,6 +9,21 @@
 #include "../synapse/GSynapse.h"
 #include "../net/GNetwork.h"
 
+struct GBuffers {
+	// Neuron Arrays
+	real *c_gNeuronInput;
+	// Neuron Tables
+	int *c_gFiredTable;
+	int *c_gFiredTableSizes;
+	int *c_gActiveTable;
+	// Synapse Tables
+	int *c_gSynapsesActiveTable;
+	int *c_gSynapsesLogTable;
+
+	int *c_neuronsFired;
+	int *c_synapsesFired;
+};
+
 __global__ void init_buffers(/*int *c_gTimeTable,*/ real *c_gNeuronInput, int *c_gFiredTable, int *c_gFiredTableSizes, int *c_gActiveTable, int *c_gSynapsesFiredTable, int *c_gSynapsesLogTable);
 
 __global__ void update_time();
@@ -25,8 +40,12 @@ __global__ void update_exp_hit(GExpSynapses *d_synapses, int num, int start_id);
 
 __global__ void update_exp_synapse(GExpSynapses *d_synapses, int num, int start_id);
 
-__global__ void update_basic_synapse(GBasicSynapses *d_synapses, int num, int start_id);
-__global__ void update_alpha_synapse(GAlphaSynapses *d_synapses, int num, int start_id);
+//__global__ void update_basic_synapse(GBasicSynapses *d_synapses, int num, int start_id);
+//__global__ void update_alpha_synapse(GAlphaSynapses *d_synapses, int num, int start_id);
+
+
+GBuffers* alloc_buffers(int neuron_num, int synapse_num, int max_delay);
+int free_buffers(GBuffers *buf);
 
 #endif /* GPU_KERNEL_H */
 

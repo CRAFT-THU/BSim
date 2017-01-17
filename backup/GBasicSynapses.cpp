@@ -15,7 +15,6 @@ SYNAPSE_GPU_FUNC_BASIC(Basic)
 int allocBasicSynapses(void *pSynapses, int S)
 {
 	GBasicSynapses *p = (GBasicSynapses*)pSynapses;
-	p->num = S;
 	p->p_weight = (real*)malloc(S*sizeof(real));
 	p->p_delay_steps = (int*)malloc(S*sizeof(int));
 
@@ -37,15 +36,14 @@ void recvBasicSynapses(void **data, int rank, int rankSize)
 	GBasicSynapses *synapses = (GBasicSynapses *)malloc(sizeof(GBasicSynapses));
 
 	MPI_Status status;
-	MPI_Recv((&synapses->num), 1, MPI_INT, rank, recvTag.getID().id, MPI_COMM_WORLD, &status);
-	allocBasicSynapses(synapses, synapses->num);
-
-	int size = synapses->num;
+	int size = 0;
+	MPI_Recv(&size, 1, MPI_INT, rank, recvTag.getID().id, MPI_COMM_WORLD, &status);
+	allocBasicSynapses(synapses, size);
 
 	MPI_Recv(synapses->p_weight, sizeof(real)*size, MPI_BYTE, rank, recvTag.getID().id, MPI_COMM_WORLD, &status);
 	MPI_Recv(synapses->p_delay_steps, sizeof(int)*size, MPI_BYTE, rank, recvTag.getID().id, MPI_COMM_WORLD, &status);
 
-	int *dst = (int*)malloc(sizeof(int) * synapses->num);
+	int *dst = (int*)malloc(sizeof(int) * size);
 	MPI_Recv(dst, size, MPI_INT, rank, recvTag.getID().id, MPI_COMM_WORLD, &status);
 
 	allocBasicConnects(synapses, dst, NULL, NULL, 0);

@@ -1,5 +1,4 @@
 
-#include "../third_party/cuda/helper_cuda.h"
 #include "../utils/Gfunc.h"
 #include "gpu_func.h"
 #include "gpu_utils.h"
@@ -16,8 +15,8 @@ GNetwork* copyNetworkToGPU(GNetwork *pCpuNet)
 
 	int nTypeNum = pCpuNet->nTypeNum;
 	int sTypeNum = pCpuNet->sTypeNum;
-	int totalNeuronNum = pCpuNet->neuronNums[pCpuNet->nTypeNum+1];
-	int totalSynapseNum = pCpuNet->synapseNums[pCpuNet->sTypeNum+1];
+	int totalNeuronNum = pCpuNet->neuronNums[pCpuNet->nTypeNum];
+	int totalSynapseNum = pCpuNet->synapseNums[pCpuNet->sTypeNum];
 	int MAX_DELAY = pCpuNet->MAX_DELAY;
 
 	//Type *g_nTypes = NULL, *g_sTypes = NULL;
@@ -51,7 +50,7 @@ GNetwork* copyNetworkToGPU(GNetwork *pCpuNet)
 	for (int i=0; i<nTypeNum; i++) {
 		void *pNTmp = createType[pCpuNet->nTypes[i]]();
 		memcpy(pNTmp, pCpuNet->pNeurons[i], getSize[pCpuNet->nTypes[i]]());
-		cudaAllocType[pCpuNet->nTypes[i]](pCpuNet->pNeurons[i], pNTmp);
+		cudaAllocType[pCpuNet->nTypes[i]](pCpuNet->pNeurons[i], pNTmp, pCpuNet->neuronNums[i+1]-pCpuNet->neuronNums[i]);
 		void *pNGpu;
 		checkCudaErrors(cudaMalloc((void**)&(pNGpu), getSize[pCpuNet->nTypes[i]]()));
 		checkCudaErrors(cudaMemcpy(pNGpu, pNTmp, getSize[pCpuNet->nTypes[i]](), cudaMemcpyHostToDevice));
@@ -62,7 +61,7 @@ GNetwork* copyNetworkToGPU(GNetwork *pCpuNet)
 	for (int i=0; i<sTypeNum; i++) {
 		void *pSTmp = createType[pCpuNet->sTypes[i]]();
 		memcpy(pSTmp, pCpuNet->pSynapses[i], getSize[pCpuNet->sTypes[i]]());
-		cudaAllocType[pCpuNet->sTypes[i]](pCpuNet->pSynapses[i], pSTmp);
+		cudaAllocType[pCpuNet->sTypes[i]](pCpuNet->pSynapses[i], pSTmp, pCpuNet->synapseNums[i+1]-pCpuNet->synapseNums[i]);
 		void *pSGpu;
 		checkCudaErrors(cudaMalloc((void**)&(pSGpu), getSize[pCpuNet->sTypes[i]]()));
 		checkCudaErrors(cudaMemcpy(pSGpu, pSTmp, getSize[pCpuNet->sTypes[i]](), cudaMemcpyHostToDevice));

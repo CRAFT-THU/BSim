@@ -10,7 +10,7 @@
 extern void* (*createType[TypeSize])();
 extern size_t (*getSize[TypeSize])();
 extern int (*allocType[TypeSize])(void *, int);
-extern int (*allocConnect[TypeSize])(void *, int *, int *, int *, int);
+extern int (*addConnection[TypeSize])(void *, int *);
 
 #endif /* GFUNC_H */
 

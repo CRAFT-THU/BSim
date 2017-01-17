@@ -4,7 +4,6 @@
  */
 
 #include <vector>
-#include <map>
 #include <math.h>
 
 #include "../third_party/json/json.h"

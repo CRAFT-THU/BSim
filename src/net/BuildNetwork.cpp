@@ -26,8 +26,8 @@ GNetwork* Network::buildNetwork()
 
 	Type *pNTypes = (Type*)malloc(sizeof(Type)*neuronTypeNum);
 	Type *pSTypes = (Type*)malloc(sizeof(Type)*synapseTypeNum);
-	int *pGNeuronNums = (int*)malloc(sizeof(int)*(neuronTypeNum + 1));
-	int *pGSynapseNums = (int*)malloc(sizeof(int)*(synapseTypeNum + 1));
+	int *pGNeuronNums = (int*)malloc(sizeof(int)*(neuronTypeNum));
+	int *pGSynapseNums = (int*)malloc(sizeof(int)*(synapseTypeNum));
 	pGNeuronNums[0] = 0;
 	pGSynapseNums[0] = 0;
 
@@ -85,6 +85,7 @@ GNetwork* Network::buildNetwork()
 	int *delayStart = (int*)malloc(sizeof(int)*(this->maxDelaySteps)*totalNeuronNum);
 	int *pSynapsesIdx = (int*)malloc(sizeof(int)*totalSynapseNum);
 
+	int synapseIdx = 0;
 	for (int nid=0; nid<totalNeuronNum; nid++) {
 		map<int, ID>::iterator iter = idx2nid.find(nid);
 		if (iter == idx2nid.end()) {
@@ -92,11 +93,19 @@ GNetwork* Network::buildNetwork()
 		}
 		map<ID, vector<ID>>::iterator n2siter = n2sNetwork.find(iter->second);
 		if (n2siter == n2sNetwork.end()) {
-			printf("Cant't find neuron id %d_%d\n", iter->second.groupId, iter->second.id);
+			//printf("Cant't find neuron id %d_%d\n", iter->second.groupId, iter->second.id);
+			
+			pSynapsesIdx[synapseIdx] = -1;
+
+			for (int delay_t=0; delay_t < maxDelaySteps; delay_t++) {
+				
+				delayStart[delay_t + maxDelaySteps*nid] = synapseIdx;
+				delayNum[delay_t + maxDelaySteps*nid] = 0;
+			}
+			continue;
 		}
 
 		int synapsesNum_t = n2siter->second.size();
-		int synapseIdx = 0;
 		for (int delay_t=0; delay_t < maxDelaySteps; delay_t++) {
 			delayStart[delay_t + maxDelaySteps*nid] = synapseIdx;
 			for (int i=0; i<synapsesNum_t; i++) {
@@ -139,7 +148,7 @@ GNetwork* Network::buildNetwork()
 			pSynapsesDst[idx] = iter->second;
 		}
 
-		allocConnect[sTypes[i]](pAllSynapses[i], pSynapsesDst, NULL, NULL, synapseNums[i]);
+		addConnection[sTypes[i]](pAllSynapses[i], pSynapsesDst);
 	}
 
 	GNetwork * ret = (GNetwork*)malloc(sizeof(GNetwork));

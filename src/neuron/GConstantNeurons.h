@@ -11,8 +11,6 @@
 struct GConstantNeurons {
 	real *p_fire_rate;
 	int *p_fire_count;
-
-	NEURON_CONNECT_PARA
 };
 
 NEURON_GPU_FUNC_DEFINE(Constant)

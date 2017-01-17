@@ -8,10 +8,10 @@
 
 #include "ConstantNeuron.h"
 #include "PossionNeuron.h"
-#include "InputNeuron.h"
+//#include "InputNeuron.h"
 #include "LIFNeuron.h"
-#include "NengoNeuron.h"
-#include "ProbeNeuron.h"
+//#include "NengoNeuron.h"
+//#include "ProbeNeuron.h"
 #include "GNeuron.h"
 
 #include "../base/CompositeNeuron.h"

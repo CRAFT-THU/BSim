@@ -15,7 +15,6 @@ NEURON_GPU_FUNC_BASIC(Constant)
 
 int allocConstantNeurons(void *pCpu, int N) {
 	GConstantNeurons *p = (GConstantNeurons *)pCpu;
-	p->num = N;
 	p->p_fire_rate = (real*)malloc(N*sizeof(real));
 	p->p_fire_count = (int*)malloc(N*sizeof(int));
 	

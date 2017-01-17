@@ -6,7 +6,6 @@
 #include <sys/time.h>
 #include <stdio.h>
 
-#include "../third_party/cuda/helper_cuda.h"
 #include "../gpu_utils/gpu_utils.h"
 #include "../gpu_utils/gpu_func.h"
 #include "../gpu_utils/gpu_kernel.h"
@@ -53,45 +52,8 @@ int SingleGPUSimulator::run(real time)
 	int MAX_DELAY = pCpuNet->MAX_DELAY;
 	printf("MAX_DELAY: %lf %lf %d\n", network->maxDelay, dt, pCpuNet->MAX_DELAY);
 
-	// Arrays
-	//int *c_gTimeTable;
-	// Neuron Arrays
-	real *c_gNeuronInput;
-	// Neuron Tables
-	int *c_gFiredTable;
-	int *c_gFiredTableSizes;
-	int *c_gActiveTable;
-	// Synapse Tables
-	int *c_gSynapsesActiveTable;
-	int *c_gSynapsesLogTable;
 
-	//checkCudaErrors(cudaMalloc((void**)&c_gTimeTable, sizeof(int)*(MAX_DELAY+1)));
-	//checkCudaErrors(cudaMemset(c_gTimeTable, 0, sizeof(int)*(MAX_DELAY+1)));
-	checkCudaErrors(cudaMalloc((void**)&c_gNeuronInput, sizeof(real)*(totalNeuronNum)));
-	checkCudaErrors(cudaMemset(c_gNeuronInput, 0, sizeof(real)*(totalNeuronNum)));
-
-	checkCudaErrors(cudaMalloc((void**)&c_gFiredTable, sizeof(int)*((totalNeuronNum)*(MAX_DELAY+1))));
-	checkCudaErrors(cudaMemset(c_gFiredTable, 0, sizeof(int)*((totalNeuronNum)*(MAX_DELAY+1))));
-
-	checkCudaErrors(cudaMalloc((void**)&c_gFiredTableSizes, sizeof(int)*(MAX_DELAY+1)));
-	checkCudaErrors(cudaMemset(c_gFiredTableSizes, 0, sizeof(int)*(MAX_DELAY+1)));
-
-	checkCudaErrors(cudaMalloc((void**)&c_gActiveTable, sizeof(int)*(totalNeuronNum)));
-	checkCudaErrors(cudaMemset(c_gActiveTable, 0, sizeof(int)*(totalNeuronNum)));
-
-	checkCudaErrors(cudaMalloc((void**)&c_gSynapsesActiveTable, sizeof(int)*(totalSynapseNum)));
-	checkCudaErrors(cudaMemset(c_gSynapsesActiveTable, 0, sizeof(int)*(totalSynapseNum)));
-	
-	checkCudaErrors(cudaMalloc((void**)&c_gSynapsesLogTable, sizeof(int)*(totalSynapseNum)));
-	checkCudaErrors(cudaMemset(c_gSynapsesLogTable, 0, sizeof(int)*(totalSynapseNum)));
-
-	int timeTableCap = MAX_DELAY+1;
-	checkCudaErrors(cudaMemcpyToSymbol(&MAX_DELAY, &MAX_DELAY, sizeof(int)));
-	checkCudaErrors(cudaMemcpyToSymbol(&gTimeTableCap, &timeTableCap, sizeof(int)));
-	checkCudaErrors(cudaMemcpyToSymbol(&gFiredTableCap, &totalNeuronNum, sizeof(int)));
-	checkCudaErrors(cudaMemcpyToSymbol(&gSynapsesTableCap, &totalSynapseNum, sizeof(int)));
-
-	init_buffers<<<1, 1, 0>>>(/*c_gTimeTable,*/ c_gNeuronInput, c_gFiredTable, c_gFiredTableSizes, c_gActiveTable, c_gSynapsesActiveTable, c_gSynapsesLogTable);
+	GBuffers *buffers = alloc_buffers(totalNeuronNum, totalSynapseNum, MAX_DELAY);
 
 	BlockSize *updateSize = getBlockSize(totalNeuronNum, totalSynapseNum);
 	BlockSize preSize = { 0, 0, 0};
@@ -101,10 +63,6 @@ int SingleGPUSimulator::run(real time)
 	cudaOccupancyMaxPotentialBlockSize(&(postSize.minGridSize), &(postSize.blockSize), update_lif_neuron, 0, totalSynapseNum); 
 	postSize.gridSize = (totalSynapseNum + (postSize.blockSize) - 1) / (postSize.blockSize);
 
-	int * c_n_fired = (int*)malloc(sizeof(int)*((totalNeuronNum)));
-	int * c_s_fired = (int*)malloc(sizeof(int)*((totalSynapseNum)));
-	//real * c_n_input = (real*)malloc(sizeof(real)*((totalNeuronNum)));
-
 	vector<int> firedInfo;
 	printf("Start runing for %d cycles\n", sim_cycle);
 	struct timeval ts, te;
@@ -113,7 +71,6 @@ int SingleGPUSimulator::run(real time)
 		printf("\rCycle: %d", time);
 		fflush(stdout);
 
-		//checkCudaErrors(cudaMemcpy(c_n_input, c_gNeuronInput, sizeof(real)*(totalNeuronNum), cudaMemcpyDeviceToHost));
 		for (int i=0; i<nTypeNum; i++) {
 			updateType[pCpuNet->nTypes[i]](c_pGpuNet->pNeurons[i], c_pGpuNet->neuronNums[i+1]-c_pGpuNet->neuronNums[i], c_pGpuNet->neuronNums[i], &updateSize[c_pGpuNet->nTypes[i]]);
 		}
@@ -127,36 +84,30 @@ int SingleGPUSimulator::run(real time)
 		update_time<<<1, 1>>>();
 
 		int currentIdx = time%(MAX_DELAY+1);
-		checkCudaErrors(cudaMemcpy(c_n_fired, c_gFiredTable + totalNeuronNum*currentIdx, sizeof(int)*(totalNeuronNum), cudaMemcpyDeviceToHost));
+
+		int copySize = 0;
+		copyFromGPU<int>(&copySize, buffers->c_gFiredTableSizes + currentIdx, 1);
+		copyFromGPU<int>(buffers->c_neuronsFired, buffers->c_gFiredTable + (totalNeuronNum*currentIdx), copySize);
 
 		fprintf(logFile, "Cycle %d: ", time);
-		firedInfo.clear();
-		for (int i=0; i<pCpuNet->neuronNums[nTypeNum]; i++) {
-			if (c_n_fired[i] > 0) {
-				firedInfo.push_back(i);
+		for (int i=0; i<copySize; i++) {
+			if (i ==  0) {
+				fprintf(logFile, "%d_%d", network->idx2nid[buffers->c_neuronsFired[0]].groupId, network->idx2nid[buffers->c_neuronsFired[0]].id);
+			} else {
+				fprintf(logFile, ", %d_%d", network->idx2nid[buffers->c_neuronsFired[i]].groupId, network->idx2nid[buffers->c_neuronsFired[i]].id);
 			}
 		}
-		int size = firedInfo.size();
-		if (size > 0) {
-			fprintf(logFile, "%d_%d", network->idx2nid[firedInfo[0]].groupId, network->idx2nid[firedInfo[0]].id);
-			for (int i=1; i<size; i++) {
-				fprintf(logFile, ", %d_%d", network->idx2nid[firedInfo[i]].groupId, network->idx2nid[firedInfo[i]].id);
-			}
-		}
-		firedInfo.clear();
-		for (int i=0; i<pCpuNet->synapseNums[sTypeNum]; i++) {
-			if (c_s_fired[i]) {
-				firedInfo.push_back(i);
-			}
-		}
-		int size2 = firedInfo.size();
-		if (size2 > 0) {
-			if (size > 0) {
-				fprintf(logFile, ", ");
-			}
-			fprintf(logFile, "%d_%d", network->idx2sid[firedInfo[0]].groupId, network->idx2sid[firedInfo[0]].id);
-			for (int i=1; i<size2; i++) {
-				fprintf(logFile, ", %d_%d", network->idx2sid[firedInfo[i]].groupId, network->idx2sid[firedInfo[i]].id);
+
+		copyFromGPU<int>(buffers->c_synapsesFired, buffers->c_gSynapsesLogTable, totalSynapseNum);
+
+		int synapseCount = 0;
+		for (int i=0; i<totalSynapseNum; i++) {
+			if (buffers->c_synapsesFired[i] == sim_cycle) {
+				if (synapseCount ==  0) {
+					fprintf(logFile, "%d_%d", network->idx2sid[buffers->c_synapsesFired[0]].groupId, network->idx2sid[buffers->c_synapsesFired[0]].id);
+				} else {
+					fprintf(logFile, ", %d_%d", network->idx2sid[buffers->c_synapsesFired[i]].groupId, network->idx2sid[buffers->c_synapsesFired[i]].id);
+				}
 			}
 		}
 		fprintf(logFile, "\n");
@@ -178,13 +129,7 @@ int SingleGPUSimulator::run(real time)
 	fclose(logFile);
 	fclose(dataFile);
 
-	//checkCudaErrors(cudaFree(c_gTimeTable));
-	checkCudaErrors(cudaFree(c_gNeuronInput));
-	checkCudaErrors(cudaFree(c_gFiredTable));
-	checkCudaErrors(cudaFree(c_gActiveTable));
-	checkCudaErrors(cudaFree(c_gSynapsesActiveTable));
-	checkCudaErrors(cudaFree(c_gSynapsesLogTable));
-
+	free_buffers(buffers);
 	freeGPUNetwork(c_pGpuNet);
 
 	return 0;

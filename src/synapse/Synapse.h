@@ -5,7 +5,7 @@
 #ifndef SYNAPSE_H
 #define SYNAPSE_H
 
-#include "AlphaSynapse.h"
+//#include "AlphaSynapse.h"
 #include "ExpSynapse.h"
 #include "GSynapse.h"
 

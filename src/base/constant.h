@@ -16,10 +16,10 @@ const int WARPSIZE = 32;
 
 enum Type { 
 	Constant = 0, LIF = 1, 
-	Basic, Alpha, Exp, 
+	/*Basic, Alpha,*/ Exp, 
 	Possion, Input,
-	Nengo, Probe, 
-	Lowpass, 
+	/*Nengo, Probe, 
+	Lowpass,*/ 
 	TypeSize
 }; 
 

@@ -6,9 +6,8 @@
 #define MPI_FUNC_H
 
 #include "../net/GNetwork.h"
-#include "../neuron/GLIFNeurons.h"
-#include "../synapse/GExpSynapses.h"
-#include "../synapse/GAlphaSynapses.h"
+#include "../neuron/GNeuron.h"
+#include "../synapse/GSynapse.h"
 
 extern void (*sendType[TypeSize])(void *data, int rank, int offset, int size);
 extern void (*recvType[TypeSize])(void **data, int rank, int size);

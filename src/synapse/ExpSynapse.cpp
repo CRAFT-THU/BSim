@@ -4,7 +4,6 @@
  */
 
 #include <math.h>
-#include <map>
 
 #include "../third_party/json/json.h"
 #include "ExpSynapse.h"

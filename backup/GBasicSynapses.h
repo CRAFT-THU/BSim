@@ -12,7 +12,7 @@ struct GBasicSynapses {
 	real *p_weight;
 	int *p_delay_steps;
 
-	SYNAPSE_CONNECT_PARA
+	int *pDst;
 };
 
 SYNAPSE_GPU_FUNC_DEFINE(Basic)

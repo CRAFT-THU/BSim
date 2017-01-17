@@ -35,10 +35,6 @@ bool ID::operator==(const ID &id1)const{
 	return ((groupId == id1.groupId) && (id == id1.id));  
 }    
 
-//bool ID::operator==(const int &id1)const{  
-//	return (id == id1);  
-//}    
-
 bool ID::operator<(const ID &id1)const{  
 	if (groupId < id1.groupId) {
 		return true;
