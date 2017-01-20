@@ -67,6 +67,15 @@ __global__ void update_time()
 	__syncthreads();
 }
 
+__global__ void reset_active_synapse()
+{
+	if ((threadIdx.x == 0) && (blockIdx.x == 0)) {
+		gSynapsesActiveTableSize = 0;
+	}
+	__syncthreads();
+
+}
+
 __global__ void update_constant_neuron(GConstantNeurons *d_neurons, int num, int start_id)
 {
 	__shared__ int fire_table_t[SHARED_SIZE];
@@ -91,7 +100,7 @@ __global__ void update_constant_neuron(GConstantNeurons *d_neurons, int num, int
 				test_loc = atomicAdd((int*)&fire_cnt, 1);
 				if (test_loc < SHARED_SIZE) {
 					fire_table_t[test_loc] = start_id + idx;
-					d_neurons->p_fire_count[idx] = d_neurons->p_fire_count[idx]++;
+					d_neurons->p_fire_count[idx] = d_neurons->p_fire_count[idx] + 1;
 					fired = false;
 				}
 			}
@@ -181,10 +190,10 @@ __global__ void find_lif_neuron(GLIFNeurons *d_neurons, int num, int start_id)
 
 }
 
-__device__ void reset_lif_neuron(GLIFNeurons *d_neurons, int *shared_buf, volatile int size) 
+__device__ void reset_lif_neuron(GLIFNeurons *d_neurons, int *shared_buf, volatile int size, int start_id) 
 {
 	for (int idx=threadIdx.x; idx<size; idx+=blockDim.x) {
-		int nid = shared_buf[idx];
+		int nid = shared_buf[idx] - start_id;
 		d_neurons->p_refrac_step[nid] = d_neurons->p_refrac_time[nid] - 1;
 		d_neurons->p_vm[nid] = d_neurons->p_v_reset[nid];
 	}
@@ -206,7 +215,7 @@ __global__ void update_lif_neuron(GLIFNeurons *d_neurons, int num, int start_id)
 		int test_loc = 0;
 		if (idx < gActiveTableSize) {
 			int nid = gActiveTable[idx];
-			int gnid = start_id + gActiveTable[idx];
+			int gnid = start_id + nid; 
 			real I = gNeuronInput[gnid] + d_neurons->p_i_tmp[nid];
 			d_neurons->p_vm[nid] = d_neurons->p_vm[nid] * d_neurons->p_C1[nid] + d_neurons->p_C2[nid] * I;
 			//d_neurons->p_i_syn[nid] = 0;
@@ -225,7 +234,7 @@ __global__ void update_lif_neuron(GLIFNeurons *d_neurons, int num, int start_id)
 				__syncthreads();
 				if (fire_cnt >= SHARED_SIZE) {
 					commit2globalTable(fire_table_t, SHARED_SIZE, gFiredTable, &gFiredTableSizes[gCurrentIdx], gFiredTableCap*gCurrentIdx);
-					reset_lif_neuron(d_neurons, fire_table_t, SHARED_SIZE);
+					reset_lif_neuron(d_neurons, fire_table_t, SHARED_SIZE, start_id);
 					if (threadIdx.x == 0) {
 						fire_cnt = 0;
 					}
@@ -237,7 +246,7 @@ __global__ void update_lif_neuron(GLIFNeurons *d_neurons, int num, int start_id)
 
 		if (fire_cnt > 0) {
 			commit2globalTable(fire_table_t, fire_cnt, gFiredTable, &gFiredTableSizes[gCurrentIdx], gFiredTableCap*gCurrentIdx);
-			reset_lif_neuron(d_neurons, fire_table_t, SHARED_SIZE);
+			reset_lif_neuron(d_neurons, fire_table_t, fire_cnt, start_id);
 			if (threadIdx.x == 0) {
 				fire_cnt = 0;
 			}
@@ -275,16 +284,16 @@ __global__ void update_exp_hit(GExpSynapses *d_synapses, int num, int start_id)
 	int tid = blockIdx.x * blockDim.x + threadIdx.x;
 	for (int idx = tid; idx < gSynapsesActiveTableSize; idx += blockDim.x*gridDim.x) {
 		int sid = gSynapsesActiveTable[idx];
-		d_synapses->p_I_syn[sid] += d_synapses->p_weight[sid];
 		d_synapses->p_I_syn[sid] *= d_synapses->p_C1[sid];
-		gSynapsesLogTable[sid] = gCurrentCycle;
+		d_synapses->p_I_syn[sid] += d_synapses->p_weight[sid];
+		gSynapsesLogTable[start_id + sid] = gCurrentCycle;
 		atomicAdd(&(gNeuronInput[d_synapses->pDst[sid]]), d_synapses->p_I_syn[sid]);
 	}
 	__syncthreads();
 
 }
 
-__global__ void find_exp_synapse(GLIFNeurons *d_neurons, int num, int start_id)
+__global__ void find_exp_synapse(GExpSynapses *d_synapses, int num, int start_id)
 {
 	__shared__ int active_table_t[SHARED_SIZE];
 	__shared__ volatile unsigned int active_cnt;
@@ -307,7 +316,7 @@ __global__ void find_exp_synapse(GLIFNeurons *d_neurons, int num, int start_id)
 			if (actived) {
 				test_loc = atomicAdd((int*)&active_cnt, 1);
 				if (test_loc < SHARED_SIZE) {
-					active_table_t[test_loc] = start_id + idx;
+					active_table_t[test_loc] = idx;
 					actived = false;
 				}
 			}
@@ -339,7 +348,7 @@ __global__ void update_exp_synapse(GExpSynapses *d_synapses, int num, int start_
 	for (int idx = tid; idx < gSynapsesActiveTableSize; idx += blockDim.x*gridDim.x) {
 		int sid = gSynapsesActiveTable[idx];
 		d_synapses->p_I_syn[sid] *= d_synapses->p_C1[sid];
-		atomicAdd(&(gNeuronInput[d_synapses->pDst[sid]]), d_synapses->p_I_syn[sid]);
+		//atomicAdd(&(gNeuronInput[d_synapses->pDst[sid]]), d_synapses->p_I_syn[sid]);
 
 	}
 	__syncthreads();

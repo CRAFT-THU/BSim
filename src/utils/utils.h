@@ -8,7 +8,9 @@
 #include <stdio.h>
 
 #include "../third_party/json/json.h"
-#include "ID.h"
+#include "../base/constant.h"
+
+static bool rand_seed_inited = false;
 
 double realRandom(double range);
 
@@ -17,15 +19,16 @@ int getOffset(int *array, int size, int index);
 
 Json::Value testValue(Json::Value value, unsigned int idx);
 
-template<typename T>
-T *getRandomArray(T range, int size);
-template<typename T>
-T *getConstArray(T value, int size);
-
+real *loadArray(const char *filename, int size);
+int saveArray(const char *filename, real *array, int size);
 
 template<typename T>
 T *getRandomArray(T range, int size) {
-	srand(time(NULL));
+	if (!rand_seed_inited) {
+		srand(time(NULL));
+		rand_seed_inited = true;
+	}
+
 	T *res = new T[size];
 	for (int i=0; i<size; i++) {
 		res[i] = static_cast<T>(realRandom(static_cast<double>(range)));
@@ -44,5 +47,6 @@ T *getConstArray(T value, int size)
 
 	return res;
 }
+
 
 #endif /* UTILS_H */

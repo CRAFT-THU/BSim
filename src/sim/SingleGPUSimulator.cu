@@ -63,6 +63,13 @@ int SingleGPUSimulator::run(real time)
 	cudaOccupancyMaxPotentialBlockSize(&(postSize.minGridSize), &(postSize.blockSize), update_lif_neuron, 0, totalSynapseNum); 
 	postSize.gridSize = (totalSynapseNum + (postSize.blockSize) - 1) / (postSize.blockSize);
 
+	real *c_vm = hostMalloc<real>(totalNeuronNum);
+	GLIFNeurons *c_g_lif = copyFromGPU<GLIFNeurons>(static_cast<GLIFNeurons*>(c_pGpuNet->pNeurons[1]), 1);
+	real *c_g_vm = c_g_lif->p_vm;
+	real *c_I_syn = hostMalloc<real>(totalSynapseNum);
+	GExpSynapses *c_g_exp = copyFromGPU<GExpSynapses>(static_cast<GExpSynapses*>(c_pGpuNet->pSynapses[0]), 1);
+	real *c_g_I_syn = c_g_exp->p_I_syn;
+
 	vector<int> firedInfo;
 	printf("Start runing for %d cycles\n", sim_cycle);
 	struct timeval ts, te;
@@ -81,13 +88,14 @@ int SingleGPUSimulator::run(real time)
 			updateType[pCpuNet->sTypes[i]](c_pGpuNet->pSynapses[i], c_pGpuNet->synapseNums[i+1]-c_pGpuNet->synapseNums[i], c_pGpuNet->synapseNums[i], &updateSize[pCpuNet->nTypes[i]]);
 		}
 
-		update_time<<<1, 1>>>();
 
 		int currentIdx = time%(MAX_DELAY+1);
 
 		int copySize = 0;
 		copyFromGPU<int>(&copySize, buffers->c_gFiredTableSizes + currentIdx, 1);
 		copyFromGPU<int>(buffers->c_neuronsFired, buffers->c_gFiredTable + (totalNeuronNum*currentIdx), copySize);
+		copyFromGPU<real>(c_vm, c_g_vm, c_pGpuNet->neuronNums[2]-c_pGpuNet->neuronNums[1]);
+		copyFromGPU<real>(c_I_syn, c_g_I_syn, c_pGpuNet->synapseNums[1]-c_pGpuNet->synapseNums[0]);
 
 		fprintf(logFile, "Cycle %d: ", time);
 		for (int i=0; i<copySize; i++) {
@@ -98,19 +106,41 @@ int SingleGPUSimulator::run(real time)
 			}
 		}
 
+		fprintf(dataFile, "Cycle %d: ", time);
+		for (int i=0; i<c_pGpuNet->neuronNums[2] - c_pGpuNet->neuronNums[1]; i++) {
+			if (i ==  0) {
+				fprintf(dataFile, "%lf", c_vm[i]);
+			} else {
+				fprintf(dataFile, ", %lf", c_vm[i]);
+			}
+		}
+		for (int i=0; i<c_pGpuNet->synapseNums[1] - c_pGpuNet->synapseNums[0]; i++) {
+				fprintf(dataFile, ", %lf", c_I_syn[i]);
+		}
+		fprintf(dataFile, "\n");
+
+
 		copyFromGPU<int>(buffers->c_synapsesFired, buffers->c_gSynapsesLogTable, totalSynapseNum);
 
 		int synapseCount = 0;
-		for (int i=0; i<totalSynapseNum; i++) {
-			if (buffers->c_synapsesFired[i] == sim_cycle) {
-				if (synapseCount ==  0) {
-					fprintf(logFile, "%d_%d", network->idx2sid[buffers->c_synapsesFired[0]].groupId, network->idx2sid[buffers->c_synapsesFired[0]].id);
-				} else {
-					fprintf(logFile, ", %d_%d", network->idx2sid[buffers->c_synapsesFired[i]].groupId, network->idx2sid[buffers->c_synapsesFired[i]].id);
+		if (time > 0) {
+			for (int i=0; i<totalSynapseNum; i++) {
+				if (buffers->c_synapsesFired[i] == time) {
+					if (synapseCount ==  0) {
+						if (copySize > 0) {
+							fprintf(logFile, ", ");
+						}
+						fprintf(logFile, "%d_%d", network->idx2sid[i].groupId, network->idx2sid[i].id);
+						synapseCount++;
+					} else {
+						fprintf(logFile, ", %d_%d", network->idx2sid[i].groupId, network->idx2sid[i].id);
+					}
 				}
 			}
+			fprintf(logFile, "\n");
 		}
-		fprintf(logFile, "\n");
+
+		update_time<<<1, 1>>>();
 	}
 	gettimeofday(&te, NULL);
 	long seconds = te.tv_sec - ts.tv_sec;

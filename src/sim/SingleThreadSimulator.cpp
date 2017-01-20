@@ -71,9 +71,13 @@ int SingleThreadSimulator::run(real time)
 
 
 		int isize = info.input.size();
-		fprintf(dataFile, "%d", info.currCycle);
+		fprintf(dataFile, "Cycle %d: ", info.currCycle);
 		for (int i=0; i<isize; i++) {
-			fprintf(dataFile, ", %lf", info.input[i]);
+			if (i==0) {
+				fprintf(dataFile, "%lf", info.input[i]);
+			} else {
+				fprintf(dataFile, ", %lf", info.input[i]);
+			}
 		}
 
 		fprintf(dataFile, "\n");

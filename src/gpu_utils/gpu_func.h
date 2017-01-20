@@ -17,12 +17,27 @@ extern int (*copyType[TypeSize])(void *, void *, int, int);
 extern BlockSize * getBlockSize(int nSize, int sSize);
 
 template<typename T>
+T* hostMalloc(int size)
+{
+	T * ret;
+	checkCudaErrors(cudaMallocHost((void**)&(ret), sizeof(T) * size));
+	checkCudaErrors(cudaMemset(ret, 0, sizeof(T)*(size)));
+	return ret;
+}
+
+template<typename T>
 T* gpuMalloc(int size)
 { 
 	T * ret;
 	checkCudaErrors(cudaMalloc((void**)&(ret), sizeof(T) * size));
 	checkCudaErrors(cudaMemset(ret, 0, sizeof(T)*(size)));
 	return ret;
+}
+
+template<typename T>
+void hostFree(T* cpu)
+{
+	checkCudaErrors(cudaFreeHost(cpu));
 }
 
 template<typename T>

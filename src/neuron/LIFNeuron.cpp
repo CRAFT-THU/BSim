@@ -83,7 +83,6 @@ int LIFNeuron::update(SimInfo &info)
 	if (refrac_step > 0) {
 		--refrac_step;
 	} else {
-		info.input.push_back(i_syn);
 		real I = i_syn + i_tmp;
 		vm = C1 * vm + C2 * I;
 		
@@ -93,6 +92,8 @@ int LIFNeuron::update(SimInfo &info)
 			refrac_step = refrac_time - 1;
 			vm = v_reset;
 		}
+
+		info.input.push_back(vm);
 	}
 
 	i_syn = 0;

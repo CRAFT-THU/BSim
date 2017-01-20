@@ -75,6 +75,8 @@ int ExpSynapse::update(SimInfo &info)
 		*iter = *iter - 1;
 	}
 
+	info.input.push_back(I_syn);
+
 	return 0;
 }
 

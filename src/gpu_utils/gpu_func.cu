@@ -25,6 +25,8 @@ int updateLIFNeuron(void *data, int num, int start_id, BlockSize *pSize)
 int updateExpSynapses(void *data, int num, int start_id, BlockSize *pSize)
 {
 	update_exp_hit<<<pSize->gridSize, pSize->blockSize>>>((GExpSynapses*)data, num, start_id);
+	reset_active_synapse<<<1, 1>>>();
+	find_exp_synapse<<<pSize->gridSize, pSize->blockSize>>>((GExpSynapses*)data, num, start_id);
 	update_exp_synapse<<<pSize->gridSize, pSize->blockSize>>>((GExpSynapses*)data, num, start_id);
 
 	return 0;
