@@ -29,13 +29,15 @@ __device__ real *gNeuronInput;
 // Neuron Tables
 __device__ int *gFiredTable;
 __device__ int *gFiredTableSizes;
-
 __device__ int *gActiveTable;
 
 // Synapse Tables
 __device__ int *gSynapsesActiveTable;
-
 __device__ int *gSynapsesLogTable;
+
+// Log Arrays
+__device__ int *gLayerInput;
+__device__ real *gXInput;
 
 
 
@@ -219,6 +221,7 @@ __global__ void update_lif_neuron(GLIFNeurons *d_neurons, int num, int start_id)
 			real I = gNeuronInput[gnid] + d_neurons->p_i_tmp[nid];
 			d_neurons->p_vm[nid] = d_neurons->p_vm[nid] * d_neurons->p_C1[nid] + d_neurons->p_C2[nid] * I;
 			//d_neurons->p_i_syn[nid] = 0;
+			gXInput[gnid] += gNeuronInput[gnid];
 			gNeuronInput[gnid] = 0;
 
 			fired = d_neurons->p_vm[nid] >= d_neurons->p_v_thresh[nid];
@@ -271,6 +274,7 @@ __global__ void update_pre_synapse(N2SConnection *pConnection)
 			int start_loc = pConnection->delayStart[delta_t + nid * MAX_DELAY];
 			int synapseNum = pConnection->delayNum[delta_t + nid * MAX_DELAY];
 			int offset = atomicAdd(&gSynapsesActiveTableSize, synapseNum);
+			gLayerInput[nid]++;
 			for (int i=0; i<synapseNum; i++) {
 				gSynapsesActiveTable[offset+i] = pConnection->pSynapsesIdx[i+start_loc];
 			}
@@ -389,6 +393,14 @@ __global__ void init_buffers(/*int *c_gTimeTable,*/ real *c_gNeuronInput, int *c
 		gActiveTable = c_gActiveTable;
 		gSynapsesActiveTable = c_gSynapsesActiveTable;
 		gSynapsesLogTable = c_gSynapsesLogTable;
+	}
+}
+
+__global__ void init_log_buffers(int * layer_input, real * x_input)
+{
+	if ((threadIdx.x == 0) && (blockIdx.x == 0)) {
+		gLayerInput = layer_input;
+		gXInput = x_input;
 	}
 }
 
