@@ -22,6 +22,18 @@ double realRandom(double range)
 //	return 0;
 //}
 
+int getIndex(Type *array, int size, Type type)
+{
+	for (int i=0; i<size; i++) {
+		if (array[i] == type) {
+			return i;
+		}
+	}
+
+	printf("ERROR: Cannot find type %d !!!\n", type);
+	return 0;
+}
+
 int getType(int *array, int size, int index)
 {
 	for (int i=0; i<size; i++) {

@@ -14,6 +14,7 @@ static bool rand_seed_inited = false;
 
 double realRandom(double range);
 
+int getIndex(Type *array, int size, Type type);
 int getType(int *array, int size, int index);
 int getOffset(int *array, int size, int index);
 

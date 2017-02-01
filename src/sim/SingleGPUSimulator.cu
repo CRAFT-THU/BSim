@@ -6,6 +6,7 @@
 #include <sys/time.h>
 #include <stdio.h>
 
+#include "../utils/utils.h"
 #include "../gpu_utils/gpu_utils.h"
 #include "../gpu_utils/gpu_func.h"
 #include "../gpu_utils/gpu_kernel.h"
@@ -64,10 +65,12 @@ int SingleGPUSimulator::run(real time)
 	postSize.gridSize = (totalSynapseNum + (postSize.blockSize) - 1) / (postSize.blockSize);
 
 	real *c_vm = hostMalloc<real>(totalNeuronNum);
-	GLIFNeurons *c_g_lif = copyFromGPU<GLIFNeurons>(static_cast<GLIFNeurons*>(c_pGpuNet->pNeurons[1]), 1);
+	int lif_idx = getIndex(pCpuNet->nTypes, nTypeNum, LIF);
+	GLIFNeurons *c_g_lif = copyFromGPU<GLIFNeurons>(static_cast<GLIFNeurons*>(c_pGpuNet->pNeurons[lif_idx]), 1);
 	real *c_g_vm = c_g_lif->p_vm;
 	real *c_I_syn = hostMalloc<real>(totalSynapseNum);
-	GExpSynapses *c_g_exp = copyFromGPU<GExpSynapses>(static_cast<GExpSynapses*>(c_pGpuNet->pSynapses[0]), 1);
+	int exp_idx = getIndex(pCpuNet->sTypes, sTypeNum, Exp);
+	GExpSynapses *c_g_exp = copyFromGPU<GExpSynapses>(static_cast<GExpSynapses*>(c_pGpuNet->pSynapses[exp_idx]), 1);
 	real *c_g_I_syn = c_g_exp->p_I_syn;
 
 	vector<int> firedInfo;
@@ -94,13 +97,13 @@ int SingleGPUSimulator::run(real time)
 		int copySize = 0;
 		copyFromGPU<int>(&copySize, buffers->c_gFiredTableSizes + currentIdx, 1);
 		copyFromGPU<int>(buffers->c_neuronsFired, buffers->c_gFiredTable + (totalNeuronNum*currentIdx), copySize);
-		copyFromGPU<real>(c_vm, c_g_vm, c_pGpuNet->neuronNums[2]-c_pGpuNet->neuronNums[1]);
-		copyFromGPU<real>(c_I_syn, c_g_I_syn, c_pGpuNet->synapseNums[1]-c_pGpuNet->synapseNums[0]);
+		copyFromGPU<real>(c_vm, c_g_vm, c_pGpuNet->neuronNums[lif_idx+1]-c_pGpuNet->neuronNums[lif_idx]);
+		copyFromGPU<real>(c_I_syn, c_g_I_syn, c_pGpuNet->synapseNums[exp_idx+1]-c_pGpuNet->synapseNums[exp_idx]);
 
 		fprintf(logFile, "Cycle %d: ", time);
 		for (int i=0; i<copySize; i++) {
 			if (i ==  0) {
-				fprintf(logFile, "%d_%d", network->idx2nid[buffers->c_neuronsFired[0]].groupId, network->idx2nid[buffers->c_neuronsFired[0]].id);
+				fprintf(logFile, "%d_%d", network->idx2nid[buffers->c_neuronsFired[i]].groupId, network->idx2nid[buffers->c_neuronsFired[i]].id);
 			} else {
 				fprintf(logFile, ", %d_%d", network->idx2nid[buffers->c_neuronsFired[i]].groupId, network->idx2nid[buffers->c_neuronsFired[i]].id);
 			}
