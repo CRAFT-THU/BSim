@@ -4,7 +4,6 @@
  */
 
 #include "../../include/BSim.h"
-#include "../../src/utils.h"
 
 using namespace std;
 
