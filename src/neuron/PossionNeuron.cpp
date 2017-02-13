@@ -3,33 +3,30 @@
  * Wed January 06 2016
  */
 
-#include <stdlib.h>
-#include <time.h>
-#include <math.h>
+#include <chrono>
 
+#include "GPossionNeurons.h"
 #include "PossionNeuron.h"
-
-double uRandom()
-{
-	long f = rand();
-	while (f==0 || f==RAND_MAX)
-		f = rand();
-
-	return (double)f/RAND_MAX;
-}
 
 const Type PossionNeuron::type = Possion;
 
-PossionNeuron::PossionNeuron(ID id, double rate, double refract, double startTime)
-	:m_rate(rate), m_refract(refract), m_startTime(startTime)
+PossionNeuron::PossionNeuron(ID id, real rate, real refract, real startTime, real duration)
 {
 	this->id = id;
+	this->rate = rate;
+	this->refract = refract;
+	this->startTime = startTime;
+	this->endTime = startTime + duration;
 	file = NULL;
 	fired = false;
 	monitored = false;
-	m_fireCycle= possion(0);
-	m_startCycle = 0;
-	srand(time(NULL));
+	fireCycle= 0;
+	startCycle = 0;
+
+	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+	generator.seed(seed);
+	poisson_distribution<int> distribution_t(rate);
+	distribution.param(distribution_t.param());
 }
 
 PossionNeuron::~PossionNeuron()
@@ -40,31 +37,13 @@ PossionNeuron::~PossionNeuron()
 int PossionNeuron::reset(SimInfo &info)
 {
 	fired = false;
-	_dt = info.dt;
-	m_startCycle = m_startTime/info.dt;
-	m_fireCycle = possion(m_startCycle);
+	startCycle = (int) startTime/info.dt;
+	startCycle += distribution(generator);
+	fireCycle = startCycle;
+	endCycle = (int) endTime/info.dt;
+	refract_step = (int) refract/info.dt;
 	return 0;
 }
-
-//int PossionNeuron::fire()
-//{
-//	vector<SynapseBase*>::iterator iter;
-//	for (iter=pSynapses.begin(); iter!=pSynapses.end(); iter++) {
-//		(*iter)->recv();
-//	}
-//
-//	return 0;
-//}
-//
-//SynapseBase * PossionNeuron::addSynapse(real weight, real delay, SpikeType type, real tau, NeuronBase *pDest)
-//{
-//	ExpSynapse *tmp = new ExpSynapse(sidPool.getID(), weight, delay, 1e-3);
-//	tmp->setDst(pDest);
-//
-//	SynapseBase *ret = (SynapseBase *)tmp;
-//	pSynapses.push_back(ret);
-//	return ret;
-//}
 
 Type PossionNeuron::getType()
 {
@@ -74,10 +53,9 @@ Type PossionNeuron::getType()
 int PossionNeuron::update(SimInfo &info)
 {
 	fired = false;
-	info.input.push_back(m_fireCycle);
-	if (info.currCycle == m_fireCycle && info.currCycle >= m_startCycle) {
+	if (info.currCycle == fireCycle && fireCycle < endCycle) {
 		fired = true;
-		m_fireCycle = possion(m_fireCycle);
+		fireCycle = fireCycle + 1 + distribution(generator); 
 		fire();
 		info.fired.push_back(this->id);
 	} 
@@ -97,7 +75,7 @@ void PossionNeuron::monitor(SimInfo &info)
 			sprintf(filename, "PossionNeuron_%d_%d.log", this->id.groupId, this->id.id);
 			file = fopen(filename, "w+");
 		}
-		fprintf(file, "%d:%d:%d:%d\n", info.currCycle, m_fireCycle, m_startCycle, fired);
+		fprintf(file, "%d:%d:%d:%d\n", info.currCycle, fireCycle, startCycle, fired);
 	}
 	return;
 }
@@ -112,28 +90,22 @@ int PossionNeuron::recv(real I) {
 }
 
 size_t PossionNeuron::getSize() {
-	return 0;
+	return sizeof(GPossionNeurons);
 }
 
 
-int PossionNeuron::hardCopy(void *data, int idx)
+int PossionNeuron::hardCopy(void *data, int idx, int base, map<ID, int> &id2idx, map<int, ID> &idx2id)
 {
-	return 0;
-}
+	GPossionNeurons *p = (GPossionNeurons *) data;
+	id2idx[id] = idx + base;
+	idx2id[idx+base] = id;
 
-int PossionNeuron::possion(int input)
-{
-	bool finished = false;
-	int ret = 0;
-	while (!finished) {
-		double tmpVal = uRandom();
-		int advance = -log(tmpVal)/m_rate;
-		if (advance >= (int)(m_refract/_dt)) {
-			finished = true;
-			ret = input + 1 + advance;
-		}
-	}
-	return ret;
+	p->p_rate[idx] = rate;
+	p->p_fire_cycle[idx] = fireCycle;
+	p->p_end_cycle[idx] = endCycle;
+	p->p_refrac_step[idx] = refract_step;
+
+	return 0;
 }
 
 int PossionNeuron::getData(void *p)

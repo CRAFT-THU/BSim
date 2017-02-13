@@ -126,6 +126,74 @@ __global__ void update_constant_neuron(GConstantNeurons *d_neurons, int num, int
 	}
 }
 
+__global__ void curand_setup_kernel(curandState *state, int num)
+{
+	int id = threadIdx.x + blockIdx.x * blockDim.x;
+	if (id < num) {
+		curand_init(1234, id, 0, &state[id]); 
+	}
+}
+
+__device__ void reset_possion_neuron(GPossionNeurons *d_neurons, int *shared_buf, volatile int size, int start_id) 
+{
+	for (int idx=threadIdx.x; idx<size; idx+=blockDim.x) {
+		int nid = shared_buf[idx] - start_id;
+
+		curandState localState = d_neuron->p_state[nid];
+		int tmp = curand_possion(&localState, d_neuron->p_rate[nid]);
+		daneurons->p_fire_cycle[nid] = d_neurons->p_fire_cycle[nid] + 1 + tmp + d_neurons->p_refrac_step[nid];
+		d_neuron->p_state[nid] = localState;
+	}
+}
+
+__global__ void update_possion_neuron(GPossionNeurons *d_neurons, int num, int start_id)
+{
+	__shared__ int fire_table_t[SHARED_SIZE];
+	__shared__ volatile unsigned int fire_cnt;
+
+	if (threadIdx.x == 0) {
+		fire_cnt = 0;
+	}
+	__syncthreads();
+
+	int tid = blockIdx.x * blockDim.x + threadIdx.x;
+	for (int idx = tid; idx < num; idx += blockDim.x * gridDim.x) {
+		bool fired = false;
+		int test_loc = 0;
+
+		if (idx < num) {
+			fired = (gCurrentCycle == d_neurons->p_fire_cycle[idx]) && (gCurrentCycle <= d_neurons->p_end_cycle[idx]);
+		}
+
+		for (int i=0; i<2; i++) {
+			if (fired) {
+				test_loc = atomicAdd((int*)&fire_cnt, 1);
+				if (test_loc < SHARED_SIZE) {
+					fire_table_t[test_loc] = start_id + idx;
+					fired = false;
+				}
+			}
+			__syncthreads();
+			if (fire_cnt >= SHARED_SIZE) {
+				commit2globalTable(fire_table_t, SHARED_SIZE, gFiredTable, &(gFiredTableSizes[gCurrentIdx]), gFiredTableCap*gCurrentIdx);
+				reset_possion_neuron(d_neurons, fire_table_t, SHARED_SIZE, start_id);
+				if (threadIdx.x == 0) {
+					fire_cnt = 0;
+				}
+			}
+			__syncthreads();
+		}
+	}
+	__syncthreads();
+	
+	if (fire_cnt > 0) {
+		commit2globalTable(fire_table_t, fire_cnt, gFiredTable, &(gFiredTableSizes[gCurrentIdx]), gFiredTableCap*gCurrentIdx);
+		reset_possion_neuron(d_neurons, fire_table_t, fire_cnt, start_id);
+		if (threadIdx.x == 0) {
+			fire_cnt = 0;
+		}
+	}
+}
 __global__ void find_lif_neuron(GLIFNeurons *d_neurons, int num, int start_id)
 {
 	__shared__ int active_table_t[SHARED_SIZE];
