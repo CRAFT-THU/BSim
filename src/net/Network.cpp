@@ -13,7 +13,9 @@ Network::Network()
 	pSynapses.clear();
 	pOutputs.clear();
 	n2sNetwork.clear();
+	n2sTargetNetwork.clear();
 	s2nNetwork.clear();
+	s2nForwardNetwork.clear();
 	id2neuron.clear();
 	id2synapse.clear();
 	nid2idx.clear();
@@ -141,8 +143,11 @@ SynapseBase* Network::connect(NeuronBase *pn1, NeuronBase *pn2, real weight, rea
 	addConnectionNum(pn1->getType(), 1);
 	addSynapseNum(p->getType(), 1);
 
-	s2nNetwork[p->getID()] = pn2->getID(); 
+	n2sTargetNetwork[pn2->getID()].push_back(p->getID());
 	n2sNetwork[pn1->getID()].push_back(p->getID());
+	s2nNetwork[p->getID()] = pn2->getID(); 
+	s2nForwardNetwork[p->getID()] = pn1->getID();
+
 
 	if (delay > maxDelay) {
 		maxDelay = delay;

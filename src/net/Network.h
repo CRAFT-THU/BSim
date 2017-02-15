@@ -35,6 +35,7 @@ public:
 	SynapseBase* connect(NeuronBase *pSrc, NeuronBase *pDst, real weight, real delay, SpikeType type = Excitatory, real tau = 0, bool store = true);
 	int connect(int populationIDSrc, int neuronIDSrc, int populationIDDst, int neuronIDDst, real weight, real delay, real tau = 0);
 	GNetwork* buildNetwork();
+	GNetwork* buildNetworks(int nodeNum);
 
 	int addNeuronNum(Type type, int num);
 	int addConnectionNum(Type type, int num);
@@ -58,7 +59,9 @@ public:
 	vector<NeuronBase*> pNeurons;
 	vector<SynapseBase*> pSynapses;
 	map<ID, vector<ID> > n2sNetwork;
+	map<ID, vector<ID> > n2sTargetNetwork;
 	map<ID, ID> s2nNetwork;
+	map<ID, ID> s2nForwardNetwork;
 	map<ID, NeuronBase*> id2neuron;
 	map<ID, SynapseBase*> id2synapse;
 	map<ID, int> nid2idx;
