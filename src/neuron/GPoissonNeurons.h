@@ -2,8 +2,8 @@
  * usually just for fun
  * Thu February 02 2017
  */
-#ifndef GPOSSIONNEURONS_H
-#define GPOSSIONNEURONS_H
+#ifndef GPOISSONNEURONS_H
+#define GPOISSONNEURONS_H
 
 #include <curand_kernel.h>
 #include <curand.h>
@@ -11,7 +11,7 @@
 #include "../base/constant.h"
 #include "../utils/macros.h"
 
-struct GPossionNeurons {
+struct GPoissonNeurons {
 	real *p_rate;
 	int *p_fire_cycle;
 	int *p_end_cycle;
@@ -19,7 +19,7 @@ struct GPossionNeurons {
 	curandState *p_state;
 };
 
-NEURON_GPU_FUNC_DEFINE(Possion)
+NEURON_GPU_FUNC_DEFINE(Poisson)
 
-#endif /* GPOSSIONNEURONS_H */
+#endif /* GPOISSONNEURONS_H */
 

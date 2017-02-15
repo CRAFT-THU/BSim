@@ -5,16 +5,16 @@
 
 #include <stdlib.h>
 
-#include "GPossionNeurons.h"
+#include "GPoissonNeurons.h"
 
 #include "../utils/macros.h"
 #include "../utils/IDPool.h"
 
-NEURON_GPU_FUNC_BASIC(Possion)
+NEURON_GPU_FUNC_BASIC(Poisson)
 
-int allocPossionNeurons(void *pCpu, int N)
+int allocPoissonNeurons(void *pCpu, int N)
 {
-	GPossionNeurons *p = (GPossionNeurons *)pCpu;
+	GPoissonNeurons *p = (GPoissonNeurons *)pCpu;
 	p->p_rate = (real*)malloc(N*sizeof(real));
 	p->p_fire_cycle = (int*)malloc(N*sizeof(int));
 	p->p_end_cycle = (int*)malloc(N*sizeof(int));

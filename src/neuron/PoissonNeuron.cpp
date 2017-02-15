@@ -5,12 +5,12 @@
 
 #include <chrono>
 
-#include "GPossionNeurons.h"
-#include "PossionNeuron.h"
+#include "GPoissonNeurons.h"
+#include "PoissonNeuron.h"
 
-const Type PossionNeuron::type = Possion;
+const Type PoissonNeuron::type = Poisson;
 
-PossionNeuron::PossionNeuron(ID id, real rate, real refract, real startTime, real duration)
+PoissonNeuron::PoissonNeuron(ID id, real rate, real refract, real startTime, real duration)
 {
 	this->id = id;
 	this->rate = rate;
@@ -29,12 +29,12 @@ PossionNeuron::PossionNeuron(ID id, real rate, real refract, real startTime, rea
 	distribution.param(distribution_t.param());
 }
 
-PossionNeuron::~PossionNeuron()
+PoissonNeuron::~PoissonNeuron()
 {
 	pSynapses.clear();
 }
 
-int PossionNeuron::reset(SimInfo &info)
+int PoissonNeuron::reset(SimInfo &info)
 {
 	fired = false;
 	startCycle = (int) startTime/info.dt;
@@ -45,12 +45,12 @@ int PossionNeuron::reset(SimInfo &info)
 	return 0;
 }
 
-Type PossionNeuron::getType()
+Type PoissonNeuron::getType()
 {
 	return type;
 }
 
-int PossionNeuron::update(SimInfo &info)
+int PoissonNeuron::update(SimInfo &info)
 {
 	fired = false;
 	if (info.currCycle == fireCycle && fireCycle < endCycle) {
@@ -62,17 +62,17 @@ int PossionNeuron::update(SimInfo &info)
 	return 0;
 }
 
-void PossionNeuron::monitorOn()
+void PoissonNeuron::monitorOn()
 {
 	monitored = true;
 }
 
-void PossionNeuron::monitor(SimInfo &info)
+void PoissonNeuron::monitor(SimInfo &info)
 {
 	if (monitored) {
 		if (file == NULL) {
 			char filename[128];
-			sprintf(filename, "PossionNeuron_%d_%d.log", this->id.groupId, this->id.id);
+			sprintf(filename, "PoissonNeuron_%d_%d.log", this->id.groupId, this->id.id);
 			file = fopen(filename, "w+");
 		}
 		fprintf(file, "%d:%d:%d:%d\n", info.currCycle, fireCycle, startCycle, fired);
@@ -80,23 +80,23 @@ void PossionNeuron::monitor(SimInfo &info)
 	return;
 }
 
-bool PossionNeuron::isFired()
+bool PoissonNeuron::isFired()
 {
 	return fired;
 }
 
-int PossionNeuron::recv(real I) {
+int PoissonNeuron::recv(real I) {
 	return 0;
 }
 
-size_t PossionNeuron::getSize() {
-	return sizeof(GPossionNeurons);
+size_t PoissonNeuron::getSize() {
+	return sizeof(GPoissonNeurons);
 }
 
 
-int PossionNeuron::hardCopy(void *data, int idx, int base, map<ID, int> &id2idx, map<int, ID> &idx2id)
+int PoissonNeuron::hardCopy(void *data, int idx, int base, map<ID, int> &id2idx, map<int, ID> &idx2id)
 {
-	GPossionNeurons *p = (GPossionNeurons *) data;
+	GPoissonNeurons *p = (GPoissonNeurons *) data;
 	id2idx[id] = idx + base;
 	idx2id[idx+base] = id;
 
@@ -108,7 +108,7 @@ int PossionNeuron::hardCopy(void *data, int idx, int base, map<ID, int> &id2idx,
 	return 0;
 }
 
-int PossionNeuron::getData(void *p)
+int PoissonNeuron::getData(void *p)
 {
 	return 0;
 }

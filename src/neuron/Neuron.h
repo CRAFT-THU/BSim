@@ -7,7 +7,7 @@
 
 
 #include "ConstantNeuron.h"
-#include "PossionNeuron.h"
+#include "PoissonNeuron.h"
 //#include "InputNeuron.h"
 #include "LIFNeuron.h"
 //#include "NengoNeuron.h"
@@ -28,4 +28,3 @@ typedef CompositeNeuron<LIFNeuron, ExpSynapse> IF_curr_exp;
 //typedef CompositeNeuron<MaxNeuron, BasicSynapse> MAX_curr_basic;
 
 #endif /* NEURON_H */
-

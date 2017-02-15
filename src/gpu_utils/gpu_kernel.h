@@ -5,6 +5,9 @@
 #ifndef GPU_KERNEL_H
 #define GPU_KERNEL_H
 
+#include "curand_kernel.h"
+#include "curand.h"
+
 #include "../neuron/GNeuron.h"
 #include "../synapse/GSynapse.h"
 #include "../net/GNetwork.h"
@@ -36,7 +39,7 @@ __global__ void update_pre_synapse(N2SConnection *pConnection);
 
 __global__ void update_constant_neuron(GConstantNeurons *d_neurons, int num, int start_id);
 
-__global__ void update_possion_neuron(GPossionNeurons *d_neurons, int num, int start_id);
+__global__ void update_poisson_neuron(GPoissonNeurons *d_neurons, int num, int start_id);
 
 __global__ void find_lif_neuron(GLIFNeurons *d_neurons, int num, int start_id);
 

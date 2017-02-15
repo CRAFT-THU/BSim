@@ -7,9 +7,9 @@
 #include "gpu_kernel.h"
 #include "gpu_func.h"
 
-int updatePossionNeuron(void *data, int num, int start_id, BlockSize *pSize)
+int updatePoissonNeuron(void *data, int num, int start_id, BlockSize *pSize)
 {
-	update_possion_neuron<<<pSize->gridSize, pSize->blockSize>>>((GConstantNeurons*)data, num, start_id);
+	update_poisson_neuron<<<pSize->gridSize, pSize->blockSize>>>((GPoissonNeurons*)data, num, start_id);
 
 	return 0;
 }
@@ -53,11 +53,11 @@ int updateExpSynapses(void *data, int num, int start_id, BlockSize *pSize)
 //	return 0;
 //}
 
-int (*updateType[])(void *, int, int, BlockSize*) = { updateConstantNeuron, updatePossionNeuron, updateLIFNeuron, /*updateBasicSynapses, updateAlphaSynapses,*/ updateExpSynapses };
+int (*updateType[])(void *, int, int, BlockSize*) = { updateConstantNeuron, updatePoissonNeuron, updateLIFNeuron, /*updateBasicSynapses, updateAlphaSynapses,*/ updateExpSynapses };
 
-int (*cudaAllocType[])(void *, void *, int) = { cudaAllocConstantNeurons, cudaAllocPossionNeurons, cudaAllocLIFNeurons, /*cudaAllocNengoNeurons, cudaAllocInputNeurons, cudaAllocPossionNeurons, cudaAllocProbeNeurons, cudaAllocBasicSynapses, cudaAllocAlphaSynapses,*/ cudaAllocExpSynapses/*, cudaAllocLowpassSynapses*/ };
+int (*cudaAllocType[])(void *, void *, int) = { cudaAllocConstantNeurons, cudaAllocPoissonNeurons, cudaAllocLIFNeurons, /*cudaAllocNengoNeurons, cudaAllocInputNeurons, cudaAllocPoissonNeurons, cudaAllocProbeNeurons, cudaAllocBasicSynapses, cudaAllocAlphaSynapses,*/ cudaAllocExpSynapses/*, cudaAllocLowpassSynapses*/ };
 
-int (*cudaFreeType[])(void *) = { cudaFreeConstantNeurons, cudaFreePossionNeurons, cudaFreeLIFNeurons, /*cudaFreeNengoNeurons, cudaFreeInputNeurons, cudaFreePossionNeurons, cudaFreeProbeNeurons, cudaFreeBasicSynapses, cudaFreeAlphaSynapses,*/ cudaFreeExpSynapses/*, cudaFreeLowpassSynapses*/ };
+int (*cudaFreeType[])(void *) = { cudaFreeConstantNeurons, cudaFreePoissonNeurons, cudaFreeLIFNeurons, /*cudaFreeNengoNeurons, cudaFreeInputNeurons, cudaFreePoissonNeurons, cudaFreeProbeNeurons, cudaFreeBasicSynapses, cudaFreeAlphaSynapses,*/ cudaFreeExpSynapses/*, cudaFreeLowpassSynapses*/ };
 
 BlockSize * getBlockSize(int nSize, int sSize)
 {
@@ -65,8 +65,8 @@ BlockSize * getBlockSize(int nSize, int sSize)
 	cudaOccupancyMaxPotentialBlockSize(&(ret[Constant].minGridSize), &(ret[Constant].blockSize), update_constant_neuron, 0, nSize); 
 	ret[Constant].gridSize = (nSize + (ret[Constant].blockSize) - 1) / (ret[Constant].blockSize);
 
-	cudaOccupancyMaxPotentialBlockSize(&(ret[Possion].minGridSize), &(ret[Possion].blockSize), update_possion_neuron, 0, nSize); 
-	ret[Possion].gridSize = (nSize + (ret[Possion].blockSize) - 1) / (ret[Possion].blockSize);
+	cudaOccupancyMaxPotentialBlockSize(&(ret[Poisson].minGridSize), &(ret[Poisson].blockSize), update_poisson_neuron, 0, nSize); 
+	ret[Poisson].gridSize = (nSize + (ret[Poisson].blockSize) - 1) / (ret[Poisson].blockSize);
 
 	cudaOccupancyMaxPotentialBlockSize(&(ret[LIF].minGridSize), &(ret[LIF].blockSize), update_lif_neuron, 0, nSize); 
 	ret[LIF].gridSize = (nSize + (ret[LIF].blockSize) - 1) / (ret[LIF].blockSize);

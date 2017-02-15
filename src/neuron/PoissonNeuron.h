@@ -2,8 +2,8 @@
  * usually just for fun
  * Wed January 06 2016
  */
-#ifndef POSSIONNEURON_H
-#define POSSIONNEURON_H
+#ifndef POISSONNEURON_H
+#define POISSONNEURON_H
 
 #include <stdio.h>
 #include <vector>
@@ -15,10 +15,10 @@ using std::vector;
 using std::default_random_engine;
 using std::poisson_distribution;
 
-class PossionNeuron : public NeuronBase {
+class PoissonNeuron : public NeuronBase {
 public:
-	PossionNeuron(ID id, real rate, real refract, real startTime = 0, real endTime = 1000);
-	~PossionNeuron();
+	PoissonNeuron(ID id, real rate, real refract, real startTime = 0, real endTime = 1000);
+	~PoissonNeuron();
 
 	virtual Type getType();
 
@@ -38,7 +38,7 @@ public:
 	virtual int hardCopy(void *data, int idx, int base, map<ID, int> &id2idx, map<int, ID> &idx2id);
 	virtual SynapseBase *addSynapse(real weight, real delay, SpikeType type, real tau, NeuronBase *pDest);
 
-	int possion(int input);
+	int poisson(int input);
 
 	const static Type type;
 protected:
@@ -60,5 +60,5 @@ protected:
 	FILE *file;
 };
 
-#endif /* POSSIONNEURON_H */
+#endif /* POISSONNEURON_H */
 

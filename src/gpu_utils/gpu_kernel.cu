@@ -134,19 +134,19 @@ __global__ void curand_setup_kernel(curandState *state, int num)
 	}
 }
 
-__device__ void reset_possion_neuron(GPossionNeurons *d_neurons, int *shared_buf, volatile int size, int start_id) 
+__device__ void reset_poisson_neuron(GPoissonNeurons *d_neurons, int *shared_buf, volatile int size, int start_id) 
 {
 	for (int idx=threadIdx.x; idx<size; idx+=blockDim.x) {
 		int nid = shared_buf[idx] - start_id;
 
-		curandState localState = d_neuron->p_state[nid];
-		int tmp = curand_possion(&localState, d_neuron->p_rate[nid]);
-		daneurons->p_fire_cycle[nid] = d_neurons->p_fire_cycle[nid] + 1 + tmp + d_neurons->p_refrac_step[nid];
-		d_neuron->p_state[nid] = localState;
+		curandState localState = d_neurons->p_state[nid];
+		int tmp = curand_poisson(&localState, d_neurons->p_rate[nid]);
+		d_neurons->p_fire_cycle[nid] = d_neurons->p_fire_cycle[nid] + 1 + tmp + d_neurons->p_refrac_step[nid];
+		d_neurons->p_state[nid] = localState;
 	}
 }
 
-__global__ void update_possion_neuron(GPossionNeurons *d_neurons, int num, int start_id)
+__global__ void update_poisson_neuron(GPoissonNeurons *d_neurons, int num, int start_id)
 {
 	__shared__ int fire_table_t[SHARED_SIZE];
 	__shared__ volatile unsigned int fire_cnt;
@@ -176,7 +176,7 @@ __global__ void update_possion_neuron(GPossionNeurons *d_neurons, int num, int s
 			__syncthreads();
 			if (fire_cnt >= SHARED_SIZE) {
 				commit2globalTable(fire_table_t, SHARED_SIZE, gFiredTable, &(gFiredTableSizes[gCurrentIdx]), gFiredTableCap*gCurrentIdx);
-				reset_possion_neuron(d_neurons, fire_table_t, SHARED_SIZE, start_id);
+				reset_poisson_neuron(d_neurons, fire_table_t, SHARED_SIZE, start_id);
 				if (threadIdx.x == 0) {
 					fire_cnt = 0;
 				}
@@ -188,7 +188,7 @@ __global__ void update_possion_neuron(GPossionNeurons *d_neurons, int num, int s
 	
 	if (fire_cnt > 0) {
 		commit2globalTable(fire_table_t, fire_cnt, gFiredTable, &(gFiredTableSizes[gCurrentIdx]), gFiredTableCap*gCurrentIdx);
-		reset_possion_neuron(d_neurons, fire_table_t, fire_cnt, start_id);
+		reset_poisson_neuron(d_neurons, fire_table_t, fire_cnt, start_id);
 		if (threadIdx.x == 0) {
 			fire_cnt = 0;
 		}

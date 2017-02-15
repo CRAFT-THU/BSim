@@ -5,5 +5,5 @@
 
 #include "mpi_func.h"
 
-void (*sendType[])(void *data, int rank, int offset, int size) = { sendLIFNeurons, /*sendNengoNeurons, sendInputNeurons, sendPossionNeurons, sendProbeNeurons, sendAlphaSynapses,*/ sendExpSynapses/*, sendLowpassSynapses*/ };
-void (*recvType[])(void **data, int rank, int size) = { recvLIFNeurons, /*recvNengoNeurons, recvInputNeurons, recvPossionNeurons, recvProbeNeurons, recvAlphaSynapses,*/ recvExpSynapses/*, recvLowpassSynapses*/ };
+void (*sendType[])(void *data, int rank, int offset, int size) = { sendLIFNeurons, /*sendNengoNeurons, sendInputNeurons, sendPoissonNeurons, sendProbeNeurons, sendAlphaSynapses,*/ sendExpSynapses/*, sendLowpassSynapses*/ };
+void (*recvType[])(void **data, int rank, int size) = { recvLIFNeurons, /*recvNengoNeurons, recvInputNeurons, recvPoissonNeurons, recvProbeNeurons, recvAlphaSynapses,*/ recvExpSynapses/*, recvLowpassSynapses*/ };

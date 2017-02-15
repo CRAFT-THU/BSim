@@ -15,7 +15,7 @@ const int MAXBLOCKSIZE = 1024;
 const int WARPSIZE = 32;
 
 enum Type { 
-	Constant = 0, Possion = 1,
+	Constant = 0, Poisson = 1,
 	LIF, 
 	/*Basic, Alpha,*/ Exp, 
 	/*Nengo, Probe, 

@@ -6,12 +6,12 @@
 
 #include "../gpu_utils/gpu_func.h"
 #include "../gpu_utils/gpu_kernel.h"
-#include "GPossionNeurons.h"
+#include "GPoissonNeurons.h"
 
-int cudaAllocPossionNeurons(void *pCpu, void *pGpu, int num)
+int cudaAllocPoissonNeurons(void *pCpu, void *pGpu, int num)
 {
-	GPossionNeurons *pGpuNeurons = (GPossionNeurons*)pGpu;
-	GPossionNeurons *p = (GPossionNeurons*)pCpu;
+	GPoissonNeurons *pGpuNeurons = (GPoissonNeurons*)pGpu;
+	GPoissonNeurons *p = (GPoissonNeurons*)pCpu;
 
 	pGpuNeurons->p_rate = copyToGPU<real>(p->p_rate, num);
 	pGpuNeurons->p_fire_cycle = copyToGPU<int>(p->p_fire_cycle, num);
@@ -24,9 +24,9 @@ int cudaAllocPossionNeurons(void *pCpu, void *pGpu, int num)
 	return 0;
 }
 
-int cudaFreePossionNeurons(void *pGpu)
+int cudaFreePoissonNeurons(void *pGpu)
 {
-	GPossionNeurons *pGpuNeurons = (GPossionNeurons*)pGpu;
+	GPoissonNeurons *pGpuNeurons = (GPoissonNeurons*)pGpu;
 
 	gpuFree(pGpuNeurons->p_rate);
 	gpuFree(pGpuNeurons->p_fire_cycle);
