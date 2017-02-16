@@ -5,8 +5,6 @@
 #ifndef CONNECTION_H
 #define CONNECTION_H
 
-#include "../base/constant.h"
-
 struct N2SConnection {
 	int *pSynapsesIdx; 
 	//int synapsesNum; 

@@ -38,7 +38,7 @@ int SingleThreadSimulator::run(real time)
 		fprintf(outFile, "Cycle");
 		int size = network->pOutputs.size();
 		for (int i=0; i<size; i++) {
-			fprintf(outFile, ",%d_%d", network->pOutputs[i]->getID().groupId, network->pOutputs[i]->getID().id);
+			fprintf(outFile, ",%s", network->pOutputs[i]->getID().getInfo().c_str());
 		}
 		fprintf(outFile, "\n");
 	}
@@ -85,9 +85,9 @@ int SingleThreadSimulator::run(real time)
 		int size = info.fired.size();
 		fprintf(logFile, "Cycle %d: ", info.currCycle);
 		if (size > 0) {
-			fprintf(logFile, "%d_%d", info.fired[0].groupId, info.fired[0].id);
+			fprintf(logFile, "%s", info.fired[0].getInfo().c_str());
 			for (int i=1; i<size; i++) {
-				fprintf(logFile, ", %d_%d", info.fired[i].groupId, info.fired[i].id);
+				fprintf(logFile, ", %s", info.fired[i].getInfo().c_str());
 			}
 		}
 		fprintf(logFile, "\n");

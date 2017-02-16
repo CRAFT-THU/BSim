@@ -8,7 +8,7 @@
 #include <curand_kernel.h>
 #include <curand.h>
 
-#include "../base/constant.h"
+#include "../base/type.h"
 #include "../utils/macros.h"
 
 struct GPoissonNeurons {

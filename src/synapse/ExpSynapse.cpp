@@ -102,7 +102,7 @@ void ExpSynapse::monitor(SimInfo &info)
 	if (monitored) {
 		if (file == NULL) {
 			char filename[128];
-			sprintf(filename, "Synapse_%d.log", id.id);
+			sprintf(filename, "Synapse_%d.log", id.getID());
 			file = fopen(filename, "w+");
 			if (file == NULL) {
 				printf("Open file %s failed\n", filename);

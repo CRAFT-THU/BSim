@@ -5,25 +5,15 @@
 #ifndef CONSTANT_H
 #define CONSTANT_H
 
-#include <string.h>
+#include <stddef.h>
 
 #define MPI_CREAL MPI_FLOAT
+
 typedef float real;
 const real ZERO = 1e-10;
 
 const int MAXBLOCKSIZE = 1024;
 const int WARPSIZE = 32;
-
-enum Type { 
-	Constant = 0, Poisson = 1,
-	LIF, 
-	/*Basic, Alpha,*/ Exp, 
-	/*Nengo, Probe, 
-	Lowpass,*/ 
-	TypeSize
-}; 
-
-enum SpikeType { Excitatory = 0, Inhibitory = 1, None = 2};
 
 #endif /* CONSTANT_H */
 

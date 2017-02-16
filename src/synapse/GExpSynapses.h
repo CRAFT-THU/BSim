@@ -6,7 +6,7 @@
 #define GEXPSYNAPSES_H
 
 #include "../utils/macros.h"
-#include "../base/constant.h"
+#include "../base/type.h"
 
 struct GExpSynapses {
 	real *p_weight;

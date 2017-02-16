@@ -9,8 +9,8 @@
 #include "../neuron/GNeuron.h"
 #include "../synapse/GSynapse.h"
 
-extern void (*sendType[TypeSize])(void *data, int rank, int offset, int size);
-extern void (*recvType[TypeSize])(void **data, int rank, int size);
+extern void (*sendType[TYPESIZE])(void *data, int rank, int offset, int size);
+extern void (*recvType[TYPESIZE])(void **data, int rank, int size);
 
 #endif /* MPI_FUNC_H */
 

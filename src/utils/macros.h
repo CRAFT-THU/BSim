@@ -5,6 +5,8 @@
 #ifndef MACROS_H
 #define MACROS_H
 
+#include <stddef.h>
+
 #define NEURON_GPU_FUNC_DEFINE(name) \
 	void* create##name##Neurons(); \
 	size_t get##name##Size(); \

@@ -5,8 +5,8 @@
 #ifndef GCONSTANTNEURONS_H
 #define GCONSTANTNEURONS_H
 
+#include "../base/type.h"
 #include "../utils/macros.h"
-#include "../base/constant.h"
 
 struct GConstantNeurons {
 	real *p_fire_rate;

@@ -30,7 +30,12 @@ int NeuronBase::fire()
 	return 0;
 }
 
-SynapseBase * NeuronBase::addSynapse(real weight, real delay, SpikeType type, real tau, NeuronBase *dst) 
+SynapseBase * NeuronBase::createSynapse(real weight, real delay, SpikeType type, real tau, NeuronBase *dst) 
+{
+	return NULL;
+}
+
+SynapseBase * NeuronBase::addSynapse(SynapseBase * synapse)
 {
 	return NULL;
 }

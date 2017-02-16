@@ -75,7 +75,7 @@ void ConstantNeuron::monitor(SimInfo &info)
 	if (monitored) {
 		if (file == NULL) {
 			char filename[128];
-			sprintf(filename, "ConstantNeuron_%d_%d.log", this->id.groupId, this->id.id);
+			sprintf(filename, "ConstantNeuron_%s.log", this->id.getInfo().c_str());
 			file = fopen(filename, "w+");
 			if (file == NULL) {
 				printf("Open File: %s failed\n", filename);

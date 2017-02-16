@@ -20,7 +20,8 @@ public:
 	CompositeNeuron(const Neuron &templ, ID id);
 	~CompositeNeuron();
 
-	SynapseBase* addSynapse(real weight, real delay, SpikeType type, real tau, NeuronBase *pDest);
+	SynapseBase* addSynapse(SynapseBase *synapse);
+	SynapseBase* createSynapse(real weight, real delay, SpikeType type, real tau_in, NeuronBase *pDest);
 	virtual int fire();
 
 private:
@@ -38,7 +39,7 @@ CompositeNeuron<Neuron, Synapse>::~CompositeNeuron()
 }
 
 template<class Neuron, class Synapse>
-SynapseBase* CompositeNeuron<Neuron, Synapse>::addSynapse(real weight, real delay, SpikeType type, real tau_in, NeuronBase *pDest)
+SynapseBase *CompositeNeuron<Neuron, Synapse>::createSynapse(real weight, real delay, SpikeType type, real tau_in, NeuronBase *pDest)
 {
 	real tau = 0.0f;
 	if (fabs(tau_in) > ZERO) {
@@ -53,8 +54,14 @@ SynapseBase* CompositeNeuron<Neuron, Synapse>::addSynapse(real weight, real dela
 	tmp->setDst(pDest);
 
 	SynapseBase *ret = (SynapseBase *)tmp;
-	pSynapses.push_back(ret);
 	return ret;
+}
+
+template<class Neuron, class Synapse>
+SynapseBase* CompositeNeuron<Neuron, Synapse>::addSynapse(SynapseBase * synapse)
+{
+	pSynapses.push_back(synapse);
+	return synapse;
 }
 
 template<class Neuron, class Synapse>

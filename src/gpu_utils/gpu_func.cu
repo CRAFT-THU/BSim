@@ -53,15 +53,9 @@ int updateExpSynapses(void *data, int num, int start_id, BlockSize *pSize)
 //	return 0;
 //}
 
-int (*updateType[])(void *, int, int, BlockSize*) = { updateConstantNeuron, updatePoissonNeuron, updateLIFNeuron, /*updateBasicSynapses, updateAlphaSynapses,*/ updateExpSynapses };
-
-int (*cudaAllocType[])(void *, void *, int) = { cudaAllocConstantNeurons, cudaAllocPoissonNeurons, cudaAllocLIFNeurons, /*cudaAllocNengoNeurons, cudaAllocInputNeurons, cudaAllocPoissonNeurons, cudaAllocProbeNeurons, cudaAllocBasicSynapses, cudaAllocAlphaSynapses,*/ cudaAllocExpSynapses/*, cudaAllocLowpassSynapses*/ };
-
-int (*cudaFreeType[])(void *) = { cudaFreeConstantNeurons, cudaFreePoissonNeurons, cudaFreeLIFNeurons, /*cudaFreeNengoNeurons, cudaFreeInputNeurons, cudaFreePoissonNeurons, cudaFreeProbeNeurons, cudaFreeBasicSynapses, cudaFreeAlphaSynapses,*/ cudaFreeExpSynapses/*, cudaFreeLowpassSynapses*/ };
-
 BlockSize * getBlockSize(int nSize, int sSize)
 {
-	BlockSize *ret = (BlockSize*)malloc(sizeof(BlockSize)*TypeSize);
+	BlockSize *ret = (BlockSize*)malloc(sizeof(BlockSize)*TYPESIZE);
 	cudaOccupancyMaxPotentialBlockSize(&(ret[Constant].minGridSize), &(ret[Constant].blockSize), update_constant_neuron, 0, nSize); 
 	ret[Constant].gridSize = (nSize + (ret[Constant].blockSize) - 1) / (ret[Constant].blockSize);
 

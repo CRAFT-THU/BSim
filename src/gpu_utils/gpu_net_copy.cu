@@ -1,5 +1,6 @@
 
-#include "../utils/Gfunc.h"
+#include "../utils/TypeFunc.h"
+#include "mem_op.h"
 #include "gpu_func.h"
 #include "gpu_utils.h"
 

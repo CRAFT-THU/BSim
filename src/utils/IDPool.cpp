@@ -12,14 +12,14 @@ IDPool recvTag;
 
 IDPool::IDPool()
 {
-	this->id.groupId = -2;
-	this->id.id = 0;
+	ID tmp(-1, 0, -1, 0);
+	this->id.changeID(tmp);
 }
 
 ID IDPool::getID()
 {
 	ID tmp = id;
-	id.id++;
+	id.advance();
 	return tmp;
 }
 

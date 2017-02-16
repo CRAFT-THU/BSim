@@ -137,7 +137,7 @@ void LIFNeuron::monitor(SimInfo &info)
 	if (monitored) {
 		if (file == NULL) {
 			char filename[128];
-			sprintf(filename, "Neuron_%d_%d.log", id.groupId, id.id);
+			sprintf(filename, "Neuron_%s.log", id.getInfo().c_str());
 			file = fopen(filename, "w+");
 
 			if (file == NULL) {
@@ -163,7 +163,7 @@ int LIFNeuron::getData(void *data)
 {
 	Json::Value *p = (Json::Value *)data;
 
-	(*p)["id"] = id.id;
+	(*p)["id"] = id.getID();
 	(*p)["v_init"] = v_init;
 	(*p)["v_rest"] = v_rest;
 	(*p)["v_reset"] = v_reset;

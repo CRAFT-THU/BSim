@@ -7,8 +7,10 @@
 #include <stdio.h>
 
 #include "../utils/utils.h"
-#include "../gpu_utils/gpu_utils.h"
+#include "../utils/TypeFunc.h"
+#include "../gpu_utils/mem_op.h"
 #include "../gpu_utils/gpu_func.h"
+#include "../gpu_utils/gpu_utils.h"
 #include "../gpu_utils/gpu_kernel.h"
 #include "SingleGPUSimulator.h"
 
@@ -103,9 +105,9 @@ int SingleGPUSimulator::run(real time)
 		fprintf(logFile, "Cycle %d: ", time);
 		for (int i=0; i<copySize; i++) {
 			if (i ==  0) {
-				fprintf(logFile, "%d_%d", network->idx2nid[buffers->c_neuronsFired[i]].groupId, network->idx2nid[buffers->c_neuronsFired[i]].id);
+				fprintf(logFile, "%s", network->idx2nid[buffers->c_neuronsFired[i]].getInfo().c_str());
 			} else {
-				fprintf(logFile, ", %d_%d", network->idx2nid[buffers->c_neuronsFired[i]].groupId, network->idx2nid[buffers->c_neuronsFired[i]].id);
+				fprintf(logFile, ", %s", network->idx2nid[buffers->c_neuronsFired[i]].getInfo().c_str());
 			}
 		}
 
@@ -133,10 +135,10 @@ int SingleGPUSimulator::run(real time)
 						if (copySize > 0) {
 							fprintf(logFile, ", ");
 						}
-						fprintf(logFile, "%d_%d", network->idx2sid[i].groupId, network->idx2sid[i].id);
+						fprintf(logFile, "%s", network->idx2sid[i].getInfo().c_str());
 						synapseCount++;
 					} else {
-						fprintf(logFile, ", %d_%d", network->idx2sid[i].groupId, network->idx2sid[i].id);
+						fprintf(logFile, ", %s", network->idx2sid[i].getInfo().c_str());
 					}
 				}
 			}

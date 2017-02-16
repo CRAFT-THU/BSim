@@ -133,7 +133,8 @@ SynapseBase* Network::connect(NeuronBase *pn1, NeuronBase *pn2, real weight, rea
 		id2neuron[pn2->getID()] = pn2;
 	}
 
-	SynapseBase * p = pn1->addSynapse(weight, delay, type, tau, pn2);
+	SynapseBase * p = pn2->createSynapse(weight, delay, type, tau, pn2);
+	pn1->addSynapse(p);
 
 	if (id2synapse.find(p->getID()) == id2synapse.end()) {
 		id2synapse[p->getID()] = p;
@@ -162,7 +163,7 @@ PopulationBase* Network::findPopulation(int populationID)
 	vector<PopulationBase*>::iterator iter;
 	for (iter = pPopulations.begin(); iter != pPopulations.end(); iter++) {
 		PopulationBase * t = *iter;
-		if (t->getID().id == populationID) {
+		if (t->getID().getID() == populationID) {
 			pP = *iter;
 		}
 		if (pP != NULL) {

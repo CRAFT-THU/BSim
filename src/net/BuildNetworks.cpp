@@ -1,8 +1,11 @@
 
 #include "../utils/utils.h"
-//#include "gpu_utils.h"
-#include "../utils/Gfunc.h"
+#include "../utils/TypeFunc.h"
 #include "Network.h"
+
+GNetwork* Network::splitNetwork(int nodeNum)
+{
+}
 
 GNetwork* Network::buildNetworks(int nodeNum)
 {
@@ -119,7 +122,7 @@ GNetwork* Network::buildNetworks(int nodeNum)
 					if (id2synapse[n2siter->second.at(i)]->getDelay() == delay_t+1) {
 						map<ID, int>::iterator sid2idxiter = sid2idx.find(n2siter->second.at(i));
 						if (sid2idxiter == sid2idx.end()) {
-							printf("Can't find synapse ID %d_%d\n", n2siter->second.at(i).groupId, n2siter->second.at(i).id);
+							printf("Can't find synapse ID %s\n", n2siter->second.at(i).getInfo().c_str());
 						}
 
 						int sid = sid2idxiter->second;
@@ -142,7 +145,7 @@ GNetwork* Network::buildNetworks(int nodeNum)
 			for (s2nIter = s2nNetwork.begin(); s2nIter != s2nNetwork.end(); s2nIter++) {
 				map<ID, int>::iterator iter = sid2idx.find(s2nIter->first);
 				if (iter == sid2idx.end()) {
-					printf("Can't find ID %d_%d\n", s2nIter->first.groupId, s2nIter->first.id);
+					printf("Can't find ID %s\n", s2nIter->first.getInfo().c_str());
 				}
 				if (i != getType(pSynapsesNum, synapseTypeNum, iter->second)) {
 					continue;
@@ -150,7 +153,7 @@ GNetwork* Network::buildNetworks(int nodeNum)
 				int idx = getOffset(pSynapsesNum, synapseTypeNum, iter->second);
 				iter = nid2idx.find(s2nIter->second);
 				if (iter == nid2idx.end()) {
-					printf("Can't find ID %d_%d\n", s2nIter->second.groupId, s2nIter->second.id);
+					printf("Can't find ID %s\n", s2nIter->first.getInfo().c_str());
 				}
 				pSynapsesDst[idx] = iter->second;
 			}

@@ -72,7 +72,7 @@ void PoissonNeuron::monitor(SimInfo &info)
 	if (monitored) {
 		if (file == NULL) {
 			char filename[128];
-			sprintf(filename, "PoissonNeuron_%d_%d.log", this->id.groupId, this->id.id);
+			sprintf(filename, "PoissonNeuron_%s.log", this->id.getInfo().c_str());
 			file = fopen(filename, "w+");
 		}
 		fprintf(file, "%d:%d:%d:%d\n", info.currCycle, fireCycle, startCycle, fired);

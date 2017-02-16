@@ -5,7 +5,6 @@
 #ifndef NEURONBASE_H
 #define NEURONBASE_H
 
-#include "../base/constant.h"
 #include "../base/Base.h"
 
 class SynapseBase;
@@ -22,7 +21,8 @@ public:
 	virtual int fire();
 	virtual int recv(real I) = 0;
 
-	virtual SynapseBase *addSynapse(real weight, real delay, SpikeType type, real tau, NeuronBase *dst);
+	virtual SynapseBase *addSynapse(SynapseBase *addSynapse);
+	virtual SynapseBase *createSynapse(real weight, real delay, SpikeType type, real tau, NeuronBase *dst);
 protected:
 	bool fired;
 	bool monitored;

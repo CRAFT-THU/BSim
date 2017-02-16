@@ -4,6 +4,7 @@
  */
 
 
+#include "../gpu_utils/mem_op.h"
 #include "../gpu_utils/gpu_func.h"
 #include "../gpu_utils/gpu_kernel.h"
 #include "GPoissonNeurons.h"
