@@ -6,7 +6,7 @@
 #include "../third_party/cuda/helper_cuda.h"
 #include "GExpSynapses.h"
 
-int cudaAllocExpSynapses(void *pCpu, void *pGpu, int num)
+int cudaAllocExp(void *pCpu, void *pGpu, int num)
 {
 	GExpSynapses *pGpuSynapses = (GExpSynapses*)pGpu;
 	GExpSynapses *p = (GExpSynapses*)pCpu;
@@ -28,7 +28,7 @@ int cudaAllocExpSynapses(void *pCpu, void *pGpu, int num)
 	return 0;
 }
 
-int cudaFreeExpSynapses(void *pGpu)
+int cudaFreeExp(void *pGpu)
 {
 	GExpSynapses *pGpuSynapses = (GExpSynapses*)pGpu;
 

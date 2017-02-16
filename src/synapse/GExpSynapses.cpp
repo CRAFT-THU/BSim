@@ -12,7 +12,7 @@
 
 SYNAPSE_GPU_FUNC_BASIC(Exp)
 
-int allocExpSynapses(void *pSynapses, int S)
+int allocExp(void *pSynapses, int S)
 {
 	GExpSynapses *p = (GExpSynapses*)pSynapses;
 	p->p_weight = (real*)malloc(S*sizeof(real));
@@ -24,7 +24,7 @@ int allocExpSynapses(void *pSynapses, int S)
 	return 0;
 }
 
-void sendExpSynapses(void *data, int rank, int offset, int size)
+void mpiSendExp(void *data, int rank, int offset, int size)
 {
 	GExpSynapses *synapses = (GExpSynapses *)data;
 	MPI_Send(&(size), 1, MPI_INT, rank, sendTag.getID().getID(), MPI_COMM_WORLD);
@@ -39,14 +39,14 @@ void sendExpSynapses(void *data, int rank, int offset, int size)
 	MPI_Send(&(synapses->pDst[offset]), size, MPI_INT, rank, sendTag.getID().getID(), MPI_COMM_WORLD);
 }
 
-void recvExpSynapses(void **data, int rank, int rankSize)
+void mpiRecvExp(void **data, int rank, int rankSize)
 {
 	GExpSynapses *synapses = (GExpSynapses *)malloc(sizeof(GExpSynapses));
 
 	MPI_Status status;
 	int size = 0;
 	MPI_Recv(&size, 1, MPI_INT, rank, recvTag.getID().getID(), MPI_COMM_WORLD, &status);
-	allocExpSynapses(synapses, size);
+	allocExp(synapses, size);
 
 	MPI_Recv(synapses->p_weight, sizeof(real)*size, MPI_BYTE, rank, recvTag.getID().getID(), MPI_COMM_WORLD, &status);
 	MPI_Recv(synapses->p_delay_steps, sizeof(int)*size, MPI_BYTE, rank, recvTag.getID().getID(), MPI_COMM_WORLD, &status);

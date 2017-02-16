@@ -7,7 +7,7 @@
 #include "../third_party/cuda/helper_cuda.h"
 #include "GConstantNeurons.h"
 
-int cudaAllocConstantNeurons(void *pCpu, void *pGpu, int num)
+int cudaAllocConstant(void *pCpu, void *pGpu, int num)
 {
 	GConstantNeurons *pGpuNeurons = (GConstantNeurons*)pGpu;
 	GConstantNeurons *p = (GConstantNeurons*)pCpu;
@@ -21,7 +21,7 @@ int cudaAllocConstantNeurons(void *pCpu, void *pGpu, int num)
 	return 0;
 }
 
-int cudaFreeConstantNeurons(void *pGpu)
+int cudaFreeConstant(void *pGpu)
 {
 	GConstantNeurons *pGpuNeurons = (GConstantNeurons*)pGpu;
 

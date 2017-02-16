@@ -9,14 +9,16 @@
 #include "BlockSize.h"
 
 extern void* (*createType[TYPESIZE])();
-extern size_t (*getSize[TYPESIZE])();
+extern size_t (*getTypeSize[TYPESIZE])();
 extern int (*allocType[TYPESIZE])(void *, int);
-extern int (*addConnection[TYPESIZE])(void *, int *);
+extern int (*addTypeConnection[TYPESIZE])(void *, int *);
 
 extern int (*cudaAllocType[TYPESIZE])(void *, void *, int);
 extern int (*cudaFreeType[TYPESIZE])(void *);
-extern int (*updateType[TYPESIZE])(void *, int, int, BlockSize*);
-extern int (*copyType[TYPESIZE])(void *, void *, int, int);
+extern int (*cudaUpdateType[TYPESIZE])(void *, int, int, BlockSize*);
+//extern int (*copyType[TYPESIZE])(void *, void *, int, int);
+extern void (*mpiSendType[TYPESIZE])(void *data, int rank, int offset, int size);
+extern void (*mpiRecvType[TYPESIZE])(void **data, int rank, int size);
 
 extern BlockSize * getBlockSize(int nSize, int sSize);
 

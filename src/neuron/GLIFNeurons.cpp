@@ -12,7 +12,7 @@
 
 NEURON_GPU_FUNC_BASIC(LIF)
 
-int allocLIFNeurons(void *pCpu, int N)
+int allocLIF(void *pCpu, int N)
 {
 	GLIFNeurons *p = (GLIFNeurons *)pCpu;
 	p->p_v_reset = (real*)malloc(N*sizeof(real));
@@ -28,7 +28,7 @@ int allocLIFNeurons(void *pCpu, int N)
 	return 0;
 }
 
-void sendLIFNeurons(void *data, int rank, int offset, int size)
+void mpiSendLIF(void *data, int rank, int offset, int size)
 {
 	GLIFNeurons *neurons = (GLIFNeurons *)data;
 	MPI_Send(&(size), 1, MPI_INT, rank, sendTag.getID().getID(), MPI_COMM_WORLD);
@@ -45,14 +45,14 @@ void sendLIFNeurons(void *data, int rank, int offset, int size)
 	MPI_Send(&(neurons->p_refrac_time[offset]), size, MPI_INT, rank, sendTag.getID().getID(), MPI_COMM_WORLD);
 }
 
-void recvLIFNeurons(void **data, int rank, int rankSize)
+void mpiRecvLIF(void **data, int rank, int rankSize)
 {
 	GLIFNeurons *neurons = (GLIFNeurons *)malloc(sizeof(GLIFNeurons));
 
 	MPI_Status status;
 	int size = 0;
 	MPI_Recv((&size), 1, MPI_INT, rank, recvTag.getID().getID(), MPI_COMM_WORLD, &status);
-	allocLIFNeurons(neurons, size);
+	allocLIF(neurons, size);
 
 	MPI_Recv(neurons->p_v_reset, sizeof(real)*size, MPI_BYTE, rank, recvTag.getID().getID(), MPI_COMM_WORLD, &status);
 	MPI_Recv(neurons->p_v_thresh, sizeof(real)*size, MPI_BYTE, rank, recvTag.getID().getID(), MPI_COMM_WORLD, &status);

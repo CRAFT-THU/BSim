@@ -7,21 +7,21 @@
 #include "gpu_kernel.h"
 #include "gpu_func.h"
 
-int updatePoissonNeuron(void *data, int num, int start_id, BlockSize *pSize)
+int cudaUpdatePoisson(void *data, int num, int start_id, BlockSize *pSize)
 {
 	update_poisson_neuron<<<pSize->gridSize, pSize->blockSize>>>((GPoissonNeurons*)data, num, start_id);
 
 	return 0;
 }
 
-int updateConstantNeuron(void *data, int num, int start_id, BlockSize *pSize)
+int cudaUpdateConstant(void *data, int num, int start_id, BlockSize *pSize)
 {
 	update_constant_neuron<<<pSize->gridSize, pSize->blockSize>>>((GConstantNeurons*)data, num, start_id);
 
 	return 0;
 }
 
-int updateLIFNeuron(void *data, int num, int start_id, BlockSize *pSize)
+int cudaUpdateLIF(void *data, int num, int start_id, BlockSize *pSize)
 {
 	find_lif_neuron<<<pSize->gridSize, pSize->blockSize>>>((GLIFNeurons*)data, num, start_id);
 	update_lif_neuron<<<pSize->gridSize, pSize->blockSize>>>((GLIFNeurons*)data, num, start_id);
@@ -29,7 +29,7 @@ int updateLIFNeuron(void *data, int num, int start_id, BlockSize *pSize)
 	return 0;
 }
 
-int updateExpSynapses(void *data, int num, int start_id, BlockSize *pSize)
+int cudaUpdateExp(void *data, int num, int start_id, BlockSize *pSize)
 {
 	update_exp_hit<<<pSize->gridSize, pSize->blockSize>>>((GExpSynapses*)data, num, start_id);
 	reset_active_synapse<<<1, 1>>>();
@@ -39,14 +39,14 @@ int updateExpSynapses(void *data, int num, int start_id, BlockSize *pSize)
 	return 0;
 }
 
-//int updateAlphaSynapses(void *data, int num, int start_id, BlockSize *pSize)
+//int cudaUpdateAlpha(void *data, int num, int start_id, BlockSize *pSize)
 //{
 //	update_alpha_synapse<<<pSize->gridSize, pSize->blockSize>>>((GAlphaSynapses*)data, num, start_id);
 //
 //	return 0;
 //}
 //
-//int updateBasicSynapses(void *data, int num, int start_id, BlockSize *pSize)
+//int cudaUpdateBasic(void *data, int num, int start_id, BlockSize *pSize)
 //{
 //	update_basic_synapse<<<pSize->gridSize, pSize->blockSize>>>((GBasicSynapses*)data, num, start_id);
 //

@@ -9,7 +9,7 @@
 #include "../gpu_utils/gpu_kernel.h"
 #include "GPoissonNeurons.h"
 
-int cudaAllocPoissonNeurons(void *pCpu, void *pGpu, int num)
+int cudaAllocPoisson(void *pCpu, void *pGpu, int num)
 {
 	GPoissonNeurons *pGpuNeurons = (GPoissonNeurons*)pGpu;
 	GPoissonNeurons *p = (GPoissonNeurons*)pCpu;
@@ -25,7 +25,7 @@ int cudaAllocPoissonNeurons(void *pCpu, void *pGpu, int num)
 	return 0;
 }
 
-int cudaFreePoissonNeurons(void *pGpu)
+int cudaFreePoisson(void *pGpu)
 {
 	GPoissonNeurons *pGpuNeurons = (GPoissonNeurons*)pGpu;
 

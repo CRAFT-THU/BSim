@@ -147,7 +147,7 @@ GNetwork* Network::buildNetwork()
 			pSynapsesDst[idx] = iter->second;
 		}
 
-		addConnection[sTypes[i]](pAllSynapses[i], pSynapsesDst);
+		addTypeConnection[sTypes[i]](pAllSynapses[i], pSynapsesDst);
 	}
 
 	GNetwork * ret = (GNetwork*)malloc(sizeof(GNetwork));

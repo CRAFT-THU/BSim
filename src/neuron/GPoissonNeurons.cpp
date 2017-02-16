@@ -12,7 +12,7 @@
 
 NEURON_GPU_FUNC_BASIC(Poisson)
 
-int allocPoissonNeurons(void *pCpu, int N)
+int allocPoisson(void *pCpu, int N)
 {
 	GPoissonNeurons *p = (GPoissonNeurons *)pCpu;
 	p->p_rate = (real*)malloc(N*sizeof(real));
@@ -24,3 +24,8 @@ int allocPoissonNeurons(void *pCpu, int N)
 }
 
 
+void mpiSendPoisson(void *data, int rank, int offset, int size) {
+}
+
+void mpiRecvPoisson(void **data, int rank, int rankSize) {
+}

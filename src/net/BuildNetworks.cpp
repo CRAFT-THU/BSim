@@ -158,7 +158,7 @@ GNetwork* Network::buildNetworks(int nodeNum)
 				pSynapsesDst[idx] = iter->second;
 			}
 
-			addConnection[sTypes[i]](pAllSynapses[i], pSynapsesDst);
+			addTypeConnection[sTypes[i]](pAllSynapses[i], pSynapsesDst);
 		}
 
 

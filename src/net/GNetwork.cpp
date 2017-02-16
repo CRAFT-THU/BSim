@@ -6,8 +6,8 @@
 #include <mpi.h>
 #include <iostream>
 
+#include "../utils/TypeFunc.h"
 #include "GNetwork.h"
-#include "../mpi_utils/mpi_func.h"
 
 int copyNetwork(GNetwork *dNet, GNetwork *sNet, int rank, int rankSize)
 {
@@ -53,7 +53,7 @@ int mpiSendNetwork(GNetwork *network, int rank, int rankSize)
 			//Copy neurons
 			MPI_Send(&nOffsets, 1, MPI_INT, idx, 2*idx*network->nTypeNum + i, MPI_COMM_WORLD);
 			MPI_Send(&size, 1, MPI_INT, idx, 2*idx*network->nTypeNum + i + 1, MPI_COMM_WORLD);
-			sendType[network->nTypes[i]](network->pNeurons[i], idx, nOffsets, size);
+			mpiSendType[network->nTypes[i]](network->pNeurons[i], idx, nOffsets, size);
 		}
 		printf("SERVER: %d SENDED NEURONS\n", rank);
 		for (int i=0; i<network->sTypeNum; i++) {
@@ -70,7 +70,7 @@ int mpiSendNetwork(GNetwork *network, int rank, int rankSize)
 			MPI_Send(&sOffsets, 1, MPI_INT, idx, 2*idx*network->nTypeNum + i, MPI_COMM_WORLD);
 			MPI_Send(&size, 1, MPI_INT, idx, 2*idx*network->nTypeNum + i + 1, MPI_COMM_WORLD);
 			//Copy synapse
-			sendType[network->sTypes[i]](network->pSynapses[i], idx, sOffsets, size);
+			mpiSendType[network->sTypes[i]](network->pSynapses[i], idx, sOffsets, size);
 		}
 		printf("SERVER: %d SENDED SYNAPSES\n", rank);
 	}
@@ -91,7 +91,7 @@ int mpiRecvNetwork(GNetwork *network, int rank, int rankSize)
 		network->nOffsets[i] = nOffsets;
 		MPI_Recv(&size, 1, MPI_INT, 0, 2*rank*network->nTypeNum + i + 1, MPI_COMM_WORLD, &Status);
 		//Copy neurons
-		recvType[network->nTypes[i]](&(network->pNeurons[i]), 0, size);
+		mpiRecvType[network->nTypes[i]](&(network->pNeurons[i]), 0, size);
 	}
 	printf("SERVER: %d RECEIVED NEURONS\n", rank);
 	for (int i=0; i<network->sTypeNum; i++) {
@@ -102,7 +102,7 @@ int mpiRecvNetwork(GNetwork *network, int rank, int rankSize)
 		network->sOffsets[i] = sOffsets;
 		MPI_Recv(&size, 1, MPI_INT, 0, 2*rank*network->nTypeNum + i + 1, MPI_COMM_WORLD, &Status);
 		//Copy synapse
-		recvType[network->sTypes[i]](&(network->pSynapses[i]), 0, size);
+		mpiRecvType[network->sTypes[i]](&(network->pSynapses[i]), 0, size);
 	}
 	printf("SERVER: %d RECEIVED SYNAPSES\n", rank);
 
