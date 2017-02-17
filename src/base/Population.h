@@ -22,14 +22,15 @@ public:
 	Type getType();
 
 	int getNum();
-	size_t getSize();
+	virtual size_t getSize() override;
 
-	int reset(SimInfo &info);
-	int update(SimInfo &info);
-	void monitor(SimInfo &info);
+	virtual int setNode(int node) final;
+	virtual int reset(SimInfo &info) override;
+	virtual int update(SimInfo &info) override;
+	virtual void monitor(SimInfo &info) override;
 
-	int getData(void *data);
-	virtual int hardCopy(void *data, int idx, int base, map<ID, int> &id2idx, map<int, ID> &idx2id);
+	virtual int getData(void *data) override;
+	virtual int hardCopy(void *data, int idx, int base, map<ID, int> &id2idx, map<int, ID> &idx2id) override;
 
 	int addNeuron(Neuron templ);
 	NeuronBase* findNeuron(ID id);
@@ -96,6 +97,19 @@ NeuronBase* Population<Neuron>::findNeuron(ID id)
 	}
 
 	return ret;
+}
+
+
+template<class Neuron>
+int Population<Neuron>::setNode(int node)
+{
+	int count = 0;
+	this->id.setNode(node);
+	typename vector<Neuron>::iterator iter;
+	for (iter = neurons.begin(); iter != neurons.end(); iter++) {
+		count = count + iter->setNode(node);
+	}
+	return count;
 }
 
 template<class Neuron>

@@ -5,19 +5,17 @@
 #ifndef POPULATIONBASE_H
 #define POPULATIONBASE_H
 
-#include "../neuron/NeuronBase.h"
+#include "../base/NeuronBase.h"
 
 class PopulationBase : public Base {
 public:
 	PopulationBase();
 	virtual ~PopulationBase() = 0;
 
-	virtual void monitorOn();
+	virtual void monitorOn() override;
 
 	virtual int getNum() = 0;
-	virtual size_t getSize() = 0;
 	virtual NeuronBase* findNeuron(ID id) = 0;
-
 protected:
 	bool monitored;
 };

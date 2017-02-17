@@ -25,12 +25,13 @@ public:
 	ID(short grp_id, int id);
 	ID(char type_id, short grp_id, int id);
 	ID(char machine_id, char type_id, short grp_id, int id);
+	ID(ID &id);
 	ID(const ID &id);
 	~ID();
 
 	void advance();
-	void changeID(ID &id);
-	void changeNode(char node);
+	void setID(ID &id);
+	void setNode(char node);
 	inline int getID() const
 	{ 
 		return id.detailed_id.id; 

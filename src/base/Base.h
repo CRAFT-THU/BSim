@@ -20,6 +20,7 @@ public:
 	virtual void setID(ID id);
 	virtual Type getType() = 0;
 
+	virtual int setNode(int node) = 0;
 	virtual void monitorOn() = 0;
 	virtual int reset(SimInfo &info) = 0;
 	virtual int update(SimInfo &info) = 0;

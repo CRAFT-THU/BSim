@@ -54,6 +54,11 @@ ID::ID(char machine_id, char type_id, short grp_id, int id)
 	this->id.detailed_id.id = id;
 }
 
+ID::ID(ID &a)
+{
+	this->id.packed_id = a.id.packed_id;
+}
+
 ID::ID(const ID &a)
 {
 	this->id.packed_id = a.id.packed_id;
@@ -68,12 +73,12 @@ void ID::advance()
 	id.packed_id++;
 }
 
-void ID::changeID(ID &id)
+void ID::setID(ID &id)
 {
 	this->id.packed_id = id.id.packed_id;
 }
 
-void ID::changeNode(char node)
+void ID::setNode(char node)
 {
 	this->id.detailed_id.machine_id = node;
 }

@@ -3,8 +3,26 @@
 #include "../utils/TypeFunc.h"
 #include "Network.h"
 
-GNetwork* Network::splitNetwork(int nodeNum)
+void Network::splitNetwork(int nodeNum)
 {
+	vector<PopulationBase*>::iterator piter;
+	vector<NeuronBase*>::iterator niter;
+	vector<SynapseBase*>::iterator siter;
+
+	int nodeIdx = 0;
+	int synapseCount = 0;
+	int synapsePerNode = totalSynapseNum/nodeNum;
+
+	for (piter = pPopulations.begin(); piter != pPopulations.end(); piter++) {
+		PopulationBase * p = *piter;
+		synapseCount += p->setNode(nodeNum);
+		if (synapseCount >= nodeIdx * synapsePerNode) {
+
+		}
+	}
+
+
+	return;
 }
 
 GNetwork* Network::buildNetworks(int nodeNum)
@@ -16,7 +34,7 @@ GNetwork* Network::buildNetworks(int nodeNum)
 	int neuronTypeNum = nTypes.size();
 	int synapseTypeNum = sTypes.size();
 
-	GNetwork * ret = (GNetwork*)malloc(sizeof(GNetwork)*nodeNum);
+	GNetwork *ret = (GNetwork*)malloc(sizeof(GNetwork)*nodeNum);
 	if (ret == NULL) {
 		printf("Malloc GNetwork failed/n");
 		return NULL;

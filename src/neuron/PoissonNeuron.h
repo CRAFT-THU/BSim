@@ -9,7 +9,7 @@
 #include <vector>
 #include <random>
 
-#include "NeuronBase.h"
+#include "../base/NeuronBase.h"
 
 using std::vector;
 using std::default_random_engine;

@@ -10,7 +10,7 @@
 #include <queue>
 
 #include "../utils/IDPool.h"
-#include "../synapse/SynapseBase.h"
+#include "../base/SynapseBase.h"
 
 using std::vector;
 

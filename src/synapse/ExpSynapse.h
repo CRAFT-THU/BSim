@@ -7,7 +7,7 @@
 
 #include <list>
 #include <stdio.h>
-#include "SynapseBase.h"
+#include "../base/SynapseBase.h"
 
 using std::list;
 

@@ -6,7 +6,7 @@
 #ifndef SYNAPSEBASE_H
 #define SYNAPSEBASE_H
 
-#include "../neuron/NeuronBase.h"
+#include "../base/NeuronBase.h"
 
 class SynapseBase : public Base {
 public:
@@ -14,7 +14,9 @@ public:
 	virtual ~SynapseBase() = 0;
 
 	virtual int recv() = 0;
-	virtual void monitorOn() = 0;
+
+	virtual int setNode(int node) override;
+	virtual void monitorOn() override;
 	virtual void setDst(NeuronBase *p) = 0;
 	virtual int getDelay();
 protected:

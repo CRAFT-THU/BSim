@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <vector>
 
-#include "NeuronBase.h"
+#include "../base/NeuronBase.h"
 
 using std::vector;
 

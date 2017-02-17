@@ -14,12 +14,14 @@ public:
 	NeuronBase();
 	virtual ~NeuronBase() = 0;
 
-	virtual void monitorOn();
+	virtual void monitorOn() override;
 
 	virtual bool isFired();
 
 	virtual int fire();
 	virtual int recv(real I) = 0;
+
+	virtual int setNode(int node) override;
 
 	virtual SynapseBase *addSynapse(SynapseBase *addSynapse);
 	virtual SynapseBase *createSynapse(real weight, real delay, SpikeType type, real tau, NeuronBase *dst);

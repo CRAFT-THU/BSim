@@ -12,6 +12,12 @@ SynapseBase::SynapseBase()
 
 SynapseBase::~SynapseBase() {}
 
+int SynapseBase::setNode(int node)
+{
+	this->id.setNode(node);
+	return 1;
+}
+
 void SynapseBase::monitorOn()
 {
 	monitored = false;
