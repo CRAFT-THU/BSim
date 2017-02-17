@@ -17,19 +17,33 @@ SET(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -std=c++11 -O0 -Wall -g -ggdb")
 SET(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -std=c++11 -O3")
 
 SET(CUDA_PROPAGATE_HOST_FLAGS OFF)
-SET(CUDA_NVCC_FLAGS_DEBUG "-std=c++11 -g -G")
-SET(CUDA_NVCC_FLAGS_RELEASE "-std=c++11 -O3")
-
-FILE(GLOB_RECURSE CPU_SRC "src/*.cpp" "src/*.c")
-FILE(GLOB_RECURSE GPU_SRC "src/*.cu")
+SET(CUDA_NVCC_FLAGS_DEBUG "-arch=sm_30 -std=c++11 -g -G")
+SET(CUDA_NVCC_FLAGS_RELEASE "-arch=sm_30 -std=c++11 -O3")
 
 SET(CPU_LIB bsim)
 SET(GPU_LIB bsim_gpu)
 
+SET(AUTO_CPU_SRC "src/utils/TypeFunc.cpp")
+SET(AUTO_GPU_SRC "src/utils/TypeFunc.cu")
+SET(GEN_TYPE_FUNC_SCRIPT "script/generate_type_functions.py")
+
+FILE(GLOB_RECURSE CPU_SRC "src/*.cpp" "src/*.c")
+FILE(GLOB_RECURSE GPU_SRC "src/*.cu")
+
 FILE(GLOB CPU_TEST "test/cpu/*.cpp" "test/cpu/*.c")
 FILE(GLOB GPU_TEST "test/gpu/*.cpp" "test/gpu/*.c")
 
-ADD_LIBRARY(${CPU_LIB} STATIC ${CPU_SRC})
+FILE(COPY ${PROJECT_SOURCE_DIR}/CLEAN_ALL.cmake DESTINATION ${CMAKE_BINARY_DIR})
+
+ADD_CUSTOM_COMMAND(OUTPUT ${PROJECT_SOURCE_DIR}/${AUTO_CPU_SRC} ${PROJECT_SOURCE_DIR}/${AUTO_GPU_SRC}
+	COMMAND echo "Generating ${AUTO_CPU_SRC} ${AUTO_GPU_SRC}"
+	COMMAND python ${PROJECT_SOURCE_DIR}/${GEN_TYPE_FUNC_SCRIPT}
+	MAIN_DEPENDENCY src/utils/TypeFunc.h
+	COMMENT "Generate type func"
+	)
+#ADD_CUSTOM_TARGET(GEN_TYPE_FUNC DEPENDS GEN_TYPE_FUNC)
+
+ADD_LIBRARY(${CPU_LIB} STATIC ${CPU_SRC} ${AUTO_CPU_SRC})
 SET_TARGET_PROPERTIES(${CPU_LIB} PROPERTIES LINKER_LANGUAGE CXX)
 
 FOREACH(exec_path ${CPU_TEST})
@@ -40,7 +54,7 @@ FOREACH(exec_path ${CPU_TEST})
 	TARGET_LINK_LIBRARIES(${exec_file} ${CPU_LIB})
 ENDFOREACH()
 
-CUDA_ADD_LIBRARY(${GPU_LIB} STATIC ${GPU_SRC})
+CUDA_ADD_LIBRARY(${GPU_LIB} STATIC ${GPU_SRC} ${AUTO_GPU_SRC})
 
 FOREACH(exec_path ${GPU_TEST})
 	#MESSAGE("EXEC_PATH: ${exec_path}")
@@ -50,8 +64,13 @@ FOREACH(exec_path ${GPU_TEST})
 	TARGET_LINK_LIBRARIES(${exec_file} ${GPU_LIB} ${CPU_LIB} ${MPI_LIBRARIES})
 ENDFOREACH()
 
-ADD_CUSTOM_COMMAND(TARGET multi-gpusim_test
-	POST_BUILD
-	COMMAND cp ${CMAKE_BINARY_DIR}/bin/multi-gpusim_test ${CMAKE_BINARY_DIR}/../shared
-	COMMENT "Copy multi-gpusim_test to shared dir"  
+#ADD_CUSTOM_COMMAND(TARGET multi-gpusim_test
+#	POST_BUILD
+#	COMMAND cp ${CMAKE_BINARY_DIR}/bin/multi-gpusim_test ${CMAKE_BINARY_DIR}/../shared
+#	COMMENT "Copy multi-gpusim_test to shared dir"  
+#	)
+
+ADD_CUSTOM_TARGET(clean-all
+	COMMAND ${CMAKE_BUILD_TOOL} clean
+	COMMAND ${CMAKE_COMMAND} -P CLEAN_ALL.cmake
 	)
