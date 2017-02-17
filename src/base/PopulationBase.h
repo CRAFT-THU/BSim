@@ -12,7 +12,7 @@ public:
 	PopulationBase();
 	virtual ~PopulationBase() = 0;
 
-	virtual void monitorOn() override;
+	virtual void monitorOn();
 
 	virtual int getNum() = 0;
 	virtual NeuronBase* findNeuron(ID id) = 0;

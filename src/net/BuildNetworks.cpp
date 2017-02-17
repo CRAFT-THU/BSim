@@ -8,6 +8,7 @@ void Network::splitNetwork(int nodeNum)
 	vector<PopulationBase*>::iterator piter;
 	vector<NeuronBase*>::iterator niter;
 	vector<SynapseBase*>::iterator siter;
+	map<ID, vector<ID> >::iterator n2siter;
 
 	int nodeIdx = 0;
 	int synapseCount = 0;
@@ -17,10 +18,28 @@ void Network::splitNetwork(int nodeNum)
 		PopulationBase * p = *piter;
 		synapseCount += p->setNode(nodeNum);
 		if (synapseCount >= nodeIdx * synapsePerNode) {
-
+			nodeIdx++;	
 		}
 	}
 
+	set<int> tmp_s;
+	for (n2siter = n2sNetwork.begin(); n2siter != n2sNetwork.end(); n2siter++) {
+		vector<ID> &p = n2siter->second;
+		int synapseNum = p.size();
+		int baseNode = n2siter->first.getNode();
+		if (synapseNum > 0) {
+			tmp_s.clear();
+			for (vector<ID>::iterator iter = p.begin(); iter != p.end(); iter++) {
+				if (iter->getNode() != baseNode) {
+					tmp_s.insert(iter->getNode());
+				}
+			}
+			if (tmp_s.size() > 0) {
+				crossNodeInfo[n2siter->first] = tmp_s;
+			}
+		}
+
+	}
 
 	return;
 }

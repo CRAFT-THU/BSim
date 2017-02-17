@@ -22,15 +22,15 @@ public:
 	Type getType();
 
 	int getNum();
-	virtual size_t getSize() override;
+	virtual size_t getSize();
 
 	virtual int setNode(int node) final;
-	virtual int reset(SimInfo &info) override;
-	virtual int update(SimInfo &info) override;
-	virtual void monitor(SimInfo &info) override;
+	virtual int reset(SimInfo &info);
+	virtual int update(SimInfo &info);
+	virtual void monitor(SimInfo &info);
 
-	virtual int getData(void *data) override;
-	virtual int hardCopy(void *data, int idx, int base, map<ID, int> &id2idx, map<int, ID> &idx2id) override;
+	virtual int getData(void *data);
+	virtual int hardCopy(void *data, int idx, int base, map<ID, int> &id2idx, map<int, ID> &idx2id);
 
 	int addNeuron(Neuron templ);
 	NeuronBase* findNeuron(ID id);

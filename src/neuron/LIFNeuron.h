@@ -15,20 +15,20 @@ public:
 	LIFNeuron(const LIFNeuron &neuron, ID id);
 	~LIFNeuron();
 
-	Type getType() override;
+	Type getType();
 
 	virtual real get_vm();
 	virtual int init(real dt);
 
-	virtual int recv(real I) override;
+	virtual int recv(real I);
 
-	virtual int reset(SimInfo &info) override;
-	virtual int update(SimInfo &info) override;
-	virtual void monitor(SimInfo &info) override;
+	virtual int reset(SimInfo &info);
+	virtual int update(SimInfo &info);
+	virtual void monitor(SimInfo &info);
 
-	virtual size_t getSize() override;
-	virtual int getData(void *data) override;
-	virtual int hardCopy(void * data, int idx, int base, map<ID, int> &id2idx, map<int, ID> &idx2id) override;
+	virtual size_t getSize();
+	virtual int getData(void *data);
+	virtual int hardCopy(void * data, int idx, int base, map<ID, int> &id2idx, map<int, ID> &idx2id);
 
 	const static Type type;
 protected:

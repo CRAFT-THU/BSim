@@ -15,8 +15,8 @@ public:
 
 	virtual int recv() = 0;
 
-	virtual int setNode(int node) override;
-	virtual void monitorOn() override;
+	virtual int setNode(int node);
+	virtual void monitorOn();
 	virtual void setDst(NeuronBase *p) = 0;
 	virtual int getDelay();
 protected:

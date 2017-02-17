@@ -6,6 +6,7 @@
 #define NETWORK_H
 
 #include <vector>
+#include <set>
 #include <map>
 #include <algorithm>
 
@@ -19,6 +20,7 @@ using std::pair;
 using std::find;
 using std::vector;
 using std::map;
+using std::set;
 
 class Network {
 public:
@@ -64,6 +66,8 @@ public:
 	map<ID, ID> s2nForwardNetwork;
 	map<ID, NeuronBase*> id2neuron;
 	map<ID, SynapseBase*> id2synapse;
+	map<ID, set<int>> crossNodeInfo;
+	map<int, set<int>> crossNodeInfoGPU;
 	map<ID, int> nid2idx;
 	map<ID, int> sid2idx;
 	map<int, ID> idx2nid;
