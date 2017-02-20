@@ -38,7 +38,7 @@ public:
 	int connect(int populationIDSrc, int neuronIDSrc, int populationIDDst, int neuronIDDst, real weight, real delay, real tau = 0);
 	GNetwork* buildNetwork();
 	void splitNetwork(int nodeNum);
-	GNetwork* buildNetworks(int nodeNum);
+	GNetwork* buildNetworks(int nodeNum, bool autoSplited = false);
 
 	int addNeuronNum(Type type, int num);
 	int addConnectionNum(Type type, int num);
@@ -68,10 +68,15 @@ public:
 	map<ID, SynapseBase*> id2synapse;
 	map<ID, set<int>> crossNodeInfo;
 	map<int, set<int>> crossNodeInfoGPU;
+	map<ID, int> nid2node;
+	map<ID, int> sid2node;
 	map<ID, int> nid2idx;
 	map<ID, int> sid2idx;
 	map<int, ID> idx2nid;
 	map<int, ID> idx2sid;
+	vector<map<int, ID> > globalIdx2nid;
+	vector<map<int, ID> > globalIdx2sid;
+
 	real maxDelay;
 	int maxDelaySteps;
 	real maxFireRate;

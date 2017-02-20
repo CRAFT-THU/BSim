@@ -16,6 +16,7 @@ public:
 
 	virtual int getNum() = 0;
 	virtual NeuronBase* findNeuron(ID id) = 0;
+	virtual NeuronBase* getNeuron(int idx) = 0;
 protected:
 	bool monitored;
 };
