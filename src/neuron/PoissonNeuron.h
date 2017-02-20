@@ -36,7 +36,6 @@ public:
 
 	virtual size_t getSize();
 	virtual int hardCopy(void *data, int idx, int base, map<ID, int> &id2idx, map<int, ID> &idx2id);
-	virtual SynapseBase *addSynapse(real weight, real delay, SpikeType type, real tau, NeuronBase *pDest);
 
 	int poisson(int input);
 

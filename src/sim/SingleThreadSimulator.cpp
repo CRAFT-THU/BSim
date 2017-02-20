@@ -5,6 +5,7 @@
 
 #include <sys/time.h>
 #include <stdio.h>
+#include <math.h>
 #include "SingleThreadSimulator.h"
 
 SingleThreadSimulator::SingleThreadSimulator(Network *network, real dt)
