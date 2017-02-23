@@ -53,8 +53,7 @@ int SingleGPUSimulator::run(real time)
 	printf("NeuronNum: %d, SynapseNum: %d\n", totalNeuronNum, totalSynapseNum);
 
 	int MAX_DELAY = pCpuNet->MAX_DELAY;
-	printf("MAX_DELAY: %lf %lf %d\n", network->maxDelay, dt, pCpuNet->MAX_DELAY);
-
+	printf("MAX_DELAY: %d\n", pCpuNet->MAX_DELAY);
 
 	GBuffers *buffers = alloc_buffers(totalNeuronNum, totalSynapseNum, MAX_DELAY);
 

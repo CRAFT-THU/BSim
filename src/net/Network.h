@@ -5,6 +5,7 @@
 #ifndef NETWORK_H
 #define NETWORK_H
 
+#include <array>
 #include <vector>
 #include <set>
 #include <map>
@@ -18,6 +19,7 @@
 
 using std::pair;
 using std::find;
+using std::array;
 using std::vector;
 using std::map;
 using std::set;
@@ -36,9 +38,9 @@ public:
 	
 	SynapseBase* connect(NeuronBase *pSrc, NeuronBase *pDst, real weight, real delay, SpikeType type = Excitatory, real tau = 0, bool store = true);
 	int connect(int populationIDSrc, int neuronIDSrc, int populationIDDst, int neuronIDDst, real weight, real delay, real tau = 0);
+
+	int addConnectionInfo(ID nID, int nid, int offset, int *delayStart, int *delayNum, int *pSynapsesIdx);
 	GNetwork* buildNetwork();
-	void splitNetwork(int nodeNum);
-	GNetwork* buildNetworks(int nodeNum, bool autoSplited = false);
 
 	int addNeuronNum(Type type, int num);
 	int addConnectionNum(Type type, int num);
@@ -56,7 +58,6 @@ public:
 
 public:
 	vector<NeuronBase*> pOutputs;
-//protected:
 	vector<PopulationBase*> pPopulations;
 	vector<NeuronBase*> pNeurons;
 	vector<SynapseBase*> pSynapses;
@@ -66,19 +67,16 @@ public:
 	map<ID, ID> s2nForwardNetwork;
 	map<ID, NeuronBase*> id2neuron;
 	map<ID, SynapseBase*> id2synapse;
-	map<ID, set<int>> crossNodeInfo;
-	map<int, set<int>> crossNodeInfoGPU;
-	map<ID, int> nid2node;
-	map<ID, int> sid2node;
 	map<ID, int> nid2idx;
 	map<ID, int> sid2idx;
 	map<int, ID> idx2nid;
 	map<int, ID> idx2sid;
-	vector<map<int, ID> > globalIdx2nid;
-	vector<map<int, ID> > globalIdx2sid;
 
-	real maxDelay;
 	int maxDelaySteps;
+	int totalNeuronNum;
+	int totalSynapseNum;
+private:
+	real maxDelay;
 	real maxFireRate;
 	vector<Type> nTypes;
 	vector<Type> sTypes;
@@ -86,8 +84,6 @@ public:
 	vector<int> neuronNums;
 	vector<int> connectNums;
 	vector<int> synapseNums;
-	int totalNeuronNum;
-	int totalSynapseNum;
 };
 
 template<class Neuron>

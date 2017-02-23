@@ -1,8 +1,8 @@
 #include "../utils/utils.h"
 #include "../utils/TypeFunc.h"
-#include "Network.h"
+#include "MultiNetwork.h"
 
-void Network::splitNetwork(int nodeNum)
+void MultiNetwork::splitNetwork(int nodeNum)
 {
 	vector<PopulationBase*>::iterator piter;
 	vector<NeuronBase*>::iterator niter;
@@ -71,3 +71,5 @@ void Network::splitNetwork(int nodeNum)
 
 	return;
 }
+
+
