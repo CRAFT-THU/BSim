@@ -5,6 +5,7 @@
 
 #include <sys/time.h>
 #include <stdio.h>
+#include <pthread.h>
 
 #include "../utils/utils.h"
 #include "../utils/TypeFunc.h"
@@ -14,6 +15,14 @@
 #include "../gpu_utils/gpu_kernel.h"
 #include "MultiGPUSimulator.h"
 
+struct DistriNetwork {
+	GNetwork * network;
+	CrossNodeMap *crossNodeMap;
+	CrossNodeMap
+};
+
+pthread_barrier_t barrier;
+
 MultiGPUSimulator::MultiGPUSimulator(Network *network, real dt) : SimulatorBase(network, dt)
 {
 }
@@ -21,6 +30,8 @@ MultiGPUSimulator::MultiGPUSimulator(Network *network, real dt) : SimulatorBase(
 MultiGPUSimulator::~MultiGPUSimulator()
 {
 }
+
+void run
 
 int MultiGPUSimulator::run(real time)
 {

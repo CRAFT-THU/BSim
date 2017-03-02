@@ -1,4 +1,6 @@
 
+#include <assert.h>
+
 #include "../utils/utils.h"
 #include "../utils/TypeFunc.h"
 #include "MultiNetwork.h"
@@ -98,10 +100,10 @@ GNetwork* MultiNetwork::buildNetworks(int nodeNum, bool autoSplited)
 	}
 
 	GNetwork *ret = (GNetwork*)malloc(sizeof(GNetwork)*nodeNum);
-	if (ret == NULL) {
-		printf("Malloc GNetwork failed/n");
-		return NULL;
-	}
+	assert(ret != NULL);
+
+	crossNodeMap = (CrossNodeMap*)malloc(sizeof(CrossNodeMap)*nodeNum);
+	assert(crossNodeMap != NULL);
 
 	for (int nodeIdx = 0; nodeIdx < nodeNum; nodeIdx++) {
 		int nodeNeuronTypeNum = globalNTypeInfo[nodeIdx].size();
@@ -273,6 +275,20 @@ GNetwork* MultiNetwork::buildNetworks(int nodeNum, bool autoSplited)
 
 			for (set<int>::const_iterator tmp_iter3 = tmp_iter->second.begin(); tmp_iter3 != tmp_iter->second.end(); tmp_iter3++) {
 				crossNodeIdx2Idx[node][idx][*tmp_iter3] = nodeNid2idx[*tmp_iter3][tmp_iter->first];
+			}
+		}
+
+		crossNodeMap[nodeIdx].idx2index = (int*)malloc(sizeof(int)*nodeNeuronNum);
+		crossNodeMap[nodeIdx].crossNodeMap = (int*)malloc(sizeof(int)*crossNodeIdx2Idx[nodeIdx].size()*nodeNum);
+		for (int tmp = 0; tmp < nodeNeuronNum; tmp++) {
+			crossNodeMap[nodeIdx].idx2index[tmp] = -1;
+		}
+
+		int count_idx = 0;
+		for (map<int, vector<int> >::const_iterator tmp_iter = crossNodeIdx2Idx[nodeIdx].begin(); tmp_iter != crossNodeIdx2Idx[nodeIdx].end(); tmp_iter++) {
+			crossNodeMap[nodeIdx].idx2index[tmp_iter->first] = count_idx;
+			for (int tmp =0; tmp<nodeNum; tmp++) {
+				crossNodeMap[nodeIdx].crossNodeMap[count_idx*nodeNum + tmp] = tmp_iter->second[tmp];
 			}
 		}
 	}

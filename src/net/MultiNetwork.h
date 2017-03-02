@@ -7,6 +7,16 @@
 
 #include "Network.h"
 
+struct CrossNodeMap {
+	int *idx2index;
+	int *crossNodeMap;
+};
+
+struct CrossNodeData {
+	int *firedNeuronNum;
+	int **firedNeuronIdx;
+};
+
 class MultiNetwork : public Network {
 public:
 	void splitNetwork(int nodeNum);
@@ -22,6 +32,8 @@ public:
 	vector<map<int, ID> > globalIdx2nid;
 	vector<map<int, ID> > globalIdx2sid;
 	vector<map<int, vector<int> > > crossNodeIdx2Idx;
+	CrossNodeMap *crossNodeMap;
+	CrossNodeData *crossNodeData;
 };
 
 
