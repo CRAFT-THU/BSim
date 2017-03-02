@@ -46,6 +46,8 @@ int Network::addConnectionInfo(ID nID, int nid, int offset, int *delayStart, int
 
 GNetwork* MultiNetwork::buildNetworks(int nodeNum, bool autoSplited)
 {
+	this->nodeNum = nodeNum;
+
 	vector<PopulationBase*>::iterator piter;
 	vector<NeuronBase*>::iterator niter;
 	vector<SynapseBase*>::iterator siter;
@@ -104,6 +106,8 @@ GNetwork* MultiNetwork::buildNetworks(int nodeNum, bool autoSplited)
 
 	crossNodeMap = (CrossNodeMap*)malloc(sizeof(CrossNodeMap)*nodeNum);
 	assert(crossNodeMap != NULL);
+
+	crossNodeData = (CrossNodeData*)malloc(sizeof(CrossNodeData)*nodeNum*nodeNum);
 
 	for (int nodeIdx = 0; nodeIdx < nodeNum; nodeIdx++) {
 		int nodeNeuronTypeNum = globalNTypeInfo[nodeIdx].size();
@@ -290,6 +294,19 @@ GNetwork* MultiNetwork::buildNetworks(int nodeNum, bool autoSplited)
 			for (int tmp =0; tmp<nodeNum; tmp++) {
 				crossNodeMap[nodeIdx].crossNodeMap[count_idx*nodeNum + tmp] = tmp_iter->second[tmp];
 			}
+		}
+
+		
+		for (int tmp = 0; tmp < nodeNum; tmp++) {
+			// nodeIdx to tmp 
+			int tmp_idx = tmp * nodeNum + nodeIdx;
+			crossNodeData[tmp_idx].maxNeuronNum = 0;
+			for (map<int, vector<int> >::const_iterator tmp_iter = crossNodeIdx2Idx[nodeIdx].begin(); tmp_iter != crossNodeIdx2Idx[nodeIdx].end(); tmp_iter++) {
+				if (tmp_iter->second[tmp] != -1) {
+					crossNodeData[tmp_idx].maxNeuronNum++;
+				}
+			}
+			crossNodeData[tmp_idx].firedNeuronIdx = (int*)malloc(sizeof(int)*crossNodeData[tmp_idx].maxNeuronNum);
 		}
 	}
 

@@ -13,18 +13,24 @@ struct CrossNodeMap {
 };
 
 struct CrossNodeData {
-	int *firedNeuronNum;
-	int **firedNeuronIdx;
+	int maxNeuronNum;
+	int firedNeuronNum;
+	int *firedNeuronIdx;
 };
 
-class MultiNetwork : public Network {
+class MultiNetwork {
 public:
+	MultiNetwork(Network *net);
+	~MultiNetwork();
+
 	void splitNetwork(int nodeNum);
 	GNetwork* buildNetworks(int nodeNum, bool autoSplited = false);
 
 public:
+	Network * network;
+
 	map<ID, set<int>> crossNodeInfo;
-	map<int, set<int>> crossNodeInfoGPU;
+	//map<int, set<int>> crossNodeInfoGPU;
 
 	map<ID, int> nid2node;
 	map<ID, int> sid2node;
@@ -34,6 +40,8 @@ public:
 	vector<map<int, vector<int> > > crossNodeIdx2Idx;
 	CrossNodeMap *crossNodeMap;
 	CrossNodeData *crossNodeData;
+
+	int nodeNum;
 };
 
 

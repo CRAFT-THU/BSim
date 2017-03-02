@@ -8,31 +8,12 @@
 
 Network::Network()
 {
-	pPopulations.clear();
-	pNeurons.clear();
-	pSynapses.clear();
-	pOutputs.clear();
-	n2sNetwork.clear();
-	n2sTargetNetwork.clear();
-	s2nNetwork.clear();
-	s2nForwardNetwork.clear();
-	id2neuron.clear();
-	id2synapse.clear();
-	nid2idx.clear();
-	idx2nid.clear();
-	sid2idx.clear();
-	idx2sid.clear();
 	maxDelay = 0.0;
 	maxDelaySteps = 0;
 	maxFireRate = 0.0;
 	populationNum = 0;
 	totalNeuronNum = 0;
 	totalSynapseNum = 0;
-	neuronNums.clear();
-	connectNums.clear();
-	synapseNums.clear();
-	nTypes.clear();
-	sTypes.clear();
 }
 
 Network::~Network()
@@ -64,6 +45,22 @@ Network::~Network()
 	pPopulations.clear();
 	pNeurons.clear();
 	pSynapses.clear();
+	pOutputs.clear();
+	n2sNetwork.clear();
+	n2sTargetNetwork.clear();
+	s2nNetwork.clear();
+	s2nForwardNetwork.clear();
+	id2neuron.clear();
+	id2synapse.clear();
+	nid2idx.clear();
+	idx2nid.clear();
+	sid2idx.clear();
+	idx2sid.clear();
+	neuronNums.clear();
+	connectNums.clear();
+	synapseNums.clear();
+	nTypes.clear();
+	sTypes.clear();
 }
 
 int Network::addNeuronNum(Type type, int num)

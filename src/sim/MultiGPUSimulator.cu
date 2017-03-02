@@ -13,15 +13,19 @@
 #include "../gpu_utils/gpu_func.h"
 #include "../gpu_utils/gpu_utils.h"
 #include "../gpu_utils/gpu_kernel.h"
+#include "../net/MultiNetwork.h"
 #include "MultiGPUSimulator.h"
 
 struct DistriNetwork {
+	int simCycle;
+	int nodeIdx;
+	int nodeNum;
 	GNetwork * network;
 	CrossNodeMap *crossNodeMap;
-	CrossNodeMap
+	CrossNodeData *CrossNodeData;
 };
 
-pthread_barrier_t barrier;
+pthread_barrier_t cycle_barrier;
 
 MultiGPUSimulator::MultiGPUSimulator(Network *network, real dt) : SimulatorBase(network, dt)
 {
@@ -31,29 +35,20 @@ MultiGPUSimulator::~MultiGPUSimulator()
 {
 }
 
-void run
+void run(void *para) {
+	DistriNetwork *network = (DistriNetwork*)para;
 
-int MultiGPUSimulator::run(real time)
-{
-	findCudaDevice(0, NULL);
+	char logFilename[512];
+	sprintf(logFilename, "GSim_%d.log", network->nodeIdx); 
+	FILE *logFile = fopen(logFilename, "w+");
+	assert(logFile != NULL);
 
-	int sim_cycle = round(time/dt);
+	char dataFilename[512];
+	sprintf(dataFilename, "GSim_%d.data", network->nodeIdx); 
+	FILE *dataFile = fopen(dataFilename, "w+");
+	assert(dataFile != NULL);
 
-	reset();
-
-	GNetwork *pCpuNet = network->buildNetwork();
-
-	FILE *logFile = fopen("GSim.log", "w+");
-	if (logFile == NULL) {
-		printf("ERROR: Open file SimGPU.log failed\n");
-		return -1;
-	}
-	FILE *dataFile = fopen("GSim.data", "w+");
-	if (dataFile == NULL) {
-		printf("ERROR: Open file SimGPU.log failed\n");
-		return -1;
-	}
-
+	GNetwork *pCpuNet = network->network;
 	GNetwork *c_pGpuNet = copyNetworkToGPU(pCpuNet);
 
 	int nTypeNum = pCpuNet->nTypeNum;
@@ -86,7 +81,7 @@ int MultiGPUSimulator::run(real time)
 	real *c_g_I_syn = c_g_exp->p_I_syn;
 
 	vector<int> firedInfo;
-	printf("Start runing for %d cycles\n", sim_cycle);
+	printf("Start runing for %d cycles\n", network->sim_cycle);
 	struct timeval ts, te;
 	gettimeofday(&ts, NULL);
 	for (int time=0; time<sim_cycle; time++) {
@@ -134,6 +129,7 @@ int MultiGPUSimulator::run(real time)
 		}
 		fprintf(dataFile, "\n");
 
+		pthread_barrier_wait(&cycle_barrier);
 
 		copyFromGPU<int>(buffers->c_synapsesFired, buffers->c_gSynapsesLogTable, totalSynapseNum);
 
@@ -155,6 +151,7 @@ int MultiGPUSimulator::run(real time)
 			fprintf(logFile, "\n");
 		}
 
+		pthread_barrier_wait(&cycle_barrier);
 		update_time<<<1, 1>>>();
 	}
 	gettimeofday(&te, NULL);
@@ -176,6 +173,43 @@ int MultiGPUSimulator::run(real time)
 
 	free_buffers(buffers);
 	freeGPUNetwork(c_pGpuNet);
+}
+
+int MultiGPUSimulator::run(real time)
+{
+	int sim_cycle = round(time/dt);
+	reset();
+
+	int device_count = 1;
+	checkCudaErrors(cudaGetDeviceCount(&device_count));
+	assert(device_count != 0);
+
+	pthread_barrier_init(&cycle_barrier, NULL, device_count);
+
+	MulitNetwork multiNet(network);
+	GNetwork *pCpuNets = multiNet.buildNetworks(device_count);
+
+	pthread_t *threadIds = (pthread_t *)malloc(sizeof(pthread_t) * device_count);
+
+	DistriNetwork *nodeNets = (DistriNetwork *)malloc(sizeof(DistriNetwork) * device_count);
+
+	for (int i=0; i<device_count; i++) {
+		nodeNets[i].simCycle = simCycle;
+		nodeNets[i].nodeIdx = i;
+		nodeNets[i].nodeNum = device_count;
+		nodeNets[i].network = pCpuNets[i];
+		nodeNets[i].crossNodeMap = &(multiNet.crossNodeMap[i]); 
+		nodeNets[i].crossNodeData = multiNet.crossNodeData; 
+
+		int ret = pthread_create(&(threadIds[i]), NULL, &(nodeNets[i]), NULL);
+		assert(ret != 0);
+	}
+
+	for (int i=0; i<device_count; i++) {
+		pthread_join(threadIds[i], NULL);
+	}
+
+	pthread_barrier_destroy(cycle_barrier);
 
 	return 0;
 }
