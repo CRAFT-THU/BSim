@@ -39,6 +39,12 @@ int cudaUpdateExp(void *data, int num, int start_id, BlockSize *pSize)
 	return 0;
 }
 
+int addCrossNeurons(int *ids, int num)
+{
+	add_cross_neuron<<<(num+MAXBLOCKSIZE-1)/MAXBLOCKSIZE, MAXBLOCKSIZE>>>(ids, num);
+	return 0;
+}
+
 //int cudaUpdateAlpha(void *data, int num, int start_id, BlockSize *pSize)
 //{
 //	update_alpha_synapse<<<pSize->gridSize, pSize->blockSize>>>((GAlphaSynapses*)data, num, start_id);

@@ -39,8 +39,6 @@ __device__ int *gSynapsesLogTable;
 __device__ int *gLayerInput;
 __device__ real *gXInput;
 
-
-
 __device__ int commit2globalTable(int *shared_buf, volatile unsigned int size, int *global_buf, int * global_size, int offset) 
 {
 	__shared__ volatile unsigned int start_loc;
@@ -424,6 +422,19 @@ __global__ void update_exp_synapse(GExpSynapses *d_synapses, int num, int start_
 
 	}
 	__syncthreads();
+}
+
+__global__ void add_cross_neuron(int *ids, int num)
+{
+	int tid = blockIdx.x * blockDim.x + threadIdx.x;
+	if (tid < num) {
+		gFiredTable[gFiredTableCap*gCurrentIdx + gFiredTableSizes[gCurrentIdx] + tid] = ids[tid];
+	}
+	__syncthreads();
+
+	if (tid == 0) {
+		gFiredTableSizes[gCurrentIdx] += num;
+	}
 }
 
 //__global__ void update_basic_synapse(GBasicSynapses *d_synapses, int num, int start_id)

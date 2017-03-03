@@ -107,7 +107,19 @@ GNetwork* MultiNetwork::buildNetworks(int nodeNum, bool autoSplited)
 	crossNodeMap = (CrossNodeMap*)malloc(sizeof(CrossNodeMap)*nodeNum);
 	assert(crossNodeMap != NULL);
 
+	for (int i=0; i<nodeNum; i++) {
+		crossNodeMap[i].idx2index = NULL;
+		crossNodeMap[i].crossNodeMap = NULL;
+	}
+
 	crossNodeData = (CrossNodeData*)malloc(sizeof(CrossNodeData)*nodeNum*nodeNum);
+	assert(crossNodeData != NULL);
+
+	for (int i=0; i<nodeNum*nodeNum; i++) {
+		crossNodeData[i].maxNeuronNum = 0;
+		crossNodeData[i].firedNeuronNum = 0;
+		crossNodeData[i].firedNeuronIdx = NULL;
+	}
 
 	for (int nodeIdx = 0; nodeIdx < nodeNum; nodeIdx++) {
 		int nodeNeuronTypeNum = globalNTypeInfo[nodeIdx].size();
@@ -306,6 +318,21 @@ GNetwork* MultiNetwork::buildNetworks(int nodeNum, bool autoSplited)
 					crossNodeData[tmp_idx].maxNeuronNum++;
 				}
 			}
+			if (crossNodeData[tmp_idx].maxNeuronNum > 0) {
+				crossNodeData[tmp_idx].firedNeuronIdx = (int*)malloc(sizeof(int)*crossNodeData[tmp_idx].maxNeuronNum);
+			}
+		}
+	}
+
+	for (int i=0; i<nodeNum; i++) {
+		int tmp_idx = i * nodeNum + i;
+		for (int j=0; j<nodeNum; j++) {
+			if (j != i) {
+				crossNodeData[tmp_idx].maxNeuronNum += crossNodeData[i*nodeNum + j].maxNeuronNum;
+			}
+		}
+
+		if (crossNodeData[tmp_idx].maxNeuronNum > 0) {
 			crossNodeData[tmp_idx].firedNeuronIdx = (int*)malloc(sizeof(int)*crossNodeData[tmp_idx].maxNeuronNum);
 		}
 	}

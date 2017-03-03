@@ -52,6 +52,7 @@ __global__ void update_exp_synapse(GExpSynapses *d_synapses, int num, int start_
 //__global__ void update_basic_synapse(GBasicSynapses *d_synapses, int num, int start_id);
 //__global__ void update_alpha_synapse(GAlphaSynapses *d_synapses, int num, int start_id);
 
+__global__ void add_cross_neuron(int *ids, int num);
 
 GBuffers* alloc_buffers(int neuron_num, int synapse_num, int max_delay);
 int free_buffers(GBuffers *buf);
