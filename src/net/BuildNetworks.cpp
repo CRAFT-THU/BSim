@@ -58,7 +58,7 @@ GNetwork* MultiNetwork::buildNetworks(int nodeNum, bool autoSplited)
 	vector<map<ID, int> > nodeNid2idx(nodeNum);
 
 	//Get Type info
-	for (piter = pPopulations.begin(); piter != pPopulations.end();  piter++) {
+	for (piter = network->pPopulations.begin(); piter != network->pPopulations.end();  piter++) {
 		PopulationBase * p = static_cast<PopulationBase*>(*piter);
 		Type type = p->getType();
 		int node = p->getID().getNode();
@@ -72,7 +72,7 @@ GNetwork* MultiNetwork::buildNetworks(int nodeNum, bool autoSplited)
 			globalNTypeInfo[node][type] += p->getNum();
 		}
 	}
-	for (niter = pNeurons.begin(); niter != pNeurons.end();  niter++) {
+	for (niter = network->pNeurons.begin(); niter != network->pNeurons.end();  niter++) {
 		NeuronBase * p = *niter;
 		Type type = p->getType();
 		int node = p->getID().getNode();
@@ -86,7 +86,7 @@ GNetwork* MultiNetwork::buildNetworks(int nodeNum, bool autoSplited)
 			globalNTypeInfo[node][type] += 1;
 		}
 	}
-	for (siter = pSynapses.begin(); siter != pSynapses.end();  siter++) {
+	for (siter = network->pSynapses.begin(); siter != network->pSynapses.end();  siter++) {
 		SynapseBase * p = *siter;
 		Type type = p->getType();
 		int node = p->getID().getNode();
@@ -136,7 +136,7 @@ GNetwork* MultiNetwork::buildNetworks(int nodeNum, bool autoSplited)
 			allocType[type](pN, tmp_iter->second);
 
 			int idx = 0;
-			for (piter = pPopulations.begin(); piter != pPopulations.end();  piter++) {
+			for (piter = network->pPopulations.begin(); piter != network->pPopulations.end();  piter++) {
 				PopulationBase * p = *piter;
 				int node = p->getID().getNode();
 				if (autoSplited) {
@@ -144,18 +144,18 @@ GNetwork* MultiNetwork::buildNetworks(int nodeNum, bool autoSplited)
 				}
 
 				if (node == nodeIdx && p->getType() == type) {
-					size_t copied = p->hardCopy(pN, idx, pNeuronsNum[index], nid2idx, nodeIdx2nid);
+					size_t copied = p->hardCopy(pN, idx, pNeuronsNum[index], network->nid2idx, nodeIdx2nid);
 					idx += copied;
 				}
 			}
-			for (niter = pNeurons.begin(); niter != pNeurons.end();  niter++) {
+			for (niter = network->pNeurons.begin(); niter != network->pNeurons.end();  niter++) {
 				NeuronBase * p = *niter;
 				int node = p->getID().getNode();
 				if (autoSplited) {
 					node = nid2node[(*niter)->getID()];
 				}
 				if (node == nodeIdx && p->getType() == type) {
-					size_t copied = p->hardCopy(pN, idx, pNeuronsNum[index], nid2idx, nodeIdx2nid);
+					size_t copied = p->hardCopy(pN, idx, pNeuronsNum[index], network->nid2idx, nodeIdx2nid);
 					idx += copied;
 				}
 			}
@@ -175,7 +175,7 @@ GNetwork* MultiNetwork::buildNetworks(int nodeNum, bool autoSplited)
 			allocType[type](pS, tmp_iter->second);
 
 			int idx = 0;
-			for (siter = pSynapses.begin(); siter != pSynapses.end();  siter++) {
+			for (siter = network->pSynapses.begin(); siter != network->pSynapses.end();  siter++) {
 				SynapseBase * p = *siter;
 				int node = p->getID().getNode();
 				if (autoSplited) {
@@ -183,7 +183,7 @@ GNetwork* MultiNetwork::buildNetworks(int nodeNum, bool autoSplited)
 				}
 
 				if (node == nodeIdx && p->getType() == type) {
-					int copied = p->hardCopy(pS, idx, pSynapsesNum[index], sid2idx, nodeIdx2sid);
+					int copied = p->hardCopy(pS, idx, pSynapsesNum[index], network->sid2idx, nodeIdx2sid);
 					idx += copied;
 				}
 			}
@@ -209,8 +209,8 @@ GNetwork* MultiNetwork::buildNetworks(int nodeNum, bool autoSplited)
 		int crossNodeNeuronNum = nodeNid2idx[nodeIdx].size();
 
 
-		int *delayNum = (int*)malloc(sizeof(int)*(this->maxDelaySteps)*(nodeNeuronNum + crossNodeNeuronNum));
-		int *delayStart = (int*)malloc(sizeof(int)*(this->maxDelaySteps)*(nodeNeuronNum + crossNodeNeuronNum));
+		int *delayNum = (int*)malloc(sizeof(int)*(this->network->maxDelaySteps)*(nodeNeuronNum + crossNodeNeuronNum));
+		int *delayStart = (int*)malloc(sizeof(int)*(this->network->maxDelaySteps)*(nodeNeuronNum + crossNodeNeuronNum));
 		int *pSynapsesIdx = (int*)malloc(sizeof(int)*nodeSynapseNum);
 
 		int synapseIdx = 0;
@@ -220,13 +220,13 @@ GNetwork* MultiNetwork::buildNetworks(int nodeNum, bool autoSplited)
 				printf("Can't find neuron index %d\n", nid);
 			}
 			
-			synapseIdx += addConnectionInfo(iter->second, nid, synapseIdx, delayStart, delayNum, pSynapsesIdx);
+			synapseIdx += network->addConnectionInfo(iter->second, nid, synapseIdx, delayStart, delayNum, pSynapsesIdx);
 		}
 
 		for (map<ID, int>::const_iterator tmp_iter = nodeNid2idx[nodeIdx].begin(); tmp_iter != nodeNid2idx[nodeIdx].end(); tmp_iter++) {
 			ID nID = tmp_iter->first; 
 			int nid = tmp_iter->second;
-			synapseIdx += addConnectionInfo(nID, nid, synapseIdx, delayStart, delayNum, pSynapsesIdx);
+			synapseIdx += network->addConnectionInfo(nID, nid, synapseIdx, delayStart, delayNum, pSynapsesIdx);
 		}
 
 		pAllConnections->pSynapsesIdx = pSynapsesIdx;
@@ -236,17 +236,17 @@ GNetwork* MultiNetwork::buildNetworks(int nodeNum, bool autoSplited)
 		for (int i=0; i<nodeSynapseTypeNum; i++) {
 			int *pSynapsesDst = (int*)malloc(sizeof(int)*(pSynapsesNum[i+1] - pSynapsesNum[i]));
 			map<ID, ID>::iterator s2nIter;
-			for (s2nIter = s2nNetwork.begin(); s2nIter != s2nNetwork.end(); s2nIter++) {
-				map<ID, int>::iterator iter = sid2idx.find(s2nIter->first);
-				if (iter == sid2idx.end()) {
+			for (s2nIter = network->s2nNetwork.begin(); s2nIter != network->s2nNetwork.end(); s2nIter++) {
+				map<ID, int>::iterator iter = network->sid2idx.find(s2nIter->first);
+				if (iter == network->sid2idx.end()) {
 					printf("Can't find ID %s\n", s2nIter->first.getInfo().c_str());
 				}
 				if (i != getType(pSynapsesNum, nodeSynapseTypeNum, iter->second)) {
 					continue;
 				}
 				int idx = getOffset(pSynapsesNum, nodeSynapseTypeNum, iter->second);
-				iter = nid2idx.find(s2nIter->second);
-				if (iter == nid2idx.end()) {
+				iter = network->nid2idx.find(s2nIter->second);
+				if (iter == network->nid2idx.end()) {
 					printf("Can't find ID %s\n", s2nIter->first.getInfo().c_str());
 				}
 				pSynapsesDst[idx] = iter->second;
@@ -266,12 +266,12 @@ GNetwork* MultiNetwork::buildNetworks(int nodeNum, bool autoSplited)
 		ret[nodeIdx].neuronNums = pNeuronsNum;
 		ret[nodeIdx].synapseNums = pSynapsesNum;
 
-		ret[nodeIdx].MAX_DELAY = maxDelaySteps;
+		ret[nodeIdx].MAX_DELAY = network->maxDelaySteps;
 
 		crossNodeIdx2Idx.resize(nodeNum);
 		for (map<ID, set<int> >::const_iterator tmp_iter = crossNodeInfo.begin(); tmp_iter != crossNodeInfo.end(); tmp_iter++) {
 			int node = nid2node[tmp_iter->first];
-			int idx = nid2idx[tmp_iter->first];
+			int idx = network->nid2idx[tmp_iter->first];
 			map<int, vector<int> >::const_iterator tmp_iter2 = crossNodeIdx2Idx[node].find(idx);
 			if (tmp_iter2 == crossNodeIdx2Idx[node].end()) {
 				crossNodeIdx2Idx[node][idx].resize(nodeNum, -1);

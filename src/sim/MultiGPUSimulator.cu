@@ -5,6 +5,7 @@
 
 #include <sys/time.h>
 #include <stdio.h>
+#include <assert.h>
 #include <pthread.h>
 
 #include "../utils/utils.h"
@@ -22,7 +23,7 @@ struct DistriNetwork {
 	int nodeNum;
 	GNetwork * network;
 	CrossNodeMap *crossNodeMap;
-	CrossNodeData *CrossNodeData;
+	CrossNodeData *crossNodeData;
 };
 
 pthread_barrier_t cycle_barrier;
@@ -33,6 +34,46 @@ MultiGPUSimulator::MultiGPUSimulator(Network *network, real dt) : SimulatorBase(
 
 MultiGPUSimulator::~MultiGPUSimulator()
 {
+}
+
+void *run_thread(void *para);
+
+int MultiGPUSimulator::run(real time)
+{
+	int simCycle = round(time/dt);
+	reset();
+
+	int deviceCount = 1;
+	checkCudaErrors(cudaGetDeviceCount(&deviceCount));
+	assert(deviceCount != 0);
+
+	pthread_barrier_init(&cycle_barrier, NULL, deviceCount);
+
+	MultiNetwork multiNet(network);
+	GNetwork *pCpuNets = multiNet.buildNetworks(deviceCount);
+
+	pthread_t *threadIds = (pthread_t *)malloc(sizeof(pthread_t) * deviceCount);
+	DistriNetwork *nodeNets = (DistriNetwork *)malloc(sizeof(DistriNetwork) * deviceCount);
+
+	for (int i=0; i<deviceCount; i++) {
+		nodeNets[i].simCycle = simCycle;
+		nodeNets[i].nodeIdx = i;
+		nodeNets[i].nodeNum = deviceCount;
+		nodeNets[i].network = &(pCpuNets[i]);
+		nodeNets[i].crossNodeMap = &(multiNet.crossNodeMap[i]); 
+		nodeNets[i].crossNodeData = multiNet.crossNodeData; 
+
+		int ret = pthread_create(&(threadIds[i]), NULL, &run_thread, (void*)&(nodeNets[i]));
+		assert(ret != 0);
+	}
+
+	for (int i=0; i<deviceCount; i++) {
+		pthread_join(threadIds[i], NULL);
+	}
+
+	pthread_barrier_destroy(&cycle_barrier);
+
+	return 0;
 }
 
 void run(void *para) {
@@ -81,10 +122,10 @@ void run(void *para) {
 	real *c_g_I_syn = c_g_exp->p_I_syn;
 
 	vector<int> firedInfo;
-	printf("Start runing for %d cycles\n", network->sim_cycle);
+	printf("Start runing for %d cycles\n", network->simCycle);
 	struct timeval ts, te;
 	gettimeofday(&ts, NULL);
-	for (int time=0; time<sim_cycle; time++) {
+	for (int time=0; time<network->simCycle; time++) {
 		printf("\rCycle: %d", time);
 		fflush(stdout);
 
@@ -110,9 +151,9 @@ void run(void *para) {
 		fprintf(logFile, "Cycle %d: ", time);
 		for (int i=0; i<copySize; i++) {
 			if (i ==  0) {
-				fprintf(logFile, "%s", network->idx2nid[buffers->c_neuronsFired[i]].getInfo().c_str());
+				fprintf(logFile, "%d", buffers->c_neuronsFired[i]);
 			} else {
-				fprintf(logFile, ", %s", network->idx2nid[buffers->c_neuronsFired[i]].getInfo().c_str());
+				fprintf(logFile, ", %d", buffers->c_neuronsFired[i]);
 			}
 		}
 
@@ -141,10 +182,10 @@ void run(void *para) {
 						if (copySize > 0) {
 							fprintf(logFile, ", ");
 						}
-						fprintf(logFile, "%s", network->idx2sid[i].getInfo().c_str());
+						fprintf(logFile, "%d", i);
 						synapseCount++;
 					} else {
-						fprintf(logFile, ", %s", network->idx2sid[i].getInfo().c_str());
+						fprintf(logFile, ", %d", i);
 					}
 				}
 			}
@@ -174,44 +215,3 @@ void run(void *para) {
 	free_buffers(buffers);
 	freeGPUNetwork(c_pGpuNet);
 }
-
-int MultiGPUSimulator::run(real time)
-{
-	int sim_cycle = round(time/dt);
-	reset();
-
-	int device_count = 1;
-	checkCudaErrors(cudaGetDeviceCount(&device_count));
-	assert(device_count != 0);
-
-	pthread_barrier_init(&cycle_barrier, NULL, device_count);
-
-	MulitNetwork multiNet(network);
-	GNetwork *pCpuNets = multiNet.buildNetworks(device_count);
-
-	pthread_t *threadIds = (pthread_t *)malloc(sizeof(pthread_t) * device_count);
-
-	DistriNetwork *nodeNets = (DistriNetwork *)malloc(sizeof(DistriNetwork) * device_count);
-
-	for (int i=0; i<device_count; i++) {
-		nodeNets[i].simCycle = simCycle;
-		nodeNets[i].nodeIdx = i;
-		nodeNets[i].nodeNum = device_count;
-		nodeNets[i].network = pCpuNets[i];
-		nodeNets[i].crossNodeMap = &(multiNet.crossNodeMap[i]); 
-		nodeNets[i].crossNodeData = multiNet.crossNodeData; 
-
-		int ret = pthread_create(&(threadIds[i]), NULL, &(nodeNets[i]), NULL);
-		assert(ret != 0);
-	}
-
-	for (int i=0; i<device_count; i++) {
-		pthread_join(threadIds[i], NULL);
-	}
-
-	pthread_barrier_destroy(cycle_barrier);
-
-	return 0;
-}
-
-
