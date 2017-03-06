@@ -3,8 +3,12 @@
  * Sat October 24 2015
  */
 
+#include <chrono>
+
 //#include "utils.h"
 #include "Network.h"
+
+using namespace std::chrono;
 
 Network::Network()
 {
@@ -381,3 +385,9 @@ void Network::monitor(SimInfo &info)
 	}
 }
 
+void Network::logMap() {
+	FILE *f = fopen("NID.map", "w+");
+	for (map<int, ID>::const_iterator iter = idx2nid.begin(); iter != idx2nid.end(); iter++) {
+		fprintf(f, "%d:%s", iter->first, iter->second.getInfo().c_str());
+	}
+}

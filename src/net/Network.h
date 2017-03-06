@@ -56,6 +56,8 @@ public:
 	int update(SimInfo &info);
 	void monitor(SimInfo &info);
 
+	void logMap();
+
 public:
 	vector<NeuronBase*> pOutputs;
 	vector<PopulationBase*> pPopulations;
