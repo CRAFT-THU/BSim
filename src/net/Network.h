@@ -5,6 +5,7 @@
 #ifndef NETWORK_H
 #define NETWORK_H
 
+#include <assert.h>
 #include <array>
 #include <vector>
 #include <set>
@@ -124,10 +125,8 @@ template<class Neuron1, class Neuron2>
 int Network::connect(Population<Neuron1> *pSrc, Population<Neuron2> *pDst, real *weight, real *delay, SpikeType *type, int size) {
 	int srcSize = pSrc->getNum();
 	int dstSize = pDst->getNum();
-	if (size != srcSize * dstSize) {
-		printf("ERROR: size not match!");
-		return -1;
-	}	
+	assert(size == (srcSize * dstSize)); 
+
 	if (find(pPopulations.begin(), pPopulations.end(), pSrc) == pPopulations.end()) {
 		pPopulations.push_back(pSrc);
 		populationNum++;

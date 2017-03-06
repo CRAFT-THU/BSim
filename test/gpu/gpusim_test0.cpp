@@ -41,9 +41,9 @@ int main(int argc, char **argv)
 
 	c.connect(pn0, pn1, weight0, delay, NULL, N*N);
 	c.connect(pn1, pn2, weight1, delay, NULL, N*N);
-	STSim st(&c, 1.0e-3f);
+	//STSim st(&c, 1.0e-3f);
 	SGSim sg(&c, 1.0e-3f);
-	st.run(0.1f);
+	//st.run(0.1f);
 	sg.run(0.1f);
 
 	if (!load) {

@@ -24,7 +24,6 @@ SingleGPUSimulator::~SingleGPUSimulator()
 
 int SingleGPUSimulator::run(real time)
 {
-	findCudaDevice(0, NULL);
 
 	int sim_cycle = round(time/dt);
 
@@ -43,6 +42,7 @@ int SingleGPUSimulator::run(real time)
 		return -1;
 	}
 
+	findCudaDevice(0, NULL);
 	GNetwork *c_pGpuNet = copyNetworkToGPU(pCpuNet);
 
 	int nTypeNum = pCpuNet->nTypeNum;
@@ -103,46 +103,36 @@ int SingleGPUSimulator::run(real time)
 
 		fprintf(logFile, "Cycle %d: ", time);
 		for (int i=0; i<copySize; i++) {
-			if (i ==  0) {
-				fprintf(logFile, "%s", network->idx2nid[buffers->c_neuronsFired[i]].getInfo().c_str());
-			} else {
-				fprintf(logFile, ", %s", network->idx2nid[buffers->c_neuronsFired[i]].getInfo().c_str());
-			}
+			fprintf(logFile, "%s ", network->idx2nid[buffers->c_neuronsFired[i]].getInfo().c_str());
 		}
 
 		fprintf(dataFile, "Cycle %d: ", time);
 		for (int i=0; i<c_pGpuNet->neuronNums[2] - c_pGpuNet->neuronNums[1]; i++) {
-			if (i ==  0) {
-				fprintf(dataFile, "%lf", c_vm[i]);
-			} else {
-				fprintf(dataFile, ", %lf", c_vm[i]);
-			}
+			fprintf(dataFile, "%lf ", c_vm[i]);
 		}
-		for (int i=0; i<c_pGpuNet->synapseNums[1] - c_pGpuNet->synapseNums[0]; i++) {
-				fprintf(dataFile, ", %lf", c_I_syn[i]);
-		}
+		//for (int i=0; i<c_pGpuNet->synapseNums[1] - c_pGpuNet->synapseNums[0]; i++) {
+		//		fprintf(dataFile, ", %lf", c_I_syn[i]);
+		//}
 		fprintf(dataFile, "\n");
 
-
-		copyFromGPU<int>(buffers->c_synapsesFired, buffers->c_gSynapsesLogTable, totalSynapseNum);
-
-		int synapseCount = 0;
-		if (time > 0) {
-			for (int i=0; i<totalSynapseNum; i++) {
-				if (buffers->c_synapsesFired[i] == time) {
-					if (synapseCount ==  0) {
-						if (copySize > 0) {
-							fprintf(logFile, ", ");
-						}
-						fprintf(logFile, "%s", network->idx2sid[i].getInfo().c_str());
-						synapseCount++;
-					} else {
-						fprintf(logFile, ", %s", network->idx2sid[i].getInfo().c_str());
-					}
-				}
-			}
-			fprintf(logFile, "\n");
-		}
+		//copyFromGPU<int>(buffers->c_synapsesFired, buffers->c_gSynapsesLogTable, totalSynapseNum);
+		//int synapseCount = 0;
+		//if (time > 0) {
+		//	for (int i=0; i<totalSynapseNum; i++) {
+		//		if (buffers->c_synapsesFired[i] == time) {
+		//			if (synapseCount ==  0) {
+		//				if (copySize > 0) {
+		//					fprintf(logFile, ", ");
+		//				}
+		//				fprintf(logFile, "%s", network->idx2sid[i].getInfo().c_str());
+		//				synapseCount++;
+		//			} else {
+		//				fprintf(logFile, ", %s", network->idx2sid[i].getInfo().c_str());
+		//			}
+		//		}
+		//	}
+		//	fprintf(logFile, "\n");
+		//}
 
 		update_time<<<1, 1>>>();
 	}

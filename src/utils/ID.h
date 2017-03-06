@@ -22,8 +22,7 @@ public:
 	ID();
 	ID(int id);
 	ID(int grp_id, int id);
-	ID(short grp_id, int id);
-	ID(char type_id, short grp_id, int id);
+	ID(char machine_id, int grp_id, int id);
 	ID(char machine_id, char type_id, short grp_id, int id);
 	ID(ID &id);
 	ID(const ID &id);

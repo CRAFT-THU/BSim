@@ -27,7 +27,6 @@ void MultiNetwork::splitNetwork(int nodeNum)
 			}
 
 		}
-		//synapseCount += p->setNode(nodeNum);
 		if (synapseCount >= nodeIdx * synapsePerNode && nodeIdx < nodeNum) {
 			nodeIdx++;	
 		}

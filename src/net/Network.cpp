@@ -18,6 +18,8 @@ Network::Network()
 	populationNum = 0;
 	totalNeuronNum = 0;
 	totalSynapseNum = 0;
+
+	n2sNetwork.clear();
 }
 
 Network::~Network()

@@ -1,4 +1,6 @@
 
+#include <assert.h>
+
 #include "../utils/utils.h"
 #include "../utils/TypeFunc.h"
 #include "Network.h"
@@ -13,20 +15,31 @@ GNetwork* Network::buildNetwork()
 	int synapseTypeNum = sTypes.size();
 
 	void **pAllNeurons = (void**)malloc(sizeof(void*)*neuronTypeNum);
+	assert(pAllNeurons != NULL);
 	void **pAllSynapses = (void**)malloc(sizeof(void*)*synapseTypeNum);
+	assert(pAllSynapses != NULL);
 	N2SConnection *pAllConnections = (N2SConnection*)malloc(sizeof(N2SConnection));
+	assert(pAllConnections != NULL);
 
 	int *pNOffsets = (int*)malloc(sizeof(int)*(neuronTypeNum));
+	assert(pNOffsets != NULL);
 	int *pSOffsets = (int*)malloc(sizeof(int)*(synapseTypeNum));
+	assert(pSOffsets != NULL);
 	int *pNeuronsNum = (int*)malloc(sizeof(int)*(neuronTypeNum + 1));
+	assert(pNeuronsNum != NULL);
 	int *pSynapsesNum = (int*)malloc(sizeof(int)*(synapseTypeNum + 1));
+	assert(pSynapsesNum != NULL);
 	pNeuronsNum[0] = 0;
 	pSynapsesNum[0] = 0;
 
 	Type *pNTypes = (Type*)malloc(sizeof(Type)*neuronTypeNum);
+	assert(pNTypes != NULL);
 	Type *pSTypes = (Type*)malloc(sizeof(Type)*synapseTypeNum);
-	int *pGNeuronNums = (int*)malloc(sizeof(int)*(neuronTypeNum));
-	int *pGSynapseNums = (int*)malloc(sizeof(int)*(synapseTypeNum));
+	assert(pSTypes != NULL);
+	int *pGNeuronNums = (int*)malloc(sizeof(int)*(neuronTypeNum+1));
+	assert(pGNeuronNums != NULL);
+	int *pGSynapseNums = (int*)malloc(sizeof(int)*(synapseTypeNum+1));
+	assert(pGSynapseNums != NULL);
 	pGNeuronNums[0] = 0;
 	pGSynapseNums[0] = 0;
 
@@ -34,6 +47,7 @@ GNetwork* Network::buildNetwork()
 		pNTypes[i] = nTypes[i];
 
 		void *pN = createType[nTypes[i]]();
+		assert(pN != NULL);
 		allocType[nTypes[i]](pN, neuronNums[i]);
 
 		int idx = 0;
@@ -63,6 +77,7 @@ GNetwork* Network::buildNetwork()
 		pSTypes[i] = sTypes[i];
 
 		void *pS = createType[sTypes[i]]();
+		assert(pS != NULL);
 		allocType[sTypes[i]](pS, synapseNums[i]);
 
 		int idx = 0;
@@ -81,23 +96,24 @@ GNetwork* Network::buildNetwork()
 	}
 
 	int *delayNum = (int*)malloc(sizeof(int)*(this->maxDelaySteps)*totalNeuronNum);
+	assert(delayNum != NULL);
 	int *delayStart = (int*)malloc(sizeof(int)*(this->maxDelaySteps)*totalNeuronNum);
+	assert(delayStart != NULL);
 	int *pSynapsesIdx = (int*)malloc(sizeof(int)*totalSynapseNum);
+	assert(pSynapsesIdx != NULL);
 
 	int synapseIdx = 0;
 	for (int nid=0; nid<totalNeuronNum; nid++) {
 		map<int, ID>::iterator iter = idx2nid.find(nid);
-		if (iter == idx2nid.end()) {
-			printf("Can't find neuron index %d\n", nid);
-		}
+		assert(iter != idx2nid.end());
+
 		map<ID, vector<ID>>::iterator n2siter = n2sNetwork.find(iter->second);
 		if (n2siter == n2sNetwork.end()) {
 			//printf("Cant't find neuron id %d_%d\n", iter->second.groupId, iter->second.id);
-			
+			assert(synapseIdx < totalSynapseNum);
 			pSynapsesIdx[synapseIdx] = -1;
 
 			for (int delay_t=0; delay_t < maxDelaySteps; delay_t++) {
-				
 				delayStart[delay_t + maxDelaySteps*nid] = synapseIdx;
 				delayNum[delay_t + maxDelaySteps*nid] = 0;
 			}
@@ -110,11 +126,10 @@ GNetwork* Network::buildNetwork()
 			for (int i=0; i<synapsesNum_t; i++) {
 				if (id2synapse[n2siter->second.at(i)]->getDelay() == delay_t+1) {
 					map<ID, int>::iterator sid2idxiter = sid2idx.find(n2siter->second.at(i));
-					if (sid2idxiter == sid2idx.end()) {
-						printf("Can't find synapse ID %s\n", n2siter->second.at(i).getInfo().c_str());
-					}
+					assert(sid2idxiter != sid2idx.end());
 
 					int sid = sid2idxiter->second;
+					assert(synapseIdx < totalSynapseNum);
 					pSynapsesIdx[synapseIdx] = sid;
 					synapseIdx++;
 				}
@@ -130,6 +145,7 @@ GNetwork* Network::buildNetwork()
 
 	for (int i=0; i<synapseTypeNum; i++) {
 		int *pSynapsesDst = (int*)malloc(sizeof(int)*synapseNums[i]);
+		assert(pSynapsesDst != NULL);
 		map<ID, ID>::iterator s2nIter;
 		for (s2nIter = s2nNetwork.begin(); s2nIter != s2nNetwork.end(); s2nIter++) {
 			map<ID, int>::iterator iter = sid2idx.find(s2nIter->first);
@@ -151,10 +167,7 @@ GNetwork* Network::buildNetwork()
 	}
 
 	GNetwork * ret = (GNetwork*)malloc(sizeof(GNetwork));
-	if (ret == NULL) {
-		printf("Malloc GNetwork failed/n");
-		return NULL;
-	}
+	assert(ret != NULL);
 
 	ret->pNeurons = pAllNeurons;
 	ret->pSynapses = pAllSynapses;

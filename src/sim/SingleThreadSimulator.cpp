@@ -23,7 +23,7 @@ int SingleThreadSimulator::run(real time)
 
 	FILE *logFile = fopen("Sim.log", "w+");
 	FILE *dataFile = fopen("Sim.data", "w+");
-	FILE *outFile = fopen("Output.csv", "w+");
+	//FILE *outFile = fopen("Output.csv", "w+");
 	if (logFile == NULL) {
 		printf("Open file Sim.log failed\n");
 		return -1;
@@ -32,17 +32,18 @@ int SingleThreadSimulator::run(real time)
 		printf("Open file Sim.data failed\n");
 		return -1;
 	}
-	if (outFile == NULL) {
-		printf("Open file Sim.log failed\n");
-		return -2;
-	} else {
-		fprintf(outFile, "Cycle");
-		int size = network->pOutputs.size();
-		for (int i=0; i<size; i++) {
-			fprintf(outFile, ",%s", network->pOutputs[i]->getID().getInfo().c_str());
-		}
-		fprintf(outFile, "\n");
-	}
+
+	//if (outFile == NULL) {
+	//	printf("Open file Sim.log failed\n");
+	//	return -2;
+	//} else {
+	//	fprintf(outFile, "Cycle");
+	//	int size = network->pOutputs.size();
+	//	for (int i=0; i<size; i++) {
+	//		fprintf(outFile, ",%s", network->pOutputs[i]->getID().getInfo().c_str());
+	//	}
+	//	fprintf(outFile, "\n");
+	//}
 
 	reset();
 	vector<SynapseBase*>::iterator iterS;
@@ -74,11 +75,7 @@ int SingleThreadSimulator::run(real time)
 		int isize = info.input.size();
 		fprintf(dataFile, "Cycle %d: ", info.currCycle);
 		for (int i=0; i<isize; i++) {
-			if (i==0) {
-				fprintf(dataFile, "%lf", info.input[i]);
-			} else {
-				fprintf(dataFile, ", %lf", info.input[i]);
-			}
+			fprintf(dataFile, "%lf ", info.input[i]);
 		}
 
 		fprintf(dataFile, "\n");
@@ -86,22 +83,22 @@ int SingleThreadSimulator::run(real time)
 		int size = info.fired.size();
 		fprintf(logFile, "Cycle %d: ", info.currCycle);
 		if (size > 0) {
-			fprintf(logFile, "%s", info.fired[0].getInfo().c_str());
+			fprintf(logFile, "%s ", info.fired[0].getInfo().c_str());
 			for (int i=1; i<size; i++) {
 				fprintf(logFile, ", %s", info.fired[i].getInfo().c_str());
 			}
 		}
 		fprintf(logFile, "\n");
 
-		size = network->pOutputs.size();
-		fprintf(outFile, "%d", info.currCycle);
-		if (size > 0) {
-			fprintf(outFile, ",%d", network->pOutputs[0]->isFired());
-			for (int i=1; i<size; i++) {
-				fprintf(outFile, ",%d", network->pOutputs[i]->isFired());
-			}
-		}
-		fprintf(outFile, "\n");
+		//size = network->pOutputs.size();
+		//fprintf(outFile, "%d", info.currCycle);
+		//if (size > 0) {
+		//	fprintf(outFile, ",%d", network->pOutputs[0]->isFired());
+		//	for (int i=1; i<size; i++) {
+		//		fprintf(outFile, ",%d", network->pOutputs[i]->isFired());
+		//	}
+		//}
+		//fprintf(outFile, "\n");
 	}
 	gettimeofday(&te, NULL);
 	long seconds = te.tv_sec - ts.tv_sec;

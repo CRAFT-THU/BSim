@@ -25,24 +25,16 @@ ID::ID(int id)
 ID::ID(int grp_id, int id)
 {
 	this->id.detailed_id.machine_id = 0;
-	this->id.detailed_id.type_id= (grp_id >> 16) & 0xF;
+	this->id.detailed_id.type_id= (grp_id >> 16) & 0xFF;
 	this->id.detailed_id.grp_id = grp_id & 0xFFFF;
 	this->id.detailed_id.id = id;
 }
 
-ID::ID(short grp_id, int id)
+ID::ID(char machine_id, int grp_id, int id)
 {
 	this->id.detailed_id.machine_id = 0;
-	this->id.detailed_id.type_id= 0;
-	this->id.detailed_id.grp_id = grp_id;
-	this->id.detailed_id.id = id;
-}
-
-ID::ID(char type_id, short grp_id, int id)
-{
-	this->id.detailed_id.machine_id = 0;
-	this->id.detailed_id.type_id = type_id;
-	this->id.detailed_id.grp_id = grp_id;
+	this->id.detailed_id.type_id = (grp_id >> 16) & 0xFF;
+	this->id.detailed_id.grp_id = grp_id & 0xFFFF;
 	this->id.detailed_id.id = id;
 }
 
