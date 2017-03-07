@@ -13,12 +13,11 @@ const Type ExpSynapse::type = Exp;
 
 using std::map;
 
-ExpSynapse::ExpSynapse(ID id, real weight, real delay = 0, real tau_syn = 0)
+ExpSynapse::ExpSynapse(ID id, real weight, real delay = 0, real tau_syn = 0) : SynapseBase(id)
 {
 	this->weight = weight;
 	this->delay = delay;
 	this->tau_syn = tau_syn;
-	this->id = id;
 	this->monitored = false;
 	file = NULL;
 }
@@ -68,7 +67,7 @@ int ExpSynapse::update(SimInfo &info)
 		I_syn += weight/_C1;
 		pDest->recv(I_syn);
 		delay_queue.pop_front();
-		info.fired.push_back(id);
+		info.fired.push_back(getID());
 	}
 
 	for (iter = delay_queue.begin(); iter != delay_queue.end(); iter++) {
@@ -102,7 +101,7 @@ void ExpSynapse::monitor(SimInfo &info)
 	if (monitored) {
 		if (file == NULL) {
 			char filename[128];
-			sprintf(filename, "Synapse_%d.log", id.getID());
+			sprintf(filename, "Synapse_%d.log", getID().getId());
 			file = fopen(filename, "w+");
 			if (file == NULL) {
 				printf("Open file %s failed\n", filename);
@@ -134,8 +133,8 @@ int ExpSynapse::getData(void *data)
 int ExpSynapse::hardCopy(void *data, int idx, int base, map<ID, int> &id2idx, map<int, ID> &idx2id)
 {
 	GExpSynapses *p = (GExpSynapses *)data;
-	id2idx[id] = idx + base;
-	idx2id[idx+base] = id;
+	id2idx[this->getID()] = idx + base;
+	idx2id[idx+base] = this->getID();
 	//p->pID[idx] = id;
 	//p->pType[idx] = type;
 	p->p_weight[idx] = weight;

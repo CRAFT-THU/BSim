@@ -33,7 +33,7 @@ public:
 	template<class Neuron>
 	Neuron* create(Neuron n1);
 	template<class Neuron>
-	Population<Neuron>* createPopulation(ID id, int num, Neuron templ, bool empty = false);
+	Population<Neuron>* createPopulation(int id, int num, Neuron templ, bool empty = false);
 	template<class Neuron1, class Neuron2>
 	int connect(Population<Neuron1> *pSrc, Population<Neuron2> *pDst, real *weight, real *delay, SpikeType *type, int size);
 	
@@ -102,7 +102,7 @@ Neuron* Network::create(Neuron n1)
 }
 
 template<class Neuron>
-Population<Neuron>* Network::createPopulation(ID id, int num, Neuron templ, bool empty)
+Population<Neuron>* Network::createPopulation(int id, int num, Neuron templ, bool empty)
 {
 	
 	Population<Neuron> * pp1 = NULL;

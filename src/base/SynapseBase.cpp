@@ -5,18 +5,12 @@
 
 #include "SynapseBase.h"
 
-SynapseBase::SynapseBase() 
+SynapseBase::SynapseBase(ID id, int node) : Base(id, node) 
 {
 	monitored = false;
 }
 
 SynapseBase::~SynapseBase() {}
-
-int SynapseBase::setNode(int node)
-{
-	this->id.setNode(node);
-	return 1;
-}
 
 void SynapseBase::monitorOn()
 {

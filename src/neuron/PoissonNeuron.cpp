@@ -10,9 +10,8 @@
 
 const Type PoissonNeuron::type = Poisson;
 
-PoissonNeuron::PoissonNeuron(ID id, real rate, real refract, real startTime, real duration)
+PoissonNeuron::PoissonNeuron(ID id, real rate, real refract, real startTime, real duration) : NeuronBase(id)
 {
-	this->id = id;
 	this->rate = rate;
 	this->refract = refract;
 	this->startTime = startTime;
@@ -57,7 +56,7 @@ int PoissonNeuron::update(SimInfo &info)
 		fired = true;
 		fireCycle = fireCycle + 1 + distribution(generator); 
 		fire();
-		info.fired.push_back(this->id);
+		info.fired.push_back(getID());
 	} 
 	return 0;
 }
@@ -72,7 +71,7 @@ void PoissonNeuron::monitor(SimInfo &info)
 	if (monitored) {
 		if (file == NULL) {
 			char filename[128];
-			sprintf(filename, "PoissonNeuron_%s.log", this->id.getInfo().c_str());
+			sprintf(filename, "PoissonNeuron_%s.log", getID().getInfo().c_str());
 			file = fopen(filename, "w+");
 		}
 		fprintf(file, "%d:%d:%d:%d\n", info.currCycle, fireCycle, startCycle, fired);
@@ -97,8 +96,8 @@ size_t PoissonNeuron::getSize() {
 int PoissonNeuron::hardCopy(void *data, int idx, int base, map<ID, int> &id2idx, map<int, ID> &idx2id)
 {
 	GPoissonNeurons *p = (GPoissonNeurons *) data;
-	id2idx[id] = idx + base;
-	idx2id[idx+base] = id;
+	id2idx[getID()] = idx + base;
+	idx2id[idx+base] = getID();
 
 	p->p_rate[idx] = rate;
 	p->p_fire_cycle[idx] = fireCycle;

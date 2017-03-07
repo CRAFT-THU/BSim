@@ -11,7 +11,7 @@ class SynapseBase;
 
 class NeuronBase : public Base {
 public:
-	NeuronBase();
+	NeuronBase(ID id, int node = 0);
 	virtual ~NeuronBase() = 0;
 
 	virtual void monitorOn();
@@ -20,8 +20,6 @@ public:
 
 	virtual int fire();
 	virtual int recv(real I) = 0;
-
-	virtual int setNode(int node);
 
 	virtual SynapseBase *addSynapse(SynapseBase *addSynapse);
 	virtual SynapseBase *createSynapse(real weight, real delay, SpikeType type, real tau, NeuronBase *dst);

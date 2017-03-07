@@ -166,7 +166,7 @@ PopulationBase* Network::findPopulation(int populationID)
 	vector<PopulationBase*>::iterator iter;
 	for (iter = pPopulations.begin(); iter != pPopulations.end(); iter++) {
 		PopulationBase * t = *iter;
-		if (t->getID().getID() == populationID) {
+		if (t->getID().getId() == populationID) {
 			pP = *iter;
 		}
 		if (pP != NULL) {

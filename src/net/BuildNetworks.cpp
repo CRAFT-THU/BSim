@@ -61,7 +61,7 @@ GNetwork* MultiNetwork::buildNetworks(int nodeNum, bool autoSplited)
 	for (piter = network->pPopulations.begin(); piter != network->pPopulations.end();  piter++) {
 		PopulationBase * p = static_cast<PopulationBase*>(*piter);
 		Type type = p->getType();
-		int node = p->getID().getNode();
+		int node = p->getNode();
 		if (autoSplited) {
 			node = nid2node[p->getNeuron(0)->getID()];
 		}
@@ -75,7 +75,7 @@ GNetwork* MultiNetwork::buildNetworks(int nodeNum, bool autoSplited)
 	for (niter = network->pNeurons.begin(); niter != network->pNeurons.end();  niter++) {
 		NeuronBase * p = *niter;
 		Type type = p->getType();
-		int node = p->getID().getNode();
+		int node = p->getNode();
 		if (autoSplited) {
 			node = nid2node[(*niter)->getID()];
 		}
@@ -89,7 +89,7 @@ GNetwork* MultiNetwork::buildNetworks(int nodeNum, bool autoSplited)
 	for (siter = network->pSynapses.begin(); siter != network->pSynapses.end();  siter++) {
 		SynapseBase * p = *siter;
 		Type type = p->getType();
-		int node = p->getID().getNode();
+		int node = p->getNode();
 		if (autoSplited) {
 			node = sid2node[(*siter)->getID()];
 		}
@@ -150,7 +150,7 @@ GNetwork* MultiNetwork::buildNetworks(int nodeNum, bool autoSplited)
 			int idx = 0;
 			for (piter = network->pPopulations.begin(); piter != network->pPopulations.end();  piter++) {
 				PopulationBase * p = *piter;
-				int node = p->getID().getNode();
+				int node = p->getNode();
 				if (autoSplited) {
 					node = nid2node[p->getNeuron(0)->getID()];
 				}
@@ -162,7 +162,7 @@ GNetwork* MultiNetwork::buildNetworks(int nodeNum, bool autoSplited)
 			}
 			for (niter = network->pNeurons.begin(); niter != network->pNeurons.end();  niter++) {
 				NeuronBase * p = *niter;
-				int node = p->getID().getNode();
+				int node = p->getNode();
 				if (autoSplited) {
 					node = nid2node[(*niter)->getID()];
 				}
@@ -189,7 +189,7 @@ GNetwork* MultiNetwork::buildNetworks(int nodeNum, bool autoSplited)
 			int idx = 0;
 			for (siter = network->pSynapses.begin(); siter != network->pSynapses.end();  siter++) {
 				SynapseBase * p = *siter;
-				int node = p->getID().getNode();
+				int node = p->getNode();
 				if (autoSplited) {
 					node = sid2node[(*siter)->getID()];
 				}

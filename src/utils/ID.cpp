@@ -11,49 +11,29 @@ using std::stringstream;
 
 ID::ID()
 {
-	this->id.packed_id = 0;
+	this->_id.packed_id = 0;
 }
 
 ID::ID(int id)
 {
-	this->id.detailed_id.machine_id = 0;
-	this->id.detailed_id.type_id= 0;
-	this->id.detailed_id.grp_id = 0;
-	this->id.detailed_id.id = id;
+	this->_id.detailed_id.grp_id = 0;
+	this->_id.detailed_id.id = id;
 }
 
 ID::ID(int grp_id, int id)
 {
-	this->id.detailed_id.machine_id = 0;
-	this->id.detailed_id.type_id= (grp_id >> 16) & 0xFF;
-	this->id.detailed_id.grp_id = grp_id & 0xFFFF;
-	this->id.detailed_id.id = id;
-}
-
-ID::ID(char machine_id, int grp_id, int id)
-{
-	this->id.detailed_id.machine_id = 0;
-	this->id.detailed_id.type_id = (grp_id >> 16) & 0xFF;
-	this->id.detailed_id.grp_id = grp_id & 0xFFFF;
-	this->id.detailed_id.id = id;
-}
-
-ID::ID(char machine_id, char type_id, short grp_id, int id)
-{
-	this->id.detailed_id.type_id= type_id;
-	this->id.detailed_id.machine_id = machine_id;
-	this->id.detailed_id.grp_id = grp_id;
-	this->id.detailed_id.id = id;
+	this->_id.detailed_id.grp_id = grp_id;
+	this->_id.detailed_id.id = id;
 }
 
 ID::ID(ID &a)
 {
-	this->id.packed_id = a.id.packed_id;
+	this->_id.packed_id = a._id.packed_id;
 }
 
 ID::ID(const ID &a)
 {
-	this->id.packed_id = a.id.packed_id;
+	this->_id.packed_id = a._id.packed_id;
 }
 
 ID::~ID()
@@ -62,33 +42,27 @@ ID::~ID()
 
 void ID::advance()
 {
-	id.packed_id++;
+	_id.packed_id++;
 }
 
 void ID::setID(ID &id)
 {
-	this->id.packed_id = id.id.packed_id;
-}
-
-void ID::setNode(char node)
-{
-	this->id.detailed_id.machine_id = node;
+	this->_id.packed_id = id._id.packed_id;
 }
 
 string ID::getInfo() const
 {
 	stringstream changer;
-	int grp_id = getGID();
-	changer << grp_id << "_" << id.detailed_id.id;
-	string ret;
-	changer << ret;
-	return ret; 
+	changer << getGid() << "_" << getId();
+	string info;
+	changer << info;
+	return info; 
 }
 
 bool ID::operator==(const ID &id1)const{  
-	return (this->id.packed_id == id1.id.packed_id);  
+	return (this->_id.packed_id == id1._id.packed_id);  
 }    
 
 bool ID::operator<(const ID &id1)const{  
-	return (this->id.packed_id < id1.id.packed_id);  
+	return (this->_id.packed_id < id1._id.packed_id);  
 }    

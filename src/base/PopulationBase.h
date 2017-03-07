@@ -9,7 +9,7 @@
 
 class PopulationBase : public Base {
 public:
-	PopulationBase();
+	PopulationBase(ID id, int node = 0);
 	virtual ~PopulationBase() = 0;
 
 	virtual void monitorOn();

@@ -15,8 +15,8 @@ using std::vector;
 template<class Neuron>
 class Population : public PopulationBase {
 public:
-	Population(ID _id, unsigned int N);
-	Population(ID _id, unsigned int N, Neuron templ);
+	Population(int id, size_t N);
+	Population(int id, size_t N, Neuron templ);
 	~Population();
 
 	Type getType();
@@ -24,7 +24,7 @@ public:
 	int getNum();
 	virtual size_t getSize();
 
-	virtual int setNode(int node) final;
+	//virtual void setNode(int node) final;
 	virtual int reset(SimInfo &info);
 	virtual int update(SimInfo &info);
 	virtual void monitor(SimInfo &info);
@@ -38,7 +38,7 @@ public:
 protected:
 	const static Type type;
 
-	unsigned int N;
+	size_t N;
 	vector<Neuron> neurons;
 };
 
@@ -48,20 +48,18 @@ template<class Neuron>
 const Type Population<Neuron>::type = Neuron::type;
 
 template<class Neuron>
-Population<Neuron>::Population(ID _id, unsigned int N) 
+Population<Neuron>::Population(int id, size_t N) : PopulationBase(ID(0, id))
 {
-	this->id = _id;
 	neurons.reserve(N);
 	this->N = N;
 }
 
 template<class Neuron>
-Population<Neuron>::Population(ID _id, unsigned int N, Neuron templ)
+Population<Neuron>::Population(int id, size_t N, Neuron templ) : PopulationBase(ID(0, id))
 {
-	this->id = _id;
 	neurons.resize(N, templ);
 	for (unsigned int i=0; i<N; i++) {
-		neurons[i].setID(ID(id.getID(), i));
+		neurons[i].setID(ID(id, i));
 	}
 	this->N = N;
 }
@@ -88,29 +86,25 @@ NeuronBase* Population<Neuron>::getNeuron(int idx)
 template<class Neuron>
 NeuronBase* Population<Neuron>::findNeuron(ID id)
 {
-	NeuronBase *ret = NULL;
 	for (unsigned int i=0; i< neurons.size(); i++) {
 		if (neurons[i].getID() == id) {
-			ret = &(neurons[i]);
-			break;
+			return &(neurons[i]);
 		}
 	}
 
-	return ret;
+	return NULL;
 }
 
 
-template<class Neuron>
-int Population<Neuron>::setNode(int node)
-{
-	int count = 0;
-	this->id.setNode(node);
-	typename vector<Neuron>::iterator iter;
-	for (iter = neurons.begin(); iter != neurons.end(); iter++) {
-		count = count + iter->setNode(node);
-	}
-	return count;
-}
+//template<class Neuron>
+//void Population<Neuron>::setNode(int node)
+//{
+//	Base::setNode(node);
+//	typename vector<Neuron>::iterator iter;
+//	for (iter = neurons.begin(); iter != neurons.end(); iter++) {
+//		setNode(node);
+//	}
+//}
 
 template<class Neuron>
 void Population<Neuron>::monitor(SimInfo &info)
@@ -170,7 +164,6 @@ int Population<Neuron>::addNeuron(Neuron templ)
 
 template<class Neuron>
 int Population<Neuron>::hardCopy(void *data, int idx, int base, map<ID, int> &id2idx, map<int, ID> &idx2id)
-//int Population<Neuron>::hardCopy(void *data, int idx)
 {
 	size_t copiedIdxs = 0;
 	typename vector<Neuron>::iterator iter;
@@ -189,8 +182,8 @@ Type Population<Neuron>::getType() {
 template<class Neuron>
 int Population<Neuron>::getData(void *data) {
 	Json::Value *p = (Json::Value *)data;
-	(*p)["id"] = id.getID();
-	(*p)["size"] = N;
+	(*p)["id"] = getID().getId();
+	(*p)["size"] = (unsigned int)N;
 	(*p)["neuron_type"] = 0;
 	Json::Value parameters(Json::arrayValue);
 	typename vector<Neuron>::iterator iter;

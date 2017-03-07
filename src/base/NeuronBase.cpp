@@ -7,7 +7,7 @@
 
 #include "NeuronBase.h"
 
-NeuronBase::NeuronBase() 
+NeuronBase::NeuronBase(ID id, int node) : Base(id, node)
 {
 	fired = false;
 	monitored = false;
@@ -28,12 +28,6 @@ void NeuronBase::monitorOn()
 int NeuronBase::fire() 
 {
 	return 0;
-}
-
-int NeuronBase::setNode(int node)
-{
-	this->id.setNode(node);
-	return 1;
 }
 
 SynapseBase * NeuronBase::createSynapse(real weight, real delay, SpikeType type, real tau, NeuronBase *dst) 

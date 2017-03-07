@@ -12,7 +12,7 @@ IDPool recvTag;
 
 IDPool::IDPool()
 {
-	ID tmp(0, 0, -1, 0);
+	ID tmp(0, 0);
 	this->id.setID(tmp);
 }
 

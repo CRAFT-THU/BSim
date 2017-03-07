@@ -11,9 +11,7 @@
 using std::string;
 
 struct Detailed_ID {
-	char machine_id;
-	char type_id;
-	short grp_id;
+	int grp_id;
 	int id;
 };
 
@@ -31,21 +29,15 @@ public:
 	void advance();
 	void setID(ID &id);
 	void setNode(char node);
-	inline int getID() const
+	inline int getId() const
 	{ 
-		return id.detailed_id.id; 
+		return _id.detailed_id.id; 
 	}
-	inline int getGID() const
+	inline int getGid() const
 	{  
-		int grp_id = id.detailed_id.type_id;
-		grp_id = grp_id << 16;
-		grp_id += id.detailed_id.grp_id;
-		return grp_id;
+		return _id.detailed_id.grp_id;
 	}
-	inline int getNode() const
-	{ 
-		return id.detailed_id.machine_id; 
-	}
+
 	string getInfo() const;
 
 	bool operator==(const ID &id1)const; 
@@ -55,7 +47,7 @@ private:
 	union Union_Id {
 		long long packed_id;
 		Detailed_ID detailed_id;
-	} id;
+	} _id;
 };
 
 #endif /* ID_H */

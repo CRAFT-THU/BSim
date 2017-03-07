@@ -10,12 +10,11 @@
 
 class SynapseBase : public Base {
 public:
-	SynapseBase();
+	SynapseBase(ID id, int node = 0);
 	virtual ~SynapseBase() = 0;
 
 	virtual int recv() = 0;
 
-	virtual int setNode(int node);
 	virtual void monitorOn();
 	virtual void setDst(NeuronBase *p) = 0;
 	virtual int getDelay();
