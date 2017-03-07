@@ -5,6 +5,13 @@
 #include "../utils/TypeFunc.h"
 #include "Network.h"
 
+void Network::mapIDtoIdx()
+{
+	vector<PopulationBase*>::iterator piter;
+	vector<NeuronBase*>::iterator niter;
+	vector<SynapseBase*>::iterator siter;
+}
+
 GNetwork* Network::buildNetwork()
 {
 	vector<PopulationBase*>::iterator piter;

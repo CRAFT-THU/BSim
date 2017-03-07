@@ -58,6 +58,8 @@ public:
 	void monitor(SimInfo &info);
 
 	void logMap();
+private:
+	void mapIDtoIdx();
 
 public:
 	vector<NeuronBase*> pOutputs;
