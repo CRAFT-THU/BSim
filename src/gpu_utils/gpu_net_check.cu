@@ -31,15 +31,11 @@ int checkGPUNetwork(GNetwork *g, GNetwork *c)
 
 	CHECK(g, c, nTypeNum);
 	CHECK(g, c, sTypeNum);
-	CHECK(g, c, nOffsets);
-	CHECK(g, c, sOffsets);
 	CHECK(g, c, neuronNums);
 	CHECK(g, c, synapseNums);
 
 	CHECK(g, c, nTypes);
 	CHECK(g, c, sTypes);
-	CHECK(g, c, gNeuronNums);
-	CHECK(g, c, gSynapseNums);
 
 	ret = 1;
 

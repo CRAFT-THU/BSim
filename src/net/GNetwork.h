@@ -9,30 +9,25 @@
 #include "Connection.h"
 
 struct GNetwork {
-	//Local Info
 	//Pointers to neurons
 	void **pNeurons;
 	//Pointers to synapses
 	void **pSynapses;
+
 	//Neuron to Synapse Connection
 	N2SConnection *pN2SConnection;
-	//Local machine offsets
-	int *nOffsets;
-	int *sOffsets;
-	//Local index for each type
+
+	//Index for each type
 	int *neuronNums;
 	int *synapseNums;
 
-	//Global Info
 	//Numbers of types
 	int nTypeNum;
 	int sTypeNum;
+
 	//Type 
 	Type * nTypes;
 	Type * sTypes;
-	//Global index for each type
-	int *gNeuronNums;
-	int *gSynapseNums;
 
 	int MAX_DELAY;
 };

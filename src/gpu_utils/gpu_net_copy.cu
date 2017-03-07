@@ -90,15 +90,15 @@ GNetwork* copyNetworkToGPU(GNetwork *pCpuNet)
 	tmpNet->pNeurons = pNs;
 	tmpNet->pSynapses = pSs;
 	tmpNet->pN2SConnection = g_pConnection;
-	tmpNet->nOffsets = pCpuNet->nOffsets;
-	tmpNet->sOffsets = pCpuNet->sOffsets;
+	//tmpNet->nOffsets = pCpuNet->nOffsets;
+	//tmpNet->sOffsets = pCpuNet->sOffsets;
 	tmpNet->neuronNums = pCpuNet->neuronNums;
 	tmpNet->synapseNums = pCpuNet->synapseNums;
 
 	tmpNet->nTypes = pCpuNet->nTypes;
 	tmpNet->sTypes = pCpuNet->sTypes;
-	tmpNet->gNeuronNums = pCpuNet->gNeuronNums;
-	tmpNet->gSynapseNums = pCpuNet->gSynapseNums;
+	//tmpNet->gNeuronNums = pCpuNet->gNeuronNums;
+	//tmpNet->gSynapseNums = pCpuNet->gSynapseNums;
 
 	return tmpNet;
 }

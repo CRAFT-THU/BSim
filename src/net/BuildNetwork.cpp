@@ -28,10 +28,10 @@ GNetwork* Network::buildNetwork()
 	N2SConnection *pAllConnections = (N2SConnection*)malloc(sizeof(N2SConnection));
 	assert(pAllConnections != NULL);
 
-	int *pNOffsets = (int*)malloc(sizeof(int)*(neuronTypeNum));
-	assert(pNOffsets != NULL);
-	int *pSOffsets = (int*)malloc(sizeof(int)*(synapseTypeNum));
-	assert(pSOffsets != NULL);
+	//int *pNOffsets = (int*)malloc(sizeof(int)*(neuronTypeNum));
+	//assert(pNOffsets != NULL);
+	//int *pSOffsets = (int*)malloc(sizeof(int)*(synapseTypeNum));
+	//assert(pSOffsets != NULL);
 	int *pNeuronsNum = (int*)malloc(sizeof(int)*(neuronTypeNum + 1));
 	assert(pNeuronsNum != NULL);
 	int *pSynapsesNum = (int*)malloc(sizeof(int)*(synapseTypeNum + 1));
@@ -43,12 +43,12 @@ GNetwork* Network::buildNetwork()
 	assert(pNTypes != NULL);
 	Type *pSTypes = (Type*)malloc(sizeof(Type)*synapseTypeNum);
 	assert(pSTypes != NULL);
-	int *pGNeuronNums = (int*)malloc(sizeof(int)*(neuronTypeNum+1));
-	assert(pGNeuronNums != NULL);
-	int *pGSynapseNums = (int*)malloc(sizeof(int)*(synapseTypeNum+1));
-	assert(pGSynapseNums != NULL);
-	pGNeuronNums[0] = 0;
-	pGSynapseNums[0] = 0;
+	//int *pGNeuronNums = (int*)malloc(sizeof(int)*(neuronTypeNum+1));
+	//assert(pGNeuronNums != NULL);
+	//int *pGSynapseNums = (int*)malloc(sizeof(int)*(synapseTypeNum+1));
+	//assert(pGSynapseNums != NULL);
+	//pGNeuronNums[0] = 0;
+	//pGSynapseNums[0] = 0;
 
 	for (int i=0; i<neuronTypeNum; i++) {
 		pNTypes[i] = nTypes[i];
@@ -73,9 +73,9 @@ GNetwork* Network::buildNetwork()
 			}
 		}
 
-		pNOffsets[i] = 0;
+		//pNOffsets[i] = 0;
 		pNeuronsNum[i+1] = idx + pNeuronsNum[i];
-		pGNeuronNums[i+1] = pNeuronsNum[i+1];
+		//pGNeuronNums[i+1] = pNeuronsNum[i+1];
 		pAllNeurons[i] = pN;
 	}
 
@@ -95,9 +95,9 @@ GNetwork* Network::buildNetwork()
 			}
 		}
 
-		pSOffsets[i] = 0;
+		//pSOffsets[i] = 0;
 		pSynapsesNum[i+1] = idx + pSynapsesNum[i];
-		pGSynapseNums[i+1] = pSynapsesNum[i+1];
+		//pGSynapseNums[i+1] = pSynapsesNum[i+1];
 		pAllSynapses[i] = pS;
 	}
 
@@ -170,13 +170,13 @@ GNetwork* Network::buildNetwork()
 	GNetwork * ret = (GNetwork*)malloc(sizeof(GNetwork));
 	assert(ret != NULL);
 
-	ret->pNeurons = pAllNeurons;
+	//ret->pNeurons = pAllNeurons;
 	ret->pSynapses = pAllSynapses;
 	ret->pN2SConnection = pAllConnections;
-	ret->nOffsets = pNOffsets;
-	ret->sOffsets = pSOffsets;
-	ret->gNeuronNums = pGNeuronNums;
-	ret->gSynapseNums = pGSynapseNums;
+	//ret->nOffsets = pNOffsets;
+	//ret->sOffsets = pSOffsets;
+	//ret->gNeuronNums = pGNeuronNums;
+	//ret->gSynapseNums = pGSynapseNums;
 
 	ret->nTypeNum = neuronTypeNum;
 	ret->sTypeNum = synapseTypeNum;
