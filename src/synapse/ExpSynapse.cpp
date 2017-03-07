@@ -67,7 +67,7 @@ int ExpSynapse::update(SimInfo &info)
 		I_syn += weight/_C1;
 		pDest->recv(I_syn);
 		delay_queue.pop_front();
-		info.fired.push_back(getID());
+		//info.fired.push_back(getID());
 	}
 
 	for (iter = delay_queue.begin(); iter != delay_queue.end(); iter++) {

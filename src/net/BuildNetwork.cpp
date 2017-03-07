@@ -70,7 +70,6 @@ GNetwork* Network::buildNetwork()
 		pNeuronsNum[i+1] = idx + pNeuronsNum[i];
 		pGNeuronNums[i+1] = pNeuronsNum[i+1];
 		pAllNeurons[i] = pN;
-
 	}
 
 	for (int i=0; i<synapseTypeNum; i++) {
@@ -148,17 +147,13 @@ GNetwork* Network::buildNetwork()
 		map<ID, ID>::iterator s2nIter;
 		for (s2nIter = s2nNetwork.begin(); s2nIter != s2nNetwork.end(); s2nIter++) {
 			map<ID, int>::iterator iter = sid2idx.find(s2nIter->first);
-			if (iter == sid2idx.end()) {
-				printf("Can't find ID %s\n", s2nIter->first.getInfo().c_str());
-			}
+			assert(iter != sid2idx.end());
 			if (i != getType(pSynapsesNum, synapseTypeNum, iter->second)) {
 				continue;
 			}
 			int idx = getOffset(pSynapsesNum, synapseTypeNum, iter->second);
 			iter = nid2idx.find(s2nIter->second);
-			if (iter == nid2idx.end()) {
-				printf("Can't find ID %s\n", s2nIter->second.getInfo().c_str());
-			}
+			assert(iter != nid2idx.end());
 			pSynapsesDst[idx] = iter->second;
 		}
 

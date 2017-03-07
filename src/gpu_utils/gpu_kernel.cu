@@ -2,6 +2,7 @@
 #include <assert.h>
 
 #include "../third_party/cuda/helper_cuda.h"
+#include "mem_op.h"
 #include "gpu_macros.h"
 #include "gpu_kernel.h"
 
@@ -505,6 +506,9 @@ GBuffers* alloc_buffers(int neuron_num, int synapse_num, int max_delay)
 	checkCudaErrors(cudaMalloc((void**)&(ret->c_gSynapsesLogTable), sizeof(int)*(synapse_num)));
 	checkCudaErrors(cudaMemset(ret->c_gSynapsesLogTable, 0, sizeof(int)*(synapse_num)));
 
+	ret->c_gLayerInput = gpuMalloc<int>(neuron_num);
+	ret->c_gXInput = gpuMalloc<real>(neuron_num);
+
 	int timeTableCap = max_delay+1;
 	checkCudaErrors(cudaMemcpyToSymbol(MAX_DELAY, &max_delay, sizeof(int)));
 	checkCudaErrors(cudaMemcpyToSymbol(gTimeTableCap, &timeTableCap, sizeof(int)));
@@ -517,6 +521,8 @@ GBuffers* alloc_buffers(int neuron_num, int synapse_num, int max_delay)
 	checkCudaErrors(cudaMallocHost((void**)(&ret->c_synapsesFired), sizeof(int)*(synapse_num)));
 
 	init_buffers<<<1, 1, 0>>>(/*ret->c_gTimeTable,*/ ret->c_gNeuronInput, ret->c_gFiredTable, ret->c_gFiredTableSizes, ret->c_gActiveTable, ret->c_gSynapsesActiveTable, ret->c_gSynapsesLogTable);
+
+	init_log_buffers<<<1, 1, 0>>>(ret->c_gLayerInput, ret->c_gXInput);
 
 	return ret;
 }

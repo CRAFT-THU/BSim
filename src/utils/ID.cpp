@@ -50,7 +50,7 @@ string ID::getInfo() const
 	stringstream changer;
 	changer << getGid() << "_" << getId();
 	string info;
-	changer << info;
+	changer >> info;
 	return info; 
 }
 

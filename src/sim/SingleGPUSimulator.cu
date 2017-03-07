@@ -69,18 +69,18 @@ int SingleGPUSimulator::run(real time)
 	int lif_idx = getIndex(pCpuNet->nTypes, nTypeNum, LIF);
 	GLIFNeurons *c_g_lif = copyFromGPU<GLIFNeurons>(static_cast<GLIFNeurons*>(c_pGpuNet->pNeurons[lif_idx]), 1);
 	real *c_g_vm = c_g_lif->p_vm;
-	real *c_I_syn = hostMalloc<real>(totalSynapseNum);
-	int exp_idx = getIndex(pCpuNet->sTypes, sTypeNum, Exp);
-	GExpSynapses *c_g_exp = copyFromGPU<GExpSynapses>(static_cast<GExpSynapses*>(c_pGpuNet->pSynapses[exp_idx]), 1);
-	real *c_g_I_syn = c_g_exp->p_I_syn;
+	//real *c_I_syn = hostMalloc<real>(totalSynapseNum);
+	//int exp_idx = getIndex(pCpuNet->sTypes, sTypeNum, Exp);
+	//GExpSynapses *c_g_exp = copyFromGPU<GExpSynapses>(static_cast<GExpSynapses*>(c_pGpuNet->pSynapses[exp_idx]), 1);
+	//real *c_g_I_syn = c_g_exp->p_I_syn;
 
 	vector<int> firedInfo;
 	printf("Start runing for %d cycles\n", sim_cycle);
 	struct timeval ts, te;
 	gettimeofday(&ts, NULL);
 	for (int time=0; time<sim_cycle; time++) {
-		printf("\rCycle: %d", time);
-		fflush(stdout);
+		//printf("\rCycle: %d", time);
+		//fflush(stdout);
 
 		for (int i=0; i<nTypeNum; i++) {
 			cudaUpdateType[pCpuNet->nTypes[i]](c_pGpuNet->pNeurons[i], c_pGpuNet->neuronNums[i+1]-c_pGpuNet->neuronNums[i], c_pGpuNet->neuronNums[i], &updateSize[c_pGpuNet->nTypes[i]]);
@@ -99,12 +99,16 @@ int SingleGPUSimulator::run(real time)
 		copyFromGPU<int>(&copySize, buffers->c_gFiredTableSizes + currentIdx, 1);
 		copyFromGPU<int>(buffers->c_neuronsFired, buffers->c_gFiredTable + (totalNeuronNum*currentIdx), copySize);
 		copyFromGPU<real>(c_vm, c_g_vm, c_pGpuNet->neuronNums[lif_idx+1]-c_pGpuNet->neuronNums[lif_idx]);
-		copyFromGPU<real>(c_I_syn, c_g_I_syn, c_pGpuNet->synapseNums[exp_idx+1]-c_pGpuNet->synapseNums[exp_idx]);
+		//copyFromGPU<real>(c_I_syn, c_g_I_syn, c_pGpuNet->synapseNums[exp_idx+1]-c_pGpuNet->synapseNums[exp_idx]);
 
 		fprintf(logFile, "Cycle %d: ", time);
 		for (int i=0; i<copySize; i++) {
+			//assert(network->idx2nid.find(buffers->c_neuronsFired[i]) != network->idx2nid.end());
+			//printf("%s ", network->idx2nid[buffers->c_neuronsFired[i]].getInfo().c_str());
 			fprintf(logFile, "%s ", network->idx2nid[buffers->c_neuronsFired[i]].getInfo().c_str());
+			//fprintf(logFile, "%d ", buffers->c_neuronsFired[i]);
 		}
+		fprintf(logFile, "\n");
 
 		fprintf(dataFile, "Cycle %d: ", time);
 		for (int i=0; i<c_pGpuNet->neuronNums[2] - c_pGpuNet->neuronNums[1]; i++) {
