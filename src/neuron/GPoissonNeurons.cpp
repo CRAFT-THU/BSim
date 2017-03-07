@@ -8,7 +8,7 @@
 #include "GPoissonNeurons.h"
 
 #include "../utils/macros.h"
-#include "../utils/IDPool.h"
+#include "../utils/TagPool.h"
 
 NEURON_GPU_FUNC_BASIC(Poisson)
 

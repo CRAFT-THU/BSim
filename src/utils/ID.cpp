@@ -40,11 +40,6 @@ ID::~ID()
 {
 }
 
-void ID::advance()
-{
-	_id.packed_id++;
-}
-
 void ID::setID(ID &id)
 {
 	this->_id.packed_id = id._id.packed_id;
@@ -64,5 +59,13 @@ bool ID::operator==(const ID &id1)const{
 }    
 
 bool ID::operator<(const ID &id1)const{  
-	return (this->_id.packed_id < id1._id.packed_id);  
+	if (this->_id.detailed_id.grp_id < id1._id.detailed_id.grp_id) {
+		return true;
+	}
+
+	if (this->_id.detailed_id.id < id1._id.detailed_id.id) {
+		return true;
+	}
+
+	return false;
 }    

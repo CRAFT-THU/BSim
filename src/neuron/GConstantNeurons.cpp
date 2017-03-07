@@ -8,7 +8,7 @@
 #include "mpi.h"
 
 #include "../utils/macros.h"
-#include "../utils/IDPool.h"
+#include "../utils/TagPool.h"
 #include "GConstantNeurons.h"
 
 NEURON_GPU_FUNC_BASIC(Constant)

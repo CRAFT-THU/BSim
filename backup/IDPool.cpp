@@ -10,9 +10,8 @@ IDPool nidPool;
 IDPool sendTag;
 IDPool recvTag;
 
-IDPool::IDPool()
+IDPool::IDPool(int gid)
 {
-	ID tmp(0, 0);
 	this->id.setID(tmp);
 }
 

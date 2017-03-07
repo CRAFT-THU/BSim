@@ -9,11 +9,12 @@
 
 class IDPool {
 public:
-	IDPool();
+	IDPool(int gid = -1);
 	~IDPool();
 	ID getID();
 private:
-	ID id;
+	int _gid;
+	int _id;
 };
 
 extern IDPool nidPool;

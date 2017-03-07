@@ -9,7 +9,7 @@
 #include <vector>
 #include <queue>
 
-#include "../utils/IDPool.h"
+#include "../utils/TagPool.h"
 #include "../base/SynapseBase.h"
 
 using std::vector;
@@ -51,7 +51,7 @@ SynapseBase *CompositeNeuron<Neuron, Synapse>::createSynapse(real weight, real d
 		tau = this->tau_syn_I;
 	}
 
-	Synapse *tmp = new Synapse(sidPool.getID(), weight, delay, tau);
+	Synapse *tmp = new Synapse(ID(pDest->getID().getGid(), sidTag.getTag()), weight, delay, tau);
 	tmp->setDst(pDest);
 
 	SynapseBase *ret = (SynapseBase *)tmp;

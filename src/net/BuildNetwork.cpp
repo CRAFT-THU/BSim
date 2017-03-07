@@ -110,9 +110,8 @@ GNetwork* Network::buildNetwork()
 		map<ID, vector<ID>>::iterator n2siter = n2sNetwork.find(iter->second);
 		if (n2siter == n2sNetwork.end()) {
 			//printf("Cant't find neuron id %d_%d\n", iter->second.groupId, iter->second.id);
-			assert(synapseIdx < totalSynapseNum);
-			pSynapsesIdx[synapseIdx] = -1;
-
+			//assert(synapseIdx < totalSynapseNum);
+			//pSynapsesIdx[synapseIdx] = -1;
 			for (int delay_t=0; delay_t < maxDelaySteps; delay_t++) {
 				delayStart[delay_t + maxDelaySteps*nid] = synapseIdx;
 				delayNum[delay_t + maxDelaySteps*nid] = 0;

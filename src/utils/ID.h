@@ -11,8 +11,8 @@
 using std::string;
 
 struct Detailed_ID {
-	int grp_id;
 	int id;
+	int grp_id;
 };
 
 struct ID {
@@ -20,15 +20,11 @@ public:
 	ID();
 	ID(int id);
 	ID(int grp_id, int id);
-	ID(char machine_id, int grp_id, int id);
-	ID(char machine_id, char type_id, short grp_id, int id);
 	ID(ID &id);
 	ID(const ID &id);
 	~ID();
 
-	void advance();
 	void setID(ID &id);
-	void setNode(char node);
 	inline int getId() const
 	{ 
 		return _id.detailed_id.id; 
