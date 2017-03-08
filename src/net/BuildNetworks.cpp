@@ -5,36 +5,34 @@
 #include "../utils/TypeFunc.h"
 #include "MultiNetwork.h"
 
-int Network::addConnectionInfo(ID nID, int nid, int offset, int *delayStart, int *delayNum, int *pSynapsesIdx)
+int MultiNetwork::addConnectionInfo(ID nID, int nid, int offset, int *delayStart, int *delayNum, int *pSynapsesIdx, int nodeIdx)
 {
 	int count = 0;
-	map<ID, vector<ID>>::iterator n2siter = n2sNetwork.find(nID);
-	if (n2siter == n2sNetwork.end()) {
-		for (int delay_t=0; delay_t < maxDelaySteps; delay_t++) {
-			delayStart[delay_t + maxDelaySteps*nid] = count + offset; 
-			delayNum[delay_t + maxDelaySteps*nid] = 0;
+	map<ID, vector<ID>>::iterator n2siter = network->n2sNetwork.find(nID);
+	if (n2siter == network->n2sNetwork.end()) {
+		for (int delay_t=0; delay_t < network->maxDelaySteps; delay_t++) {
+			delayStart[delay_t + network->maxDelaySteps*nid] = count + offset; 
+			delayNum[delay_t + network->maxDelaySteps*nid] = 0;
 		}
 
 		return count;
 	}
 
 	int synapsesNum_t = n2siter->second.size();
-	for (int delay_t=0; delay_t < maxDelaySteps; delay_t++) {
-		delayStart[delay_t + maxDelaySteps*nid] = offset + count;
+	for (int delay_t=0; delay_t < network->maxDelaySteps; delay_t++) {
+		delayStart[delay_t + network->maxDelaySteps*nid] = offset + count;
 		for (int i=0; i<synapsesNum_t; i++) {
-			if (id2synapse[n2siter->second.at(i)]->getDelay() == delay_t+1) {
-				map<ID, int>::iterator sid2idxiter = sid2idx.find(n2siter->second.at(i));
-				if (sid2idxiter == sid2idx.end()) {
-					printf("Can't find synapse ID %s\n", n2siter->second.at(i).getInfo().c_str());
+			if (network->id2synapse[n2siter->second.at(i)]->getDelay() == delay_t+1) {
+				map<ID, int>::iterator sid2idxiter = network->sid2idx.find(n2siter->second.at(i));
+				assert(sid2idxiter != network->sid2idx.end());
+				if (sid2node[sid2idxiter->first] == nodeIdx) {
+					int sid = sid2idxiter->second;
+					pSynapsesIdx[offset + count] = sid;
+					count++;
 				}
-
-				int sid = sid2idxiter->second;
-				assert(offset + count < totalSynapseNum);
-				pSynapsesIdx[offset + count] = sid;
-				count++;
 			}
 		}
-		delayNum[delay_t + maxDelaySteps*nid] = offset + count - delayStart[delay_t + maxDelaySteps*nid];
+		delayNum[delay_t + network->maxDelaySteps*nid] = offset + count - delayStart[delay_t + network->maxDelaySteps*nid];
 	}
 
 	return count;
@@ -44,6 +42,8 @@ int Network::addConnectionInfo(ID nID, int nid, int offset, int *delayStart, int
 GNetwork* MultiNetwork::buildNetworks(int nodeNum, bool autoSplited)
 {
 	this->nodeNum = nodeNum;
+	globalIdx2nid.resize(nodeNum);
+	globalIdx2sid.resize(nodeNum);
 
 	vector<PopulationBase*>::iterator piter;
 	vector<NeuronBase*>::iterator niter;
@@ -68,7 +68,7 @@ GNetwork* MultiNetwork::buildNetworks(int nodeNum, bool autoSplited)
 		}
 
 		if (globalNTypeInfo[node].find(type) == globalNTypeInfo[node].end()) {
-			globalNTypeInfo[node][type] = 0;
+			globalNTypeInfo[node][type] = p->getNum();
 		} else {
 			globalNTypeInfo[node][type] += p->getNum();
 		}
@@ -82,7 +82,7 @@ GNetwork* MultiNetwork::buildNetworks(int nodeNum, bool autoSplited)
 		}
 
 		if (globalNTypeInfo[node].find(type) == globalNTypeInfo[node].end()) {
-			globalNTypeInfo[node][type] = 0;
+			globalNTypeInfo[node][type] = 1;
 		} else {
 			globalNTypeInfo[node][type] += 1;
 		}
@@ -96,7 +96,7 @@ GNetwork* MultiNetwork::buildNetworks(int nodeNum, bool autoSplited)
 		}
 
 		if (globalSTypeInfo[node].find(type) == globalSTypeInfo[node].end()) {
-			globalSTypeInfo[node][type] = 0;
+			globalSTypeInfo[node][type] = 1;
 		} else {
 			globalSTypeInfo[node][type] += 1;
 		}
@@ -186,7 +186,7 @@ GNetwork* MultiNetwork::buildNetworks(int nodeNum, bool autoSplited)
 			pAllNeurons[index] = pN;
 			index++;
 		}
-		globalIdx2nid.push_back(nodeIdx2nid);
+		globalIdx2nid[nodeIdx] = nodeIdx2nid;
 
 		index = 0;
 		for (map<Type, int>::const_iterator tmp_iter = globalSTypeInfo[nodeIdx].begin(); tmp_iter != globalSTypeInfo[nodeIdx].end(); tmp_iter++) {
@@ -216,7 +216,7 @@ GNetwork* MultiNetwork::buildNetworks(int nodeNum, bool autoSplited)
 			pAllSynapses[index] = pS;
 			index++;
 		}
-		globalIdx2sid.push_back(nodeIdx2sid);
+		globalIdx2sid[nodeIdx] = nodeIdx2sid;
 
 		int nodeNeuronNum = pNeuronsNum[nodeNeuronTypeNum];
 		int nodeSynapseNum = pNeuronsNum[nodeSynapseTypeNum];
@@ -243,13 +243,65 @@ GNetwork* MultiNetwork::buildNetworks(int nodeNum, bool autoSplited)
 			map<int, ID>::iterator iter = nodeIdx2nid.find(nid);
 			assert(iter != nodeIdx2nid.end());
 			
-			synapseIdx += network->addConnectionInfo(iter->second, nid, synapseIdx, delayStart, delayNum, pSynapsesIdx);
+			map<ID, vector<ID>>::iterator n2siter = network->n2sNetwork.find(iter->second);
+			if (n2siter == network->n2sNetwork.end()) {
+				for (int delay_t=0; delay_t < network->maxDelaySteps; delay_t++) {
+					delayStart[delay_t + network->maxDelaySteps*nid] = synapseIdx;
+					delayNum[delay_t + network->maxDelaySteps*nid] = 0;
+				}
+				continue;
+			}
+
+			int synapsesNum_t = n2siter->second.size();
+			for (int delay_t=0; delay_t < network->maxDelaySteps; delay_t++) {
+				delayStart[delay_t + network->maxDelaySteps*nid] = synapseIdx;
+				for (int i=0; i<synapsesNum_t; i++) {
+					if (network->id2synapse[n2siter->second.at(i)]->getDelay() == delay_t+1) {
+						map<ID, int>::iterator sid2idxiter = network->sid2idx.find(n2siter->second.at(i));
+						assert(sid2idxiter != network->sid2idx.end());
+
+						if(sid2node[sid2idxiter->first] == nodeIdx) {
+							int sid = sid2idxiter->second;
+							assert(synapseIdx < nodeSynapseNum);
+							pSynapsesIdx[synapseIdx] = sid;
+							synapseIdx++;
+						}
+					}
+				}
+				delayNum[delay_t + network->maxDelaySteps*nid] = synapseIdx - delayStart[delay_t + network->maxDelaySteps*nid];
+			}
 		}
 
 		for (map<ID, int>::const_iterator tmp_iter = nodeNid2idx[nodeIdx].begin(); tmp_iter != nodeNid2idx[nodeIdx].end(); tmp_iter++) {
 			ID nID = tmp_iter->first; 
 			int nid = tmp_iter->second;
-			synapseIdx += network->addConnectionInfo(nID, nid, synapseIdx, delayStart, delayNum, pSynapsesIdx);
+			map<ID, vector<ID>>::iterator n2siter = network->n2sNetwork.find(nID);
+			if (n2siter == network->n2sNetwork.end()) {
+				for (int delay_t=0; delay_t < network->maxDelaySteps; delay_t++) {
+					delayStart[delay_t + network->maxDelaySteps*nid] = synapseIdx;
+					delayNum[delay_t + network->maxDelaySteps*nid] = 0;
+				}
+				continue;
+			}
+
+			int synapsesNum_t = n2siter->second.size();
+			for (int delay_t=0; delay_t < network->maxDelaySteps; delay_t++) {
+				delayStart[delay_t + network->maxDelaySteps*nid] = synapseIdx;
+				for (int i=0; i<synapsesNum_t; i++) {
+					if (network->id2synapse[n2siter->second.at(i)]->getDelay() == delay_t+1) {
+						map<ID, int>::iterator sid2idxiter = network->sid2idx.find(n2siter->second.at(i));
+						assert(sid2idxiter != network->sid2idx.end());
+
+						if(sid2node[sid2idxiter->first] == nodeIdx) {
+							int sid = sid2idxiter->second;
+							assert(synapseIdx < nodeSynapseNum);
+							pSynapsesIdx[synapseIdx] = sid;
+							synapseIdx++;
+						}
+					}
+				}
+				delayNum[delay_t + network->maxDelaySteps*nid] = synapseIdx - delayStart[delay_t + network->maxDelaySteps*nid];
+			}
 		}
 
 		pAllConnections->pSynapsesIdx = pSynapsesIdx;

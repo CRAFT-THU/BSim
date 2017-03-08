@@ -25,6 +25,7 @@ public:
 
 	void splitNetwork(int nodeNum);
 	GNetwork* buildNetworks(int nodeNum, bool autoSplited = true);
+	int addConnectionInfo(ID nID, int nid, int offset, int *delayStart, int *delayNum, int *pSynapsesIdx, int nodeIdx =0);
 
 public:
 	Network * network;

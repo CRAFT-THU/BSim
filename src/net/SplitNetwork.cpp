@@ -18,8 +18,8 @@ void MultiNetwork::splitNetwork(int nodeNum)
 		for (int i=0; i<p->getNum(); i++) {
 			ID nid = p->getNeuron(i)->getID();
 			nid2node[nid] = nodeIdx;
-			n2siter = network->n2sNetwork.find(nid);
-			if (n2siter != network->n2sNetwork.end()) {
+			n2siter = network->n2sTargetNetwork.find(nid);
+			if (n2siter != network->n2sTargetNetwork.end()) {
 				synapseCount += n2siter->second.size();
 				for (vector<ID>::iterator viter = n2siter->second.begin(); viter != n2siter->second.end(); viter++) {
 					sid2node[*viter] = nodeIdx;
@@ -36,7 +36,7 @@ void MultiNetwork::splitNetwork(int nodeNum)
 		ID nid = (*niter)->getID();
 		nid2node[nid] = nodeIdx;
 		n2siter = network->n2sNetwork.find(nid);
-		if (n2siter != network->n2sNetwork.end()) {
+		if (n2siter != network->n2sTargetNetwork.end()) {
 			synapseCount += n2siter->second.size();
 			for (vector<ID>::iterator viter = n2siter->second.begin(); viter != n2siter->second.end(); viter++) {
 				sid2node[*viter] = nodeIdx;
