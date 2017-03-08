@@ -4,8 +4,8 @@
 
 #include "../gpu_utils/gpu_func.h"
 
-#include "../neuron/GNeuron.h"
-#include "../synapse/GSynapse.h"
+#include "../../include/GNeuron.h"
+#include "../../include/GSynapse.h"
 #include "../utils/TypeFunc.h"
 
 int (*cudaAllocType[])(void *, void *, int) = { cudaAllocConstant, cudaAllocPoisson, cudaAllocLIF, cudaAllocExp};

@@ -2,8 +2,8 @@
  * do not change it by hand.
  */
 
-#include "../neuron/GNeuron.h"
-#include "../synapse/GSynapse.h"
+#include "../../include/GNeuron.h"
+#include "../../include/GSynapse.h"
 #include "../utils/TypeFunc.h"
 
 void* (*createType[])() = { createConstant, createPoisson, createLIF, createExp};

@@ -5,9 +5,9 @@
 #ifndef GNEURON_H
 #define GNEURON_H
 
-#include "GConstantNeurons.h"
-#include "GPoissonNeurons.h"
-#include "GLIFNeurons.h"
+#include "../src/neuron/GConstantNeurons.h"
+#include "../src/neuron/GPoissonNeurons.h"
+#include "../src/neuron/GLIFNeurons.h"
 
 #endif /* GNEURON_H */
 

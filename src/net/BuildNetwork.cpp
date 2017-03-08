@@ -5,12 +5,13 @@
 #include "../utils/TypeFunc.h"
 #include "Network.h"
 
-void Network::mapIDtoIdx()
+void Network::mapIDtoIdx(GNetwork *net)
 {
 	vector<PopulationBase*>::iterator piter;
 	vector<NeuronBase*>::iterator niter;
 	vector<SynapseBase*>::iterator siter;
 }
+
 
 GNetwork* Network::buildNetwork()
 {
@@ -28,10 +29,6 @@ GNetwork* Network::buildNetwork()
 	N2SConnection *pAllConnections = (N2SConnection*)malloc(sizeof(N2SConnection));
 	assert(pAllConnections != NULL);
 
-	//int *pNOffsets = (int*)malloc(sizeof(int)*(neuronTypeNum));
-	//assert(pNOffsets != NULL);
-	//int *pSOffsets = (int*)malloc(sizeof(int)*(synapseTypeNum));
-	//assert(pSOffsets != NULL);
 	int *pNeuronsNum = (int*)malloc(sizeof(int)*(neuronTypeNum + 1));
 	assert(pNeuronsNum != NULL);
 	int *pSynapsesNum = (int*)malloc(sizeof(int)*(synapseTypeNum + 1));
@@ -43,12 +40,6 @@ GNetwork* Network::buildNetwork()
 	assert(pNTypes != NULL);
 	Type *pSTypes = (Type*)malloc(sizeof(Type)*synapseTypeNum);
 	assert(pSTypes != NULL);
-	//int *pGNeuronNums = (int*)malloc(sizeof(int)*(neuronTypeNum+1));
-	//assert(pGNeuronNums != NULL);
-	//int *pGSynapseNums = (int*)malloc(sizeof(int)*(synapseTypeNum+1));
-	//assert(pGSynapseNums != NULL);
-	//pGNeuronNums[0] = 0;
-	//pGSynapseNums[0] = 0;
 
 	for (int i=0; i<neuronTypeNum; i++) {
 		pNTypes[i] = nTypes[i];
@@ -73,11 +64,11 @@ GNetwork* Network::buildNetwork()
 			}
 		}
 
-		//pNOffsets[i] = 0;
+		assert(idx == neuronNums[i]);
 		pNeuronsNum[i+1] = idx + pNeuronsNum[i];
-		//pGNeuronNums[i+1] = pNeuronsNum[i+1];
 		pAllNeurons[i] = pN;
 	}
+	assert(pNeuronsNum[neuronTypeNum] == totalNeuronNum);
 
 	for (int i=0; i<synapseTypeNum; i++) {
 		pSTypes[i] = sTypes[i];
@@ -95,11 +86,15 @@ GNetwork* Network::buildNetwork()
 			}
 		}
 
-		//pSOffsets[i] = 0;
+		assert(idx == synapseNums[i]);
 		pSynapsesNum[i+1] = idx + pSynapsesNum[i];
-		//pGSynapseNums[i+1] = pSynapsesNum[i+1];
 		pAllSynapses[i] = pS;
 	}
+	assert(pSynapsesNum[synapseTypeNum] == totalSynapseNum);
+
+	logMap();
+	checkIDtoIdx();
+
 
 	int *delayNum = (int*)malloc(sizeof(int)*(this->maxDelaySteps)*totalNeuronNum);
 	assert(delayNum != NULL);
@@ -115,9 +110,6 @@ GNetwork* Network::buildNetwork()
 
 		map<ID, vector<ID>>::iterator n2siter = n2sNetwork.find(iter->second);
 		if (n2siter == n2sNetwork.end()) {
-			//printf("Cant't find neuron id %d_%d\n", iter->second.groupId, iter->second.id);
-			//assert(synapseIdx < totalSynapseNum);
-			//pSynapsesIdx[synapseIdx] = -1;
 			for (int delay_t=0; delay_t < maxDelaySteps; delay_t++) {
 				delayStart[delay_t + maxDelaySteps*nid] = synapseIdx;
 				delayNum[delay_t + maxDelaySteps*nid] = 0;
@@ -170,13 +162,9 @@ GNetwork* Network::buildNetwork()
 	GNetwork * ret = (GNetwork*)malloc(sizeof(GNetwork));
 	assert(ret != NULL);
 
-	//ret->pNeurons = pAllNeurons;
+	ret->pNeurons = pAllNeurons;
 	ret->pSynapses = pAllSynapses;
 	ret->pN2SConnection = pAllConnections;
-	//ret->nOffsets = pNOffsets;
-	//ret->sOffsets = pSOffsets;
-	//ret->gNeuronNums = pGNeuronNums;
-	//ret->gSynapseNums = pGSynapseNums;
 
 	ret->nTypeNum = neuronTypeNum;
 	ret->sTypeNum = synapseTypeNum;

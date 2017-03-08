@@ -11,10 +11,7 @@ int Network::addConnectionInfo(ID nID, int nid, int offset, int *delayStart, int
 	int count = 0;
 	map<ID, vector<ID>>::iterator n2siter = n2sNetwork.find(nID);
 	if (n2siter == n2sNetwork.end()) {
-		pSynapsesIdx[count + offset] = -1;
-
 		for (int delay_t=0; delay_t < maxDelaySteps; delay_t++) {
-
 			delayStart[delay_t + maxDelaySteps*nid] = count + offset; 
 			delayNum[delay_t + maxDelaySteps*nid] = 0;
 		}
@@ -33,6 +30,7 @@ int Network::addConnectionInfo(ID nID, int nid, int offset, int *delayStart, int
 				}
 
 				int sid = sid2idxiter->second;
+				assert(offset + count < totalSynapseNum);
 				pSynapsesIdx[offset + count] = sid;
 				count++;
 			}
@@ -125,16 +123,23 @@ GNetwork* MultiNetwork::buildNetworks(int nodeNum, bool autoSplited)
 		int nodeNeuronTypeNum = globalNTypeInfo[nodeIdx].size();
 		int nodeSynapseTypeNum = globalSTypeInfo[nodeIdx].size();
 		void **pAllNeurons = (void**)malloc(sizeof(void*)*nodeNeuronTypeNum);
+		assert(pAllNeurons != NULL);
 		void **pAllSynapses = (void**)malloc(sizeof(void*)*nodeSynapseTypeNum);
+		assert(pAllSynapses != NULL);
 		N2SConnection *pAllConnections = (N2SConnection*)malloc(sizeof(N2SConnection));
+		assert(pAllConnections != NULL);
 
 		int *pNeuronsNum = (int*)malloc(sizeof(int)*(nodeNeuronTypeNum + 1));
+		assert(pNeuronsNum != NULL);
 		int *pSynapsesNum = (int*)malloc(sizeof(int)*(nodeSynapseTypeNum + 1));
+		assert(pSynapsesNum != NULL);
 		pNeuronsNum[0] = 0;
 		pSynapsesNum[0] = 0;
 
 		Type *pNTypes = (Type*)malloc(sizeof(Type)*nodeNeuronTypeNum);
+		assert(pNTypes != NULL);
 		Type *pSTypes = (Type*)malloc(sizeof(Type)*nodeSynapseTypeNum);
+		assert(pSTypes != NULL);
 
 		map<int, ID> nodeIdx2nid;
 		map<int, ID> nodeIdx2sid;
@@ -145,6 +150,7 @@ GNetwork* MultiNetwork::buildNetworks(int nodeNum, bool autoSplited)
 			pNTypes[index] = tmp_iter->first;
 
 			void *pN = createType[type]();
+			assert(pN != NULL);
 			allocType[type](pN, tmp_iter->second);
 
 			int idx = 0;
@@ -172,6 +178,7 @@ GNetwork* MultiNetwork::buildNetworks(int nodeNum, bool autoSplited)
 				}
 			}
 
+			assert(idx == tmp_iter->second);
 			pNeuronsNum[index+1] = idx + pNeuronsNum[index];
 			pAllNeurons[index] = pN;
 			index++;
@@ -184,6 +191,7 @@ GNetwork* MultiNetwork::buildNetworks(int nodeNum, bool autoSplited)
 			pSTypes[index] = type;
 
 			void *pS = createType[type]();
+			assert(pS != NULL);
 			allocType[type](pS, tmp_iter->second);
 
 			int idx = 0;
@@ -200,6 +208,7 @@ GNetwork* MultiNetwork::buildNetworks(int nodeNum, bool autoSplited)
 				}
 			}
 
+			assert(idx == tmp_iter->second); 
 			pSynapsesNum[index+1] = idx + pSynapsesNum[index];
 			pAllSynapses[index] = pS;
 			index++;
@@ -209,12 +218,10 @@ GNetwork* MultiNetwork::buildNetworks(int nodeNum, bool autoSplited)
 		int nodeNeuronNum = pNeuronsNum[nodeNeuronTypeNum];
 		int nodeSynapseNum = pNeuronsNum[nodeSynapseTypeNum];
 
-		//map<ID, set<int>> crossNodeInfo;
 		for (map<ID, set<int> >::iterator tmp_iter = crossNodeInfo.begin(); tmp_iter != crossNodeInfo.end(); tmp_iter++) {	
 			if (tmp_iter->second.find(nodeIdx) != tmp_iter->second.end()) {
 				int size = nodeNid2idx[nodeIdx].size();
 				nodeNid2idx[nodeIdx][tmp_iter->first] = nodeNeuronNum + size;
-				//crossNodeIDs[nodeIdx].push_back(tmp_iter->first);
 			}
 		}
 
@@ -222,15 +229,16 @@ GNetwork* MultiNetwork::buildNetworks(int nodeNum, bool autoSplited)
 
 
 		int *delayNum = (int*)malloc(sizeof(int)*(this->network->maxDelaySteps)*(nodeNeuronNum + crossNodeNeuronNum));
+		assert(delayNum != NULL);
 		int *delayStart = (int*)malloc(sizeof(int)*(this->network->maxDelaySteps)*(nodeNeuronNum + crossNodeNeuronNum));
+		assert(delayStart != NULL);
 		int *pSynapsesIdx = (int*)malloc(sizeof(int)*nodeSynapseNum);
+		assert(pSynapsesIdx != NULL);
 
 		int synapseIdx = 0;
 		for (int nid=0; nid<nodeNeuronNum; nid++) {
 			map<int, ID>::iterator iter = nodeIdx2nid.find(nid);
-			if (iter == nodeIdx2nid.end()) {
-				printf("Can't find neuron index %d\n", nid);
-			}
+			assert(iter != nodeIdx2nid.end());
 			
 			synapseIdx += network->addConnectionInfo(iter->second, nid, synapseIdx, delayStart, delayNum, pSynapsesIdx);
 		}
@@ -247,20 +255,17 @@ GNetwork* MultiNetwork::buildNetworks(int nodeNum, bool autoSplited)
 
 		for (int i=0; i<nodeSynapseTypeNum; i++) {
 			int *pSynapsesDst = (int*)malloc(sizeof(int)*(pSynapsesNum[i+1] - pSynapsesNum[i]));
+			assert(pSynapsesDst != NULL);
 			map<ID, ID>::iterator s2nIter;
 			for (s2nIter = network->s2nNetwork.begin(); s2nIter != network->s2nNetwork.end(); s2nIter++) {
 				map<ID, int>::iterator iter = network->sid2idx.find(s2nIter->first);
-				if (iter == network->sid2idx.end()) {
-					printf("Can't find ID %s\n", s2nIter->first.getInfo().c_str());
-				}
+				assert(iter != network->sid2idx.end());
 				if (i != getType(pSynapsesNum, nodeSynapseTypeNum, iter->second)) {
 					continue;
 				}
 				int idx = getOffset(pSynapsesNum, nodeSynapseTypeNum, iter->second);
 				iter = network->nid2idx.find(s2nIter->second);
-				if (iter == network->nid2idx.end()) {
-					printf("Can't find ID %s\n", s2nIter->first.getInfo().c_str());
-				}
+				assert(iter != network->nid2idx.end());
 				pSynapsesDst[idx] = iter->second;
 			}
 
@@ -295,7 +300,9 @@ GNetwork* MultiNetwork::buildNetworks(int nodeNum, bool autoSplited)
 		}
 
 		crossNodeMap[nodeIdx].idx2index = (int*)malloc(sizeof(int)*nodeNeuronNum);
+		assert(crossNodeMap[nodeIdx].idx2index != NULL);
 		crossNodeMap[nodeIdx].crossNodeMap = (int*)malloc(sizeof(int)*crossNodeIdx2Idx[nodeIdx].size()*nodeNum);
+		assert(crossNodeMap[nodeIdx].crossNodeMap != NULL);
 		for (int tmp = 0; tmp < nodeNeuronNum; tmp++) {
 			crossNodeMap[nodeIdx].idx2index[tmp] = -1;
 		}
@@ -320,6 +327,7 @@ GNetwork* MultiNetwork::buildNetworks(int nodeNum, bool autoSplited)
 			}
 			if (crossNodeData[tmp_idx].maxNeuronNum > 0) {
 				crossNodeData[tmp_idx].firedNeuronIdx = (int*)malloc(sizeof(int)*crossNodeData[tmp_idx].maxNeuronNum);
+				assert(crossNodeData[tmp_idx].firedNeuronIdx != NULL);
 			}
 		}
 	}
@@ -334,6 +342,7 @@ GNetwork* MultiNetwork::buildNetworks(int nodeNum, bool autoSplited)
 
 		if (crossNodeData[tmp_idx].maxNeuronNum > 0) {
 			crossNodeData[tmp_idx].firedNeuronIdx = (int*)malloc(sizeof(int)*crossNodeData[tmp_idx].maxNeuronNum);
+			assert(crossNodeData[tmp_idx].firedNeuronIdx != NULL);
 		}
 	}
 

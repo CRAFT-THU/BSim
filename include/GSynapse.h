@@ -6,7 +6,7 @@
 #define GSYNAPSE_H
 
 //#include "GBasicSynapses.h"
-#include "GExpSynapses.h"
+#include "../src/synapse/GExpSynapses.h"
 //#include "GAlphaSynapses.h"
 
 #endif /* GSYNAPSE_H */

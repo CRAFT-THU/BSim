@@ -6,16 +6,18 @@
 #define NEURON_H
 
 
-#include "ConstantNeuron.h"
-#include "PoissonNeuron.h"
+#include "../src/neuron/ConstantNeuron.h"
+#include "../src/neuron/PoissonNeuron.h"
 //#include "InputNeuron.h"
-#include "LIFNeuron.h"
+#include "../src/neuron/LIFNeuron.h"
 //#include "NengoNeuron.h"
 //#include "ProbeNeuron.h"
+
 #include "GNeuron.h"
 
-#include "../base/CompositeNeuron.h"
-#include "../synapse/Synapse.h"
+#include "Synapse.h"
+
+#include "../src/base/CompositeNeuron.h"
 
 typedef CompositeNeuron<ConstantNeuron, ExpSynapse> Constant_curr_exp;
 typedef CompositeNeuron<LIFNeuron, ExpSynapse> IF_curr_exp;

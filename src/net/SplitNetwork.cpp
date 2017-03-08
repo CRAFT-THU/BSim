@@ -47,23 +47,17 @@ void MultiNetwork::splitNetwork(int nodeNum)
 		}
 	}
 
-	//set<int> tmp_s;
 	for (n2siter = network->n2sNetwork.begin(); n2siter != network->n2sNetwork.end(); n2siter++) {
 		vector<ID> &p = n2siter->second;
 		int synapseNum = p.size();
 		int baseNode = nid2node[n2siter->first];
 		if (synapseNum > 0) {
-			//tmp_s.clear();
 			for (vector<ID>::iterator iter = p.begin(); iter != p.end(); iter++) {
 				int snode = sid2node[*iter];
 				if (snode != baseNode) {
-					//tmp_s.insert(iter->getNode());
 					crossNodeInfo[n2siter->first].insert(snode);
 				}
 			}
-			//if (tmp_s.size() > 0) {
-			//	crossNodeInfo[n2siter->first] = tmp_s;
-			//}
 		}
 
 	}

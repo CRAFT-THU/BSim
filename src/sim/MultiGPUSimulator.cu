@@ -76,7 +76,7 @@ int MultiGPUSimulator::run(real time)
 	return 0;
 }
 
-void run(void *para) {
+void * run_thread(void *para) {
 	DistriNetwork *network = (DistriNetwork*)para;
 
 	char logFilename[512];
@@ -249,4 +249,6 @@ void run(void *para) {
 
 	free_buffers(buffers);
 	freeGPUNetwork(c_pGpuNet);
+
+	return NULL;
 }

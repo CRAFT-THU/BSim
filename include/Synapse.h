@@ -6,7 +6,7 @@
 #define SYNAPSE_H
 
 //#include "AlphaSynapse.h"
-#include "ExpSynapse.h"
+#include "../src/synapse/ExpSynapse.h"
 #include "GSynapse.h"
 
 //#include "BasicSynapse.h"

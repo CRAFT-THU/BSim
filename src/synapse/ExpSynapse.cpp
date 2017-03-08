@@ -134,6 +134,7 @@ int ExpSynapse::hardCopy(void *data, int idx, int base, map<ID, int> &id2idx, ma
 {
 	GExpSynapses *p = (GExpSynapses *)data;
 	id2idx[this->getID()] = idx + base;
+	setIdx(idx+base);
 	idx2id[idx+base] = this->getID();
 	//p->pID[idx] = id;
 	//p->pType[idx] = type;

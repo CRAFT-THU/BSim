@@ -3,7 +3,7 @@
  * Sat March 12 2016
  */
 
-#include "../neuron/GNeuron.h"
+#include "../../include/GNeuron.h"
 #include "gpu_kernel.h"
 #include "gpu_func.h"
 

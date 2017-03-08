@@ -97,6 +97,7 @@ int PoissonNeuron::hardCopy(void *data, int idx, int base, map<ID, int> &id2idx,
 {
 	GPoissonNeurons *p = (GPoissonNeurons *) data;
 	id2idx[getID()] = idx + base;
+	setIdx(idx+base);
 	idx2id[idx+base] = getID();
 
 	p->p_rate[idx] = rate;

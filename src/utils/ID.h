@@ -36,8 +36,10 @@ public:
 
 	string getInfo() const;
 
-	bool operator==(const ID &id1)const; 
-	bool operator<(const ID &id1)const; 
+	bool operator==(const ID &id1) const; 
+	bool operator!=(const ID &id1) const; 
+	bool operator<(const ID &id1) const; 
+	bool operator>(const ID &id1) const; 
 
 private:
 	union Union_Id {

@@ -180,6 +180,7 @@ int LIFNeuron::hardCopy(void *data, int idx, int base, map<ID, int> &id2idx, map
 {
 	GLIFNeurons * p = (GLIFNeurons *) data;
 	id2idx[getID()] = idx + base;
+	setIdx(idx+base);
 	idx2id[idx+base] = getID();
 	//p->pID[idx] = id;
 	//p->pType[idx] = type;

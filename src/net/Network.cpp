@@ -390,6 +390,6 @@ void Network::monitor(SimInfo &info)
 void Network::logMap() {
 	FILE *f = fopen("NID.map", "w+");
 	for (map<int, ID>::const_iterator iter = idx2nid.begin(); iter != idx2nid.end(); iter++) {
-		fprintf(f, "%d:%s", iter->first, iter->second.getInfo().c_str());
+		fprintf(f, "%d:%s\n", iter->first, iter->second.getInfo().c_str());
 	}
 }

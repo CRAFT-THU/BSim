@@ -5,7 +5,7 @@
 #ifndef MULTIGPUSIMULATOR_H
 #define MULTIGPUSIMULATOR_H
 
-#include "SimulatorBase.h"
+#include "../base/SimulatorBase.h"
 
 class MultiGPUSimulator : public SimulatorBase {
 public:

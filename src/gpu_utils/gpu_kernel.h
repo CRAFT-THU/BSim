@@ -8,8 +8,8 @@
 #include "curand_kernel.h"
 #include "curand.h"
 
-#include "../neuron/GNeuron.h"
-#include "../synapse/GSynapse.h"
+#include "../../include/GNeuron.h"
+#include "../../include/GSynapse.h"
 #include "../net/GNetwork.h"
 
 struct GBuffers {

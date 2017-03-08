@@ -54,18 +54,34 @@ string ID::getInfo() const
 	return info; 
 }
 
-bool ID::operator==(const ID &id1)const{  
+bool ID::operator==(const ID &id1) const {  
 	return (this->_id.packed_id == id1._id.packed_id);  
 }    
 
-bool ID::operator<(const ID &id1)const{  
+bool ID::operator!=(const ID &id1) const {  
+	return (this->_id.packed_id != id1._id.packed_id);  
+}    
+
+bool ID::operator>(const ID &id1) const {  
+	if (this->_id.detailed_id.grp_id > id1._id.detailed_id.grp_id) {
+		return true;
+	}
+
+	if (this->_id.detailed_id.grp_id < id1._id.detailed_id.grp_id) {
+		return false;
+	}
+
+	return this->_id.detailed_id.id > id1._id.detailed_id.id;
+}    
+
+bool ID::operator<(const ID &id1) const {  
 	if (this->_id.detailed_id.grp_id < id1._id.detailed_id.grp_id) {
 		return true;
 	}
 
-	if (this->_id.detailed_id.id < id1._id.detailed_id.id) {
-		return true;
+	if (this->_id.detailed_id.grp_id > id1._id.detailed_id.grp_id) {
+		return false;
 	}
 
-	return false;
+	return this->_id.detailed_id.id < id1._id.detailed_id.id;
 }    

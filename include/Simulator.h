@@ -5,15 +5,15 @@
 #ifndef SIMULATOR_H
 #define SIMULATOR_H
 
-#include "../neuron/Neuron.h"
-#include "../synapse/Synapse.h"
+#include "Neuron.h"
+#include "Synapse.h"
 
 //CPU SIM
-#include "SingleThreadSimulator.h"
+#include "../src/sim/SingleThreadSimulator.h"
 
 //GPU SIM
-#include "SingleGPUSimulator.h"
-#include "MultiGPUSimulator.h"
+#include "../src/sim/SingleGPUSimulator.h"
+#include "../src/sim/MultiGPUSimulator.h"
 
 
 typedef SingleThreadSimulator STSim;

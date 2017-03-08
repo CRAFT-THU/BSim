@@ -2,15 +2,15 @@
  * usually just for fun
  * Fri October 30 2015
  */
-#ifndef SNNSIM_H
-#define SNNSIM_H
+#ifndef BSIM_H
+#define BSIM_H
 
 //#include "../src/SNNReader.h"
 #include "../src/utils/utils.h"
 #include "../src/generator/generator.h"
 #include "../src/rw/SNNWriter.h"
 
-#include "../src/sim/Simulator.h"
+#include "Simulator.h"
 
-#endif /* SNNSIM_H */
+#endif /* BSIM_H */
 
