@@ -64,7 +64,7 @@ int MultiGPUSimulator::run(real time)
 		nodeNets[i].crossNodeData = multiNet.crossNodeData; 
 
 		int ret = pthread_create(&(threadIds[i]), NULL, &run_thread, (void*)&(nodeNets[i]));
-		assert(ret != 0);
+		assert(ret == 0);
 	}
 
 	for (int i=0; i<deviceCount; i++) {
@@ -117,8 +117,12 @@ void * run_thread(void *para) {
 
 	real *c_vm = hostMalloc<real>(totalNeuronNum);
 	int lif_idx = getIndex(pCpuNet->nTypes, nTypeNum, LIF);
-	GLIFNeurons *c_g_lif = copyFromGPU<GLIFNeurons>(static_cast<GLIFNeurons*>(c_pGpuNet->pNeurons[lif_idx]), 1);
-	real *c_g_vm = c_g_lif->p_vm;
+	GLIFNeurons *c_g_lif;
+	real *c_g_vm;
+	if (lif_idx > 0) {
+		c_g_lif = copyFromGPU<GLIFNeurons>(static_cast<GLIFNeurons*>(c_pGpuNet->pNeurons[lif_idx]), 1);
+		c_g_vm = c_g_lif->p_vm;
+	}
 	int * c_g_cross_id = gpuMalloc<int>(network->crossNodeData[dataIdx].maxNeuronNum);
 	//real *c_I_syn = hostMalloc<real>(totalSynapseNum);
 	//int exp_idx = getIndex(pCpuNet->sTypes, sTypeNum, Exp);
@@ -143,8 +147,10 @@ void * run_thread(void *para) {
 		int copySize = 0;
 		copyFromGPU<int>(&copySize, buffers->c_gFiredTableSizes + currentIdx, 1);
 		copyFromGPU<int>(buffers->c_neuronsFired, buffers->c_gFiredTable + (totalNeuronNum*currentIdx), copySize);
-		copyFromGPU<real>(c_vm, c_g_vm, c_pGpuNet->neuronNums[lif_idx+1]-c_pGpuNet->neuronNums[lif_idx]);
-		//copyFromGPU<real>(c_I_syn, c_g_I_syn, c_pGpuNet->synapseNums[exp_idx+1]-c_pGpuNet->synapseNums[exp_idx]);
+		if (lif_idx > 0) {
+			copyFromGPU<real>(c_vm, c_g_vm, c_pGpuNet->neuronNums[lif_idx+1]-c_pGpuNet->neuronNums[lif_idx]);
+			//copyFromGPU<real>(c_I_syn, c_g_I_syn, c_pGpuNet->synapseNums[exp_idx+1]-c_pGpuNet->synapseNums[exp_idx]);
+		}
 
 		update_pre_synapse<<<preSize.gridSize, preSize.blockSize>>>(c_pGpuNet->pN2SConnection);
 

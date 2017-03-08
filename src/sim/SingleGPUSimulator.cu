@@ -67,6 +67,7 @@ int SingleGPUSimulator::run(real time)
 
 	real *c_vm = hostMalloc<real>(totalNeuronNum);
 	int lif_idx = getIndex(pCpuNet->nTypes, nTypeNum, LIF);
+	assert(lif_idx >= 0);
 	GLIFNeurons *c_g_lif = copyFromGPU<GLIFNeurons>(static_cast<GLIFNeurons*>(c_pGpuNet->pNeurons[lif_idx]), 1);
 	real *c_g_vm = c_g_lif->p_vm;
 	//real *c_I_syn = hostMalloc<real>(totalSynapseNum);

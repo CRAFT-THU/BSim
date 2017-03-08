@@ -219,7 +219,7 @@ GNetwork* MultiNetwork::buildNetworks(int nodeNum, bool autoSplited)
 		globalIdx2sid[nodeIdx] = nodeIdx2sid;
 
 		int nodeNeuronNum = pNeuronsNum[nodeNeuronTypeNum];
-		int nodeSynapseNum = pNeuronsNum[nodeSynapseTypeNum];
+		int nodeSynapseNum = pSynapsesNum[nodeSynapseTypeNum];
 
 		for (map<ID, set<int> >::iterator tmp_iter = crossNodeInfo.begin(); tmp_iter != crossNodeInfo.end(); tmp_iter++) {	
 			if (tmp_iter->second.find(nodeIdx) != tmp_iter->second.end()) {
@@ -258,9 +258,8 @@ GNetwork* MultiNetwork::buildNetworks(int nodeNum, bool autoSplited)
 				for (int i=0; i<synapsesNum_t; i++) {
 					if (network->id2synapse[n2siter->second.at(i)]->getDelay() == delay_t+1) {
 						map<ID, int>::iterator sid2idxiter = network->sid2idx.find(n2siter->second.at(i));
-						assert(sid2idxiter != network->sid2idx.end());
 
-						if(sid2node[sid2idxiter->first] == nodeIdx) {
+						if(sid2idxiter != network->sid2idx.end() && sid2node[sid2idxiter->first] == nodeIdx) {
 							int sid = sid2idxiter->second;
 							assert(synapseIdx < nodeSynapseNum);
 							pSynapsesIdx[synapseIdx] = sid;
@@ -314,8 +313,7 @@ GNetwork* MultiNetwork::buildNetworks(int nodeNum, bool autoSplited)
 			map<ID, ID>::iterator s2nIter;
 			for (s2nIter = network->s2nNetwork.begin(); s2nIter != network->s2nNetwork.end(); s2nIter++) {
 				map<ID, int>::iterator iter = network->sid2idx.find(s2nIter->first);
-				assert(iter != network->sid2idx.end());
-				if (i != getType(pSynapsesNum, nodeSynapseTypeNum, iter->second)) {
+				if ((iter == network->sid2idx.end()) || (i != getType(pSynapsesNum, nodeSynapseTypeNum, iter->second))) {
 					continue;
 				}
 				int idx = getOffset(pSynapsesNum, nodeSynapseTypeNum, iter->second);

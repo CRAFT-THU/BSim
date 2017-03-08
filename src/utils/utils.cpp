@@ -30,8 +30,8 @@ int getIndex(Type *array, int size, Type type)
 		}
 	}
 
-	printf("ERROR: Cannot find type %d !!!\n", type);
-	return 0;
+	//printf("ERROR: Cannot find type %d !!!\n", type);
+	return -1;
 }
 
 int getType(int *array, int size, int index)
@@ -42,8 +42,8 @@ int getType(int *array, int size, int index)
 		}
 	}
 
-	printf("ERROR: Cannot find index %d !!!\n", index);
-	return 0;
+	//printf("ERROR: Cannot find index %d !!!\n", index);
+	return -1;
 }
 
 int getOffset(int *array, int size, int index)
@@ -54,8 +54,8 @@ int getOffset(int *array, int size, int index)
 		}
 	}
 
-	printf("ERROR: Cannot find index %d !!!\n", index);
-	return 0;
+	//printf("ERROR: Cannot find index %d !!!\n", index);
+	return -1;
 }
 
 Json::Value testValue(Json::Value value, unsigned int idx)
