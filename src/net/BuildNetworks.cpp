@@ -5,7 +5,6 @@
 #include "../utils/TypeFunc.h"
 #include "MultiNetwork.h"
 
-
 int Network::addConnectionInfo(ID nID, int nid, int offset, int *delayStart, int *delayNum, int *pSynapsesIdx)
 {
 	int count = 0;
@@ -54,6 +53,10 @@ GNetwork* MultiNetwork::buildNetworks(int nodeNum, bool autoSplited)
 	vector<map<Type, int> > globalSTypeInfo(nodeNum);
 
 	vector<map<ID, int> > nodeNid2idx(nodeNum);
+
+	if (autoSplited) {
+		splitNetwork(nodeNum);
+	}
 
 	//Get Type info
 	for (piter = network->pPopulations.begin(); piter != network->pPopulations.end();  piter++) {

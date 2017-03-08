@@ -24,7 +24,7 @@ public:
 	~MultiNetwork();
 
 	void splitNetwork(int nodeNum);
-	GNetwork* buildNetworks(int nodeNum, bool autoSplited = false);
+	GNetwork* buildNetworks(int nodeNum, bool autoSplited = true);
 
 public:
 	Network * network;
