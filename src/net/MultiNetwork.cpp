@@ -6,40 +6,50 @@
 //#include "utils.h"
 #include "MultiNetwork.h"
 
-MultiNetwork::MultiNetwork(Network *net)
+MultiNetwork::MultiNetwork(Network *net, int node_num)
 {
-	network = net;
-	crossNodeMap = NULL;
-	crossNodeData = NULL;
-	nodeNum = 1;
+	_crossnode_nID2idx.resize(node_num);
+	_crossnode_idx2idx.resize(node_num);
+
+	//crossNodeMap = NULL;
+	//crossNodeData = NULL;
+	
+	_global_idx2nID.resize(node_num);
+	_global_idx2sID.resize(node_num);
+	_global_ntype_num.resize(node_num);
+	_global_stype_num.resize(node_num);
+	
+	this->_node_num = node_num;
+	this->_network = net;
 }
 
 MultiNetwork::~MultiNetwork()
 {
-	delete network;
+	delete _network;
 
-	if (crossNodeMap != NULL) {
-		for (int i=0; i<nodeNum; i++) {
-			delete [] (crossNodeMap[i].idx2index);
-			delete [] (crossNodeMap[i].crossNodeMap);
-		}
-		delete [] crossNodeMap;
-	}
+	//if (crossNodeMap != NULL) {
+	//	for (int i=0; i<node_num; i++) {
+	//		delete [] (crossNodeMap[i].idx2index);
+	//		delete [] (crossNodeMap[i].crossNodeMap);
+	//	}
+	//	delete [] crossNodeMap;
+	//}
 
-	if (crossNodeData != NULL) {
-		for (int i=0; i<nodeNum*nodeNum; i++) {
-			delete [] (crossNodeData[i].firedNeuronIdx);
-		}
-		delete [] crossNodeData;
-	}
+	//if (crossNodeData != NULL) {
+	//	for (int i=0; i<node_num*node_num; i++) {
+	//		delete [] (crossNodeData[i].firedNeuronIdx);
+	//	}
+	//	delete [] crossNodeData;
+	//}
 
-	crossNodeInfo.clear();
-	//crossNodeInfoGPU.clear();
-	nid2node.clear();
-	sid2node.clear();
+	_nID2node.clear();
+	_sID2node.clear();
+	_crossnode_nID2nodes.clear();
+	_crossnode_nID2idx.clear();
+	_crossnode_idx2idx.clear();
 
-	globalIdx2nid.clear();
-	globalIdx2sid.clear();
-
-	crossNodeIdx2Idx.clear();
+	_global_idx2nID.clear();
+	_global_idx2sID.clear();
+	_global_ntype_num.clear();
+	_global_stype_num.clear();
 }

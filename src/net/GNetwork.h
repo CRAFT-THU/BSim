@@ -32,6 +32,9 @@ struct GNetwork {
 	int MAX_DELAY;
 };
 
+//This func donot deal with N2SConnection
+GNetwork * initGNetwork(int ntype_num, int stype_num);
+
 int copyNetwork(GNetwork *dNet, GNetwork *sNet, int rank, int rankSize);
 int mpiSendNetwork(GNetwork *network, int rank, int rankSize);
 int mpiRecvNetwork(GNetwork *network, int rank, int rankSize);

@@ -4,10 +4,38 @@
  */
 
 #include <mpi.h>
+#include <assert.h>
 #include <iostream>
 
 #include "../utils/TypeFunc.h"
 #include "GNetwork.h"
+
+GNetwork *initGNetwork(int ntype_num, int stype_num) {
+	GNetwork *ret_net = (GNetwork *)malloc(sizeof(GNetwork));
+
+	ret_net->pNeurons = (void**)malloc(sizeof(void*)*ntype_num);
+	assert(ret_net->pNeurons != NULL);
+	ret_net->pSynapses = (void**)malloc(sizeof(void*)*stype_num);
+	assert(ret_net->pSynapses != NULL);
+
+	ret_net->pN2SConnection = NULL;
+
+	ret_net->neuronNums = (int*)malloc(sizeof(int)*(ntype_num + 1));
+	assert(ret_net->neuronNums != NULL);
+	ret_net->synapseNums = (int*)malloc(sizeof(int)*(stype_num + 1));
+	assert(ret_net->synapseNums != NULL);
+	ret_net->neuronNums[0] = 0;
+	ret_net->synapseNums[0] = 0;
+
+	ret_net->nTypes = (Type*)malloc(sizeof(Type)*ntype_num);
+	assert(ret_net->nTypes != NULL);
+	ret_net->sTypes = (Type*)malloc(sizeof(Type)*stype_num);
+	assert(ret_net->sTypes != NULL);
+
+	ret_net->MAX_DELAY = 1;
+
+	return ret_net;
+}
 
 int copyNetwork(GNetwork *dNet, GNetwork *sNet, int rank, int rankSize)
 {
