@@ -17,15 +17,6 @@
 #include "../net/MultiNetwork.h"
 #include "MultiGPUSimulator.h"
 
-struct DistriNetwork {
-	int simCycle;
-	int nodeIdx;
-	int nodeNum;
-	GNetwork * network;
-	CrossNodeMap *crossNodeMap;
-	CrossNodeData *crossNodeData;
-};
-
 pthread_barrier_t cycle_barrier;
 
 MultiGPUSimulator::MultiGPUSimulator(Network *network, real dt) : SimulatorBase(network, dt)
@@ -88,6 +79,8 @@ void * run_thread(void *para) {
 	sprintf(dataFilename, "GSim_%d.data", network->nodeIdx); 
 	FILE *dataFile = fopen(dataFilename, "w+");
 	assert(dataFile != NULL);
+
+	checkCudaErrors(cudaSetDevice(network->nodeIdx));
 
 	GNetwork *pCpuNet = network->network;
 	GNetwork *c_pGpuNet = copyNetworkToGPU(pCpuNet);

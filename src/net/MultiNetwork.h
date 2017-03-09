@@ -6,41 +6,39 @@
 #define MULTINETWORK_H
 
 #include "Network.h"
-
-struct CrossNodeMap {
-	int *idx2index;
-	int *crossNodeMap;
-};
-
-struct CrossNodeData {
-	int maxNeuronNum;
-	int firedNeuronNum;
-	int *firedNeuronIdx;
-};
+#include "DistriNetwork.h"
 
 class MultiNetwork {
 public:
-	MultiNetwork(Network *net);
+	MultiNetwork(Network *net, int nodeNum = 1);
 	~MultiNetwork();
 
 	void splitNetwork(int nodeNum);
-	GNetwork* buildNetworks(int nodeNum, bool autoSplited = true);
-	int addConnectionInfo(ID nID, int nid, int offset, int *delayStart, int *delayNum, int *pSynapsesIdx, int nodeIdx =0);
+	DistriNetwork * buildNetworks(int nodeNum, bool autoSplited = true);
+	//int addConnectionInfo(ID nID, int nid, int offset, int *delayStart, int *delayNum, int *pSynapsesIdx, int nodeIdx =0);
+
+private:
+	void countTypeNum(int nodeNum, bool autoSplited);
+
 
 public:
 	Network * network;
 
-	map<ID, set<int>> crossNodeInfo;
+	map<ID, set<int>> _crossNodeInfo;
 	//map<int, set<int>> crossNodeInfoGPU;
+	
+	vector<map<Type, int> >	_globalNTypeInfo;
+	vector<map<Type, int> > _globalSTypeInfo;
 
-	map<ID, int> nid2node;
-	map<ID, int> sid2node;
+	map<ID, int> _nID2node;
+	map<ID, int> _sID2node;
 
-	vector<map<int, ID> > globalIdx2nid;
-	vector<map<int, ID> > globalIdx2sid;
-	vector<map<int, vector<int> > > crossNodeIdx2Idx;
-	CrossNodeMap *crossNodeMap;
-	CrossNodeData *crossNodeData;
+	vector<map<int, ID> > _globalIdx2nID;
+	vector<map<int, ID> > _globalIdx2sID;
+	vector<map<int, vector<int> > > _crossNodeIdx2Idx;
+
+	//CrossNodeMap *_crossNodeMap;
+	//CrossNodeData *_crossNodeData;
 
 	int nodeNum;
 };
