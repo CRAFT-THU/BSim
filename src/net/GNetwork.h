@@ -32,8 +32,10 @@ struct GNetwork {
 	int MAX_DELAY;
 };
 
-//This func donot deal with N2SConnection
+//This func donot deal with the member of N2SConnection
 GNetwork * initGNetwork(int ntype_num, int stype_num);
+
+//TODO freeGNetwork
 
 int copyNetwork(GNetwork *dNet, GNetwork *sNet, int rank, int rankSize);
 int mpiSendNetwork(GNetwork *network, int rank, int rankSize);

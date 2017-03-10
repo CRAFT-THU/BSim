@@ -14,28 +14,30 @@ public:
 	MultiNetwork(Network *net, int node_num = 1);
 	~MultiNetwork();
 
-	void splitNetwork();
 	DistriNetwork * buildNetworks(bool auto_splited = true);
+	CrossNodeData* arrangeCrossNodeData(int node_num);
 	//int addConnectionInfo(ID nID, int nid, int offset, int *delayStart, int *delayNum, int *pSynapsesIdx, int nodeIdx =0);
 
 private:
+	void splitNetwork();
 	void countTypeNum(bool auto_splited);
         GNetwork* arrangeData(int node, bool auto_splited);
         N2SConnection* arrangeConnect(int n_num, int s_num, int node_idx);
+	CrossNodeMap* arrangeCrossNodeMap(int n_num, int node_idx, int node_num);
 
 public:
 	//Cross Node
 	map<ID, int> _nID2node;
 	map<ID, int> _sID2node;
-	map<ID, set<int>> _crossnode_nID2nodes;
+	vector<set<ID> > _crossnode_IDs_send;
+	vector<set<ID> > _crossnode_IDs_receive;
 	vector<map<ID, int> > _crossnode_nID2idx;
-	vector<map<int, vector<int> > > _crossnode_idx2idx;
+	//vector<map<int, vector<int> > > _crossnode_idx2idx;
 	//CrossNodeMap *_crossNodeMap;
 	//CrossNodeData *_crossNodeData;
-	
 
 	//Per Node
-	vector<map<ID, int> > _global_nID2idx;
+	//vector<map<ID, int> > _global_nID2idx;
 	vector<map<int, ID> > _global_idx2nID;
 	vector<map<int, ID> > _global_idx2sID;
 	vector<map<Type, int> >	_global_ntype_num;

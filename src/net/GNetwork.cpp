@@ -18,7 +18,7 @@ GNetwork *initGNetwork(int ntype_num, int stype_num) {
 	ret_net->pSynapses = (void**)malloc(sizeof(void*)*stype_num);
 	assert(ret_net->pSynapses != NULL);
 
-	ret_net->pN2SConnection = NULL;
+	ret_net->pN2SConnection = (N2SConnection*)malloc(sizeof(N2SConnection));
 
 	ret_net->neuronNums = (int*)malloc(sizeof(int)*(ntype_num + 1));
 	assert(ret_net->neuronNums != NULL);

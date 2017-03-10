@@ -18,8 +18,11 @@ struct DistriNetwork {
 	int _node_num;
 	GNetwork * _network;
 	CrossNodeMap *_crossnode_map;
-	CrossNodeData *_crossnode_data;
+	//CrossNodeData *_crossnode_data;
 };
 
+// Pointers inited to NULL, specific funcs in MultiNetwork will deal with these pointers later 
 DistriNetwork* initDistriNet(int num);
+
+// Not NULL pointers are also freed.
 DistriNetwork* freeDistriNet(int num);
