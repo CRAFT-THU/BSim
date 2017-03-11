@@ -42,8 +42,8 @@ int MultiGPUSimulator::run(real time)
 
 	pthread_barrier_init(&cycle_barrier, NULL, device_count);
 
-	MultiNetwork multiNet(network);
-	DistriNetwork *node_nets = multiNet.buildNetworks(device_count);
+	MultiNetwork multiNet(network, device_count);
+	DistriNetwork *node_nets = multiNet.buildNetworks();
 	assert(node_nets != NULL);
 	global_cross_data = multiNet.arrangeCrossNodeData(device_count);
 	assert(global_cross_data != NULL);
