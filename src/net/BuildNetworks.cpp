@@ -178,7 +178,7 @@ GNetwork* MultiNetwork::arrangeData(int node_idx, bool auto_splited) {
 		assert(dst != NULL);
 
 		for (int sidx = 0; sidx< node_s_num; sidx++) {
-			assert(_global_idx2sID[node_idx].find(sidx) == _global_idx2sID[node_idx].end());
+			assert(_global_idx2sID[node_idx].find(sidx) != _global_idx2sID[node_idx].end());
 			ID sID = _global_idx2sID[node_idx][sidx];
 			assert(_network->s2nNetwork.find(sID) != _network->s2nNetwork.end());
 			ID nID = _network->s2nNetwork[sID];	
@@ -198,7 +198,7 @@ GNetwork* MultiNetwork::arrangeData(int node_idx, bool auto_splited) {
 			_global_idx2nID[node_idx][node_n_num + size] = *iter;
 	}
 
-	assert(_global_idx2nID[node_idx].size() ==  node_n_num + _crossnode_nID2idx.size());
+	assert(_global_idx2nID[node_idx].size() ==  node_n_num + _crossnode_nID2idx[node_idx].size());
 
 	net->MAX_DELAY = _network->maxDelaySteps;
 
@@ -238,7 +238,7 @@ N2SConnection* MultiNetwork::arrangeConnect(int n_num, int s_num, int node_idx)
 				ID sID = n2siter->second.at(i);
 				if (_network->id2synapse[sID]->getDelay() == delay_t+1) {
 					map<ID, int>::iterator sid2idxiter = _network->sid2idx.find(sID);
-					assert(_sID2node[sID] == node_idx && sid2idxiter == _network->sid2idx.end());
+					assert(_sID2node[sID] != node_idx || sid2idxiter != _network->sid2idx.end());
 
 					if(sid2idxiter != _network->sid2idx.end() && _sID2node[sID] == node_idx) {
 						int sid = sid2idxiter->second;
@@ -342,7 +342,7 @@ DistriNetwork* MultiNetwork::buildNetworks(bool auto_splited)
 		net[node_idx]._network = arrangeData(node_idx, auto_splited);
 
 		int n_num = _global_idx2nID[node_idx].size();
-		int s_num = net[node_idx]._network->synapseNums[net[node_idx]._network->sTypeNum];
+		int s_num = _global_idx2sID[node_idx].size();
 		net[node_idx]._network->pN2SConnection = arrangeConnect(n_num, s_num, node_idx);
 
 	}

@@ -27,6 +27,9 @@ GNetwork *initGNetwork(int ntype_num, int stype_num) {
 	ret_net->neuronNums[0] = 0;
 	ret_net->synapseNums[0] = 0;
 
+	ret_net->nTypeNum = ntype_num;
+	ret_net->sTypeNum = stype_num;
+
 	ret_net->nTypes = (Type*)malloc(sizeof(Type)*ntype_num);
 	assert(ret_net->nTypes != NULL);
 	ret_net->sTypes = (Type*)malloc(sizeof(Type)*stype_num);

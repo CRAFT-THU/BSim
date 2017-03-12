@@ -27,7 +27,7 @@ void MultiNetwork::splitNetwork()
 			}
 
 		}
-		if (synapse_count >= node_idx * synapse_per_node && node_idx < _node_num) {
+		if (synapse_count >= (node_idx+1) * synapse_per_node && node_idx < _node_num) {
 			node_idx++;	
 		}
 	}
@@ -42,7 +42,7 @@ void MultiNetwork::splitNetwork()
 				_sID2node[*viter] = node_idx;
 			}
 		}
-		if (synapse_count >= node_idx * synapse_per_node && node_idx < _node_num) {
+		if (synapse_count >= (node_idx+1) * synapse_per_node && node_idx < _node_num) {
 			node_idx++;	
 		}
 	}
@@ -88,8 +88,8 @@ void MultiNetwork::splitNetwork()
 		int nnode = _nID2node[iter->first];
 		assert(_crossnode_IDs_send[nnode].find(iter->first) != _crossnode_IDs_send[nnode].end());
 		for (auto iter2 = iter->second.begin(); iter2 != iter->second.end(); iter2++) {
-			int snode = _sID2node[*iter2];
-			assert(_crossnode_IDs_receive[snode].find(iter->first) != _crossnode_IDs_receive[snode].end());
+			//int snode = _sID2node[*iter2];
+			assert(_crossnode_IDs_receive[*iter2].find(iter->first) != _crossnode_IDs_receive[*iter2].end());
 		}
 	}
 
