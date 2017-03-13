@@ -24,7 +24,7 @@ ELSE( "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang" )
 ENDIF ( "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang" )
 
 SET(CUDA_PROPAGATE_HOST_FLAGS OFF)
-SET(CUDA_NVCC_FLAGS_DEBUG "-arch=sm_30 -std=c++11 -g -G")
+SET(CUDA_NVCC_FLAGS_DEBUG "-arch=sm_30 -std=c++11 -g -G -lineinfo -Xcompiler -Wall")
 SET(CUDA_NVCC_FLAGS_RELEASE "-arch=sm_30 -std=c++11 -O3")
 
 SET(CPU_LIB bsim)
