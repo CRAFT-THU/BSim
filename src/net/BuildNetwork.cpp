@@ -26,8 +26,6 @@ GNetwork* Network::buildNetwork()
 	assert(pAllNeurons != NULL);
 	void **pAllSynapses = (void**)malloc(sizeof(void*)*synapseTypeNum);
 	assert(pAllSynapses != NULL);
-	N2SConnection *pAllConnections = (N2SConnection*)malloc(sizeof(N2SConnection));
-	assert(pAllConnections != NULL);
 
 	int *pNeuronsNum = (int*)malloc(sizeof(int)*(neuronTypeNum + 1));
 	assert(pNeuronsNum != NULL);
@@ -95,6 +93,11 @@ GNetwork* Network::buildNetwork()
 	logMap();
 	checkIDtoIdx();
 
+	N2SConnection *pAllConnections = (N2SConnection*)malloc(sizeof(N2SConnection));
+	assert(pAllConnections != NULL);
+
+	pAllConnections->n_num = totalNeuronNum;
+	pAllConnections->s_num = totalSynapseNum;
 
 	int *delayNum = (int*)malloc(sizeof(int)*(this->maxDelaySteps)*totalNeuronNum);
 	assert(delayNum != NULL);

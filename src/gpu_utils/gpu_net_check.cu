@@ -46,9 +46,9 @@ int checkGPUNetwork(GNetwork *g, GNetwork *c)
 	N2SConnection p;
 	checkCudaErrors(cudaMemcpy(&p, g->pN2SConnection, sizeof(N2SConnection), cudaMemcpyDeviceToHost));
 
-	CHECK_CROSS_ARRAY(p.pSynapsesIdx, c->pN2SConnection->pSynapsesIdx, sizeof(int)*totalSynapseNum);
-	CHECK_CROSS_ARRAY(p.delayStart, c->pN2SConnection->delayStart, sizeof(int)*totalNeuronNum*MAX_DELAY);
-	CHECK_CROSS_ARRAY(p.delayNum, c->pN2SConnection->delayNum, sizeof(int)*totalNeuronNum*MAX_DELAY);
+	CHECK_CROSS_ARRAY(p.pSynapsesIdx, c->pN2SConnection->pSynapsesIdx, sizeof(int)*(c->pN2SConnection->s_num));
+	CHECK_CROSS_ARRAY(p.delayStart, c->pN2SConnection->delayStart, sizeof(int)*(c->pN2SConnection->n_num)*MAX_DELAY);
+	CHECK_CROSS_ARRAY(p.delayNum, c->pN2SConnection->delayNum, sizeof(int)*(c->pN2SConnection->n_num)*MAX_DELAY);
 
         ret = 2;
 
