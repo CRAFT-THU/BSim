@@ -487,6 +487,7 @@ __global__ void init_log_buffers(int * layer_input, real * x_input)
 GBuffers* alloc_buffers(int neuron_num, int synapse_num, int max_delay) 
 {
 	GBuffers *ret = (GBuffers*)malloc(sizeof(GBuffers));
+	memset(ret, 0, sizeof(GBuffers));
 	
 	checkCudaErrors(cudaMalloc((void**)&(ret->c_gNeuronInput), sizeof(real)*(neuron_num)));
 	checkCudaErrors(cudaMemset(ret->c_gNeuronInput, 0, sizeof(real)*(neuron_num)));

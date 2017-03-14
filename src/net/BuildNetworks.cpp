@@ -287,6 +287,7 @@ CrossNodeMap* MultiNetwork::arrangeCrossNodeMap(int n_num, int node_idx, int nod
 				cross_map->_crossnode_index2idx[index*node_num + t] = -1;
 			}
 		}
+		index++;
 	}
 
 	return cross_map;

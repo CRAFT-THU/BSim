@@ -27,7 +27,8 @@ MultiNetwork::MultiNetwork(Network *net, int node_num)
 
 MultiNetwork::~MultiNetwork()
 {
-	delete _network;
+	//An external pointer, should not delete here
+	//delete _network;
 
 	//if (crossNodeMap != NULL) {
 	//	for (int i=0; i<node_num; i++) {
