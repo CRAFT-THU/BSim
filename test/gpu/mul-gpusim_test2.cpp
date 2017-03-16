@@ -27,8 +27,8 @@ int main(int argc, char **argv)
 	c.connect(pn3, pn4, weight2, delay, NULL, N*N);
 	c.connect(pn4, pn5, weight2, delay, NULL, N*N);
 
-	//STSim st(&c, 1.0e-3f);
-	//st.run(0.1f);
+	STSim st(&c, 1.0e-3f);
+	st.run(0.1f);
 	MGSim mg(&c, 1.0e-3f);
 	mg.run(0.1f);
 
