@@ -15,5 +15,7 @@ const real ZERO = 1e-10;
 const int MAXBLOCKSIZE = 1024;
 const int WARPSIZE = 32;
 
+const int DECAY_MULTIPLE_TAU = 5;
+
 #endif /* CONSTANT_H */
 

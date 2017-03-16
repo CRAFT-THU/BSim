@@ -419,7 +419,12 @@ __global__ void update_exp_synapse(GExpSynapses *d_synapses, int num, int start_
 	for (int idx = tid; idx < gSynapsesActiveTableSize; idx += blockDim.x*gridDim.x) {
 		int sid = gSynapsesActiveTable[idx];
 		d_synapses->p_I_syn[sid] *= d_synapses->p_C1[sid];
-		//atomicAdd(&(gNeuronInput[d_synapses->pDst[sid]]), d_synapses->p_I_syn[sid]);
+
+		if (gSynapsesLogTable[sid] + d_synapses->p_active_step[sid] < gCurrentCycle) {
+			atomicAdd(&(gNeuronInput[d_synapses->pDst[sid]]), d_synapses->p_I_syn[sid]);
+		} else {
+			d_synapses->p_I_syn[sid] = 0; 
+		}
 
 	}
 	__syncthreads();

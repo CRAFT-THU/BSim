@@ -54,6 +54,8 @@ int ExpSynapse::init(real dt) {
 		return -1;
 	}
 
+	active_steps = static_cast<int>(DECAY_MULTIPLE_TAU * tau_syn/dt + 0.5);
+
 	return 0;
 }
 
@@ -65,9 +67,17 @@ int ExpSynapse::update(SimInfo &info)
 
 	while (!delay_queue.empty() && (delay_queue.front() <= 0)) {
 		I_syn += weight/_C1;
-		pDest->recv(I_syn);
+		//pDest->recv(I_syn);
 		delay_queue.pop_front();
 		//info.fired.push_back(getID());
+		step_to_zero = active_steps;
+	}
+
+	if (step_to_zero > 0) {
+		pDest->recv(I_syn);
+		step_to_zero--;
+	} else {
+		I_syn = 0;
 	}
 
 	for (iter = delay_queue.begin(); iter != delay_queue.end(); iter++) {

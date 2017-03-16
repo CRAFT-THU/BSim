@@ -35,6 +35,8 @@ public:
 protected:
 	//real weight;
 	//int delay_setps;
+	int active_steps;
+	int step_to_zero;
 	real delay;
 	real C1;
 	real _C1;
