@@ -111,7 +111,7 @@ int SingleGPUSimulator::run(real time)
 		}
 		fprintf(logFile, "\n");
 
-		fprintf(dataFile, "Cycle %d: ", time);
+		//fprintf(dataFile, "Cycle %d: ", time);
 		for (int i=0; i<c_pGpuNet->neuronNums[lif_idx+1] - c_pGpuNet->neuronNums[lif_idx]; i++) {
 			fprintf(dataFile, "%lf ", c_vm[i]);
 		}

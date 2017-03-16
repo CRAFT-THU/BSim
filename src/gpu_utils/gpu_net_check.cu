@@ -39,8 +39,8 @@ int checkGPUNetwork(GNetwork *g, GNetwork *c)
 
 	ret = 1;
 
-	int totalNeuronNum = g->neuronNums[g->nTypeNum+1];
-	int totalSynapseNum = g->synapseNums[g->sTypeNum+1];
+	//int totalNeuronNum = g->neuronNums[g->nTypeNum+1];
+	//int totalSynapseNum = g->synapseNums[g->sTypeNum+1];
 	int MAX_DELAY = c->MAX_DELAY;
 
 	N2SConnection p;

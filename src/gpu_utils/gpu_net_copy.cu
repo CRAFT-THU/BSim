@@ -16,8 +16,8 @@ GNetwork* copyNetworkToGPU(GNetwork *pCpuNet)
 
 	int nTypeNum = pCpuNet->nTypeNum;
 	int sTypeNum = pCpuNet->sTypeNum;
-	int totalNeuronNum = pCpuNet->neuronNums[pCpuNet->nTypeNum];
-	int totalSynapseNum = pCpuNet->synapseNums[pCpuNet->sTypeNum];
+	//int totalNeuronNum = pCpuNet->neuronNums[pCpuNet->nTypeNum];
+	//int totalSynapseNum = pCpuNet->synapseNums[pCpuNet->sTypeNum];
 	int MAX_DELAY = pCpuNet->MAX_DELAY;
 
 	//Type *g_nTypes = NULL, *g_sTypes = NULL;
