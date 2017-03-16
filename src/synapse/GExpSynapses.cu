@@ -4,6 +4,7 @@
  */
 
 #include "../third_party/cuda/helper_cuda.h"
+#include "../gpu_utils/mem_op.h"
 #include "GExpSynapses.h"
 
 int cudaAllocExp(void *pCpu, void *pGpu, int num)
