@@ -16,7 +16,7 @@ int main(int argc, char **argv)
 	Population<IF_curr_exp> *pn2 = c.createPopulation(2, N, IF_curr_exp(LIFNeuron(ID(0, 0), 0.0f, 0.0f, 0.0f, 1.0e-1f, 50.0e-4f, 0.0f, 1.0f, 1.0f, 15.0e-3f, 0), ID(0, 0)));
 	Population<IF_curr_exp> *pn3 = c.createPopulation(3, N, IF_curr_exp(LIFNeuron(ID(0, 0), 0.0f, 0.0f, 0.0f, 1.0e-1f, 50.0e-4f, 0.0f, 1.0f, 1.0f, 15.0e-3f, 0), ID(0, 0)));
 	Population<IF_curr_exp> *pn4 = c.createPopulation(4, N, IF_curr_exp(LIFNeuron(ID(0, 0), 0.0f, 0.0f, 0.0f, 1.0e-1f, 50.0e-4f, 0.0f, 1.0f, 1.0f, 15.0e-3f, 0), ID(0, 0)));
-	Population<IF_curr_exp> *pn5 = c.createPopulation(4, N, IF_curr_exp(LIFNeuron(ID(0, 0), 0.0f, 0.0f, 0.0f, 1.0e-1f, 50.0e-4f, 0.0f, 1.0f, 1.0f, 15.0e-3f, 0), ID(0, 0)));
+	Population<IF_curr_exp> *pn5 = c.createPopulation(5, N, IF_curr_exp(LIFNeuron(ID(0, 0), 0.0f, 0.0f, 0.0f, 1.0e-1f, 50.0e-4f, 0.0f, 1.0f, 1.0f, 15.0e-3f, 0), ID(0, 0)));
 
 	real * weight = getRandomArray((real)20e-3, N*N);
 	real * weight2 = getRandomArray((real)15e-3, N*N);
