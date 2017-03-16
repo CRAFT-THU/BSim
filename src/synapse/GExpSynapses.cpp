@@ -17,6 +17,8 @@ int allocExp(void *pSynapses, int S)
 	GExpSynapses *p = (GExpSynapses*)pSynapses;
 	p->p_weight = (real*)malloc(S*sizeof(real));
 	p->p_delay_steps = (int*)malloc(S*sizeof(int));
+
+	p->p_active_steps = (int*)malloc(S*sizeof(int));
 	p->p_C1 = (real*)malloc(S*sizeof(real));
 	p->p__C1 = (real*)malloc(S*sizeof(real));
 	p->p_I_syn = (real*)malloc(S*sizeof(real));

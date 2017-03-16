@@ -151,6 +151,7 @@ int ExpSynapse::hardCopy(void *data, int idx, int base, map<ID, int> &id2idx, ma
 	p->p_weight[idx] = weight;
 	p->p_delay_steps[idx] = delay_steps;
 	//p->p_delay[idx] = delay;
+	p->p_active_steps[idx] = active_steps;
 	p->p_C1[idx] = C1;
 	p->p__C1[idx] = _C1;
 	//p->p_tau_syn[idx] = tau_syn;
