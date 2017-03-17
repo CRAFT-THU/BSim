@@ -115,7 +115,7 @@ void * run_thread(void *para) {
 	if (lif_idx >= 0) {
 		c_g_lif = copyFromGPU<GLIFNeurons>(static_cast<GLIFNeurons*>(c_pGpuNet->pNeurons[lif_idx]), 1);
 		c_g_vm = c_g_lif->p_vm;
-		printf("Thread %d pointer vm %p\n", network->_node_idx, c_g_vm);
+		//printf("Thread %d pointer vm %p\n", network->_node_idx, c_g_vm);
 	}
 	int * c_g_cross_id = gpuMalloc<int>(global_cross_data[dataIdx]._max_n_num); 
 	//real *c_I_syn = hostMalloc<real>(totalSynapseNum);
@@ -125,7 +125,7 @@ void * run_thread(void *para) {
 
 
 	vector<int> firedInfo;
-	printf("Thread %d: Start runing for %d cycles\n", network->_node_idx, network->_sim_cycle);
+	//printf("Thread %d: Start runing for %d cycles\n", network->_node_idx, network->_sim_cycle);
 	struct timeval ts, te;
 	gettimeofday(&ts, NULL);
 	for (int time=0; time<network->_sim_cycle; time++) {
@@ -220,7 +220,7 @@ void * run_thread(void *para) {
 
 		fprintf(logFile, "Cycle %d: ", time);
 		for (int i=0; i<copySize; i++) {
-			if (network->_node_idx == 1) printf("hehe\n");
+			//if (network->_node_idx == 1) printf("hehe\n");
 			fprintf(logFile, "%d ", buffers->c_neuronsFired[i]);
 		}
 		fprintf(logFile, "\n");

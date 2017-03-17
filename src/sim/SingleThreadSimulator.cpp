@@ -58,8 +58,8 @@ int SingleThreadSimulator::run(real time)
 	struct timeval ts, te;
 	gettimeofday(&ts, NULL);
 	for (int cycle=0; cycle<sim_cycle; cycle++) {
-		printf("\rCycle: %d", cycle);
-		fflush(stdout);
+		//printf("\rCycle: %d", cycle);
+		//fflush(stdout);
 
 		info.currCycle = cycle;
 		info.fired.clear();

@@ -6,7 +6,7 @@
 #include "gpu_macros.h"
 #include "gpu_kernel.h"
 
-#define SHARED_SIZE 512
+#define MAXBLOCKSIZE 512
 
 // Constant
 __constant__ int MAX_DELAY;
@@ -79,7 +79,7 @@ __global__ void reset_active_synapse()
 
 __global__ void update_constant_neuron(GConstantNeurons *d_neurons, int num, int start_id)
 {
-	__shared__ int fire_table_t[SHARED_SIZE];
+	__shared__ int fire_table_t[MAXBLOCKSIZE];
 	__shared__ volatile unsigned int fire_cnt;
 
 	if (threadIdx.x == 0) {
@@ -92,22 +92,20 @@ __global__ void update_constant_neuron(GConstantNeurons *d_neurons, int num, int
 		bool fired = false;
 		int test_loc = 0;
 
-		if (idx < num) {
-			fired = (gCurrentCycle * d_neurons->p_fire_rate[idx]) > (d_neurons->p_fire_count[idx]);
-		}
+		fired = (gCurrentCycle * d_neurons->p_fire_rate[idx]) > (d_neurons->p_fire_count[idx]);
 
 		for (int i=0; i<2; i++) {
 			if (fired) {
 				test_loc = atomicAdd((int*)&fire_cnt, 1);
-				if (test_loc < SHARED_SIZE) {
+				if (test_loc < MAXBLOCKSIZE) {
 					fire_table_t[test_loc] = start_id + idx;
 					d_neurons->p_fire_count[idx] = d_neurons->p_fire_count[idx] + 1;
 					fired = false;
 				}
 			}
 			__syncthreads();
-			if (fire_cnt >= SHARED_SIZE) {
-				commit2globalTable(fire_table_t, SHARED_SIZE, gFiredTable, &(gFiredTableSizes[gCurrentIdx]), gFiredTableCap*gCurrentIdx);
+			if (fire_cnt >= MAXBLOCKSIZE) {
+				commit2globalTable(fire_table_t, MAXBLOCKSIZE, gFiredTable, &(gFiredTableSizes[gCurrentIdx]), gFiredTableCap*gCurrentIdx);
 				if (threadIdx.x == 0) {
 					fire_cnt = 0;
 				}
@@ -147,7 +145,7 @@ __device__ void reset_poisson_neuron(GPoissonNeurons *d_neurons, int *shared_buf
 
 __global__ void update_poisson_neuron(GPoissonNeurons *d_neurons, int num, int start_id)
 {
-	__shared__ int fire_table_t[SHARED_SIZE];
+	__shared__ int fire_table_t[MAXBLOCKSIZE];
 	__shared__ volatile unsigned int fire_cnt;
 
 	if (threadIdx.x == 0) {
@@ -160,22 +158,20 @@ __global__ void update_poisson_neuron(GPoissonNeurons *d_neurons, int num, int s
 		bool fired = false;
 		int test_loc = 0;
 
-		if (idx < num) {
-			fired = (gCurrentCycle == d_neurons->p_fire_cycle[idx]) && (gCurrentCycle <= d_neurons->p_end_cycle[idx]);
-		}
+		fired = (gCurrentCycle == d_neurons->p_fire_cycle[idx]) && (gCurrentCycle <= d_neurons->p_end_cycle[idx]);
 
 		for (int i=0; i<2; i++) {
 			if (fired) {
 				test_loc = atomicAdd((int*)&fire_cnt, 1);
-				if (test_loc < SHARED_SIZE) {
+				if (test_loc < MAXBLOCKSIZE) {
 					fire_table_t[test_loc] = start_id + idx;
 					fired = false;
 				}
 			}
 			__syncthreads();
-			if (fire_cnt >= SHARED_SIZE) {
-				commit2globalTable(fire_table_t, SHARED_SIZE, gFiredTable, &(gFiredTableSizes[gCurrentIdx]), gFiredTableCap*gCurrentIdx);
-				reset_poisson_neuron(d_neurons, fire_table_t, SHARED_SIZE, start_id);
+			if (fire_cnt >= MAXBLOCKSIZE) {
+				commit2globalTable(fire_table_t, MAXBLOCKSIZE, gFiredTable, &(gFiredTableSizes[gCurrentIdx]), gFiredTableCap*gCurrentIdx);
+				reset_poisson_neuron(d_neurons, fire_table_t, MAXBLOCKSIZE, start_id);
 				if (threadIdx.x == 0) {
 					fire_cnt = 0;
 				}
@@ -195,7 +191,7 @@ __global__ void update_poisson_neuron(GPoissonNeurons *d_neurons, int num, int s
 }
 __global__ void find_lif_neuron(GLIFNeurons *d_neurons, int num, int start_id)
 {
-	__shared__ int active_table_t[SHARED_SIZE];
+	__shared__ int active_table_t[MAXBLOCKSIZE];
 	__shared__ volatile int active_cnt;
 
 	if (threadIdx.x == 0) {
@@ -208,13 +204,11 @@ __global__ void find_lif_neuron(GLIFNeurons *d_neurons, int num, int start_id)
 		bool actived = false;
 		int test_loc = 0;
 
-		if (idx < num) {
-			actived = d_neurons->p_refrac_step[idx] <= 0;
-		}
+		actived = d_neurons->p_refrac_step[idx] <= 0;
 
 		if (actived) {
 			test_loc = atomicAdd((int*)&active_cnt, 1);
-			if (test_loc < SHARED_SIZE) {
+			if (test_loc < MAXBLOCKSIZE) {
 				active_table_t[test_loc] = idx;
 				actived = false;
 			}
@@ -224,8 +218,8 @@ __global__ void find_lif_neuron(GLIFNeurons *d_neurons, int num, int start_id)
 		}
 		__syncthreads();
 
-		if (active_cnt >= SHARED_SIZE) {
-			commit2globalTable(active_table_t, SHARED_SIZE, gActiveTable, &gActiveTableSize, 0);
+		if (active_cnt >= MAXBLOCKSIZE) {
+			commit2globalTable(active_table_t, MAXBLOCKSIZE, gActiveTable, &gActiveTableSize, 0);
 			if (threadIdx.x == 0) {
 				active_cnt = 0;
 			}
@@ -234,14 +228,14 @@ __global__ void find_lif_neuron(GLIFNeurons *d_neurons, int num, int start_id)
 
 		if (actived) {
 			test_loc = atomicAdd((int*)&active_cnt, 1);
-			if (test_loc < SHARED_SIZE) {
+			if (test_loc < MAXBLOCKSIZE) {
 				active_table_t[test_loc] = idx;
 				actived = false;
 			}
 		}
 		__syncthreads();
-		if (active_cnt >= SHARED_SIZE) {
-			commit2globalTable(active_table_t, SHARED_SIZE, gActiveTable, &gActiveTableSize, 0);
+		if (active_cnt >= MAXBLOCKSIZE) {
+			commit2globalTable(active_table_t, MAXBLOCKSIZE, gActiveTable, &gActiveTableSize, 0);
 			if (threadIdx.x == 0) {
 				active_cnt = 0;
 			}
@@ -270,7 +264,7 @@ __device__ void reset_lif_neuron(GLIFNeurons *d_neurons, int *shared_buf, volati
 
 __global__ void update_lif_neuron(GLIFNeurons *d_neurons, int num, int start_id)
 {
-	__shared__ int fire_table_t[SHARED_SIZE];
+	__shared__ int fire_table_t[MAXBLOCKSIZE];
 	__shared__ volatile int fire_cnt;
 
 	if (threadIdx.x == 0) {
@@ -279,38 +273,37 @@ __global__ void update_lif_neuron(GLIFNeurons *d_neurons, int num, int start_id)
 	__syncthreads();
 
 	int tid = blockIdx.x * blockDim.x + threadIdx.x;
-	for (int idx = tid; idx < num; idx +=blockDim.x*gridDim.x) {
+	for (int idx = tid; idx < gActiveTableSize; idx +=blockDim.x*gridDim.x) {
 		bool fired = false;
 		int test_loc = 0;
-		if (idx < gActiveTableSize) {
-			int nid = gActiveTable[idx];
-			int gnid = start_id + nid; 
-			real I = gNeuronInput[gnid] + d_neurons->p_i_tmp[nid];
-			d_neurons->p_vm[nid] = d_neurons->p_vm[nid] * d_neurons->p_C1[nid] + d_neurons->p_C2[nid] * I;
-			//d_neurons->p_i_syn[nid] = 0;
-			gXInput[gnid] += gNeuronInput[gnid];
-			gNeuronInput[gnid] = 0;
 
-			fired = d_neurons->p_vm[nid] >= d_neurons->p_v_thresh[nid];
+		int nid = gActiveTable[idx];
+		int gnid = start_id + nid; 
+		real I = gNeuronInput[gnid] + d_neurons->p_i_tmp[nid];
+		d_neurons->p_vm[nid] = d_neurons->p_vm[nid] * d_neurons->p_C1[nid] + d_neurons->p_C2[nid] * I;
+		//d_neurons->p_i_syn[nid] = 0;
+		gXInput[gnid] += gNeuronInput[gnid];
+		gNeuronInput[gnid] = 0;
 
-			for (int i=0; i<2; i++) {
-				if (fired) {
-					test_loc = atomicAdd((int*)&fire_cnt, 1);
-					if (test_loc < SHARED_SIZE) {
-						fire_table_t[test_loc] = gnid;
-						fired = false;
-					}
+		fired = d_neurons->p_vm[nid] >= d_neurons->p_v_thresh[nid];
+
+		for (int i=0; i<2; i++) {
+			if (fired) {
+				test_loc = atomicAdd((int*)&fire_cnt, 1);
+				if (test_loc < MAXBLOCKSIZE) {
+					fire_table_t[test_loc] = gnid;
+					fired = false;
 				}
-				__syncthreads();
-				if (fire_cnt >= SHARED_SIZE) {
-					commit2globalTable(fire_table_t, SHARED_SIZE, gFiredTable, &gFiredTableSizes[gCurrentIdx], gFiredTableCap*gCurrentIdx);
-					reset_lif_neuron(d_neurons, fire_table_t, SHARED_SIZE, start_id);
-					if (threadIdx.x == 0) {
-						fire_cnt = 0;
-					}
-				}
-				__syncthreads();
 			}
+			__syncthreads();
+			if (fire_cnt >= MAXBLOCKSIZE) {
+				commit2globalTable(fire_table_t, MAXBLOCKSIZE, gFiredTable, &gFiredTableSizes[gCurrentIdx], gFiredTableCap*gCurrentIdx);
+				reset_lif_neuron(d_neurons, fire_table_t, MAXBLOCKSIZE, start_id);
+				if (threadIdx.x == 0) {
+					fire_cnt = 0;
+				}
+			}
+			__syncthreads();
 		}
 		__syncthreads();
 
@@ -366,7 +359,7 @@ __global__ void update_exp_hit(GExpSynapses *d_synapses, int num, int start_id)
 
 __global__ void find_exp_synapse(GExpSynapses *d_synapses, int num, int start_id)
 {
-	__shared__ int active_table_t[SHARED_SIZE];
+	__shared__ int active_table_t[MAXBLOCKSIZE];
 	__shared__ volatile unsigned int active_cnt;
 
 	if (threadIdx.x == 0) {
@@ -379,22 +372,20 @@ __global__ void find_exp_synapse(GExpSynapses *d_synapses, int num, int start_id
 		bool actived = false;
 		int test_loc = 0;
 
-		if (idx < num) {
-			actived = (gSynapsesLogTable[start_id + idx] < gCurrentCycle);
-		}
+		actived = (gSynapsesLogTable[start_id + idx] < gCurrentCycle);
 
 		for (int i=0; i<2; i++) {
 			if (actived) {
 				test_loc = atomicAdd((int*)&active_cnt, 1);
-				if (test_loc < SHARED_SIZE) {
+				if (test_loc < MAXBLOCKSIZE) {
 					active_table_t[test_loc] = idx;
 					actived = false;
 				}
 			}
 			__syncthreads();
 
-			if (active_cnt >= SHARED_SIZE) {
-				commit2globalTable(active_table_t, SHARED_SIZE, gSynapsesActiveTable, &gSynapsesActiveTableSize, 0);
+			if (active_cnt >= MAXBLOCKSIZE) {
+				commit2globalTable(active_table_t, MAXBLOCKSIZE, gSynapsesActiveTable, &gSynapsesActiveTableSize, 0);
 				if (threadIdx.x == 0) {
 					active_cnt = 0;
 				}
