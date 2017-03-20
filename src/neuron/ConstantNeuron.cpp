@@ -11,11 +11,11 @@
 
 const Type ConstantNeuron::type = Constant;
 
-ConstantNeuron::ConstantNeuron(ID id, real fire_rate, real tau_syn_E, real tau_syn_I) : NeuronBase(id)
+ConstantNeuron::ConstantNeuron(ID id, real fire_rate/*, real tau_syn_E, real tau_syn_I*/) : NeuronBase(id)
 {
 	this->fire_rate = fire_rate;
-	this->tau_syn_E = tau_syn_E;
-	this->tau_syn_I = tau_syn_I;
+	//this->tau_syn_E = tau_syn_E;
+	//this->tau_syn_I = tau_syn_I;
 	file = NULL;
 	fired = false;
 	monitored = false;

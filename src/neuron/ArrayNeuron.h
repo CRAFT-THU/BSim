@@ -24,7 +24,6 @@ public:
 
 	virtual Type getType();
 
-	virtual int fire();
 	virtual int recv(real I);
 
 	virtual int reset(SimInfo &info);
@@ -33,7 +32,7 @@ public:
 
 	virtual size_t getSize();
 	virtual int getData(void *data);
-	virtual int hardCopy(void *data, int idx, int base, map<ID, int> &id2idx, map<int, ID> &idx2id) = 0;
+	virtual int hardCopy(void *data, int idx, int base, map<ID, int> &id2idx, map<int, ID> &idx2id);
 
 	int addFireTime(int cycle);
 

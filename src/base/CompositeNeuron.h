@@ -17,7 +17,7 @@ using std::vector;
 template<class Neuron, class Synapse>
 class CompositeNeuron : public Neuron {
 public:
-	CompositeNeuron(const Neuron &templ, ID id);
+	CompositeNeuron(const Neuron &templ, ID id, real tau_syn_E = 1e-3, real tau_syn_I = 1e-3);
 	~CompositeNeuron();
 
 	SynapseBase* addSynapse(SynapseBase *synapse);
@@ -25,12 +25,16 @@ public:
 	virtual int fire();
 	virtual int setNode(int node);
 private:
+	real _tau_syn_E;
+	real _tau_syn_I;
 	vector<SynapseBase*> pSynapses;
 	vector<SynapseBase*> pPreSynapses;
 };
 
 template<class Neuron, class Synapse>
-CompositeNeuron<Neuron, Synapse>::CompositeNeuron(const Neuron &templ, ID id) : Neuron(templ, id) {
+CompositeNeuron<Neuron, Synapse>::CompositeNeuron(const Neuron &templ, ID id, real tau_syn_E, real tau_syn_I) : Neuron(templ, id) {
+	this->_tau_syn_E = tau_syn_E;
+	this->_tau_syn_I = tau_syn_I;
 }
 
 template<class Neuron, class Synapse>
@@ -46,9 +50,9 @@ SynapseBase *CompositeNeuron<Neuron, Synapse>::createSynapse(real weight, real d
 	if (fabs(tau_in) > ZERO) {
 		tau = tau_in;
 	} else if (type == Excitatory) {
-		tau = this->tau_syn_E;
+		tau = this->_tau_syn_E;
 	} else {
-		tau = this->tau_syn_I;
+		tau = this->_tau_syn_I;
 	}
 
 	Synapse *tmp = new Synapse(ID(pDest->getID().getGid(), sidTag.getTag()), weight, delay, tau);

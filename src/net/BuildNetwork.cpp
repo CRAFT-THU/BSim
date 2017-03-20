@@ -4,6 +4,8 @@
 #include "../utils/utils.h"
 #include "../utils/TypeFunc.h"
 #include "Network.h"
+#include "../neuron/ArrayNeuron.h"
+#include "../neuron/GArrayNeurons.h"
 
 void Network::mapIDtoIdx(GNetwork *net)
 {
@@ -25,7 +27,7 @@ void arrangeFireArray(vector<int> &fire_array, vector<int> &start_loc, Populatio
 
 void arrangeArrayNeuron(vector<int> &fire_array, vector<int> &start_loc, GArrayNeurons *p, int num)
 {
-	assert(num == array_neuron_start.size());
+	assert(num == (int)start_loc.size());
 	for (int i=0; i<num; i++) {
 		p->p_start[i] = start_loc[i];
 		p->p_end[i] += p->p_start[i];
@@ -33,7 +35,7 @@ void arrangeArrayNeuron(vector<int> &fire_array, vector<int> &start_loc, GArrayN
 			assert(p->p_end[i-1] == p->p_start[i]);
 		}
 	}
-	assert(p->end[num-1] == fire_array.size());
+	assert(p->p_end[num-1] == (int)fire_array.size());
 	p->p_fire_time = static_cast<int*>(malloc(sizeof(int) * fire_array.size()));
 	std::copy(fire_array.begin(), fire_array.end(), p->p_fire_time);
 }

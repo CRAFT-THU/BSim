@@ -15,8 +15,8 @@ using std::map;
 
 const Type LIFNeuron::type = LIF;
 
-LIFNeuron::LIFNeuron(ID id, real v_init, real v_rest, real v_reset, real cm, real tau_m, real tau_refrac, real tau_syn_E, real tau_syn_I, real v_thresh, real i_offset)
-	: NeuronBase(id), v_init(v_init), v_rest(v_rest), v_reset(v_reset), cm(cm), tau_m(tau_m), tau_refrac(tau_refrac), tau_syn_E(tau_syn_E), tau_syn_I(tau_syn_I), v_thresh(v_thresh), i_offset(i_offset)
+LIFNeuron::LIFNeuron(ID id, real v_init, real v_rest, real v_reset, real cm, real tau_m, real tau_refrac, /*real tau_syn_E, real tau_syn_I, */real v_thresh, real i_offset)
+	: NeuronBase(id), v_init(v_init), v_rest(v_rest), v_reset(v_reset), cm(cm), tau_m(tau_m), tau_refrac(tau_refrac), /*tau_syn_E(tau_syn_E), tau_syn_I(tau_syn_I), */v_thresh(v_thresh), i_offset(i_offset)
 {
 	this->i_syn = 0;
 	this->file = NULL;
@@ -31,8 +31,8 @@ LIFNeuron::LIFNeuron(const LIFNeuron &neuron, ID id) : NeuronBase(id)
 	this->cm = neuron.cm;
 	this->tau_m = neuron.tau_m;
 	this->tau_refrac = neuron.tau_refrac;
-	this->tau_syn_E = neuron.tau_syn_E;
-	this->tau_syn_I = neuron.tau_syn_I;
+	//this->tau_syn_E = neuron.tau_syn_E;
+	//this->tau_syn_I = neuron.tau_syn_I;
 	this->v_thresh = neuron.v_thresh;
 	this->i_offset = neuron.i_offset;
 	this->i_syn = 0;
@@ -168,8 +168,8 @@ int LIFNeuron::getData(void *data)
 	(*p)["cm"] = cm;
 	(*p)["tau_m"] = tau_m;
 	(*p)["tau_refrac"] = tau_refrac;
-	(*p)["tau_syn_E"] = tau_syn_E;
-	(*p)["tau_syn_I"] = tau_syn_I;
+	//(*p)["tau_syn_E"] = tau_syn_E;
+	//(*p)["tau_syn_I"] = tau_syn_I;
 	(*p)["v_thresh"] = v_thresh;
 	(*p)["i_offset"] = i_offset;
 

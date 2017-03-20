@@ -11,11 +11,11 @@
 
 class LIFNeuron : public NeuronBase {
 public:
-	LIFNeuron(ID id, real v_init, real v_rest, real v_reset, real cm, real tau_m, real tau_refrac, real tau_syn_E, real tau_syn_I, real v_thresh, real i_offset);
+	LIFNeuron(ID id, real v_init, real v_rest, real v_reset, real cm, real tau_m, real tau_refrac, /*real tau_syn_E, real tau_syn_I, */real v_thresh, real i_offset);
 	LIFNeuron(const LIFNeuron &neuron, ID id);
 	~LIFNeuron();
 
-	Type getType();
+	virtual Type getType();
 
 	virtual real get_vm();
 	virtual int init(real dt);
@@ -38,8 +38,8 @@ protected:
 	real cm;
 	real tau_m;
 	real tau_refrac;
-	real tau_syn_E;
-	real tau_syn_I;
+	//real tau_syn_E;
+	//real tau_syn_I;
 	real v_thresh;
 	real i_offset;
 	real i_syn;

@@ -19,7 +19,9 @@
 
 #include "../src/base/CompositeNeuron.h"
 
-typedef CompositeNeuron<ConstantNeuron, ExpSynapse> Constant_curr_exp;
+typedef CompositeNeuron<ConstantNeuron, ExpSynapse> Constant_curr;
+typedef CompositeNeuron<PoissonNeuron, ExpSynapse> Poisson_curr;
+typedef CompositeNeuron<ArrayNeuron, ExpSynapse> Array_curr;
 typedef CompositeNeuron<LIFNeuron, ExpSynapse> IF_curr_exp;
 
 //typedef CompositeNeuron<InputNeuron, LowpassSynapse> Input_lowpass;

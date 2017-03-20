@@ -213,7 +213,7 @@ __global__ void update_array_neuron(GArrayNeurons *d_neurons, int num, int start
 		bool fired = false;
 		int test_loc = 0;
 
-		fired = (d_neurons->p_start[idx] < d_neurons->p_end[idx]) &&  (gCurrentIdx <= d_neurons->p_fire_time[d_neurons->p_start[idx]]);
+		fired = (d_neurons->p_start[idx] < d_neurons->p_end[idx]) &&  (gCurrentCycle >= d_neurons->p_fire_time[d_neurons->p_start[idx]]);
 
 		for (int i=0; i<2; i++) {
 			if (fired) {

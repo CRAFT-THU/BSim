@@ -14,7 +14,7 @@ using std::vector;
 
 class ConstantNeuron: public NeuronBase {
 public:
-	ConstantNeuron(ID id, real fire_rate, real tau_syn_E = 1e-3, real tau_syn_I = 1e-3);
+	ConstantNeuron(ID id, real fire_rate/*, real tau_syn_E = 1e-3, real tau_syn_I = 1e-3*/);
 	ConstantNeuron(const ConstantNeuron &templ, ID id);
 	~ConstantNeuron();
 
@@ -36,8 +36,8 @@ public:
 protected:
 	int fire_count;
 	real fire_rate;
-	real tau_syn_E;
-	real tau_syn_I;
+	//real tau_syn_E;
+	//real tau_syn_I;
 	//real _dt;
 	FILE *file;
 };
