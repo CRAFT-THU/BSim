@@ -59,20 +59,20 @@ void MultiNetwork::countTypeNum(bool auto_splited)
 		}
 	}
 
-	for (niter = _network->pNeurons.begin(); niter != _network->pNeurons.end();  niter++) {
-		NeuronBase * p = *niter;
-		Type type = p->getType();
-		int node = p->getNode();
-		if (auto_splited) {
-			node = _nID2node[(*niter)->getID()];
-		}
+	//for (niter = _network->pNeurons.begin(); niter != _network->pNeurons.end();  niter++) {
+	//	NeuronBase * p = *niter;
+	//	Type type = p->getType();
+	//	int node = p->getNode();
+	//	if (auto_splited) {
+	//		node = _nID2node[(*niter)->getID()];
+	//	}
 
-		if (_global_ntype_num[node].find(type) == _global_ntype_num[node].end()) {
-			_global_ntype_num[node][type] = 1;
-		} else {
-			_global_ntype_num[node][type] += 1;
-		}
-	}
+	//	if (_global_ntype_num[node].find(type) == _global_ntype_num[node].end()) {
+	//		_global_ntype_num[node][type] = 1;
+	//	} else {
+	//		_global_ntype_num[node][type] += 1;
+	//	}
+	//}
 
 	for (siter = _network->pSynapses.begin(); siter != _network->pSynapses.end();  siter++) {
 		SynapseBase * p = *siter;
@@ -123,17 +123,17 @@ GNetwork* MultiNetwork::arrangeData(int node_idx, bool auto_splited) {
 				idx += copied;
 			}
 		}
-		for (niter = _network->pNeurons.begin(); niter != _network->pNeurons.end();  niter++) {
-			NeuronBase * p = *niter;
-			int node = p->getNode();
-			if (auto_splited) {
-				node = _nID2node[(*niter)->getID()];
-			}
-			if (node == node_idx && p->getType() == type) {
-				size_t copied = p->hardCopy(pN, idx, net->neuronNums[index], _network->nid2idx, _global_idx2nID[node_idx]);
-				idx += copied;
-			}
-		}
+		//for (niter = _network->pNeurons.begin(); niter != _network->pNeurons.end();  niter++) {
+		//	NeuronBase * p = *niter;
+		//	int node = p->getNode();
+		//	if (auto_splited) {
+		//		node = _nID2node[(*niter)->getID()];
+		//	}
+		//	if (node == node_idx && p->getType() == type) {
+		//		size_t copied = p->hardCopy(pN, idx, net->neuronNums[index], _network->nid2idx, _global_idx2nID[node_idx]);
+		//		idx += copied;
+		//	}
+		//}
 
 		assert(idx == tmp_iter->second);
 		net->neuronNums[index+1] = idx + net->neuronNums[index];

@@ -10,6 +10,7 @@
 
 int cudaUpdatePoisson(void *data, int num, int start_id, BlockSize *pSize);
 int cudaUpdateConstant(void *data, int num, int start_id, BlockSize *pSize);
+int cudaUpdateArray(void *data, int num, int start_id, BlockSize *pSize);
 int cudaUpdateLIF(void *data, int num, int start_id, BlockSize *pSize);
 int cudaUpdateAllLIF(void *data, int num, int start_id, BlockSize *pSize);
 int cudaUpdateExp(void *data, int num, int start_id, BlockSize *pSize);

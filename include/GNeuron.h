@@ -7,6 +7,7 @@
 
 #include "../src/neuron/GConstantNeurons.h"
 #include "../src/neuron/GPoissonNeurons.h"
+#include "../src/neuron/GArrayNeurons.h"
 #include "../src/neuron/GLIFNeurons.h"
 
 #endif /* GNEURON_H */

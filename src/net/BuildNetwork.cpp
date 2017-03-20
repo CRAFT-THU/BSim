@@ -54,13 +54,14 @@ GNetwork* Network::buildNetwork()
 				idx += copied;
 			}
 		}
-		for (niter = pNeurons.begin(); niter != pNeurons.end();  niter++) {
-			NeuronBase * p = *niter;
-			if (p->getType() == nTypes[i]) {
-				size_t copied = p->hardCopy(pN, idx, pNeuronsNum[i], nid2idx, idx2nid);
-				idx += copied;
-			}
-		}
+
+		//for (niter = pNeurons.begin(); niter != pNeurons.end();  niter++) {
+		//	NeuronBase * p = *niter;
+		//	if (p->getType() == nTypes[i]) {
+		//		size_t copied = p->hardCopy(pN, idx, pNeuronsNum[i], nid2idx, idx2nid);
+		//		idx += copied;
+		//	}
+		//}
 
 		assert(idx == neuronNums[i]);
 		pNeuronsNum[i+1] = idx + pNeuronsNum[i];

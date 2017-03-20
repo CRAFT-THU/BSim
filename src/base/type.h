@@ -9,6 +9,7 @@
 
 enum Type { 
 	Constant = 0, Poisson = 1,
+	Array,
 	LIF, 
 	/*Basic, Alpha,*/ Exp, 
 	/*Nengo, Probe, 

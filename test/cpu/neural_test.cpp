@@ -10,7 +10,7 @@ int main(int argc, char **argv)
 	//LIFNeuron::LIFNeuron(real v_init, real v_rest, real v_reset, real cm, real tau_m, real tau_refrac, real tau_syn_E, real tau_syn_I, real v_thresh, real i_offset)
 	IF_curr_exp n = IF_curr_exp(LIFNeuron(ID(0,0), 0.0f, 0.0f, 0.0f, 1.0e-1f, 10.0e-3f, 0.0f, 1.0f, 1.0f, 15.0e-3f, 2.0e-3f), ID(0, 0));
 	Network c;
-	c.create(n);
+	c.createPopulation(0, 1, n);
 	SingleThreadSimulator s(&c, 1.0e-3f);
 	s.run(0.1f);
 

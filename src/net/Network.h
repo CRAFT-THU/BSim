@@ -30,15 +30,18 @@ public:
 	Network();
 	~Network();
 
-	template<class Neuron>
-	Neuron* create(Neuron n1);
+	//template<class Neuron>
+	//Population<Neuron>* createNeuron(Neuron n1);
 	template<class Neuron>
 	Population<Neuron>* createPopulation(int id, int num, Neuron templ, bool empty = false);
+
+	template<class Neuron1, class Neuron2>
+	int connect(Population<Neuron1> *pSrc, Population<Neuron2> *pDst, real weight, real delay, SpikeType type);
 	template<class Neuron1, class Neuron2>
 	int connect(Population<Neuron1> *pSrc, Population<Neuron2> *pDst, real *weight, real *delay, SpikeType *type, int size);
 	
-	SynapseBase* connect(NeuronBase *pSrc, NeuronBase *pDst, real weight, real delay, SpikeType type = Excitatory, real tau = 0, bool store = true);
 	int connect(int populationIDSrc, int neuronIDSrc, int populationIDDst, int neuronIDDst, real weight, real delay, real tau = 0);
+	SynapseBase* connect(NeuronBase *pSrc, NeuronBase *pDst, real weight, real delay, SpikeType type = Excitatory, real tau = 0, bool store = true);
 
 	GNetwork* buildNetwork();
 
@@ -64,7 +67,7 @@ private:
 public:
 	vector<NeuronBase*> pOutputs;
 	vector<PopulationBase*> pPopulations;
-	vector<NeuronBase*> pNeurons;
+	//vector<NeuronBase*> pNeurons;
 	vector<SynapseBase*> pSynapses;
 	map<ID, vector<ID> > n2sNetwork;
 	map<ID, vector<ID> > n2sTargetNetwork;
@@ -91,17 +94,20 @@ private:
 	vector<int> synapseNums;
 };
 
-template<class Neuron>
-Neuron* Network::create(Neuron n1)
-{
-	Neuron *pn1 = new Neuron(n1);
-	if (find(pNeurons.begin(), pNeurons.end(), pn1) == pNeurons.end()) {
-		pNeurons.push_back(pn1);
-		addNeuronNum(pn1->getType(), 1);
-	}
-
-	return pn1;
-}
+//template<class Neuron>
+//Population<Neuron>* Network::createNeuron(Neuron n1)
+//{
+//	//Neuron *pn1 = new Neuron(n1);
+//	//if (find(pNeurons.begin(), pNeurons.end(), pn1) == pNeurons.end()) {
+//	//	pNeurons.push_back(pn1);
+//	//	addNeuronNum(pn1->getType(), 1);
+//	//}
+//	//
+//	
+//	Population<Neuron> * pn1 = createPopulation(n1.getID().getId(), 1, n1);
+//	
+//	return pn1;
+//}
 
 template<class Neuron>
 Population<Neuron>* Network::createPopulation(int id, int num, Neuron templ, bool empty)
@@ -121,6 +127,36 @@ Population<Neuron>* Network::createPopulation(int id, int num, Neuron templ, boo
 	}
 
 	return pp1;
+}
+
+template<class Neuron1, class Neuron2>
+int Network::connect(Population<Neuron1> *pSrc, Population<Neuron2> *pDst, real weight, real delay, SpikeType type) {
+	int srcSize = pSrc->getNum();
+	int dstSize = pDst->getNum();
+	int size = srcSize * dstSize; 
+
+	if (find(pPopulations.begin(), pPopulations.end(), pSrc) == pPopulations.end()) {
+		pPopulations.push_back(pSrc);
+		populationNum++;
+		//neuronNum += pSrc->getNum();
+		addNeuronNum(pSrc->getType(), pSrc->getNum());
+	}
+	if (find(pPopulations.begin(), pPopulations.end(), pDst) == pPopulations.end()) {
+		pPopulations.push_back(pDst);
+		populationNum++;
+		//neuronNum += pDst->getNum();
+		addNeuronNum(pDst->getType(), pDst->getNum());
+	}
+
+	int count = 0;
+	for (int i=0; i<size; i++) {
+		int iSrc = i/dstSize;
+		int iDst = i%dstSize;
+			connect(pSrc->getNeuron(iSrc), pDst->getNeuron(iDst), weight, delay, type, 0.0, false);
+		count++;
+	}
+
+	return count;
 }
 
 template<class Neuron1, class Neuron2>

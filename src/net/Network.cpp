@@ -32,13 +32,13 @@ Network::~Network()
 		}
 	}
 
-	if (!pNeurons.empty()) {
-		vector<NeuronBase*>::iterator iter;
-		for (iter = pNeurons.begin(); iter != pNeurons.end(); iter++) {
-			NeuronBase * t = *iter;
-			delete t;
-		}
-	}
+	//if (!pNeurons.empty()) {
+	//	vector<NeuronBase*>::iterator iter;
+	//	for (iter = pNeurons.begin(); iter != pNeurons.end(); iter++) {
+	//		NeuronBase * t = *iter;
+	//		delete t;
+	//	}
+	//}
 
 	if (!pSynapses.empty()) {
 		vector<SynapseBase*>::iterator iter;
@@ -49,7 +49,7 @@ Network::~Network()
 	}
 
 	pPopulations.clear();
-	pNeurons.clear();
+	//pNeurons.clear();
 	pSynapses.clear();
 	pOutputs.clear();
 	n2sNetwork.clear();
@@ -118,16 +118,16 @@ int Network::addSynapseNum(Type type, int num)
 
 SynapseBase* Network::connect(NeuronBase *pn1, NeuronBase *pn2, real weight, real delay, SpikeType type, real tau, bool store)
 {
-	if (store) {
-		if (find(pNeurons.begin(), pNeurons.end(), pn1) == pNeurons.end()) {
-			pNeurons.push_back(pn1);
-			addNeuronNum(pn1->getType(), 1);
-		}
-		if (find(pNeurons.begin(), pNeurons.end(), pn2) == pNeurons.end()) {
-			pNeurons.push_back(pn2);
-			addNeuronNum(pn2->getType(), 1);
-		}
-	}
+	//if (store) {
+	//	if (find(pNeurons.begin(), pNeurons.end(), pn1) == pNeurons.end()) {
+	//		pNeurons.push_back(pn1);
+	//		addNeuronNum(pn1->getType(), 1);
+	//	}
+	//	if (find(pNeurons.begin(), pNeurons.end(), pn2) == pNeurons.end()) {
+	//		pNeurons.push_back(pn2);
+	//		addNeuronNum(pn2->getType(), 1);
+	//	}
+	//}
 
 	if (id2neuron.find(pn1->getID()) == id2neuron.end()) {
 		id2neuron[pn1->getID()] = pn1;
@@ -327,10 +327,10 @@ int Network::reset(SimInfo &info)
 		SynapseBase *p = *iterS;
 		p->reset(info);
 	}
-	for (iterN=pNeurons.begin(); iterN!=pNeurons.end(); iterN++) {
-		NeuronBase * p = *iterN;
-		p->reset(info);
-	}
+	//for (iterN=pNeurons.begin(); iterN!=pNeurons.end(); iterN++) {
+	//	NeuronBase * p = *iterN;
+	//	p->reset(info);
+	//}
 	for (iterP=pPopulations.begin(); iterP!=pPopulations.end(); iterP++) {
 		PopulationBase * p = *iterP;
 		p->reset(info);
@@ -350,10 +350,10 @@ int Network::update(SimInfo &info)
 		p->update(info);
 	}
 
-	for (iterN=pNeurons.begin(); iterN!=pNeurons.end(); iterN++) {
-		NeuronBase * p = *iterN;
-		p->update(info);
-	}
+	//for (iterN=pNeurons.begin(); iterN!=pNeurons.end(); iterN++) {
+	//	NeuronBase * p = *iterN;
+	//	p->update(info);
+	//}
 
 	for (iterS=pSynapses.begin(); iterS!=pSynapses.end(); iterS++) {
 		SynapseBase *p = *iterS;

@@ -44,6 +44,8 @@ __global__ void update_constant_neuron(GConstantNeurons *d_neurons, int num, int
 
 __global__ void update_poisson_neuron(GPoissonNeurons *d_neurons, int num, int start_id);
 
+__global__ void update_array_neuron(GArrayNeurons *d_neurons, int num, int start_id);
+
 __global__ void find_lif_neuron(GLIFNeurons *d_neurons, int num, int start_id);
 
 __global__ void update_lif_neuron(GLIFNeurons *d_neurons, int num, int start_id);

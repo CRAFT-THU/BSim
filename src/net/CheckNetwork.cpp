@@ -21,15 +21,15 @@ void Network::checkIDtoIdx()
 		}
 	}
 
-	for (niter = pNeurons.begin(); niter != pNeurons.end();  niter++) {
-		NeuronBase * p = *niter;
-		if (p->getIdx() != (size_t)nid2idx[p->getID()]) {
-			printf("Not match: single neuron %s and index %d\n", p->getID().getInfo().c_str(), (int)p->getIdx());
-		}
-		if (idx2nid[(int)p->getIdx()] != (p->getID())) {
-			printf("Not match: index %d and single neuron %s\n", (int)p->getIdx(), p->getID().getInfo().c_str());
-		}
-	}
+	//for (niter = pNeurons.begin(); niter != pNeurons.end();  niter++) {
+	//	NeuronBase * p = *niter;
+	//	if (p->getIdx() != (size_t)nid2idx[p->getID()]) {
+	//		printf("Not match: single neuron %s and index %d\n", p->getID().getInfo().c_str(), (int)p->getIdx());
+	//	}
+	//	if (idx2nid[(int)p->getIdx()] != (p->getID())) {
+	//		printf("Not match: index %d and single neuron %s\n", (int)p->getIdx(), p->getID().getInfo().c_str());
+	//	}
+	//}
 
 	for (siter = pSynapses.begin(); siter != pSynapses.end();  siter++) {
 		SynapseBase * p = *siter;

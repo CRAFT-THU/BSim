@@ -8,6 +8,14 @@
 #include "gpu_kernel.h"
 #include "gpu_func.h"
 
+
+int cudaUpdateConstant(void *data, int num, int start_id, BlockSize *pSize)
+{
+	update_constant_neuron<<<pSize->gridSize, pSize->blockSize>>>((GConstantNeurons*)data, num, start_id);
+
+	return 0;
+}
+
 int cudaUpdatePoisson(void *data, int num, int start_id, BlockSize *pSize)
 {
 	update_poisson_neuron<<<pSize->gridSize, pSize->blockSize>>>((GPoissonNeurons*)data, num, start_id);
@@ -15,9 +23,9 @@ int cudaUpdatePoisson(void *data, int num, int start_id, BlockSize *pSize)
 	return 0;
 }
 
-int cudaUpdateConstant(void *data, int num, int start_id, BlockSize *pSize)
+int cudaUpdateArray(void *data, int num, int start_id, BlockSize *pSize)
 {
-	update_constant_neuron<<<pSize->gridSize, pSize->blockSize>>>((GConstantNeurons*)data, num, start_id);
+	update_array_neuron<<<pSize->gridSize, pSize->blockSize>>>((GArrayNeurons*)data, num, start_id);
 
 	return 0;
 }
@@ -84,6 +92,9 @@ BlockSize * getBlockSize(int nSize, int sSize)
 
 	cudaOccupancyMaxPotentialBlockSize(&(ret[Poisson].minGridSize), &(ret[Poisson].blockSize), update_poisson_neuron, 0, nSize); 
 	ret[Poisson].gridSize = (upzero_else_set_one(nSize) + (ret[Poisson].blockSize) - 1) / (ret[Poisson].blockSize);
+
+	cudaOccupancyMaxPotentialBlockSize(&(ret[Array].minGridSize), &(ret[Array].blockSize), update_poisson_neuron, 0, nSize); 
+	ret[Array].gridSize = (upzero_else_set_one(nSize) + (ret[Array].blockSize) - 1) / (ret[Array].blockSize);
 
 	cudaOccupancyMaxPotentialBlockSize(&(ret[LIF].minGridSize), &(ret[LIF].blockSize), update_lif_neuron, 0, nSize); 
 	ret[LIF].gridSize = (upzero_else_set_one(nSize) + (ret[LIF].blockSize) - 1) / (ret[LIF].blockSize);
