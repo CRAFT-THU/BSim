@@ -8,7 +8,7 @@
 
 #include "../src/neuron/ConstantNeuron.h"
 #include "../src/neuron/PoissonNeuron.h"
-//#include "InputNeuron.h"
+#include "../src/neuron/ArrayNeuron.h"
 #include "../src/neuron/LIFNeuron.h"
 //#include "NengoNeuron.h"
 //#include "ProbeNeuron.h"

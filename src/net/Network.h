@@ -62,7 +62,7 @@ public:
 	void logMap();
 private:
 	void mapIDtoIdx(GNetwork *net);
-	void checkIDtoIdx();
+	bool checkIDtoIdx();
 
 public:
 	vector<NeuronBase*> pOutputs;

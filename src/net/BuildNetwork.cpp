@@ -12,6 +12,31 @@ void Network::mapIDtoIdx(GNetwork *net)
 	vector<SynapseBase*>::iterator siter;
 }
 
+void arrangeFireArray(vector<int> &fire_array, vector<int> &start_loc, PopulationBase *popu)
+{
+	size_t num = popu->getNum();
+	for (size_t i=0; i<num; i++) {
+		ArrayNeuron *p = dynamic_cast<ArrayNeuron*>(popu->getNeuron(i));
+		vector<int> &vec = p->getFireTimes();
+		start_loc.push_back(fire_array.size());
+		fire_array.insert(fire_array.end(), vec.begin(), vec.end());
+	}
+}
+
+void arrangeArrayNeuron(vector<int> &fire_array, vector<int> &start_loc, GArrayNeurons *p, int num)
+{
+	assert(num == array_neuron_start.size());
+	for (int i=0; i<num; i++) {
+		p->p_start[i] = start_loc[i];
+		p->p_end[i] += p->p_start[i];
+		if (i > 0) {
+			assert(p->p_end[i-1] == p->p_start[i]);
+		}
+	}
+	assert(p->end[num-1] == fire_array.size());
+	p->p_fire_time = static_cast<int*>(malloc(sizeof(int) * fire_array.size()));
+	std::copy(fire_array.begin(), fire_array.end(), p->p_fire_time);
+}
 
 GNetwork* Network::buildNetwork()
 {
@@ -39,6 +64,9 @@ GNetwork* Network::buildNetwork()
 	Type *pSTypes = (Type*)malloc(sizeof(Type)*synapseTypeNum);
 	assert(pSTypes != NULL);
 
+	vector<int> array_neuron_start;
+	vector<int> array_neuron_fire_times;
+
 	for (int i=0; i<neuronTypeNum; i++) {
 		pNTypes[i] = nTypes[i];
 
@@ -52,6 +80,9 @@ GNetwork* Network::buildNetwork()
 			if (p->getType() == nTypes[i]) {
 				size_t copied = p->hardCopy(pN, idx, pNeuronsNum[i], nid2idx, idx2nid);
 				idx += copied;
+				if (p->getType() == Array) {
+					arrangeFireArray(array_neuron_fire_times, array_neuron_start, p);
+				}
 			}
 		}
 
@@ -64,6 +95,11 @@ GNetwork* Network::buildNetwork()
 		//}
 
 		assert(idx == neuronNums[i]);
+
+		if (nTypes[i] == Array) {
+			arrangeArrayNeuron(array_neuron_fire_times, array_neuron_start, static_cast<GArrayNeurons*>(pN), idx);
+		}
+
 		pNeuronsNum[i+1] = idx + pNeuronsNum[i];
 		pAllNeurons[i] = pN;
 	}
@@ -92,7 +128,7 @@ GNetwork* Network::buildNetwork()
 	assert(pSynapsesNum[synapseTypeNum] == totalSynapseNum);
 
 	logMap();
-	checkIDtoIdx();
+	assert(checkIDtoIdx());
 
 	N2SConnection *pAllConnections = (N2SConnection*)malloc(sizeof(N2SConnection));
 	assert(pAllConnections != NULL);
