@@ -47,10 +47,12 @@ __global__ void update_poisson_neuron(GPoissonNeurons *d_neurons, int num, int s
 __global__ void find_lif_neuron(GLIFNeurons *d_neurons, int num, int start_id);
 
 __global__ void update_lif_neuron(GLIFNeurons *d_neurons, int num, int start_id);
+__global__ void update_all_lif_neuron(GLIFNeurons *d_neurons, int num, int start_id);
 
 __global__ void update_exp_hit(GExpSynapses *d_synapses, int num, int start_id);
 __global__ void find_exp_synapse(GExpSynapses *d_synapses, int num, int start_id);
 __global__ void update_exp_synapse(GExpSynapses *d_synapses, int num, int start_id);
+__global__ void update_all_exp_synapse(GExpSynapses *d_synapses, int num, int start_id);
 
 //__global__ void update_basic_synapse(GBasicSynapses *d_synapses, int num, int start_id);
 //__global__ void update_alpha_synapse(GAlphaSynapses *d_synapses, int num, int start_id);

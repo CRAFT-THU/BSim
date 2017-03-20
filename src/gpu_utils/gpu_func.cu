@@ -30,12 +30,28 @@ int cudaUpdateLIF(void *data, int num, int start_id, BlockSize *pSize)
 	return 0;
 }
 
+int cudaUpdateAllLIF(void *data, int num, int start_id, BlockSize *pSize)
+{
+	update_all_lif_neuron<<<pSize->gridSize, pSize->blockSize>>>((GLIFNeurons*)data, num, start_id);
+
+	return 0;
+}
+
 int cudaUpdateExp(void *data, int num, int start_id, BlockSize *pSize)
 {
 	update_exp_hit<<<pSize->gridSize, pSize->blockSize>>>((GExpSynapses*)data, num, start_id);
 	reset_active_synapse<<<1, 1>>>();
 	find_exp_synapse<<<pSize->gridSize, pSize->blockSize>>>((GExpSynapses*)data, num, start_id);
 	update_exp_synapse<<<pSize->gridSize, pSize->blockSize>>>((GExpSynapses*)data, num, start_id);
+
+	return 0;
+}
+
+int cudaUpdateAllExp(void *data, int num, int start_id, BlockSize *pSize)
+{
+	update_exp_hit<<<pSize->gridSize, pSize->blockSize>>>((GExpSynapses*)data, num, start_id);
+	reset_active_synapse<<<1, 1>>>();
+	update_all_exp_synapse<<<pSize->gridSize, pSize->blockSize>>>((GExpSynapses*)data, num, start_id);
 
 	return 0;
 }

@@ -14,3 +14,5 @@ int (*cudaFreeType[])(void *) = { cudaFreeConstant, cudaFreePoisson, cudaFreeLIF
 
 int (*cudaUpdateType[])(void *, int, int, BlockSize*) = { cudaUpdateConstant, cudaUpdatePoisson, cudaUpdateLIF, cudaUpdateExp};
 
+int (*cudaUpdateAllType[])(void *, int, int, BlockSize*) = { cudaUpdateConstant, cudaUpdatePoisson, cudaUpdateAllLIF, cudaUpdateAllExp};
+

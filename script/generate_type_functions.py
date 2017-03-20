@@ -62,15 +62,23 @@ cpp_content.append(warn_info + common_headers)
 
 for (name, body) in zip(func_names, func_mains):
     tmp = body + " = {"
-    if name.find("Connection") < 0:
-        for type_name in type_content_main:
-            tmp += (" " + name.replace("Type", type_name) + ",")
-    else:
+
+    if name.find("AllType") >= 0:
+            for type_name in type_content_main:
+                if type_content_main.index(type_name) >=  type_content_main.index("LIF"):
+                    tmp += (" " + name.replace("Type", type_name) + ",")
+                else:
+                    tmp += (" " + name.replace("AllType", type_name) + ",")
+    elif name.find("Connection") >= 0:
         for type_name in type_content_main:
             if type_content_main.index(type_name) < type_content_main.index("Exp"):
                 tmp += (" NULL,")
             else:
                 tmp += (" " + name.replace("Type", type_name) + ",")
+    else:
+        for type_name in type_content_main:
+            tmp += (" " + name.replace("Type", type_name) + ",")
+        
     tmp = tmp[:-1] + "};\n\n"
     if name.startswith("cuda"):
         cu_content.append(tmp)

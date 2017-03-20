@@ -28,6 +28,7 @@ int main()
 	SGSim sg(&c, 1.0e-3f);
 	st.run(0.1f);
 	sg.run(0.1f);
+	sg.compare_run(0.1f);
 	
 	FILE *logFile = fopen("weight.csv", "w+");
 	if (logFile == NULL) {

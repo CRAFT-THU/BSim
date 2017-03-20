@@ -44,6 +44,7 @@ int main(int argc, char **argv)
 	STSim st(&c, 1.0e-3f);
 	SGSim sg(&c, 1.0e-3f);
 	st.run(0.1f);
+	sg.compare_run(0.1f);
 	sg.run(0.1f);
 
 	if (!load) {
