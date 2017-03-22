@@ -10,10 +10,10 @@
 enum Type { 
 	Constant = 0, Poisson = 1,
 	Array,
+	Max,
 	LIF, 
-	/*Basic, Alpha,*/ Exp, 
-	/*Nengo, Probe, 
-	Lowpass,*/ 
+	Exp, /*Basic, Alpha,*/
+	/*Nengo, Probe, Lowpass,*/ 
 	TYPESIZE
 }; 
 

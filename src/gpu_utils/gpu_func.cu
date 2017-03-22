@@ -38,6 +38,13 @@ int cudaUpdateLIF(void *data, int num, int start_id, BlockSize *pSize)
 	return 0;
 }
 
+int cudaUpdateMax(void *data, int num, int start_id, BlockSize *pSize)
+{
+	update_max_neuron<<<pSize->gridSize, pSize->blockSize>>>((GMaxNeurons*)data, num, start_id);
+
+	return 0;
+}
+
 int cudaUpdateAllLIF(void *data, int num, int start_id, BlockSize *pSize)
 {
 	update_all_lif_neuron<<<pSize->gridSize, pSize->blockSize>>>((GLIFNeurons*)data, num, start_id);
@@ -98,6 +105,9 @@ BlockSize * getBlockSize(int nSize, int sSize)
 
 	cudaOccupancyMaxPotentialBlockSize(&(ret[LIF].minGridSize), &(ret[LIF].blockSize), update_lif_neuron, 0, nSize); 
 	ret[LIF].gridSize = (upzero_else_set_one(nSize) + (ret[LIF].blockSize) - 1) / (ret[LIF].blockSize);
+
+	cudaOccupancyMaxPotentialBlockSize(&(ret[Max].minGridSize), &(ret[Max].blockSize), update_lif_neuron, 0, nSize); 
+	ret[Max].gridSize = (upzero_else_set_one(nSize) + (ret[Max].blockSize) - 1) / (ret[Max].blockSize);
 
 	//cudaOccupancyMaxPotentialBlockSize(&(ret[Basic].minGridSize), &(ret[Basic].blockSize), update_basic_synapse, 0, sSize); 
 	//ret[Basic].gridSize = (sSize + (ret[Basic].blockSize) - 1) / (ret[Basic].blockSize);

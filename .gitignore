@@ -13,4 +13,4 @@ Makefile
 build/
 
 src/utils/TypeFunc.cpp
-src/utils/TypeFunc.c
+src/utils/TypeFunc.cu

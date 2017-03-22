@@ -10,6 +10,7 @@
 #include "../src/neuron/PoissonNeuron.h"
 #include "../src/neuron/ArrayNeuron.h"
 #include "../src/neuron/LIFNeuron.h"
+#include "../src/neuron/MaxNeuron.h"
 //#include "NengoNeuron.h"
 //#include "ProbeNeuron.h"
 
