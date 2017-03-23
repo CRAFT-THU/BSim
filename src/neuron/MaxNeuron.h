@@ -13,11 +13,10 @@ class MaxNeuron : public NeuronBase {
 public:
 	MaxNeuron(ID id, int N);
 	MaxNeuron(const MaxNeuron &neuron, ID id);
+	MaxNeuron(const MaxNeuron &neuron);
 	~MaxNeuron();
 
 	virtual Type getType();
-
-	virtual real get_vm();
 
 	virtual int recv(real I);
 

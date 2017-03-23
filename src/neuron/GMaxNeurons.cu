@@ -14,7 +14,7 @@ int cudaAllocMax(void *pCpu, void *pGpu, int num)
 	GMaxNeurons *p = (GMaxNeurons*)pCpu;
 
 	pGpuNeurons->p_N = copyToGPU<int>(p->p_N, num);
-	pGpuNeurons->p_count = copyToGPU<int>(p->p_count, num);
+	pGpuNeurons->p_count = gpuMalloc<int>(num);
 	pGpuNeurons->p_record = gpuMalloc<int>(num*(p->max_N));
 
 	return 0;

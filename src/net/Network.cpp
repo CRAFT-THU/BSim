@@ -93,7 +93,7 @@ int Network::addConnectionNum(Type type, int num)
 		//nTypes.push_back(type);
 		//neuronNums.push_back(num);
 		//connectNums.push_back(0);
-		printf("This should not happed, when a connect is added, a pre-neuron must exist!");
+		printf("This should not happed, when a connect is added, a pre-neuron must exist!\n");
 	} else {
 		int idx = std::distance(nTypes.begin(), iter);
 		connectNums[idx] += num;
@@ -309,7 +309,7 @@ int Network::connect(int populationIDSrc, int neuronIDSrc, int populationIDDst, 
 	}
 	
 	SpikeType type = Excitatory;
-	if (delay < 0) {
+	if (weight < 0.0f) {
 		type = Inhibitory;
 	}
 	connect(pnSrc, pnDst, weight, delay, type, tau, false);

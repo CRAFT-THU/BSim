@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <assert.h>
+#include <string.h>
 
 #include "MaxNeuron.h"
 #include "GMaxNeurons.h"
@@ -19,7 +20,10 @@ MaxNeuron::MaxNeuron(ID id, int N) : NeuronBase(id)
 	assert(N < 32 && N >= 0);
 	this->_N = N;
 	this->_count = 0;
-	this->_record = static_cast<int*>(malloc(sizeof(int)*(N)));
+	this->_idxs = 0;
+	this->_record = (int*)(malloc(sizeof(int)*N));
+	assert(this->_record != NULL);
+	memset(this->_record, 0, sizeof(int)*N);
 }
 
 MaxNeuron::MaxNeuron(const MaxNeuron &neuron, ID id) : NeuronBase(id)
@@ -27,13 +31,32 @@ MaxNeuron::MaxNeuron(const MaxNeuron &neuron, ID id) : NeuronBase(id)
 	this->fired = false;
 	this->monitored = false;
 	this->_N = neuron._N;
+	assert(_N < 32 && _N >= 0);
 	this->_count = 0;
-	this->_record = static_cast<int*>(malloc(sizeof(int)*(_N)));
+	this->_idxs = 0;
+	this->_record = (int*)(malloc(sizeof(int)*this->_N));
+	assert(this->_record != NULL);
+	memset(this->_record, 0, sizeof(int)*this->_N);
+}
+
+MaxNeuron::MaxNeuron(const MaxNeuron &neuron) : NeuronBase(neuron)
+{
+	this->fired = false;
+	this->monitored = false;
+	this->_N = neuron._N;
+	assert(_N < 32 && _N >= 0);
+	this->_count = 0;
+	this->_idxs = 0;
+	this->_record = (int*)(malloc(sizeof(int)*this->_N));
+	assert(this->_record != NULL);
+	memset(this->_record, 0, sizeof(int)*this->_N);
 }
 
 MaxNeuron::~MaxNeuron()
 {
-	free(this->_record);
+	if (this->_record != NULL) {
+		free(this->_record);
+	}
 }
 
 int MaxNeuron::reset(SimInfo &info)
@@ -43,7 +66,7 @@ int MaxNeuron::reset(SimInfo &info)
 
 int MaxNeuron::recv(real I)
 {
-	this->_idxs = static_cast<int>(I);
+	this->_idxs += static_cast<int>(I);
 
 	return 0;
 }
@@ -66,6 +89,8 @@ int MaxNeuron::update(SimInfo &info)
 		}
 		test = test << 1;
 	}
+
+	_idxs = 0;
 
 	if (fired) {
 		_count++;
@@ -100,7 +125,7 @@ int MaxNeuron::hardCopy(void *data, int idx, int base, map<ID, int> &id2idx, map
 	idx2id[idx+base] = getID();
 
 	p->p_N[idx] = _N;
-	p->p_count[idx] = _count;
+	//p->p_count[idx] = _count;
 	if (_N > p->max_N) {
 		p->max_N = _N;
 	}

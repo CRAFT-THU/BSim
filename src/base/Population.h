@@ -16,7 +16,7 @@ template<class Neuron>
 class Population : public PopulationBase {
 public:
 	Population(int id, size_t N);
-	Population(int id, size_t N, Neuron templ);
+	Population(int id, size_t N, const Neuron &templ);
 	~Population();
 
 	Type getType();
@@ -55,7 +55,7 @@ Population<Neuron>::Population(int id, size_t N) : PopulationBase(ID(0, id))
 }
 
 template<class Neuron>
-Population<Neuron>::Population(int id, size_t N, Neuron templ) : PopulationBase(ID(0, id))
+Population<Neuron>::Population(int id, size_t N, const Neuron &templ) : PopulationBase(ID(0, id))
 {
 	neurons.resize(N, templ);
 	for (unsigned int i=0; i<N; i++) {

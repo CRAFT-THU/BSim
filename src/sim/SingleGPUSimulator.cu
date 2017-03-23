@@ -67,9 +67,12 @@ int SingleGPUSimulator::run(real time)
 
 	real *c_vm = hostMalloc<real>(totalNeuronNum);
 	int lif_idx = getIndex(pCpuNet->nTypes, nTypeNum, LIF);
-	assert(lif_idx >= 0);
-	GLIFNeurons *c_g_lif = copyFromGPU<GLIFNeurons>(static_cast<GLIFNeurons*>(c_pGpuNet->pNeurons[lif_idx]), 1);
-	real *c_g_vm = c_g_lif->p_vm;
+	GLIFNeurons *c_g_lif = NULL;
+	real *c_g_vm = NULL;
+	if (lif_idx >= 0) {
+		c_g_lif = copyFromGPU<GLIFNeurons>(static_cast<GLIFNeurons*>(c_pGpuNet->pNeurons[lif_idx]), 1);
+		c_g_vm = c_g_lif->p_vm;
+	}
 	//real *c_I_syn = hostMalloc<real>(totalSynapseNum);
 	//int exp_idx = getIndex(pCpuNet->sTypes, sTypeNum, Exp);
 	//GExpSynapses *c_g_exp = copyFromGPU<GExpSynapses>(static_cast<GExpSynapses*>(c_pGpuNet->pSynapses[exp_idx]), 1);
@@ -99,7 +102,9 @@ int SingleGPUSimulator::run(real time)
 		int copySize = 0;
 		copyFromGPU<int>(&copySize, buffers->c_gFiredTableSizes + currentIdx, 1);
 		copyFromGPU<int>(buffers->c_neuronsFired, buffers->c_gFiredTable + (totalNeuronNum*currentIdx), copySize);
-		copyFromGPU<real>(c_vm, c_g_vm, c_pGpuNet->neuronNums[lif_idx+1]-c_pGpuNet->neuronNums[lif_idx]);
+		if (lif_idx >= 0) {
+			copyFromGPU<real>(c_vm, c_g_vm, c_pGpuNet->neuronNums[lif_idx+1]-c_pGpuNet->neuronNums[lif_idx]);
+		}
 		//copyFromGPU<real>(c_I_syn, c_g_I_syn, c_pGpuNet->synapseNums[exp_idx+1]-c_pGpuNet->synapseNums[exp_idx]);
 
 		fprintf(logFile, "Cycle %d: ", time);
@@ -112,8 +117,10 @@ int SingleGPUSimulator::run(real time)
 		fprintf(logFile, "\n");
 
 		//fprintf(dataFile, "Cycle %d: ", time);
-		for (int i=0; i<c_pGpuNet->neuronNums[lif_idx+1] - c_pGpuNet->neuronNums[lif_idx]; i++) {
-			fprintf(dataFile, "%lf ", c_vm[i]);
+		if (lif_idx >= 0) {
+			for (int i=0; i<c_pGpuNet->neuronNums[lif_idx+1] - c_pGpuNet->neuronNums[lif_idx]; i++) {
+				fprintf(dataFile, "%lf ", c_vm[i]);
+			}
 		}
 		//for (int i=0; i<c_pGpuNet->synapseNums[1] - c_pGpuNet->synapseNums[0]; i++) {
 		//		fprintf(dataFile, ", %lf", c_I_syn[i]);
@@ -209,9 +216,13 @@ int SingleGPUSimulator::compare_run(real time)
 
 	real *c_vm = hostMalloc<real>(totalNeuronNum);
 	int lif_idx = getIndex(pCpuNet->nTypes, nTypeNum, LIF);
-	assert(lif_idx >= 0);
-	GLIFNeurons *c_g_lif = copyFromGPU<GLIFNeurons>(static_cast<GLIFNeurons*>(c_pGpuNet->pNeurons[lif_idx]), 1);
-	real *c_g_vm = c_g_lif->p_vm;
+
+	GLIFNeurons *c_g_lif = NULL;
+	real *c_g_vm = NULL;
+	if (lif_idx >= 0) {
+		c_g_lif = copyFromGPU<GLIFNeurons>(static_cast<GLIFNeurons*>(c_pGpuNet->pNeurons[lif_idx]), 1);
+		c_g_vm = c_g_lif->p_vm;
+	}
 	//real *c_I_syn = hostMalloc<real>(totalSynapseNum);
 	//int exp_idx = getIndex(pCpuNet->sTypes, sTypeNum, Exp);
 	//GExpSynapses *c_g_exp = copyFromGPU<GExpSynapses>(static_cast<GExpSynapses*>(c_pGpuNet->pSynapses[exp_idx]), 1);
@@ -241,7 +252,9 @@ int SingleGPUSimulator::compare_run(real time)
 		int copySize = 0;
 		copyFromGPU<int>(&copySize, buffers->c_gFiredTableSizes + currentIdx, 1);
 		copyFromGPU<int>(buffers->c_neuronsFired, buffers->c_gFiredTable + (totalNeuronNum*currentIdx), copySize);
-		copyFromGPU<real>(c_vm, c_g_vm, c_pGpuNet->neuronNums[lif_idx+1]-c_pGpuNet->neuronNums[lif_idx]);
+		if (lif_idx >= 0) {
+			copyFromGPU<real>(c_vm, c_g_vm, c_pGpuNet->neuronNums[lif_idx+1]-c_pGpuNet->neuronNums[lif_idx]);
+		}
 		//copyFromGPU<real>(c_I_syn, c_g_I_syn, c_pGpuNet->synapseNums[exp_idx+1]-c_pGpuNet->synapseNums[exp_idx]);
 
 		fprintf(logFile, "Cycle %d: ", time);
@@ -254,8 +267,10 @@ int SingleGPUSimulator::compare_run(real time)
 		fprintf(logFile, "\n");
 
 		//fprintf(dataFile, "Cycle %d: ", time);
-		for (int i=0; i<c_pGpuNet->neuronNums[lif_idx+1] - c_pGpuNet->neuronNums[lif_idx]; i++) {
-			fprintf(dataFile, "%lf ", c_vm[i]);
+		if (lif_idx >= 0) {
+			for (int i=0; i<c_pGpuNet->neuronNums[lif_idx+1] - c_pGpuNet->neuronNums[lif_idx]; i++) {
+				fprintf(dataFile, "%lf ", c_vm[i]);
+			}
 		}
 		//for (int i=0; i<c_pGpuNet->synapseNums[1] - c_pGpuNet->synapseNums[0]; i++) {
 		//		fprintf(dataFile, ", %lf", c_I_syn[i]);

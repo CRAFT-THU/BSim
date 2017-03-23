@@ -17,7 +17,9 @@ using std::vector;
 template<class Neuron, class Synapse>
 class CompositeNeuron : public Neuron {
 public:
+	CompositeNeuron(real tau_syn_E, real tau_syn_I);
 	CompositeNeuron(const Neuron &templ, ID id, real tau_syn_E = 1e-3, real tau_syn_I = 1e-3);
+	CompositeNeuron(const CompositeNeuron<Neuron, Synapse> &templ, ID id);
 	~CompositeNeuron();
 
 	SynapseBase* addSynapse(SynapseBase *synapse);
@@ -32,15 +34,29 @@ private:
 };
 
 template<class Neuron, class Synapse>
+CompositeNeuron<Neuron, Synapse>::CompositeNeuron(real tau_syn_E, real tau_syn_I) {
+	this->_tau_syn_E = tau_syn_E;
+	this->_tau_syn_I = tau_syn_I;
+	exit(-1);
+}
+
+template<class Neuron, class Synapse>
 CompositeNeuron<Neuron, Synapse>::CompositeNeuron(const Neuron &templ, ID id, real tau_syn_E, real tau_syn_I) : Neuron(templ, id) {
 	this->_tau_syn_E = tau_syn_E;
 	this->_tau_syn_I = tau_syn_I;
 }
 
 template<class Neuron, class Synapse>
+CompositeNeuron<Neuron, Synapse>::CompositeNeuron(const CompositeNeuron<Neuron, Synapse> &templ, ID id) : Neuron(templ, id) {
+	this->_tau_syn_E = templ.tau_syn_E;
+	this->_tau_syn_I = templ.tau_syn_I;
+}
+
+template<class Neuron, class Synapse>
 CompositeNeuron<Neuron, Synapse>::~CompositeNeuron()
 {
 	pSynapses.clear();
+	pPreSynapses.clear();
 }
 
 template<class Neuron, class Synapse>

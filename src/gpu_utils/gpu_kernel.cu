@@ -262,12 +262,13 @@ __global__ void update_max_neuron(GMaxNeurons *d_neurons, int num, int start_id)
 		int test_loc = 0;
 
 		int input = (int)gNeuronInput[start_id + idx];
+		gNeuronInput[start_id + idx] = 0;
 		int test = 1;
 		int record_offset = idx*d_neurons->max_N; 
 		for (int i=0; i<d_neurons->p_N[idx]; i++) {
 			if (input & test) {
-				d_neurons->p_record[idx*d_neurons->max_N + i]++;
-				if (d_neurons->p_record[record_offset + i] >d_neurons->p_count[idx]) {
+				d_neurons->p_record[record_offset + i]++;
+				if (d_neurons->p_record[record_offset + i] > d_neurons->p_count[idx]) {
 
 					fired = true;
 				}

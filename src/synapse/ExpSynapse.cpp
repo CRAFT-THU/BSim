@@ -49,12 +49,15 @@ int ExpSynapse::init(real dt) {
 	if (tau_syn > 0) {
 		C1 = expf(-dt/tau_syn);
 		_C1 = expf(-(delay-dt*delay_steps)/tau_syn);
+		active_steps = static_cast<int>(DECAY_MULTIPLE_TAU * tau_syn/dt + 0.5);
 	} else {
-		printf("Wrong tau!\n");
+		C1 = 0;
+		_C1 = 1.0;
+		active_steps = 1;
+		printf("Tau of synapse %s is ZERO, Please make sure!\n", getID().getInfo().c_str());
 		return -1;
 	}
 
-	active_steps = static_cast<int>(DECAY_MULTIPLE_TAU * tau_syn/dt + 0.5);
 
 	return 0;
 }
