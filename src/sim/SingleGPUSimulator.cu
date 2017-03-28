@@ -105,28 +105,31 @@ int SingleGPUSimulator::run(real time)
 		if (lif_idx >= 0) {
 			copyFromGPU<real>(c_vm, c_g_vm, c_pGpuNet->neuronNums[lif_idx+1]-c_pGpuNet->neuronNums[lif_idx]);
 		}
-		//copyFromGPU<real>(c_I_syn, c_g_I_syn, c_pGpuNet->synapseNums[exp_idx+1]-c_pGpuNet->synapseNums[exp_idx]);
 
-		fprintf(logFile, "Cycle %d: ", time);
-		for (int i=0; i<copySize; i++) {
-			//assert(network->idx2nid.find(buffers->c_neuronsFired[i]) != network->idx2nid.end());
-			//printf("%s ", network->idx2nid[buffers->c_neuronsFired[i]].getInfo().c_str());
-			fprintf(logFile, "%s ", network->idx2nid[buffers->c_neuronsFired[i]].getInfo().c_str());
-			//fprintf(logFile, "%d ", buffers->c_neuronsFired[i]);
-		}
-		fprintf(logFile, "\n");
+		//LOG DATA
+		////copyFromGPU<real>(c_I_syn, c_g_I_syn, c_pGpuNet->synapseNums[exp_idx+1]-c_pGpuNet->synapseNums[exp_idx]);
 
-		//fprintf(dataFile, "Cycle %d: ", time);
-		if (lif_idx >= 0) {
-			for (int i=0; i<c_pGpuNet->neuronNums[lif_idx+1] - c_pGpuNet->neuronNums[lif_idx]; i++) {
-				fprintf(dataFile, "%lf ", c_vm[i]);
-			}
-		}
-		//for (int i=0; i<c_pGpuNet->synapseNums[1] - c_pGpuNet->synapseNums[0]; i++) {
-		//		fprintf(dataFile, ", %lf", c_I_syn[i]);
+		//fprintf(logFile, "Cycle %d: ", time);
+		//for (int i=0; i<copySize; i++) {
+		//	//assert(network->idx2nid.find(buffers->c_neuronsFired[i]) != network->idx2nid.end());
+		//	//printf("%s ", network->idx2nid[buffers->c_neuronsFired[i]].getInfo().c_str());
+		//	fprintf(logFile, "%s ", network->idx2nid[buffers->c_neuronsFired[i]].getInfo().c_str());
+		//	//fprintf(logFile, "%d ", buffers->c_neuronsFired[i]);
 		//}
-		fprintf(dataFile, "\n");
+		//fprintf(logFile, "\n");
 
+		////fprintf(dataFile, "Cycle %d: ", time);
+		//if (lif_idx >= 0) {
+		//	for (int i=0; i<c_pGpuNet->neuronNums[lif_idx+1] - c_pGpuNet->neuronNums[lif_idx]; i++) {
+		//		fprintf(dataFile, "%lf ", c_vm[i]);
+		//	}
+		//}
+		////for (int i=0; i<c_pGpuNet->synapseNums[1] - c_pGpuNet->synapseNums[0]; i++) {
+		////		fprintf(dataFile, ", %lf", c_I_syn[i]);
+		////}
+		//fprintf(dataFile, "\n");
+
+		//LOG SYNAPSE
 		//copyFromGPU<int>(buffers->c_synapsesFired, buffers->c_gSynapsesLogTable, totalSynapseNum);
 		//int synapseCount = 0;
 		//if (time > 0) {
@@ -148,6 +151,7 @@ int SingleGPUSimulator::run(real time)
 
 		update_time<<<1, 1>>>();
 	}
+
 	gettimeofday(&te, NULL);
 	long seconds = te.tv_sec - ts.tv_sec;
 	long hours = seconds/3600;
@@ -161,6 +165,14 @@ int SingleGPUSimulator::run(real time)
 	}
 
 	printf("\nSimulation finesed in %ld:%ld:%ld.%06lds\n", hours, minutes, seconds, uSeconds);
+
+	//CALC Firing Rate
+	int *rate = hostMalloc<int>(totalNeuronNum);
+	copyFromGPU<int>(rate, buffers->c_gLayerInput, totalNeuronNum);
+
+	//TODO: For FX
+
+	//END TODO
 
 	fclose(logFile);
 	fclose(dataFile);
