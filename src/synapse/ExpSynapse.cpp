@@ -50,6 +50,8 @@ int ExpSynapse::init(real dt) {
 		C1 = expf(-dt/tau_syn);
 		_C1 = expf(-(delay-dt*delay_steps)/tau_syn);
 		active_steps = static_cast<int>(DECAY_MULTIPLE_TAU * tau_syn/dt + 0.5);
+		// To be identified with brian2
+		this->weight = this->weight * expf(-dt/tau_syn/2.0f);
 	} else {
 		C1 = 0;
 		_C1 = 1.0;
