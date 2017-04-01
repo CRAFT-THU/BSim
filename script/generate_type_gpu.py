@@ -8,27 +8,25 @@ def generate_h_file(paras, types, type_name, type_type):
     filename = obj_type + ".cpp"
     f = open(filename, "w+")
 
+    f.write("#ifndef"+ obj_type.upper() + "_H\n")
+    f.write("#define"+ obj_type.upper() + "_H\n")
     f.write("\n")
-    f.write('#include <stdlib.h>\n')
-    f.write('#include "mpi.h"\n')
+    f.write('#include "../base/type.h"\n')
     f.write('#include "../utils/macros.h"\n')
-    f.write('#include "../utils/TagPool.h"\n')
-    f.write('#include "' + obj_type +'.h"\n')
+    f.write('\n')
 
-    f.write('\nNEURON_GPU_FUNC_BASIC(' + type_name + ')\n\n')
-
-    f.write("int alloc" + type_name + "(void *pCpu, int N)\n")
-    f.write("{\n")
-    f.write("\t" + obj_type + " *p = " + "(" + obj_type + "*)pCpu;\n")
-
+    f.write("struct " + obj_type + " {\n")
     for para in paras:
         t = paras[para]
-        f.write("\tp->p_" + para + " = (" + t + "*)malloc(N*sizeof(" + t + "));\n")
+        f.write("\t" + t + " *" + para + ";\n")
+    f.write('\n')
+    
+    f.write('NEURON_GPU_FUNC_DEFINE(' + type_name + ')\n')
+    f.write('\n')
+
+    f.write("#endif /* " + obj_type.upper() + "_H */\n")
+
         
-
-    f.write("\treturn 0;\n")
-    f.write("}\n\n")
-
 
     f.close()
 
