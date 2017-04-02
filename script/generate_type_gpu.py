@@ -1,15 +1,15 @@
 #!/usr/bin/python
 
-paras = [ "start": "int", "end":"real" ]
+import os
 
-def generate_h_file(paras, types, type_name, type_type):
+def generate_h_file(paras, type_name, type_type, path_name):
     obj_type = "G" + type_name + type_type
 
-    filename = obj_type + ".cpp"
+    filename = os.path.join(path_name, obj_type + ".h")
     f = open(filename, "w+")
 
-    f.write("#ifndef"+ obj_type.upper() + "_H\n")
-    f.write("#define"+ obj_type.upper() + "_H\n")
+    f.write("#ifndef "+ obj_type.upper() + "_H\n")
+    f.write("#define "+ obj_type.upper() + "_H\n")
     f.write("\n")
     f.write('#include "../base/type.h"\n')
     f.write('#include "../utils/macros.h"\n')
@@ -18,7 +18,8 @@ def generate_h_file(paras, types, type_name, type_type):
     f.write("struct " + obj_type + " {\n")
     for para in paras:
         t = paras[para]
-        f.write("\t" + t + " *" + para + ";\n")
+        f.write("\t" + t + " *p_" + para + ";\n")
+    f.write('};\n')
     f.write('\n')
     
     f.write('NEURON_GPU_FUNC_DEFINE(' + type_name + ')\n')
@@ -31,10 +32,10 @@ def generate_h_file(paras, types, type_name, type_type):
     f.close()
 
 
-def generate_cpp_file(paras, types, type_name, type_type):
+def generate_cpp_file(paras, type_name, type_type, path_name):
     obj_type = "G" + type_name + type_type
 
-    filename = obj_type + ".cpp"
+    filename = os.path.join(path_name, obj_type + ".cpp")
     f = open(filename, "w+")
 
     f.write("\n")
@@ -80,16 +81,17 @@ def generate_cpp_file(paras, types, type_name, type_type):
     f.close()
     
 
-def generate_cu_file(paras, type_name, type_type):
+def generate_cu_file(paras, type_name, type_type, path_name):
     obj_type = "G" + type_name + type_type
 
-    filename = obj_type + ".cu"
+    filename = os.path.join(path_name, obj_type + ".cu")
     f = open(filename, "w+")
 
     f.write("\n")
     f.write('#include "../third_party/cuda/helper_cuda.h"\n')
     f.write('#include "../gpu_utils/mem_op.h"\n')
     f.write('#include "' + obj_type +'.h"\n')
+    f.write("\n")
 
     f.write("int cudaAlloc" + type_name + "(void *pCpu, void *pGpu, int num)\n")
     f.write("{\n")

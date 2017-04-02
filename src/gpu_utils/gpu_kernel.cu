@@ -26,6 +26,7 @@ __device__ int gSynapsesActiveTableSize;
 
 // Neuron Arrays
 __device__ real *gNeuronInput;
+__device__ real *gNeuronInput_I;
 
 // Neuron Tables
 __device__ int *gFiredTable;
@@ -649,7 +650,7 @@ __global__ void add_cross_neuron(int *ids, int num)
 //	__syncthreads();
 //}
 
-__global__ void init_buffers(/*int *c_gTimeTable,*/ real *c_gNeuronInput, int *c_gFiredTable, int *c_gFiredTableSizes, int *c_gActiveTable, int *c_gSynapsesActiveTable, int *c_gSynapsesLogTable) 
+__global__ void init_buffers(/*int *c_gTimeTable,*/ real *c_gNeuronInput, real *c_gNeuronInput_I, int *c_gFiredTable, int *c_gFiredTableSizes, int *c_gActiveTable, int *c_gSynapsesActiveTable, int *c_gSynapsesLogTable) 
 {
 	if ((threadIdx.x == 0) && (blockIdx.x == 0)) {
 		gCurrentIdx = 0;
@@ -660,6 +661,7 @@ __global__ void init_buffers(/*int *c_gTimeTable,*/ real *c_gNeuronInput, int *c
 
 		//gTimeTable = c_gTimeTable;
 		gNeuronInput = c_gNeuronInput;
+		gNeuronInput_I = c_gNeuronInput_I;
 		gFiredTable = c_gFiredTable;
 		gFiredTableSizes = c_gFiredTableSizes;
 		gActiveTable = c_gActiveTable;
@@ -683,6 +685,9 @@ GBuffers* alloc_buffers(int neuron_num, int synapse_num, int max_delay)
 	
 	checkCudaErrors(cudaMalloc((void**)&(ret->c_gNeuronInput), sizeof(real)*(neuron_num)));
 	checkCudaErrors(cudaMemset(ret->c_gNeuronInput, 0, sizeof(real)*(neuron_num)));
+
+	checkCudaErrors(cudaMalloc((void**)&(ret->c_gNeuronInput_I), sizeof(real)*(neuron_num)));
+	checkCudaErrors(cudaMemset(ret->c_gNeuronInput_I, 0, sizeof(real)*(neuron_num)));
 
 	checkCudaErrors(cudaMalloc((void**)&(ret->c_gFiredTable), sizeof(int)*((neuron_num)*(max_delay+1))));
 	checkCudaErrors(cudaMemset(ret->c_gFiredTable, 0, sizeof(int)*((neuron_num)*(max_delay+1))));
@@ -713,7 +718,7 @@ GBuffers* alloc_buffers(int neuron_num, int synapse_num, int max_delay)
 	checkCudaErrors(cudaMallocHost((void**)(&ret->c_neuronsFired), sizeof(int)*(neuron_num)));
 	checkCudaErrors(cudaMallocHost((void**)(&ret->c_synapsesFired), sizeof(int)*(synapse_num)));
 
-	init_buffers<<<1, 1, 0>>>(/*ret->c_gTimeTable,*/ ret->c_gNeuronInput, ret->c_gFiredTable, ret->c_gFiredTableSizes, ret->c_gActiveTable, ret->c_gSynapsesActiveTable, ret->c_gSynapsesLogTable);
+	init_buffers<<<1, 1, 0>>>(/*ret->c_gTimeTable,*/ ret->c_gNeuronInput, ret->c_gNeuronInput_I, ret->c_gFiredTable, ret->c_gFiredTableSizes, ret->c_gActiveTable, ret->c_gSynapsesActiveTable, ret->c_gSynapsesLogTable);
 
 	init_log_buffers<<<1, 1, 0>>>(ret->c_gLayerInput, ret->c_gXInput);
 
@@ -723,6 +728,7 @@ GBuffers* alloc_buffers(int neuron_num, int synapse_num, int max_delay)
 int free_buffers(GBuffers *buf) 
 {
 	checkCudaErrors(cudaFree(buf->c_gNeuronInput));
+	checkCudaErrors(cudaFree(buf->c_gNeuronInput_I));
 	checkCudaErrors(cudaFree(buf->c_gFiredTable));
 	checkCudaErrors(cudaFree(buf->c_gFiredTableSizes));
 	checkCudaErrors(cudaFree(buf->c_gActiveTable));

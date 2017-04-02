@@ -15,6 +15,7 @@
 struct GBuffers {
 	// Neuron Arrays
 	real *c_gNeuronInput;
+	real *c_gNeuronInput_I;
 	// Neuron Tables
 	int *c_gFiredTable;
 	int *c_gFiredTableSizes;
