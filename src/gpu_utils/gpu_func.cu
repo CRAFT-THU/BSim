@@ -38,16 +38,31 @@ int cudaUpdateLIF(void *data, int num, int start_id, BlockSize *pSize)
 	return 0;
 }
 
-int cudaUpdateMax(void *data, int num, int start_id, BlockSize *pSize)
+int cudaUpdateAllLIF(void *data, int num, int start_id, BlockSize *pSize)
 {
-	update_max_neuron<<<pSize->gridSize, pSize->blockSize>>>((GMaxNeurons*)data, num, start_id);
+	update_all_lif_neuron<<<pSize->gridSize, pSize->blockSize>>>((GLIFNeurons*)data, num, start_id);
 
 	return 0;
 }
 
-int cudaUpdateAllLIF(void *data, int num, int start_id, BlockSize *pSize)
+int cudaUpdateLIFE(void *data, int num, int start_id, BlockSize *pSize)
 {
-	update_all_lif_neuron<<<pSize->gridSize, pSize->blockSize>>>((GLIFNeurons*)data, num, start_id);
+	find_life_neuron<<<pSize->gridSize, pSize->blockSize>>>((GLIFENeurons*)data, num, start_id);
+	update_life_neuron<<<pSize->gridSize, pSize->blockSize>>>((GLIFENeurons*)data, num, start_id);
+
+	return 0;
+}
+
+int cudaUpdateAllLIFE(void *data, int num, int start_id, BlockSize *pSize)
+{
+	//update_all_life_neuron<<<pSize->gridSize, pSize->blockSize>>>((GLIFENeurons*)data, num, start_id);
+
+	return 0;
+}
+
+int cudaUpdateMax(void *data, int num, int start_id, BlockSize *pSize)
+{
+	update_max_neuron<<<pSize->gridSize, pSize->blockSize>>>((GMaxNeurons*)data, num, start_id);
 
 	return 0;
 }
@@ -67,6 +82,22 @@ int cudaUpdateAllExp(void *data, int num, int start_id, BlockSize *pSize)
 	update_exp_hit<<<pSize->gridSize, pSize->blockSize>>>((GExpSynapses*)data, num, start_id);
 	reset_active_synapse<<<1, 1>>>();
 	update_all_exp_synapse<<<pSize->gridSize, pSize->blockSize>>>((GExpSynapses*)data, num, start_id);
+
+	return 0;
+}
+
+int cudaUpdateStatic(void *data, int num, int start_id, BlockSize *pSize)
+{
+	update_static_hit<<<pSize->gridSize, pSize->blockSize>>>((GStaticSynapses*)data, num, start_id);
+	reset_active_synapse<<<1, 1>>>();
+
+	return 0;
+}
+
+int cudaUpdateAllStatic(void *data, int num, int start_id, BlockSize *pSize)
+{
+	update_static_hit<<<pSize->gridSize, pSize->blockSize>>>((GStaticSynapses*)data, num, start_id);
+	reset_active_synapse<<<1, 1>>>();
 
 	return 0;
 }
@@ -106,7 +137,10 @@ BlockSize * getBlockSize(int nSize, int sSize)
 	cudaOccupancyMaxPotentialBlockSize(&(ret[LIF].minGridSize), &(ret[LIF].blockSize), update_lif_neuron, 0, nSize); 
 	ret[LIF].gridSize = (upzero_else_set_one(nSize) + (ret[LIF].blockSize) - 1) / (ret[LIF].blockSize);
 
-	cudaOccupancyMaxPotentialBlockSize(&(ret[Max].minGridSize), &(ret[Max].blockSize), update_lif_neuron, 0, nSize); 
+	cudaOccupancyMaxPotentialBlockSize(&(ret[LIFE].minGridSize), &(ret[LIFE].blockSize), update_life_neuron, 0, nSize); 
+	ret[LIFE].gridSize = (upzero_else_set_one(nSize) + (ret[LIFE].blockSize) - 1) / (ret[LIFE].blockSize);
+
+	cudaOccupancyMaxPotentialBlockSize(&(ret[Max].minGridSize), &(ret[Max].blockSize), update_max_neuron, 0, nSize); 
 	ret[Max].gridSize = (upzero_else_set_one(nSize) + (ret[Max].blockSize) - 1) / (ret[Max].blockSize);
 
 	//cudaOccupancyMaxPotentialBlockSize(&(ret[Basic].minGridSize), &(ret[Basic].blockSize), update_basic_synapse, 0, sSize); 
@@ -114,6 +148,9 @@ BlockSize * getBlockSize(int nSize, int sSize)
 
 	cudaOccupancyMaxPotentialBlockSize(&(ret[Exp].minGridSize), &(ret[Exp].blockSize), update_exp_synapse, 0, sSize); 
 	ret[Exp].gridSize = (upzero_else_set_one(sSize) + (ret[Exp].blockSize) - 1) / (ret[Exp].blockSize);
+
+	cudaOccupancyMaxPotentialBlockSize(&(ret[Static].minGridSize), &(ret[Static].blockSize), update_static_hit, 0, sSize); 
+	ret[Static].gridSize = (upzero_else_set_one(sSize) + (ret[Static].blockSize) - 1) / (ret[Static].blockSize);
 
 	//cudaOccupancyMaxPotentialBlockSize(&(ret[Alpha].minGridSize), &(ret[Alpha].blockSize), update_alpha_synapse, 0, sSize); 
 	//ret[Alpha].gridSize = (sSize + (ret[Alpha].blockSize) - 1) / (ret[Alpha].blockSize);

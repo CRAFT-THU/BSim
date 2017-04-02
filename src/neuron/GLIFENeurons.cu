@@ -22,7 +22,7 @@ int cudaAllocLIFE(void *pCpu, void *pGpu, int num)
 	return 0;
 }
 
-int cudaFreeLIFE(void *pCpu)
+int cudaFreeLIFE(void *pGpu)
 {
 	GLIFENeurons *pGpuNeurons = (GLIFENeurons*)pGpu;
 	gpuFree(pGpuNeurons->p_CI);

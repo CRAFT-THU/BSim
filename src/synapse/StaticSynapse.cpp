@@ -49,6 +49,8 @@ int StaticSynapse::reset(SimInfo &info)
 	delay_steps = static_cast<int>(_delay/dt);
         real _C1 = expf(-(_delay-dt*delay_steps)/_tau_syn);
 	this->_weight = this->_weight * _C1;
+
+	return 0;
 }
 
 int StaticSynapse::update(SimInfo &info)

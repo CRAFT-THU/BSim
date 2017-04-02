@@ -58,8 +58,8 @@ if __name__ == '__main__':
     type_type = get_type_type()
     path_name = get_path(type_type)
 
-    generate_type_cpu.generate_h_file(paras, type_name, type_type, path_name)
-    generate_type_cpu.generate_cpp_file(paras, type_name, type_type, path_name)
+    #generate_type_cpu.generate_h_file(paras, type_name, type_type, path_name)
+    #generate_type_cpu.generate_cpp_file(paras, type_name, type_type, path_name)
 
     type_type += "s"
     generate_type_gpu.generate_h_file(paras, type_name, type_type, path_name)

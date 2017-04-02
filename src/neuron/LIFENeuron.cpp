@@ -87,9 +87,9 @@ int LIFENeuron::reset(SimInfo &info)
 	}
 
 	if (_tau_syn_I > 0) {
-		_CE = exp(-dt/_tau_syn_I);
+		_CI = exp(-dt/_tau_syn_I);
 	} else {
-		_CE = 0.0f;
+		_CI = 0.0f;
 	}
 
 	if (rm > 0) {
@@ -103,6 +103,8 @@ int LIFENeuron::reset(SimInfo &info)
 
 	_i_I = 0;
 	_i_E = 0;
+
+	_vm = _v_reset;
 
 	return 0;
 }

@@ -8,6 +8,7 @@
 #include "../src/neuron/GConstantNeurons.h"
 #include "../src/neuron/GPoissonNeurons.h"
 #include "../src/neuron/GArrayNeurons.h"
+#include "../src/neuron/GLIFNeurons.h"
 #include "../src/neuron/GLIFENeurons.h"
 #include "../src/neuron/GMaxNeurons.h"
 

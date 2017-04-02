@@ -66,11 +66,11 @@ int SingleGPUSimulator::run(real time)
 	postSize.gridSize = (totalSynapseNum + (postSize.blockSize) - 1) / (postSize.blockSize);
 
 	real *c_vm = hostMalloc<real>(totalNeuronNum);
-	int lif_idx = getIndex(pCpuNet->nTypes, nTypeNum, LIF);
-	GLIFNeurons *c_g_lif = NULL;
+	int lif_idx = getIndex(pCpuNet->nTypes, nTypeNum, LIFE);
+	GLIFENeurons *c_g_lif = NULL;
 	real *c_g_vm = NULL;
 	if (lif_idx >= 0) {
-		c_g_lif = copyFromGPU<GLIFNeurons>(static_cast<GLIFNeurons*>(c_pGpuNet->pNeurons[lif_idx]), 1);
+		c_g_lif = copyFromGPU<GLIFENeurons>(static_cast<GLIFENeurons*>(c_pGpuNet->pNeurons[lif_idx]), 1);
 		c_g_vm = c_g_lif->p_vm;
 	}
 	//real *c_I_syn = hostMalloc<real>(totalSynapseNum);
@@ -107,27 +107,27 @@ int SingleGPUSimulator::run(real time)
 		}
 
 		//LOG DATA
-		////copyFromGPU<real>(c_I_syn, c_g_I_syn, c_pGpuNet->synapseNums[exp_idx+1]-c_pGpuNet->synapseNums[exp_idx]);
+		//copyFromGPU<real>(c_I_syn, c_g_I_syn, c_pGpuNet->synapseNums[exp_idx+1]-c_pGpuNet->synapseNums[exp_idx]);
 
-		//fprintf(logFile, "Cycle %d: ", time);
-		//for (int i=0; i<copySize; i++) {
-		//	//assert(network->idx2nid.find(buffers->c_neuronsFired[i]) != network->idx2nid.end());
-		//	//printf("%s ", network->idx2nid[buffers->c_neuronsFired[i]].getInfo().c_str());
-		//	fprintf(logFile, "%s ", network->idx2nid[buffers->c_neuronsFired[i]].getInfo().c_str());
-		//	//fprintf(logFile, "%d ", buffers->c_neuronsFired[i]);
-		//}
-		//fprintf(logFile, "\n");
+		fprintf(logFile, "Cycle %d: ", time);
+		for (int i=0; i<copySize; i++) {
+			//assert(network->idx2nid.find(buffers->c_neuronsFired[i]) != network->idx2nid.end());
+			//printf("%s ", network->idx2nid[buffers->c_neuronsFired[i]].getInfo().c_str());
+			fprintf(logFile, "%s ", network->idx2nid[buffers->c_neuronsFired[i]].getInfo().c_str());
+			//fprintf(logFile, "%d ", buffers->c_neuronsFired[i]);
+		}
+		fprintf(logFile, "\n");
 
-		////fprintf(dataFile, "Cycle %d: ", time);
-		//if (lif_idx >= 0) {
-		//	for (int i=0; i<c_pGpuNet->neuronNums[lif_idx+1] - c_pGpuNet->neuronNums[lif_idx]; i++) {
-		//		fprintf(dataFile, "%lf ", c_vm[i]);
-		//	}
+		//fprintf(dataFile, "Cycle %d: ", time);
+		if (lif_idx >= 0) {
+			for (int i=0; i<c_pGpuNet->neuronNums[lif_idx+1] - c_pGpuNet->neuronNums[lif_idx]; i++) {
+				fprintf(dataFile, "%lf ", c_vm[i]);
+			}
+		}
+		//for (int i=0; i<c_pGpuNet->synapseNums[1] - c_pGpuNet->synapseNums[0]; i++) {
+		//		fprintf(dataFile, ", %lf", c_I_syn[i]);
 		//}
-		////for (int i=0; i<c_pGpuNet->synapseNums[1] - c_pGpuNet->synapseNums[0]; i++) {
-		////		fprintf(dataFile, ", %lf", c_I_syn[i]);
-		////}
-		//fprintf(dataFile, "\n");
+		fprintf(dataFile, "\n");
 
 		//LOG SYNAPSE
 		//copyFromGPU<int>(buffers->c_synapsesFired, buffers->c_gSynapsesLogTable, totalSynapseNum);

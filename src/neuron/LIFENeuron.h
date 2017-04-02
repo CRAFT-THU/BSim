@@ -22,8 +22,8 @@ public:
 	virtual int getData(void *data) override;
 	virtual int hardCopy(void * data, int idx, int base, map<ID, int> &id2idx, map<int, ID> &idx2id) override;
 
-protected:
 	const static Type type;
+protected:
 	real _CI;
 	real _vm;
 	real _CE;

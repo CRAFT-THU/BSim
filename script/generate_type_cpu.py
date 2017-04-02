@@ -57,9 +57,9 @@ def generate_h_file(paras, type_name, type_type, path_name):
     f.write("\tvirtual int hardCopy(void * data, int idx, int base, map<ID, int> &id2idx, map<int, ID> &idx2id) override;\n")
     f.write('\n')
 
+    f.write("\tconst static Type type;\n")
     f.write("protected:")
     f.write('\n')
-    f.write("\tconst static Type type;\n")
     for para in paras:
         t = paras[para]
         f.write("\t" + t + " _" + para + ";\n")

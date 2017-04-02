@@ -12,10 +12,14 @@ int cudaUpdatePoisson(void *data, int num, int start_id, BlockSize *pSize);
 int cudaUpdateConstant(void *data, int num, int start_id, BlockSize *pSize);
 int cudaUpdateArray(void *data, int num, int start_id, BlockSize *pSize);
 int cudaUpdateLIF(void *data, int num, int start_id, BlockSize *pSize);
+int cudaUpdateLIFE(void *data, int num, int start_id, BlockSize *pSize);
 int cudaUpdateMax(void *data, int num, int start_id, BlockSize *pSize);
 int cudaUpdateAllLIF(void *data, int num, int start_id, BlockSize *pSize);
+int cudaUpdateAllLIFE(void *data, int num, int start_id, BlockSize *pSize);
 int cudaUpdateExp(void *data, int num, int start_id, BlockSize *pSize);
+int cudaUpdateStatic(void *data, int num, int start_id, BlockSize *pSize);
 int cudaUpdateAllExp(void *data, int num, int start_id, BlockSize *pSize);
+int cudaUpdateAllStatic(void *data, int num, int start_id, BlockSize *pSize);
 int addCrossNeurons(int *ids, int num);
 
 BlockSize * getBlockSize(int nSize, int sSize);

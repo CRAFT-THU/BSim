@@ -27,7 +27,7 @@ def generate_h_file(paras, type_name, type_type, path_name):
     f.write('};\n')
     f.write('\n')
     
-    f.write('NEURON_GPU_FUNC_DEFINE(' + type_name + ')\n')
+    f.write(type_type.upper()[:-1] + '_GPU_FUNC_DEFINE(' + type_name + ')\n')
     f.write('\n')
 
     f.write("#endif /* " + obj_type.upper() + "_H */\n")
@@ -50,7 +50,7 @@ def generate_cpp_file(paras, type_name, type_type, path_name):
     f.write('#include "../utils/TagPool.h"\n')
     f.write('#include "' + obj_type +'.h"\n')
 
-    f.write('\nNEURON_GPU_FUNC_BASIC(' + type_name + ')\n\n')
+    f.write('\n' +  type_type.upper()[:-1] + '_GPU_FUNC_BASIC(' + type_name + ')\n\n')
 
     f.write("int alloc" + type_name + "(void *pCpu, int N)\n")
     f.write("{\n")
@@ -60,6 +60,8 @@ def generate_cpp_file(paras, type_name, type_type, path_name):
         t = paras[para]
         f.write("\tp->p_" + para + " = (" + t + "*)malloc(N*sizeof(" + t + "));\n")
         
+    if type_type == "Synapses":
+        f.write("\tp->pDst = (int *)malloc(N*sizeof(int));\n")
 
     f.write("\treturn 0;\n")
     f.write("}\n\n")
@@ -70,6 +72,9 @@ def generate_cpp_file(paras, type_name, type_type, path_name):
 
     for para in paras:
         f.write("\t" + "free(" + "pCpu" +  type_type + "->p_" + para + ");\n")
+
+    if type_type == "Synapses":
+        f.write("\t" + "free(" + "pCpu" +  type_type + "->pDst);\n")
         
 
     f.write("\treturn 0;\n")
@@ -106,18 +111,23 @@ def generate_cu_file(paras, type_name, type_type, path_name):
     for para in paras:
         t = paras[para]
         f.write("\t" + "pGpu" +  type_type + "->p_" + para + " = copyToGPU<" + t + ">(p->p_" + para + ", num);\n")
+
+    if type_type == "Synapses":
+        f.write("\t" + "pGpu" +  type_type + "->pDst = copyToGPU<int>(p->pDst, num);\n")
         
 
     f.write("\treturn 0;\n")
     f.write("}\n\n")
 
-    f.write("int cudaFree" + type_name + "(void *pCpu)\n")
+    f.write("int cudaFree" + type_name + "(void *pGpu)\n")
     f.write("{\n")
     f.write("\t" + obj_type + " *pGpu" + type_type + " = " + "(" + obj_type + "*)pGpu;\n")
 
     for para in paras:
         f.write("\t" + "gpuFree(" + "pGpu" +  type_type + "->p_" + para + ");\n")
         
+    if type_type == "Synapses":
+        f.write("\t" + "gpuFree(" + "pGpu" +  type_type + "->pDst);\n")
 
     f.write("\treturn 0;\n")
     f.write("}\n\n")

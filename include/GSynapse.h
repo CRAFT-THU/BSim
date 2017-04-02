@@ -7,6 +7,7 @@
 
 //#include "GBasicSynapses.h"
 #include "../src/synapse/GExpSynapses.h"
+#include "../src/synapse/GStaticSynapses.h"
 //#include "GAlphaSynapses.h"
 
 #endif /* GSYNAPSE_H */

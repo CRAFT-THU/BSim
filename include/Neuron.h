@@ -26,7 +26,7 @@ typedef CompositeNeuron<PoissonNeuron, ExpSynapse> Poisson_curr;
 typedef CompositeNeuron<ArrayNeuron, ExpSynapse> Array_curr;
 typedef CompositeNeuron<MaxNeuron, ExpSynapse> Max_curr_exp;
 typedef CompositeNeuron<LIFNeuron, ExpSynapse> IF_curr_exp;
-typedef CompositeNeuron<LIFENeuron, ExpSynapse> LIF_brian;
+typedef CompositeNeuron<LIFENeuron, StaticSynapse> LIF_brian;
 
 //typedef CompositeNeuron<InputNeuron, LowpassSynapse> Input_lowpass;
 //typedef CompositeNeuron<ProbeNeuron, LowpassSynapse> Probe_lowpass;

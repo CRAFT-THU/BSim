@@ -9,6 +9,6 @@ struct GStaticSynapses {
 	int *pDst;
 };
 
-NEURON_GPU_FUNC_DEFINE(Static)
+SYNAPSE_GPU_FUNC_DEFINE(Static)
 
 #endif /* GSTATICSYNAPSES_H */
