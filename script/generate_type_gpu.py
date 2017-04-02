@@ -19,6 +19,11 @@ def generate_h_file(paras, type_name, type_type, path_name):
     for para in paras:
         t = paras[para]
         f.write("\t" + t + " *p_" + para + ";\n")
+
+    if type_type == "Synapses":
+        f.write("\tint *pDst;\n")
+
+
     f.write('};\n')
     f.write('\n')
     
@@ -64,7 +69,7 @@ def generate_cpp_file(paras, type_name, type_type, path_name):
     f.write("\t" + obj_type + " *pCpu" + type_type + " = " + "(" + obj_type + "*)pCpu;\n")
 
     for para in paras:
-        f.write("\t" + "free" + "pCpu" +  type_type + "->p_" + para + ");\n")
+        f.write("\t" + "free(" + "pCpu" +  type_type + "->p_" + para + ");\n")
         
 
     f.write("\treturn 0;\n")
@@ -111,7 +116,7 @@ def generate_cu_file(paras, type_name, type_type, path_name):
     f.write("\t" + obj_type + " *pGpu" + type_type + " = " + "(" + obj_type + "*)pGpu;\n")
 
     for para in paras:
-        f.write("\t" + "gpuFree" + "pGpu" +  type_type + "->p_" + para + ");\n")
+        f.write("\t" + "gpuFree(" + "pGpu" +  type_type + "->p_" + para + ");\n")
         
 
     f.write("\treturn 0;\n")

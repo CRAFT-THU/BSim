@@ -13,7 +13,9 @@ enum Type {
 	Max,
 	LIF, 
 	LIFE,
-	Exp, /*Basic, Alpha,*/
+	Exp,
+	Static,
+       	/*Basic, Alpha,*/
 	/*Nengo, Probe, Lowpass,*/ 
 	TYPESIZE
 }; 

@@ -25,18 +25,18 @@ int cudaAllocLIFE(void *pCpu, void *pGpu, int num)
 int cudaFreeLIFE(void *pCpu)
 {
 	GLIFENeurons *pGpuNeurons = (GLIFENeurons*)pGpu;
-	gpuFreepGpuNeurons->p_CI);
-	gpuFreepGpuNeurons->p_vm);
-	gpuFreepGpuNeurons->p_CE);
-	gpuFreepGpuNeurons->p_refrac_step);
-	gpuFreepGpuNeurons->p_refrac_time);
-	gpuFreepGpuNeurons->p_i_tmp);
-	gpuFreepGpuNeurons->p_i_I);
-	gpuFreepGpuNeurons->p_i_E);
-	gpuFreepGpuNeurons->p_v_thresh);
-	gpuFreepGpuNeurons->p_v_reset);
-	gpuFreepGpuNeurons->p_C2);
-	gpuFreepGpuNeurons->p_C1);
+	gpuFree(pGpuNeurons->p_CI);
+	gpuFree(pGpuNeurons->p_vm);
+	gpuFree(pGpuNeurons->p_CE);
+	gpuFree(pGpuNeurons->p_refrac_step);
+	gpuFree(pGpuNeurons->p_refrac_time);
+	gpuFree(pGpuNeurons->p_i_tmp);
+	gpuFree(pGpuNeurons->p_i_I);
+	gpuFree(pGpuNeurons->p_i_E);
+	gpuFree(pGpuNeurons->p_v_thresh);
+	gpuFree(pGpuNeurons->p_v_reset);
+	gpuFree(pGpuNeurons->p_C2);
+	gpuFree(pGpuNeurons->p_C1);
 	return 0;
 }
 

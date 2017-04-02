@@ -28,18 +28,18 @@ int allocLIFE(void *pCpu, int N)
 int freeLIFE(void *pCpu)
 {
 	GLIFENeurons *pCpuNeurons = (GLIFENeurons*)pCpu;
-	freepCpuNeurons->p_CI);
-	freepCpuNeurons->p_vm);
-	freepCpuNeurons->p_CE);
-	freepCpuNeurons->p_refrac_step);
-	freepCpuNeurons->p_refrac_time);
-	freepCpuNeurons->p_i_tmp);
-	freepCpuNeurons->p_i_I);
-	freepCpuNeurons->p_i_E);
-	freepCpuNeurons->p_v_thresh);
-	freepCpuNeurons->p_v_reset);
-	freepCpuNeurons->p_C2);
-	freepCpuNeurons->p_C1);
+	free(pCpuNeurons->p_CI);
+	free(pCpuNeurons->p_vm);
+	free(pCpuNeurons->p_CE);
+	free(pCpuNeurons->p_refrac_step);
+	free(pCpuNeurons->p_refrac_time);
+	free(pCpuNeurons->p_i_tmp);
+	free(pCpuNeurons->p_i_I);
+	free(pCpuNeurons->p_i_E);
+	free(pCpuNeurons->p_v_thresh);
+	free(pCpuNeurons->p_v_reset);
+	free(pCpuNeurons->p_C2);
+	free(pCpuNeurons->p_C1);
 	return 0;
 }
 

@@ -9,27 +9,34 @@ synapse_path = "../src/synapse/"
 neuron_path = "../src/neuron/"
 
 def get_type_paras():
+    #paras = {
+    #        "v_reset" : "real",
+    #        "v_thresh" : "real",
+    #        "i_E" : "real",
+    #        "i_I" : "real",
+    #        "vm" : "real",
+    #        "C1" : "real",
+    #        "C2" : "real",
+    #        "CE" : "real",
+    #        "CI" : "real",
+    #        "i_tmp" : "real",
+    #        "refrac_step" : "int",
+    #        "refrac_time" : "int",
+    #        }
+
     paras = {
-            "v_reset" : "real",
-            "v_thresh" : "real",
-            "i_E" : "real",
-            "i_I" : "real",
-            "vm" : "real",
-            "C1" : "real",
-            "C2" : "real",
-            "CE" : "real",
-            "CI" : "real",
-            "i_tmp" : "real",
-            "refrac_step" : "int",
-            "refrac_time" : "int",
+            "weight" : "real",
             }
+
     return paras
 
 def get_type_name():
-    return "LIFE"
+    #return "LIFE"
+    return "Static"
 
 def get_type_type():
-    return "Neuron"
+    #return "Neuron"
+    return "Synapse"
 
 def get_path(type_type):
     script_path = os.path.abspath(__file__)

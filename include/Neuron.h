@@ -10,6 +10,7 @@
 #include "../src/neuron/PoissonNeuron.h"
 #include "../src/neuron/ArrayNeuron.h"
 #include "../src/neuron/LIFNeuron.h"
+#include "../src/neuron/LIFENeuron.h"
 #include "../src/neuron/MaxNeuron.h"
 //#include "NengoNeuron.h"
 //#include "ProbeNeuron.h"
@@ -25,6 +26,7 @@ typedef CompositeNeuron<PoissonNeuron, ExpSynapse> Poisson_curr;
 typedef CompositeNeuron<ArrayNeuron, ExpSynapse> Array_curr;
 typedef CompositeNeuron<MaxNeuron, ExpSynapse> Max_curr_exp;
 typedef CompositeNeuron<LIFNeuron, ExpSynapse> IF_curr_exp;
+typedef CompositeNeuron<LIFENeuron, ExpSynapse> LIF_brian;
 
 //typedef CompositeNeuron<InputNeuron, LowpassSynapse> Input_lowpass;
 //typedef CompositeNeuron<ProbeNeuron, LowpassSynapse> Probe_lowpass;

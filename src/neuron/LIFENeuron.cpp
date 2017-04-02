@@ -121,8 +121,8 @@ int LIFENeuron::update(SimInfo &info)
 	if (_refrac_step > 0) {
 		--_refrac_step;
 	} else {
-		_i_I = _CI * _i_I;
 		_i_E = _CE * _i_E;
+		_i_I = _CI * _i_I;
 		real I = _i_E + _i_I + _i_tmp;
 		_vm = _C1 * _vm + _C2 * I;
 		
@@ -132,8 +132,8 @@ int LIFENeuron::update(SimInfo &info)
 			_refrac_step = _refrac_time - 1;
 			_vm = _v_reset;
 		} else {
-			_i_E += _i_syn_E;
-			_i_E += _i_syn_I;
+			_i_E += _i_syn_E * sqrt(_CE);
+			_i_I += _i_syn_I * sqrt(_CI);
 		}
 
 		info.input.push_back(_vm);
@@ -143,7 +143,7 @@ int LIFENeuron::update(SimInfo &info)
 	_i_syn_I = 0;
 
 	if (fired) {
-	//TODO fire
+		//TODO fire
 		fire();
 		info.fired.push_back(getID());
 		return 1;

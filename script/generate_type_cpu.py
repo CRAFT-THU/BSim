@@ -57,6 +57,10 @@ def generate_h_file(paras, type_name, type_type, path_name):
         t = paras[para]
         f.write("\t" + t + " _" + para + ";\n")
 
+    if type_type == "Synapse":
+        f.write("\tNeuronBase *pDest;\n")
+
+
     f.write("};\n\n")
 
     f.write("#endif /* " + obj_type.upper() + "_H */\n")
