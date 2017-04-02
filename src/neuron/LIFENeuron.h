@@ -7,7 +7,6 @@
 class LIFENeuron : public NeuronBase {
 public:
 	LIFENeuron(ID id, real v_init, real v_rest, real v_reset, real cm, real tau_m, real tau_refrac, real tau_syn_E, real tau_syn_I, real v_thresh, real i_offset);
-	LIFENeuron(ID id, real CI, real vm, real CE, int refrac_step, int refrac_time, real i_tmp, real i_I, real i_E, real v_thresh, real v_reset, real C2, real C1);
 	LIFENeuron(const LIFENeuron &neuron, ID id);
 	~LIFENeuron();
 

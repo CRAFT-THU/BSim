@@ -12,7 +12,13 @@ def generate_h_file(paras, type_name, type_type, path_name):
     f.write("#define "+ obj_type.upper() + "_H\n")
     f.write("\n")
     f.write('#include <stdio.h>\n')
-    f.write('#include "../base/NeuronBase.h"\n')
+    if type_type == "Synapse":
+        f.write('#include <list>\n')
+    f.write('#include "../base/' + type_type + 'Base.h"\n')
+    f.write('\n')
+
+    if type_type == "Synapse":
+        f.write('using std::list;\n')
     f.write('\n')
 
     f.write("class " + obj_type + " : public " + type_type + "Base {\n")
@@ -22,6 +28,8 @@ def generate_h_file(paras, type_name, type_type, path_name):
     for para in paras:
         t = paras[para]
         f.write(", " + t + " " + para)
+        if type_type == "Synapse":
+            f.write(", real delay, real tau_syn")
     f.write(");\n")
     f.write("\t" + obj_type + "(const " + obj_type + " &" + type_type.lower() + ", ID id);\n")
     f.write("\t" + "~" + obj_type + "();\n")
@@ -32,12 +40,11 @@ def generate_h_file(paras, type_name, type_type, path_name):
         f.write("\tvirtual int recv(real I)  override;\n")
         f.write("\n")
     elif type_type == "Synapse":
-        f.write("\tvirtual int recv(real I)  override;\n")
+        f.write("\tvirtual int recv()  override;\n")
+        f.write("\tvirtual void setDst(NeuronBase *p)  override;\n")
         f.write("\n")
     else:
         f.write("\n")
-
-
 
     f.write("\tvirtual Type getType() override;\n")
     f.write('\n')
@@ -58,6 +65,7 @@ def generate_h_file(paras, type_name, type_type, path_name):
         f.write("\t" + t + " _" + para + ";\n")
 
     if type_type == "Synapse":
+        f.write("\tlist<int> delay_queue;\n")
         f.write("\tNeuronBase *pDest;\n")
 
 
@@ -75,6 +83,8 @@ def generate_cpp_file(paras, type_name, type_type, path_name):
     f = open(filename, "w+")
 
     f.write("\n")
+    f.write('#include <math.h>\n')
+    f.write("\n")
     f.write('#include "../third_party/json/json.h"\n')
     f.write('#include "' + obj_type + '.h"\n')
     f.write('#include "G' + obj_type +'s.h"\n')
@@ -87,11 +97,14 @@ def generate_cpp_file(paras, type_name, type_type, path_name):
     for para in paras:
         t = paras[para]
         f.write(", " + t + " " + para)
+        if type_type == "Synapse":
+            f.write(", real delay, real tau_syn")
     f.write(")\n")
     f.write("\t: " + type_type + "Base(id)")
     for para in paras:
         t = paras[para]
         f.write(", _" + para + "(" + para + ")")
+    f.write("\n")
     f.write("{\n")
     f.write("\tthis->monitored = false;\n")
     f.write("}\n\n")
@@ -107,6 +120,7 @@ def generate_cpp_file(paras, type_name, type_type, path_name):
 
     f.write(obj_type + "::" + "~" + obj_type + "()\n")
     f.write("{\n")
+    f.write("\tdelay_queue.clear();\n")
     f.write("}\n\n")
 
     if type_type == "Neuron":
@@ -117,7 +131,11 @@ def generate_cpp_file(paras, type_name, type_type, path_name):
         f.write("{\n")
         f.write("}\n\n")
     elif type_type == "Synapse":
-        f.write("int " + obj_type + "::" + "recv(real I)\n")
+        f.write("void " + obj_type + "::" + "setDst(NeuronBase *p)\n")
+        f.write("{\n")
+        f.write("\tpDest = p;\n")
+        f.write("}\n\n")
+        f.write("int " + obj_type + "::" + "recv()\n")
         f.write("{\n")
         f.write("}\n\n")
     else:

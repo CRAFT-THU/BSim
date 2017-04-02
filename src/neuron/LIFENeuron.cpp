@@ -15,13 +15,6 @@ LIFENeuron::LIFENeuron(ID id, real v_init, real v_rest, real v_reset, real cm, r
 	this->monitored = false;
 }
 
-LIFENeuron::LIFENeuron(ID id, real CI, real vm, real CE, int refrac_step, int refrac_time, real i_tmp, real i_I, real i_E, real v_thresh, real v_reset, real C2, real C1)
-	: NeuronBase(id), _CI(CI), _vm(vm), _CE(CE), _refrac_step(refrac_step), _refrac_time(refrac_time), _i_tmp(i_tmp), _i_I(i_I), _i_E(i_E), _v_thresh(v_thresh), _v_reset(v_reset), _C2(C2), _C1(C1){
-	this->_i_syn_E = 0.0f;
-	this->_i_syn_I = 0.0f;
-	this->monitored = false;
-}
-
 LIFENeuron::LIFENeuron(const LIFENeuron &neuron, ID id) : NeuronBase(id)
 {
 	this->_CI = neuron._CI;
