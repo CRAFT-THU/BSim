@@ -104,7 +104,7 @@ int LIFENeuron::reset(SimInfo &info)
 	_i_I = 0;
 	_i_E = 0;
 
-	_vm = _v_reset;
+	_vm = _v_init;
 
 	return 0;
 }
