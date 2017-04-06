@@ -39,4 +39,6 @@ v = -73.36964415e-3
 print ((vm - C1*v)/C2 - i_tmp)/math.sqrt(CE)
 print (C1*vm + C2 * (i_tmp + i_E))
 
+print (rm*tau_E/(tau_E - tau_m))
+
 

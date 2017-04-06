@@ -106,6 +106,7 @@ int SingleGPUSimulator::run(real time)
 			copyFromGPU<real>(c_vm, c_g_vm, c_pGpuNet->neuronNums[lif_idx+1]-c_pGpuNet->neuronNums[lif_idx]);
 		}
 
+#ifdef LOG_DATA
 		//LOG DATA
 		//copyFromGPU<real>(c_I_syn, c_g_I_syn, c_pGpuNet->synapseNums[exp_idx+1]-c_pGpuNet->synapseNums[exp_idx]);
 
@@ -121,7 +122,7 @@ int SingleGPUSimulator::run(real time)
 		//fprintf(dataFile, "Cycle %d: ", time);
 		if (lif_idx >= 0) {
 			for (int i=0; i<c_pGpuNet->neuronNums[lif_idx+1] - c_pGpuNet->neuronNums[lif_idx]; i++) {
-				fprintf(dataFile, "%lf ", c_vm[i]);
+				fprintf(dataFile, "%.10lf \t", c_vm[i]);
 			}
 		}
 		//for (int i=0; i<c_pGpuNet->synapseNums[1] - c_pGpuNet->synapseNums[0]; i++) {
@@ -148,6 +149,7 @@ int SingleGPUSimulator::run(real time)
 		//	}
 		//	fprintf(logFile, "\n");
 		//}
+#endif
 
 		update_time<<<1, 1>>>();
 	}

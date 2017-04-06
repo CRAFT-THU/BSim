@@ -71,7 +71,7 @@ int SingleThreadSimulator::run(real time)
 		//Log info
 		network->monitor(info);
 
-
+#ifdef LOG_DATA
 		int isize = info.input.size();
 		//fprintf(dataFile, "Cycle %d: ", info.currCycle);
 		for (int i=0; i<isize; i++) {
@@ -96,6 +96,7 @@ int SingleThreadSimulator::run(real time)
 		//	}
 		//}
 		//fprintf(outFile, "\n");
+#endif
 	}
 	gettimeofday(&te, NULL);
 	long seconds = te.tv_sec - ts.tv_sec;
