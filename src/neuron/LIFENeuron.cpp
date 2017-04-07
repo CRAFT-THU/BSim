@@ -22,13 +22,12 @@ LIFENeuron::LIFENeuron(const LIFENeuron &neuron, ID id) : NeuronBase(id)
 	this->_CE = neuron._CE;
 	this->_refrac_step = neuron._refrac_step;
 	this->_refrac_time = neuron._refrac_time;
-	this->_i_tmp = neuron._i_tmp;
+	this->_v_tmp = neuron._v_tmp;
 	this->_i_I = neuron._i_I;
 	this->_i_E = neuron._i_E;
 	this->_v_thresh = neuron._v_thresh;
 	this->_v_reset = neuron._v_reset;
-	this->_C2 = neuron._C2;
-	this->_C1 = neuron._C1;
+	this->_Cm = neuron._Cm;
 	this->monitored = false;
 
 	this->_v_init = neuron._v_init;
@@ -73,11 +72,9 @@ int LIFENeuron::reset(SimInfo &info)
 		rm = _tau_m/_cm;
 	}
 	if (_tau_m > 0) {
-		_C1 = exp(-dt/_tau_m);
-		_C2 = rm*(1-_C1);
+		_Cm = exp(-dt/_tau_m);
 	} else {
-		_C1 = 0.0f;
-		_C2 = rm;
+		_Cm = 0.0f;
 	}
 
 	if (_tau_syn_E > 0) {
@@ -92,11 +89,15 @@ int LIFENeuron::reset(SimInfo &info)
 		_CI = 0.0f;
 	}
 
-	if (rm > 0) {
-		_i_tmp = _i_offset + _v_rest/rm;
-	} else {
-		_i_tmp = 0;
-	}
+	_v_tmp = _i_offset * rm + _v_rest;
+	_v_tmp *= (1-_Cm);
+
+	real C_E = rm * _tau_syn_E/( _tau_syn_E - _tau_m);
+	real C_I = rm * _tau_syn_I/( _tau_syn_I - _tau_m);
+
+	_CE = C_E * (_CE - _Cm);
+	_CI = C_I * (_CI - _Cm);
+
 
 	_refrac_time = static_cast<int>(_tau_refrac/dt);
 	_refrac_step = _refrac_time;
@@ -116,8 +117,7 @@ int LIFENeuron::update(SimInfo &info)
 	if (_refrac_step > 0) {
 		--_refrac_step;
 	} else {
-		real I = _i_E * sqrtf(_CE) + _i_I * sqrtf(_CI) + _i_tmp;
-		_vm = _C1 * _vm + _C2 * I;
+		_vm = _Cm * _vm + _v_tmp + _i_E * _CE + _i_I * _CI;
 
 		_i_E = _CE * _i_E;
 		_i_I = _CI * _i_I;
@@ -170,13 +170,12 @@ int LIFENeuron::getData(void *data)
 	(*p)["CE"] = _CE;
 	(*p)["refrac_step"] = _refrac_step;
 	(*p)["refrac_time"] = _refrac_time;
-	(*p)["i_tmp"] = _i_tmp;
+	(*p)["v_tmp"] = _v_tmp;
 	(*p)["i_I"] = _i_I;
 	(*p)["i_E"] = _i_E;
 	(*p)["v_thresh"] = _v_thresh;
 	(*p)["v_reset"] = _v_reset;
-	(*p)["C2"] = _C2;
-	(*p)["C1"] = _C1;
+	(*p)["Cm"] = _Cm;
 
 	return 0;
 }
@@ -192,13 +191,12 @@ int LIFENeuron::hardCopy(void * data, int idx, int base, map<ID, int> &id2idx, m
 	p->p_CE[idx] = _CE;
 	p->p_refrac_step[idx] = _refrac_step;
 	p->p_refrac_time[idx] = _refrac_time;
-	p->p_i_tmp[idx] = _i_tmp;
+	p->p_v_tmp[idx] = _v_tmp;
 	p->p_i_I[idx] = _i_I;
 	p->p_i_E[idx] = _i_E;
 	p->p_v_thresh[idx] = _v_thresh;
 	p->p_v_reset[idx] = _v_reset;
-	p->p_C2[idx] = _C2;
-	p->p_C1[idx] = _C1;
+	p->p_Cm[idx] = _Cm;
 
 	return 1;
 }

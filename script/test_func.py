@@ -20,6 +20,7 @@ rm = tau_m/c_m
 
 C1 = math.exp(-dt/tau_m)
 CE = math.exp(-dt/tau_E)
+CI = math.exp(-dt/tau_I)
 C2 = rm*(1-C1)
 
 i_tmp = i_offset + v_rest/rm
@@ -29,18 +30,18 @@ i_tmp = i_offset + v_rest/rm
 #i_E *= CE
 
 
-i_E = 7.80507935899e-9
-i_I = -2.53944517467e-9
+i_E = 0e-9
+i_I = -3e-9
 
 #print i_E * CE
 
 i_E = i_E * math.sqrt(CE)
-i_I = i_I * math.sqrt(CE)
+i_I = i_I * math.sqrt(CI)
 
-vm = -60e-3
-v = -56.3520826e-3
+vm = -74e-3
+v = -75.3731877e-3
 
-i_syn = ((v - C1*vm)/C2 - i_tmp)/math.sqrt(CE)
+i_syn = ((v - C1*vm)/C2 - i_tmp)
 v_new = (C1*vm + C2 * (i_tmp + i_E + i_I))
 
 print i_syn

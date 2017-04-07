@@ -29,13 +29,12 @@ protected:
 	real _CE;
 	int _refrac_step;
 	int _refrac_time;
-	real _i_tmp;
+	real _v_tmp;
 	real _i_I;
 	real _i_E;
 	real _v_thresh;
 	real _v_reset;
-	real _C2;
-	real _C1;
+	real _Cm;
 
 	real _v_init;
 	real _v_rest;
