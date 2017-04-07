@@ -17,9 +17,11 @@ LIFENeuron::LIFENeuron(ID id, real v_init, real v_rest, real v_reset, real cm, r
 
 LIFENeuron::LIFENeuron(const LIFENeuron &neuron, ID id) : NeuronBase(id)
 {
-	this->_CI = neuron._CI;
 	this->_vm = neuron._vm;
+	this->_CI = neuron._CI;
 	this->_CE = neuron._CE;
+	this->_C_I = neuron._C_I;
+	this->_C_E = neuron._C_E;
 	this->_refrac_step = neuron._refrac_step;
 	this->_refrac_time = neuron._refrac_time;
 	this->_v_tmp = neuron._v_tmp;
@@ -92,12 +94,11 @@ int LIFENeuron::reset(SimInfo &info)
 	_v_tmp = _i_offset * rm + _v_rest;
 	_v_tmp *= (1-_Cm);
 
-	real C_E = rm * _tau_syn_E/( _tau_syn_E - _tau_m);
-	real C_I = rm * _tau_syn_I/( _tau_syn_I - _tau_m);
+	_C_E = rm * _tau_syn_E/( _tau_syn_E - _tau_m);
+	_C_I = rm * _tau_syn_I/( _tau_syn_I - _tau_m);
 
-	_CE = C_E * (_CE - _Cm);
-	_CI = C_I * (_CI - _Cm);
-
+	_C_E = _C_E * (_CE - _Cm);
+	_CI = _C_I * (_CI - _Cm);
 
 	_refrac_time = static_cast<int>(_tau_refrac/dt);
 	_refrac_step = _refrac_time;
@@ -117,7 +118,7 @@ int LIFENeuron::update(SimInfo &info)
 	if (_refrac_step > 0) {
 		--_refrac_step;
 	} else {
-		_vm = _Cm * _vm + _v_tmp + _i_E * _CE + _i_I * _CI;
+		_vm = _Cm * _vm + _v_tmp + _i_E * _C_E + _i_I * _C_I;
 
 		_i_E = _CE * _i_E;
 		_i_I = _CI * _i_I;

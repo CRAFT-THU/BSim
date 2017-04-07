@@ -24,9 +24,11 @@ public:
 
 	const static Type type;
 protected:
-	real _CI;
 	real _vm;
+	real _CI;
 	real _CE;
+	real _C_I;
+	real _C_E;
 	int _refrac_step;
 	int _refrac_time;
 	real _v_tmp;

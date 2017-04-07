@@ -10,9 +10,11 @@ NEURON_GPU_FUNC_BASIC(LIFE)
 int allocLIFE(void *pCpu, int N)
 {
 	GLIFENeurons *p = (GLIFENeurons*)pCpu;
-	p->p_CI = (real*)malloc(N*sizeof(real));
 	p->p_vm = (real*)malloc(N*sizeof(real));
+	p->p_CI = (real*)malloc(N*sizeof(real));
 	p->p_CE = (real*)malloc(N*sizeof(real));
+	p->p_C_I = (real*)malloc(N*sizeof(real));
+	p->p_C_E = (real*)malloc(N*sizeof(real));
 	p->p_refrac_step = (int*)malloc(N*sizeof(int));
 	p->p_refrac_time = (int*)malloc(N*sizeof(int));
 	p->p_v_tmp = (real*)malloc(N*sizeof(real));
@@ -27,9 +29,11 @@ int allocLIFE(void *pCpu, int N)
 int freeLIFE(void *pCpu)
 {
 	GLIFENeurons *pCpuNeurons = (GLIFENeurons*)pCpu;
-	free(pCpuNeurons->p_CI);
 	free(pCpuNeurons->p_vm);
+	free(pCpuNeurons->p_CI);
 	free(pCpuNeurons->p_CE);
+	free(pCpuNeurons->p_C_I);
+	free(pCpuNeurons->p_C_E);
 	free(pCpuNeurons->p_refrac_step);
 	free(pCpuNeurons->p_refrac_time);
 	free(pCpuNeurons->p_v_tmp);

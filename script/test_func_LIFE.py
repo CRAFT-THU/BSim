@@ -31,13 +31,10 @@ v_tmp = v_rest + i_offset * rm
 C_E = rm * tau_E / (tau_E - tau_m);
 C_I = rm * tau_I / (tau_I - tau_m);
 
+i_E = 0
+i_I = -2.53945174e-9
 
-i_E = 0e-9
-i_I = -3e-9
-
-vm = -74e-3
-
-v = -75.3731877e-3
+vm = -75.3745884e-3
 
 C_m = vm - v_tmp - C_E * i_E - C_I * i_I
 

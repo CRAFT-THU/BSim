@@ -5,9 +5,11 @@
 #include "../utils/macros.h"
 
 struct GLIFENeurons {
-	real *p_CI;
 	real *p_vm;
+	real *p_CI;
 	real *p_CE;
+	real *p_C_I;
+	real *p_C_E;
 	int *p_refrac_step;
 	int *p_refrac_time;
 	real *p_v_tmp;
