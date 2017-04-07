@@ -134,6 +134,9 @@ int LIFENeuron::update(SimInfo &info)
 	}
 	
 	info.input.push_back(_vm);
+	info.input.push_back(_i_E);
+	info.input.push_back(_i_I);
+	info.input.push_back(_i_E * sqrtf(_CE) + _i_I * sqrtf(_CI));
 
 
 	_i_syn_E = 0;
