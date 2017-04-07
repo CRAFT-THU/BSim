@@ -40,6 +40,7 @@ __device__ int *gSynapsesLogTable;
 // Log Arrays
 __device__ int *gLayerInput;
 __device__ real *gXInput;
+__device__ int *gFireCount;
 
 __device__ int commit2globalTable(int *shared_buf, volatile unsigned int size, int *global_buf, int * global_size, int offset) 
 {
@@ -407,6 +408,8 @@ __global__ void update_lif_neuron(GLIFNeurons *d_neurons, int num, int start_id)
 
 		fired = d_neurons->p_vm[nid] >= d_neurons->p_v_thresh[nid];
 
+		gFireCount[gnid] += fired;
+
 		for (int i=0; i<2; i++) {
 			if (fired) {
 				test_loc = atomicAdd((int*)&fire_cnt, 1);
@@ -465,6 +468,8 @@ __global__ void update_all_lif_neuron(GLIFNeurons *d_neurons, int num, int start
 			gXInput[gnid] += gNeuronInput[gnid];
 
 			fired = d_neurons->p_vm[idx] >= d_neurons->p_v_thresh[idx];
+
+			gFireCount[gnid] += fired;
 
 			for (int i=0; i<2; i++) {
 				if (fired) {
@@ -596,6 +601,8 @@ __global__ void update_life_neuron(GLIFENeurons *d_neurons, int num, int start_i
 
 		fired = d_neurons->p_vm[nid] >= d_neurons->p_v_thresh[nid];
 
+		gFireCount[gnid] += fired;
+
 		if (fired) {
 			test_loc = atomicAdd((int*)&fire_cnt, 1);
 			if (test_loc < MAXBLOCKSIZE) {
@@ -683,6 +690,8 @@ __global__ void update_all_life_neuron(GLIFENeurons *d_neurons, int num, int sta
 			d_neurons->p_i_I[nid] *= d_neurons->p_CI[nid];
 
 			fired = d_neurons->p_vm[nid] >= d_neurons->p_v_thresh[nid];
+
+			gFireCount[gnid] += fired;
 
 			if (fired) {
 				test_loc = atomicAdd((int*)&fire_cnt, 1);
@@ -924,11 +933,12 @@ __global__ void init_buffers(/*int *c_gTimeTable,*/ real *c_gNeuronInput, real *
 	}
 }
 
-__global__ void init_log_buffers(int * layer_input, real * x_input)
+__global__ void init_log_buffers(int * layer_input, real * x_input, int * fire_count)
 {
 	if ((threadIdx.x == 0) && (blockIdx.x == 0)) {
 		gLayerInput = layer_input;
 		gXInput = x_input;
+		gFireCount = fire_count;
 	}
 }
 
@@ -960,6 +970,7 @@ GBuffers* alloc_buffers(int neuron_num, int synapse_num, int max_delay)
 
 	ret->c_gLayerInput = gpuMalloc<int>(neuron_num);
 	ret->c_gXInput = gpuMalloc<real>(neuron_num);
+	ret->c_gFireCount = gpuMalloc<int>(neuron_num);
 
 	int timeTableCap = max_delay+1;
 	checkCudaErrors(cudaMemcpyToSymbol(MAX_DELAY, &max_delay, sizeof(int)));
@@ -974,7 +985,7 @@ GBuffers* alloc_buffers(int neuron_num, int synapse_num, int max_delay)
 
 	init_buffers<<<1, 1, 0>>>(/*ret->c_gTimeTable,*/ ret->c_gNeuronInput, ret->c_gNeuronInput_I, ret->c_gFiredTable, ret->c_gFiredTableSizes, ret->c_gActiveTable, ret->c_gSynapsesActiveTable, ret->c_gSynapsesLogTable);
 
-	init_log_buffers<<<1, 1, 0>>>(ret->c_gLayerInput, ret->c_gXInput);
+	init_log_buffers<<<1, 1, 0>>>(ret->c_gLayerInput, ret->c_gXInput, ret->c_gFireCount);
 
 	return ret;
 }
