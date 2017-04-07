@@ -98,7 +98,7 @@ int LIFENeuron::reset(SimInfo &info)
 	_C_I = rm * _tau_syn_I/( _tau_syn_I - _tau_m);
 
 	_C_E = _C_E * (_CE - _Cm);
-	_CI = _C_I * (_CI - _Cm);
+	_C_I = _C_I * (_CI - _Cm);
 
 	_refrac_time = static_cast<int>(_tau_refrac/dt);
 	_refrac_step = _refrac_time;
