@@ -6,6 +6,7 @@
 #include <sys/time.h>
 #include <stdio.h>
 #include <math.h>
+#include <string.h>
 #include "SingleThreadSimulator.h"
 
 SingleThreadSimulator::SingleThreadSimulator(Network *network, real dt)
@@ -57,6 +58,7 @@ int SingleThreadSimulator::run(real time)
 	printf("Start runing for %d cycles\n", sim_cycle);
 	struct timeval ts, te;
 	gettimeofday(&ts, NULL);
+
 	for (int cycle=0; cycle<sim_cycle; cycle++) {
 		//printf("\rCycle: %d", cycle);
 		//fflush(stdout);
@@ -112,6 +114,22 @@ int SingleThreadSimulator::run(real time)
 
 	fclose(logFile);
 	printf("\nSimulation finished in %ld:%ld:%ld.%06lds\n", hours, minutes, seconds, uSeconds);
+
+	FILE *rateFile = fopen("Fire.log", "w+");
+	if (rateFile == NULL) {
+		printf("Open file Sim.log failed\n");
+		return -1;
+	}
+
+	for (auto piter = network->pPopulations.begin(); piter != network->pPopulations.end(); piter++) {
+		PopulationBase * p = *piter;
+		for (int i=0; i<p->getNum(); i++) {
+			int rate = p->getNeuron(i)->getFireCount();
+			fprintf(rateFile, "%d \t", rate);
+		}
+	}
+
+	fclose(rateFile);
 
 	return 0;
 }

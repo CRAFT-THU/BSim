@@ -135,9 +135,9 @@ int LIFENeuron::update(SimInfo &info)
 	}
 	
 	info.input.push_back(_vm);
-	info.input.push_back(_i_E);
-	info.input.push_back(_i_I);
-	info.input.push_back(_i_E * sqrtf(_CE) + _i_I * sqrtf(_CI));
+	//info.input.push_back(_i_E);
+	//info.input.push_back(_i_I);
+	//info.input.push_back(_i_E + _i_I);
 
 
 	_i_syn_E = 0;
@@ -146,6 +146,7 @@ int LIFENeuron::update(SimInfo &info)
 	if (fired) {
 		//TODO fire
 		fire();
+		fireCount++;
 		info.fired.push_back(getID());
 		return 1;
 	} else {
@@ -166,9 +167,11 @@ int LIFENeuron::getData(void *data)
 {
 	Json::Value *p = (Json::Value *)data;
 	(*p)["id"] = getID().getId();
-	(*p)["CI"] = _CI;
 	(*p)["vm"] = _vm;
+	(*p)["CI"] = _CI;
 	(*p)["CE"] = _CE;
+	(*p)["C_I"] = _C_I;
+	(*p)["C_E"] = _C_E;
 	(*p)["refrac_step"] = _refrac_step;
 	(*p)["refrac_time"] = _refrac_time;
 	(*p)["v_tmp"] = _v_tmp;
@@ -187,9 +190,11 @@ int LIFENeuron::hardCopy(void * data, int idx, int base, map<ID, int> &id2idx, m
 	id2idx[getID()] = idx + base;
 	setIdx(idx+base);
 	idx2id[idx+base] = getID();
-	p->p_CI[idx] = _CI;
 	p->p_vm[idx] = _vm;
+	p->p_CI[idx] = _CI;
 	p->p_CE[idx] = _CE;
+	p->p_C_I[idx] = _C_I;
+	p->p_C_E[idx] = _C_E;
 	p->p_refrac_step[idx] = _refrac_step;
 	p->p_refrac_time[idx] = _refrac_time;
 	p->p_v_tmp[idx] = _v_tmp;

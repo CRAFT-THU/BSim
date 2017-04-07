@@ -170,11 +170,19 @@ int SingleGPUSimulator::run(real time)
 
 	//CALC Firing Rate
 	int *rate = hostMalloc<int>(totalNeuronNum);
-	copyFromGPU<int>(rate, buffers->c_gLayerInput, totalNeuronNum);
+	copyFromGPU<int>(rate, buffers->c_gFireCount, totalNeuronNum);
 
-	//TODO: For FX
+	FILE *rateFile = fopen("GFire.log", "w+");
+	if (rateFile == NULL) {
+		printf("Open file Sim.log failed\n");
+		return -1;
+	}
 
-	//END TODO
+	for (int i=0; i<totalNeuronNum; i++) {
+		fprintf(rateFile, "%d \t", rate[i]);
+	}
+
+	fclose(rateFile);
 
 	fclose(logFile);
 	fclose(dataFile);

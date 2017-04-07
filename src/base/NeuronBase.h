@@ -17,6 +17,7 @@ public:
 	virtual void monitorOn();
 
 	virtual bool isFired();
+	virtual int getFireCount() final;
 
 	virtual int fire();
 	virtual int recv(real I) = 0;
@@ -25,6 +26,7 @@ public:
 	virtual SynapseBase *createSynapse(real weight, real delay, SpikeType type, real tau, NeuronBase *dst);
 protected:
 	bool fired;
+	int fireCount;
 	bool monitored;
 };
 

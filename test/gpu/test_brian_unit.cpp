@@ -34,8 +34,8 @@ int main(int argc, char **argv)
 	} else {
 		printf("GENERATE DATA...\n");
 		//real * array = getConstArray(weight_value, num);
-		weight0 = getRandomArray((real)20e-3, N*N);
-		weight1 = getRandomArray((real)20e-3, N*N);
+		weight0 = getConstArray((real)20e-3, N*N);
+		weight1 = getConstArray((real)20e-3, N*N);
 		delay = getConstArray((real)1e-3, N*N);
 		printf("GENERATE DATA FINISHED\n");
 	}

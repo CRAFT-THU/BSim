@@ -11,6 +11,7 @@ NeuronBase::NeuronBase(ID id, int node) : Base(id, node)
 {
 	fired = false;
 	monitored = false;
+	fireCount = 0;
 }
 
 NeuronBase::~NeuronBase() {}
@@ -18,6 +19,11 @@ NeuronBase::~NeuronBase() {}
 bool NeuronBase::isFired() 
 {
 	return fired;
+}
+
+int NeuronBase::getFireCount() 
+{
+	return fireCount;
 }
 
 void NeuronBase::monitorOn() 
