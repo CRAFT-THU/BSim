@@ -14,7 +14,7 @@ public:
 	~StaticSynapse();
 
 	virtual int recv()  override;
-	virtual void setDst(NeuronBase *p)  override;
+	//virtual void setDst(NeuronBase *p)  override;
 
 	virtual Type getType() override;
 
@@ -24,15 +24,15 @@ public:
 
 	virtual size_t getSize() override;
 	virtual int getData(void *data) override;
-	virtual int hardCopy(void * data, int idx, int base, map<ID, int> &id2idx, map<int, ID> &idx2id) override;
+	virtual int hardCopy(void * data, int idx, int base) override;
 
 protected:
 	const static Type type;
-	real _weight;
+	//real _weight;
 	real _delay;
 	real _tau_syn;
 	list<int> delay_queue;
-	NeuronBase *pDest;
+	//NeuronBase *pDest;
 };
 
 #endif /* STATICSYNAPSE_H */

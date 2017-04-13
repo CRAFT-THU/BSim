@@ -48,18 +48,18 @@ template<class Neuron>
 const Type Population<Neuron>::type = Neuron::type;
 
 template<class Neuron>
-Population<Neuron>::Population(int id, size_t N) : PopulationBase(ID(0, id))
+Population<Neuron>::Population(ID id, size_t N) : PopulationBase(id)
 {
 	neurons.reserve(N);
 	this->N = N;
 }
 
 template<class Neuron>
-Population<Neuron>::Population(int id, size_t N, const Neuron &templ) : PopulationBase(ID(0, id))
+Population<Neuron>::Population(ID id, size_t N, const Neuron &templ) : PopulationBase(id)
 {
 	neurons.resize(N, templ);
 	for (unsigned int i=0; i<N; i++) {
-		neurons[i].setID(ID(id, i));
+		neurons[i].setID(id + i);
 	}
 	this->N = N;
 }
@@ -182,7 +182,7 @@ Type Population<Neuron>::getType() {
 template<class Neuron>
 int Population<Neuron>::getData(void *data) {
 	Json::Value *p = (Json::Value *)data;
-	(*p)["id"] = getID().getId();
+	(*p)["id"] = getID();
 	(*p)["size"] = (unsigned int)N;
 	(*p)["neuron_type"] = 0;
 	Json::Value parameters(Json::arrayValue);

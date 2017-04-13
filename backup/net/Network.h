@@ -35,9 +35,6 @@ public:
 	template<class Neuron>
 	Population<Neuron>* createPopulation(int id, int num, Neuron templ, bool empty = false);
 
-	template<class Neuron>
-	Population<Neuron>* createPopulation(int num, Neuron templ, bool empty = false);
-
 	template<class Neuron1, class Neuron2>
 	int connect(Population<Neuron1> *pSrc, Population<Neuron2> *pDst, real weight, real delay, SpikeType type);
 	template<class Neuron1, class Neuron2>
@@ -65,22 +62,23 @@ public:
 	void logMap();
 private:
 	void mapIDtoIdx(GNetwork *net);
-	//bool checkIDtoIdx();
+	bool checkIDtoIdx();
 
 public:
 	vector<NeuronBase*> pOutputs;
 	vector<PopulationBase*> pPopulations;
+	//vector<NeuronBase*> pNeurons;
 	vector<SynapseBase*> pSynapses;
-	//map<ID, vector<ID> > n2sNetwork;
+	map<ID, vector<ID> > n2sNetwork;
 	//map<ID, vector<ID> > n2sTargetNetwork;
-	//map<ID, ID> s2nNetwork;
-	//map<ID, ID> s2nForwardNetwork;
-	//map<ID, NeuronBase*> id2neuron;
-	//map<ID, SynapseBase*> id2synapse;
-	//map<ID, int> nid2idx;
-	//map<ID, int> sid2idx;
-	//map<int, ID> idx2nid;
-	//map<int, ID> idx2sid;
+	map<ID, ID> s2nNetwork;
+	map<ID, ID> s2nForwardNetwork;
+	map<ID, NeuronBase*> id2neuron;
+	map<ID, SynapseBase*> id2synapse;
+	map<ID, int> nid2idx;
+	map<ID, int> sid2idx;
+	map<int, ID> idx2nid;
+	map<int, ID> idx2sid;
 
 	int maxDelaySteps;
 	int totalNeuronNum;
@@ -114,13 +112,7 @@ private:
 template<class Neuron>
 Population<Neuron>* Network::createPopulation(int id, int num, Neuron templ, bool empty)
 {
-	createPopulation(num, templ, empty);
-}
-
-template<class Neuron>
-Population<Neuron>* Network::createPopulation(int num, Neuron templ, bool empty)
-{
-	ID id = totalNeuronNum;
+	
 	Population<Neuron> * pp1 = NULL;
 	if (empty) {
 		pp1 = new Population<Neuron>(id, num);

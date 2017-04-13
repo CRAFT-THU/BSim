@@ -114,8 +114,7 @@ int SingleGPUSimulator::run(real time)
 		for (int i=0; i<copySize; i++) {
 			//assert(network->idx2nid.find(buffers->c_neuronsFired[i]) != network->idx2nid.end());
 			//printf("%s ", network->idx2nid[buffers->c_neuronsFired[i]].getInfo().c_str());
-			fprintf(logFile, "%s ", network->idx2nid[buffers->c_neuronsFired[i]].getInfo().c_str());
-			//fprintf(logFile, "%d ", buffers->c_neuronsFired[i]);
+			fprintf(logFile, "%d ", buffers->c_neuronsFired[i]);
 		}
 		fprintf(logFile, "\n");
 
@@ -283,8 +282,7 @@ int SingleGPUSimulator::compare_run(real time)
 		for (int i=0; i<copySize; i++) {
 			//assert(network->idx2nid.find(buffers->c_neuronsFired[i]) != network->idx2nid.end());
 			//printf("%s ", network->idx2nid[buffers->c_neuronsFired[i]].getInfo().c_str());
-			fprintf(logFile, "%s ", network->idx2nid[buffers->c_neuronsFired[i]].getInfo().c_str());
-			//fprintf(logFile, "%d ", buffers->c_neuronsFired[i]);
+			fprintf(logFile, "%d ", buffers->c_neuronsFired[i]);
 		}
 		fprintf(logFile, "\n");
 

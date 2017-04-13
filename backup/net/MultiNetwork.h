@@ -27,13 +27,17 @@ private:
 
 public:
 	//Cross Node
-	//map<ID, int> _nID2node;
-	//map<ID, int> _sID2node;
+	map<ID, int> _nID2node;
+	map<ID, int> _sID2node;
 	vector<set<ID> > _crossnode_IDs_send;
 	vector<set<ID> > _crossnode_IDs_receive;
 	vector<map<ID, int> > _crossnode_nID2idx;
+	//vector<map<int, vector<int> > > _crossnode_idx2idx;
+	//CrossNodeMap *_crossNodeMap;
+	//CrossNodeData *_crossNodeData;
 
 	//Per Node
+	//vector<map<ID, int> > _global_nID2idx;
 	vector<map<int, ID> > _global_idx2nID;
 	vector<map<int, ID> > _global_idx2sID;
 	vector<map<Type, int> >	_global_ntype_num;

@@ -25,6 +25,7 @@ public:
 	virtual SynapseBase *addSynapse(SynapseBase *addSynapse);
 	virtual SynapseBase *createSynapse(real weight, real delay, SpikeType type, real tau, NeuronBase *dst);
 protected:
+	vector<SynapseBase*> pSynapses;
 	bool fired;
 	int fireCount;
 	bool monitored;
