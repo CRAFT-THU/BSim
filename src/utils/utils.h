@@ -8,7 +8,7 @@
 #include <stdio.h>
 
 #include "../third_party/json/json.h"
-#include "../base/constant.h"
+#include "../base/type.h"
 
 static bool rand_seed_inited = false;
 
@@ -22,6 +22,14 @@ Json::Value testValue(Json::Value value, unsigned int idx);
 
 real *loadArray(const char *filename, int size);
 int saveArray(const char *filename, real *array, int size);
+
+inline int upzero_else_set_one(int value) {
+	if (value > 0) {
+		return value;
+	}
+
+	return 1;
+}
 
 template<typename T>
 T *getRandomArray(T range, int size) {

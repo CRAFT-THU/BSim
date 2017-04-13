@@ -4,9 +4,10 @@
  */
 
 #include "../third_party/cuda/helper_cuda.h"
+#include "../gpu_utils/mem_op.h"
 #include "GExpSynapses.h"
 
-int cudaAllocExpSynapses(void *pCpu, void *pGpu, int num)
+int cudaAllocExp(void *pCpu, void *pGpu, int num)
 {
 	GExpSynapses *pGpuSynapses = (GExpSynapses*)pGpu;
 	GExpSynapses *p = (GExpSynapses*)pCpu;
@@ -15,6 +16,8 @@ int cudaAllocExpSynapses(void *pCpu, void *pGpu, int num)
 	checkCudaErrors(cudaMemcpy(pGpuSynapses->p_weight, p->p_weight, sizeof(real)*num, cudaMemcpyHostToDevice));
 	checkCudaErrors(cudaMalloc((void**)&(pGpuSynapses->p_delay_steps), sizeof(int)*num));
 	checkCudaErrors(cudaMemcpy(pGpuSynapses->p_delay_steps, p->p_delay_steps, sizeof(int)*num, cudaMemcpyHostToDevice));
+
+	pGpuSynapses->p_active_steps = copyToGPU<int>(p->p_delay_steps, num);
 	checkCudaErrors(cudaMalloc((void**)&(pGpuSynapses->p_C1), sizeof(real)*num));
 	checkCudaErrors(cudaMemcpy(pGpuSynapses->p_C1, p->p_C1, sizeof(real)*num, cudaMemcpyHostToDevice));
 	checkCudaErrors(cudaMalloc((void**)&(pGpuSynapses->p__C1), sizeof(real)*num));
@@ -28,12 +31,13 @@ int cudaAllocExpSynapses(void *pCpu, void *pGpu, int num)
 	return 0;
 }
 
-int cudaFreeExpSynapses(void *pGpu)
+int cudaFreeExp(void *pGpu)
 {
 	GExpSynapses *pGpuSynapses = (GExpSynapses*)pGpu;
 
 	checkCudaErrors(cudaFree(pGpuSynapses->p_weight));
 	checkCudaErrors(cudaFree(pGpuSynapses->p_delay_steps));
+	gpuFree(pGpuSynapses->p_active_steps);
 	checkCudaErrors(cudaFree(pGpuSynapses->p_C1));
 	checkCudaErrors(cudaFree(pGpuSynapses->p__C1));
 	checkCudaErrors(cudaFree(pGpuSynapses->p_I_syn));

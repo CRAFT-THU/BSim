@@ -6,11 +6,14 @@
 #define GEXPSYNAPSES_H
 
 #include "../utils/macros.h"
-#include "../base/constant.h"
+#include "../base/type.h"
 
 struct GExpSynapses {
 	real *p_weight;
 	int *p_delay_steps;
+
+	int *p_active_steps;
+
 	real *p_C1;
 	real *p__C1;
 	real *p_I_syn;

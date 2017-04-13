@@ -11,21 +11,19 @@
 
 const Type ConstantNeuron::type = Constant;
 
-ConstantNeuron::ConstantNeuron(ID id, real fire_rate, real tau_syn_E, real tau_syn_I)
+ConstantNeuron::ConstantNeuron(ID id, real fire_rate/*, real tau_syn_E, real tau_syn_I*/) : NeuronBase(id)
 {
-	this->id = id;
 	this->fire_rate = fire_rate;
-	this->tau_syn_E = tau_syn_E;
-	this->tau_syn_I = tau_syn_I;
+	//this->tau_syn_E = tau_syn_E;
+	//this->tau_syn_I = tau_syn_I;
 	file = NULL;
 	fired = false;
 	monitored = false;
 
 }
 
-ConstantNeuron::ConstantNeuron(const ConstantNeuron &templ, ID id)
+ConstantNeuron::ConstantNeuron(const ConstantNeuron &templ, ID id) : NeuronBase(id)
 {
-	this->id = id;
 	file = NULL;
 	fired = false;
 	this->fire_rate = templ.fire_rate;
@@ -65,7 +63,7 @@ int ConstantNeuron::update(SimInfo &info)
 		fired = true;
 		fire_count++;
 		fire();
-		info.fired.push_back(this->id);
+		info.fired.push_back(getID());
 	}
 	return 0;
 }
@@ -75,7 +73,7 @@ void ConstantNeuron::monitor(SimInfo &info)
 	if (monitored) {
 		if (file == NULL) {
 			char filename[128];
-			sprintf(filename, "ConstantNeuron_%d_%d.log", this->id.groupId, this->id.id);
+			sprintf(filename, "ConstantNeuron_%s.log", getID().getInfo().c_str());
 			file = fopen(filename, "w+");
 			if (file == NULL) {
 				printf("Open File: %s failed\n", filename);
@@ -102,8 +100,9 @@ int ConstantNeuron::getData(void *data)
 int ConstantNeuron::hardCopy(void *data, int idx, int base, map<ID, int> &id2idx, map<int, ID> &idx2id)
 {
 	GConstantNeurons *p = (GConstantNeurons*) data;
-	id2idx[id] = idx + base;
-	idx2id[idx+base] = id;
+	id2idx[getID()] = idx + base;
+	setIdx(idx+base);
+	idx2id[idx+base] = getID();
 
 	p->p_fire_rate[idx] = fire_rate;
 	p->p_fire_count[idx] = fire_count;

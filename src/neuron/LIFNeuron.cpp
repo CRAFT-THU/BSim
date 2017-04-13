@@ -15,16 +15,15 @@ using std::map;
 
 const Type LIFNeuron::type = LIF;
 
-LIFNeuron::LIFNeuron(ID id, real v_init, real v_rest, real v_reset, real cm, real tau_m, real tau_refrac, real tau_syn_E, real tau_syn_I, real v_thresh, real i_offset)
-	:v_init(v_init), v_rest(v_rest), v_reset(v_reset), cm(cm), tau_m(tau_m), tau_refrac(tau_refrac), tau_syn_E(tau_syn_E), tau_syn_I(tau_syn_I), v_thresh(v_thresh), i_offset(i_offset)
+LIFNeuron::LIFNeuron(ID id, real v_init, real v_rest, real v_reset, real cm, real tau_m, real tau_refrac, /*real tau_syn_E, real tau_syn_I, */real v_thresh, real i_offset)
+	: NeuronBase(id), v_init(v_init), v_rest(v_rest), v_reset(v_reset), cm(cm), tau_m(tau_m), tau_refrac(tau_refrac), /*tau_syn_E(tau_syn_E), tau_syn_I(tau_syn_I), */v_thresh(v_thresh), i_offset(i_offset)
 {
 	this->i_syn = 0;
-	this->id = id;
 	this->file = NULL;
 	this->monitored = false;
 }
 
-LIFNeuron::LIFNeuron(const LIFNeuron &neuron, ID id)
+LIFNeuron::LIFNeuron(const LIFNeuron &neuron, ID id) : NeuronBase(id)
 {
 	this->v_init = neuron.v_init;
 	this->v_rest = neuron.v_rest;
@@ -32,13 +31,12 @@ LIFNeuron::LIFNeuron(const LIFNeuron &neuron, ID id)
 	this->cm = neuron.cm;
 	this->tau_m = neuron.tau_m;
 	this->tau_refrac = neuron.tau_refrac;
-	this->tau_syn_E = neuron.tau_syn_E;
-	this->tau_syn_I = neuron.tau_syn_I;
+	//this->tau_syn_E = neuron.tau_syn_E;
+	//this->tau_syn_I = neuron.tau_syn_I;
 	this->v_thresh = neuron.v_thresh;
 	this->i_offset = neuron.i_offset;
 	this->i_syn = 0;
 	this->file = NULL;
-	this->id = id;
 }
 
 LIFNeuron::~LIFNeuron()
@@ -101,7 +99,7 @@ int LIFNeuron::update(SimInfo &info)
 	if (fired) {
 	//TODO fire
 		fire();
-		info.fired.push_back(this->id);
+		info.fired.push_back(getID());
 		return 1;
 	} else {
 		return -1;
@@ -137,7 +135,7 @@ void LIFNeuron::monitor(SimInfo &info)
 	if (monitored) {
 		if (file == NULL) {
 			char filename[128];
-			sprintf(filename, "Neuron_%d_%d.log", id.groupId, id.id);
+			sprintf(filename, "Neuron_%s.log", getID().getInfo().c_str());
 			file = fopen(filename, "w+");
 
 			if (file == NULL) {
@@ -163,15 +161,15 @@ int LIFNeuron::getData(void *data)
 {
 	Json::Value *p = (Json::Value *)data;
 
-	(*p)["id"] = id.id;
+	(*p)["id"] = getID().getId();
 	(*p)["v_init"] = v_init;
 	(*p)["v_rest"] = v_rest;
 	(*p)["v_reset"] = v_reset;
 	(*p)["cm"] = cm;
 	(*p)["tau_m"] = tau_m;
 	(*p)["tau_refrac"] = tau_refrac;
-	(*p)["tau_syn_E"] = tau_syn_E;
-	(*p)["tau_syn_I"] = tau_syn_I;
+	//(*p)["tau_syn_E"] = tau_syn_E;
+	//(*p)["tau_syn_I"] = tau_syn_I;
 	(*p)["v_thresh"] = v_thresh;
 	(*p)["i_offset"] = i_offset;
 
@@ -181,8 +179,9 @@ int LIFNeuron::getData(void *data)
 int LIFNeuron::hardCopy(void *data, int idx, int base, map<ID, int> &id2idx, map<int, ID> &idx2id)
 {
 	GLIFNeurons * p = (GLIFNeurons *) data;
-	id2idx[id] = idx + base;
-	idx2id[idx+base] = id;
+	id2idx[getID()] = idx + base;
+	setIdx(idx+base);
+	idx2id[idx+base] = getID();
 	//p->pID[idx] = id;
 	//p->pType[idx] = type;
 	//p->p_v_init[idx] = v_init;

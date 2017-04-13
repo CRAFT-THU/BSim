@@ -5,7 +5,7 @@
 #ifndef SINGLETHREADSIMULATOR_H
 #define SINGLETHREADSIMULATOR_H
 
-#include "SimulatorBase.h"
+#include "../base/SimulatorBase.h"
 
 class SingleThreadSimulator : public SimulatorBase {
 public:

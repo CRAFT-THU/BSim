@@ -7,7 +7,7 @@
 
 #include <vector>
 
-#include "constant.h"
+#include "type.h"
 #include "../utils/ID.h"
 
 using std::vector;

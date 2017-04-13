@@ -5,13 +5,14 @@
 #ifndef SINGLEGPUSIMULATOR_H
 #define SINGLEGPUSIMULATOR_H
 
-#include "SimulatorBase.h"
+#include "../base/SimulatorBase.h"
 
 class SingleGPUSimulator : public SimulatorBase {
 public:
 	SingleGPUSimulator(Network *network, real dt);
 	~SingleGPUSimulator();
 	virtual int run(real time);
+	int compare_run(real time);
 	int cudaAllocGlobal();
 	int cudaFreeGlobal();
 };

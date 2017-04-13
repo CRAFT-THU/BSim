@@ -5,7 +5,7 @@
 #ifndef GLIFNEURON_H
 #define GLIFNEURON_H
 
-#include "../base/constant.h"
+#include "../base/type.h"
 #include "../utils/macros.h"
 
 struct GLIFNeurons {

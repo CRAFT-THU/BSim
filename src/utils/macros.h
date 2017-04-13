@@ -5,27 +5,29 @@
 #ifndef MACROS_H
 #define MACROS_H
 
+#include <stddef.h>
+
 #define NEURON_GPU_FUNC_DEFINE(name) \
-	void* create##name##Neurons(); \
+	void* create##name(); \
 	size_t get##name##Size(); \
-	int alloc##name##Neurons(void *pCpu, int N); \
-	void send##name##Neurons(void *data, int rank, int offset, int size); \
-	void recv##name##Neurons(void **data, int rank, int size); \
-	int cudaAlloc##name##Neurons(void *pCpu, void *pGpu, int num); \
-	int cudaFree##name##Neurons(void *pGpu); 
+	int alloc##name(void *pCpu, int N); \
+	void mpiSend##name(void *data, int rank, int offset, int size); \
+	void mpiRecv##name(void **data, int rank, int size); \
+	int cudaAlloc##name(void *pCpu, void *pGpu, int num); \
+	int cudaFree##name(void *pGpu); 
 
 #define SYNAPSE_GPU_FUNC_DEFINE(name) \
-	void *create##name##Synapses(); \
+	void *create##name(); \
 	size_t get##name##Size(); \
-	int alloc##name##Synapses(void *pSynapses, int S); \
+	int alloc##name(void *pSynapses, int S); \
 	int add##name##Connection(void *pCpu, int *pSynapsesDst); \
-	void send##name##Synapses(void *data, int rank, int offset, int size); \
-	void recv##name##Synapses(void **data, int rank, int size); \
-	int cudaAlloc##name##Synapses(void *pCpu, void *pGpu, int num); \
-	int cudaFree##name##Synapses(void *pGpu);
+	void mpiSend##name(void *data, int rank, int offset, int size); \
+	void mpiRecv##name(void **data, int rank, int size); \
+	int cudaAlloc##name(void *pCpu, void *pGpu, int num); \
+	int cudaFree##name(void *pGpu);
 
 #define NEURON_GPU_FUNC_BASIC(name) \
-void* create##name##Neurons() \
+void* create##name() \
 { \
 	return malloc(sizeof(G##name##Neurons)); \
 } \
@@ -36,7 +38,7 @@ size_t get##name##Size() \
 } \
 
 #define SYNAPSE_GPU_FUNC_BASIC(name) \
-void *create##name##Synapses() \
+void *create##name() \
 { \
 	return malloc(sizeof(G##name##Synapses)); \
 } \

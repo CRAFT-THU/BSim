@@ -8,12 +8,12 @@
 #include "mpi.h"
 
 #include "../utils/macros.h"
-#include "../utils/IDPool.h"
+#include "../utils/TagPool.h"
 #include "GConstantNeurons.h"
 
 NEURON_GPU_FUNC_BASIC(Constant)
 
-int allocConstantNeurons(void *pCpu, int N) {
+int allocConstant(void *pCpu, int N) {
 	GConstantNeurons *p = (GConstantNeurons *)pCpu;
 	p->p_fire_rate = (real*)malloc(N*sizeof(real));
 	p->p_fire_count = (int*)malloc(N*sizeof(int));
@@ -21,8 +21,8 @@ int allocConstantNeurons(void *pCpu, int N) {
 	return 0;
 }
 
-void sendConstantNeurons(void *data, int rank, int offset, int size) {
+void mpiSendConstant(void *data, int rank, int offset, int size) {
 }
 
-void recvConstantNeurons(void **data, int rank, int rankSize) {
+void mpiRecvConstant(void **data, int rank, int rankSize) {
 }

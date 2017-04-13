@@ -7,7 +7,7 @@
 #include "../third_party/cuda/helper_cuda.h"
 #include "GLIFNeurons.h"
 
-int cudaAllocLIFNeurons(void *pCpu, void *pGpu, int num)
+int cudaAllocLIF(void *pCpu, void *pGpu, int num)
 {
 	GLIFNeurons *pGpuNeurons = (GLIFNeurons*)pGpu;
 	GLIFNeurons *p = (GLIFNeurons*)pCpu;
@@ -36,7 +36,7 @@ int cudaAllocLIFNeurons(void *pCpu, void *pGpu, int num)
 	return 0;
 }
 
-int cudaFreeLIFNeurons(void *pGpu)
+int cudaFreeLIF(void *pGpu)
 {
 	GLIFNeurons *pGpuNeurons = (GLIFNeurons*)pGpu;
 

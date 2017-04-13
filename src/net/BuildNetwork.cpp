@@ -1,8 +1,44 @@
 
+#include <assert.h>
+
 #include "../utils/utils.h"
-//#include "gpu_utils.h"
-#include "../utils/Gfunc.h"
+#include "../utils/TypeFunc.h"
 #include "Network.h"
+#include "../neuron/ArrayNeuron.h"
+#include "../neuron/GArrayNeurons.h"
+
+void Network::mapIDtoIdx(GNetwork *net)
+{
+	vector<PopulationBase*>::iterator piter;
+	vector<NeuronBase*>::iterator niter;
+	vector<SynapseBase*>::iterator siter;
+}
+
+void arrangeFireArray(vector<int> &fire_array, vector<int> &start_loc, PopulationBase *popu)
+{
+	size_t num = popu->getNum();
+	for (size_t i=0; i<num; i++) {
+		ArrayNeuron *p = dynamic_cast<ArrayNeuron*>(popu->getNeuron(i));
+		vector<int> &vec = p->getFireTimes();
+		start_loc.push_back(fire_array.size());
+		fire_array.insert(fire_array.end(), vec.begin(), vec.end());
+	}
+}
+
+void arrangeArrayNeuron(vector<int> &fire_array, vector<int> &start_loc, GArrayNeurons *p, int num)
+{
+	assert(num == (int)start_loc.size());
+	for (int i=0; i<num; i++) {
+		p->p_start[i] = start_loc[i];
+		p->p_end[i] += p->p_start[i];
+		if (i > 0) {
+			assert(p->p_end[i-1] == p->p_start[i]);
+		}
+	}
+	assert(p->p_end[num-1] == (int)fire_array.size());
+	p->p_fire_time = static_cast<int*>(malloc(sizeof(int) * fire_array.size()));
+	std::copy(fire_array.begin(), fire_array.end(), p->p_fire_time);
+}
 
 GNetwork* Network::buildNetwork()
 {
@@ -14,27 +50,30 @@ GNetwork* Network::buildNetwork()
 	int synapseTypeNum = sTypes.size();
 
 	void **pAllNeurons = (void**)malloc(sizeof(void*)*neuronTypeNum);
+	assert(pAllNeurons != NULL);
 	void **pAllSynapses = (void**)malloc(sizeof(void*)*synapseTypeNum);
-	N2SConnection *pAllConnections = (N2SConnection*)malloc(sizeof(N2SConnection));
+	assert(pAllSynapses != NULL);
 
-	int *pNOffsets = (int*)malloc(sizeof(int)*(neuronTypeNum));
-	int *pSOffsets = (int*)malloc(sizeof(int)*(synapseTypeNum));
 	int *pNeuronsNum = (int*)malloc(sizeof(int)*(neuronTypeNum + 1));
+	assert(pNeuronsNum != NULL);
 	int *pSynapsesNum = (int*)malloc(sizeof(int)*(synapseTypeNum + 1));
+	assert(pSynapsesNum != NULL);
 	pNeuronsNum[0] = 0;
 	pSynapsesNum[0] = 0;
 
 	Type *pNTypes = (Type*)malloc(sizeof(Type)*neuronTypeNum);
+	assert(pNTypes != NULL);
 	Type *pSTypes = (Type*)malloc(sizeof(Type)*synapseTypeNum);
-	int *pGNeuronNums = (int*)malloc(sizeof(int)*(neuronTypeNum));
-	int *pGSynapseNums = (int*)malloc(sizeof(int)*(synapseTypeNum));
-	pGNeuronNums[0] = 0;
-	pGSynapseNums[0] = 0;
+	assert(pSTypes != NULL);
+
+	vector<int> array_neuron_start;
+	vector<int> array_neuron_fire_times;
 
 	for (int i=0; i<neuronTypeNum; i++) {
 		pNTypes[i] = nTypes[i];
 
 		void *pN = createType[nTypes[i]]();
+		assert(pN != NULL);
 		allocType[nTypes[i]](pN, neuronNums[i]);
 
 		int idx = 0;
@@ -43,27 +82,36 @@ GNetwork* Network::buildNetwork()
 			if (p->getType() == nTypes[i]) {
 				size_t copied = p->hardCopy(pN, idx, pNeuronsNum[i], nid2idx, idx2nid);
 				idx += copied;
-			}
-		}
-		for (niter = pNeurons.begin(); niter != pNeurons.end();  niter++) {
-			NeuronBase * p = *niter;
-			if (p->getType() == nTypes[i]) {
-				size_t copied = p->hardCopy(pN, idx, pNeuronsNum[i], nid2idx, idx2nid);
-				idx += copied;
+				if (p->getType() == Array) {
+					arrangeFireArray(array_neuron_fire_times, array_neuron_start, p);
+				}
 			}
 		}
 
-		pNOffsets[i] = 0;
+		//for (niter = pNeurons.begin(); niter != pNeurons.end();  niter++) {
+		//	NeuronBase * p = *niter;
+		//	if (p->getType() == nTypes[i]) {
+		//		size_t copied = p->hardCopy(pN, idx, pNeuronsNum[i], nid2idx, idx2nid);
+		//		idx += copied;
+		//	}
+		//}
+
+		assert(idx == neuronNums[i]);
+
+		if (nTypes[i] == Array) {
+			arrangeArrayNeuron(array_neuron_fire_times, array_neuron_start, static_cast<GArrayNeurons*>(pN), idx);
+		}
+
 		pNeuronsNum[i+1] = idx + pNeuronsNum[i];
-		pGNeuronNums[i+1] = pNeuronsNum[i+1];
 		pAllNeurons[i] = pN;
-
 	}
+	assert(pNeuronsNum[neuronTypeNum] == totalNeuronNum);
 
 	for (int i=0; i<synapseTypeNum; i++) {
 		pSTypes[i] = sTypes[i];
 
 		void *pS = createType[sTypes[i]]();
+		assert(pS != NULL);
 		allocType[sTypes[i]](pS, synapseNums[i]);
 
 		int idx = 0;
@@ -75,30 +123,36 @@ GNetwork* Network::buildNetwork()
 			}
 		}
 
-		pSOffsets[i] = 0;
+		assert(idx == synapseNums[i]);
 		pSynapsesNum[i+1] = idx + pSynapsesNum[i];
-		pGSynapseNums[i+1] = pSynapsesNum[i+1];
 		pAllSynapses[i] = pS;
 	}
+	assert(pSynapsesNum[synapseTypeNum] == totalSynapseNum);
+
+	logMap();
+	assert(checkIDtoIdx());
+
+	N2SConnection *pAllConnections = (N2SConnection*)malloc(sizeof(N2SConnection));
+	assert(pAllConnections != NULL);
+
+	pAllConnections->n_num = totalNeuronNum;
+	pAllConnections->s_num = totalSynapseNum;
 
 	int *delayNum = (int*)malloc(sizeof(int)*(this->maxDelaySteps)*totalNeuronNum);
+	assert(delayNum != NULL);
 	int *delayStart = (int*)malloc(sizeof(int)*(this->maxDelaySteps)*totalNeuronNum);
+	assert(delayStart != NULL);
 	int *pSynapsesIdx = (int*)malloc(sizeof(int)*totalSynapseNum);
+	assert(pSynapsesIdx != NULL);
 
 	int synapseIdx = 0;
 	for (int nid=0; nid<totalNeuronNum; nid++) {
 		map<int, ID>::iterator iter = idx2nid.find(nid);
-		if (iter == idx2nid.end()) {
-			printf("Can't find neuron index %d\n", nid);
-		}
+		assert(iter != idx2nid.end());
+
 		map<ID, vector<ID>>::iterator n2siter = n2sNetwork.find(iter->second);
 		if (n2siter == n2sNetwork.end()) {
-			//printf("Cant't find neuron id %d_%d\n", iter->second.groupId, iter->second.id);
-			
-			pSynapsesIdx[synapseIdx] = -1;
-
 			for (int delay_t=0; delay_t < maxDelaySteps; delay_t++) {
-				
 				delayStart[delay_t + maxDelaySteps*nid] = synapseIdx;
 				delayNum[delay_t + maxDelaySteps*nid] = 0;
 			}
@@ -111,11 +165,10 @@ GNetwork* Network::buildNetwork()
 			for (int i=0; i<synapsesNum_t; i++) {
 				if (id2synapse[n2siter->second.at(i)]->getDelay() == delay_t+1) {
 					map<ID, int>::iterator sid2idxiter = sid2idx.find(n2siter->second.at(i));
-					if (sid2idxiter == sid2idx.end()) {
-						printf("Can't find synapse ID %d_%d\n", n2siter->second.at(i).groupId, n2siter->second.at(i).id);
-					}
+					assert(sid2idxiter != sid2idx.end());
 
 					int sid = sid2idxiter->second;
+					assert(synapseIdx < totalSynapseNum);
 					pSynapsesIdx[synapseIdx] = sid;
 					synapseIdx++;
 				}
@@ -131,39 +184,29 @@ GNetwork* Network::buildNetwork()
 
 	for (int i=0; i<synapseTypeNum; i++) {
 		int *pSynapsesDst = (int*)malloc(sizeof(int)*synapseNums[i]);
+		assert(pSynapsesDst != NULL);
 		map<ID, ID>::iterator s2nIter;
 		for (s2nIter = s2nNetwork.begin(); s2nIter != s2nNetwork.end(); s2nIter++) {
 			map<ID, int>::iterator iter = sid2idx.find(s2nIter->first);
-			if (iter == sid2idx.end()) {
-				printf("Can't find ID %d_%d\n", s2nIter->first.groupId, s2nIter->first.id);
-			}
+			assert(iter != sid2idx.end());
 			if (i != getType(pSynapsesNum, synapseTypeNum, iter->second)) {
 				continue;
 			}
 			int idx = getOffset(pSynapsesNum, synapseTypeNum, iter->second);
 			iter = nid2idx.find(s2nIter->second);
-			if (iter == nid2idx.end()) {
-				printf("Can't find ID %d_%d\n", s2nIter->second.groupId, s2nIter->second.id);
-			}
+			assert(iter != nid2idx.end());
 			pSynapsesDst[idx] = iter->second;
 		}
 
-		addConnection[sTypes[i]](pAllSynapses[i], pSynapsesDst);
+		addTypeConnection[sTypes[i]](pAllSynapses[i], pSynapsesDst);
 	}
 
 	GNetwork * ret = (GNetwork*)malloc(sizeof(GNetwork));
-	if (ret == NULL) {
-		printf("Malloc GNetwork failed/n");
-		return NULL;
-	}
+	assert(ret != NULL);
 
 	ret->pNeurons = pAllNeurons;
 	ret->pSynapses = pAllSynapses;
 	ret->pN2SConnection = pAllConnections;
-	ret->nOffsets = pNOffsets;
-	ret->sOffsets = pSOffsets;
-	ret->gNeuronNums = pGNeuronNums;
-	ret->gSynapseNums = pGSynapseNums;
 
 	ret->nTypeNum = neuronTypeNum;
 	ret->sTypeNum = synapseTypeNum;

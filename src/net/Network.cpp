@@ -3,34 +3,23 @@
  * Sat October 24 2015
  */
 
+#include <chrono>
+
 //#include "utils.h"
 #include "Network.h"
 
+using namespace std::chrono;
+
 Network::Network()
 {
-	pPopulations.clear();
-	pNeurons.clear();
-	pSynapses.clear();
-	pOutputs.clear();
-	n2sNetwork.clear();
-	s2nNetwork.clear();
-	id2neuron.clear();
-	id2synapse.clear();
-	nid2idx.clear();
-	idx2nid.clear();
-	sid2idx.clear();
-	idx2sid.clear();
 	maxDelay = 0.0;
 	maxDelaySteps = 0;
 	maxFireRate = 0.0;
 	populationNum = 0;
 	totalNeuronNum = 0;
 	totalSynapseNum = 0;
-	neuronNums.clear();
-	connectNums.clear();
-	synapseNums.clear();
-	nTypes.clear();
-	sTypes.clear();
+
+	n2sNetwork.clear();
 }
 
 Network::~Network()
@@ -43,13 +32,13 @@ Network::~Network()
 		}
 	}
 
-	if (!pNeurons.empty()) {
-		vector<NeuronBase*>::iterator iter;
-		for (iter = pNeurons.begin(); iter != pNeurons.end(); iter++) {
-			NeuronBase * t = *iter;
-			delete t;
-		}
-	}
+	//if (!pNeurons.empty()) {
+	//	vector<NeuronBase*>::iterator iter;
+	//	for (iter = pNeurons.begin(); iter != pNeurons.end(); iter++) {
+	//		NeuronBase * t = *iter;
+	//		delete t;
+	//	}
+	//}
 
 	if (!pSynapses.empty()) {
 		vector<SynapseBase*>::iterator iter;
@@ -60,8 +49,24 @@ Network::~Network()
 	}
 
 	pPopulations.clear();
-	pNeurons.clear();
+	//pNeurons.clear();
 	pSynapses.clear();
+	pOutputs.clear();
+	n2sNetwork.clear();
+	n2sTargetNetwork.clear();
+	s2nNetwork.clear();
+	s2nForwardNetwork.clear();
+	id2neuron.clear();
+	id2synapse.clear();
+	nid2idx.clear();
+	idx2nid.clear();
+	sid2idx.clear();
+	idx2sid.clear();
+	neuronNums.clear();
+	connectNums.clear();
+	synapseNums.clear();
+	nTypes.clear();
+	sTypes.clear();
 }
 
 int Network::addNeuronNum(Type type, int num)
@@ -88,7 +93,7 @@ int Network::addConnectionNum(Type type, int num)
 		//nTypes.push_back(type);
 		//neuronNums.push_back(num);
 		//connectNums.push_back(0);
-		printf("This should not happed, when a connect is added, a pre-neuron must exist!");
+		printf("This should not happed, when a connect is added, a pre-neuron must exist!\n");
 	} else {
 		int idx = std::distance(nTypes.begin(), iter);
 		connectNums[idx] += num;
@@ -113,16 +118,16 @@ int Network::addSynapseNum(Type type, int num)
 
 SynapseBase* Network::connect(NeuronBase *pn1, NeuronBase *pn2, real weight, real delay, SpikeType type, real tau, bool store)
 {
-	if (store) {
-		if (find(pNeurons.begin(), pNeurons.end(), pn1) == pNeurons.end()) {
-			pNeurons.push_back(pn1);
-			addNeuronNum(pn1->getType(), 1);
-		}
-		if (find(pNeurons.begin(), pNeurons.end(), pn2) == pNeurons.end()) {
-			pNeurons.push_back(pn2);
-			addNeuronNum(pn2->getType(), 1);
-		}
-	}
+	//if (store) {
+	//	if (find(pNeurons.begin(), pNeurons.end(), pn1) == pNeurons.end()) {
+	//		pNeurons.push_back(pn1);
+	//		addNeuronNum(pn1->getType(), 1);
+	//	}
+	//	if (find(pNeurons.begin(), pNeurons.end(), pn2) == pNeurons.end()) {
+	//		pNeurons.push_back(pn2);
+	//		addNeuronNum(pn2->getType(), 1);
+	//	}
+	//}
 
 	if (id2neuron.find(pn1->getID()) == id2neuron.end()) {
 		id2neuron[pn1->getID()] = pn1;
@@ -131,7 +136,8 @@ SynapseBase* Network::connect(NeuronBase *pn1, NeuronBase *pn2, real weight, rea
 		id2neuron[pn2->getID()] = pn2;
 	}
 
-	SynapseBase * p = pn1->addSynapse(weight, delay, type, tau, pn2);
+	SynapseBase * p = pn2->createSynapse(weight, delay, type, tau, pn2);
+	pn1->addSynapse(p);
 
 	if (id2synapse.find(p->getID()) == id2synapse.end()) {
 		id2synapse[p->getID()] = p;
@@ -141,8 +147,11 @@ SynapseBase* Network::connect(NeuronBase *pn1, NeuronBase *pn2, real weight, rea
 	addConnectionNum(pn1->getType(), 1);
 	addSynapseNum(p->getType(), 1);
 
-	s2nNetwork[p->getID()] = pn2->getID(); 
+	n2sTargetNetwork[pn2->getID()].push_back(p->getID());
 	n2sNetwork[pn1->getID()].push_back(p->getID());
+	s2nNetwork[p->getID()] = pn2->getID(); 
+	s2nForwardNetwork[p->getID()] = pn1->getID();
+
 
 	if (delay > maxDelay) {
 		maxDelay = delay;
@@ -157,7 +166,7 @@ PopulationBase* Network::findPopulation(int populationID)
 	vector<PopulationBase*>::iterator iter;
 	for (iter = pPopulations.begin(); iter != pPopulations.end(); iter++) {
 		PopulationBase * t = *iter;
-		if (t->getID().id == populationID) {
+		if (t->getID().getId() == populationID) {
 			pP = *iter;
 		}
 		if (pP != NULL) {
@@ -300,7 +309,7 @@ int Network::connect(int populationIDSrc, int neuronIDSrc, int populationIDDst, 
 	}
 	
 	SpikeType type = Excitatory;
-	if (delay < 0) {
+	if (weight < 0.0f) {
 		type = Inhibitory;
 	}
 	connect(pnSrc, pnDst, weight, delay, type, tau, false);
@@ -318,10 +327,10 @@ int Network::reset(SimInfo &info)
 		SynapseBase *p = *iterS;
 		p->reset(info);
 	}
-	for (iterN=pNeurons.begin(); iterN!=pNeurons.end(); iterN++) {
-		NeuronBase * p = *iterN;
-		p->reset(info);
-	}
+	//for (iterN=pNeurons.begin(); iterN!=pNeurons.end(); iterN++) {
+	//	NeuronBase * p = *iterN;
+	//	p->reset(info);
+	//}
 	for (iterP=pPopulations.begin(); iterP!=pPopulations.end(); iterP++) {
 		PopulationBase * p = *iterP;
 		p->reset(info);
@@ -341,10 +350,10 @@ int Network::update(SimInfo &info)
 		p->update(info);
 	}
 
-	for (iterN=pNeurons.begin(); iterN!=pNeurons.end(); iterN++) {
-		NeuronBase * p = *iterN;
-		p->update(info);
-	}
+	//for (iterN=pNeurons.begin(); iterN!=pNeurons.end(); iterN++) {
+	//	NeuronBase * p = *iterN;
+	//	p->update(info);
+	//}
 
 	for (iterS=pSynapses.begin(); iterS!=pSynapses.end(); iterS++) {
 		SynapseBase *p = *iterS;
@@ -378,3 +387,9 @@ void Network::monitor(SimInfo &info)
 	}
 }
 
+void Network::logMap() {
+	FILE *f = fopen("NID.map", "w+");
+	for (map<int, ID>::const_iterator iter = idx2nid.begin(); iter != idx2nid.end(); iter++) {
+		fprintf(f, "%d:%s\n", iter->first, iter->second.getInfo().c_str());
+	}
+}

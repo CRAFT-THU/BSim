@@ -11,3 +11,6 @@ CMakeFiles/
 cmake_install.cmake
 Makefile
 build/
+
+src/utils/TypeFunc.cpp
+src/utils/TypeFunc.cu

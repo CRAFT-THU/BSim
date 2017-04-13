@@ -13,12 +13,11 @@ const Type ExpSynapse::type = Exp;
 
 using std::map;
 
-ExpSynapse::ExpSynapse(ID id, real weight, real delay = 0, real tau_syn = 0)
+ExpSynapse::ExpSynapse(ID id, real weight, real delay = 0, real tau_syn = 0) : SynapseBase(id)
 {
 	this->weight = weight;
 	this->delay = delay;
 	this->tau_syn = tau_syn;
-	this->id = id;
 	this->monitored = false;
 	file = NULL;
 }
@@ -50,10 +49,15 @@ int ExpSynapse::init(real dt) {
 	if (tau_syn > 0) {
 		C1 = expf(-dt/tau_syn);
 		_C1 = expf(-(delay-dt*delay_steps)/tau_syn);
+		active_steps = static_cast<int>(DECAY_MULTIPLE_TAU * tau_syn/dt + 0.5);
 	} else {
-		printf("Wrong tau!\n");
+		C1 = 0;
+		_C1 = 1.0;
+		active_steps = 1;
+		printf("Tau of synapse %s is ZERO, Please make sure!\n", getID().getInfo().c_str());
 		return -1;
 	}
+
 
 	return 0;
 }
@@ -66,16 +70,24 @@ int ExpSynapse::update(SimInfo &info)
 
 	while (!delay_queue.empty() && (delay_queue.front() <= 0)) {
 		I_syn += weight/_C1;
-		pDest->recv(I_syn);
+		//pDest->recv(I_syn);
 		delay_queue.pop_front();
-		info.fired.push_back(id);
+		//info.fired.push_back(getID());
+		step_to_zero = active_steps;
+	}
+
+	if (step_to_zero > 0) {
+		pDest->recv(I_syn);
+		step_to_zero--;
+	} else {
+		I_syn = 0;
 	}
 
 	for (iter = delay_queue.begin(); iter != delay_queue.end(); iter++) {
 		*iter = *iter - 1;
 	}
 
-	info.input.push_back(I_syn);
+	//info.input.push_back(I_syn);
 
 	return 0;
 }
@@ -102,7 +114,7 @@ void ExpSynapse::monitor(SimInfo &info)
 	if (monitored) {
 		if (file == NULL) {
 			char filename[128];
-			sprintf(filename, "Synapse_%d.log", id.id);
+			sprintf(filename, "Synapse_%d.log", getID().getId());
 			file = fopen(filename, "w+");
 			if (file == NULL) {
 				printf("Open file %s failed\n", filename);
@@ -134,13 +146,15 @@ int ExpSynapse::getData(void *data)
 int ExpSynapse::hardCopy(void *data, int idx, int base, map<ID, int> &id2idx, map<int, ID> &idx2id)
 {
 	GExpSynapses *p = (GExpSynapses *)data;
-	id2idx[id] = idx + base;
-	idx2id[idx+base] = id;
+	id2idx[this->getID()] = idx + base;
+	setIdx(idx+base);
+	idx2id[idx+base] = this->getID();
 	//p->pID[idx] = id;
 	//p->pType[idx] = type;
 	p->p_weight[idx] = weight;
 	p->p_delay_steps[idx] = delay_steps;
 	//p->p_delay[idx] = delay;
+	p->p_active_steps[idx] = active_steps;
 	p->p_C1[idx] = C1;
 	p->p__C1[idx] = _C1;
 	//p->p_tau_syn[idx] = tau_syn;
