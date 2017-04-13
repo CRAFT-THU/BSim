@@ -12,7 +12,10 @@ enum Type {
 	Array,
 	Max,
 	LIF, 
-	Exp, /*Basic, Alpha,*/
+	LIFE,
+	Exp,
+	Static,
+       	/*Basic, Alpha,*/
 	/*Nengo, Probe, Lowpass,*/ 
 	TYPESIZE
 }; 

@@ -19,7 +19,7 @@ public:
 	virtual void setDst(NeuronBase *p) = 0;
 	virtual int getDelay();
 protected:
-	real weight;
+	//real weight;
 	int delay_steps;
 	bool monitored;
 };

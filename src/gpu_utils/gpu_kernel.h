@@ -15,6 +15,7 @@
 struct GBuffers {
 	// Neuron Arrays
 	real *c_gNeuronInput;
+	real *c_gNeuronInput_I;
 	// Neuron Tables
 	int *c_gFiredTable;
 	int *c_gFiredTableSizes;
@@ -28,6 +29,8 @@ struct GBuffers {
 
 	int *c_gLayerInput;
 	real *c_gXInput;
+
+	int *c_gFireCount;
 };
 
 __global__ void init_buffers(/*int *c_gTimeTable,*/ real *c_gNeuronInput, int *c_gFiredTable, int *c_gFiredTableSizes, int *c_gActiveTable, int *c_gSynapsesFiredTable, int *c_gSynapsesLogTable);
@@ -53,10 +56,17 @@ __global__ void find_lif_neuron(GLIFNeurons *d_neurons, int num, int start_id);
 __global__ void update_lif_neuron(GLIFNeurons *d_neurons, int num, int start_id);
 __global__ void update_all_lif_neuron(GLIFNeurons *d_neurons, int num, int start_id);
 
+__global__ void find_life_neuron(GLIFENeurons *d_neurons, int num, int start_id);
+
+__global__ void update_life_neuron(GLIFENeurons *d_neurons, int num, int start_id);
+__global__ void update_all_life_neuron(GLIFENeurons *d_neurons, int num, int start_id);
+
 __global__ void update_exp_hit(GExpSynapses *d_synapses, int num, int start_id);
 __global__ void find_exp_synapse(GExpSynapses *d_synapses, int num, int start_id);
 __global__ void update_exp_synapse(GExpSynapses *d_synapses, int num, int start_id);
 __global__ void update_all_exp_synapse(GExpSynapses *d_synapses, int num, int start_id);
+
+__global__ void update_static_hit(GStaticSynapses *d_synapses, int num, int start_id);
 
 //__global__ void update_basic_synapse(GBasicSynapses *d_synapses, int num, int start_id);
 //__global__ void update_alpha_synapse(GAlphaSynapses *d_synapses, int num, int start_id);

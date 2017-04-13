@@ -17,9 +17,9 @@ int main(int argc, char **argv)
 
 	const int N = 2;
 	Network c;
-	Population<Constant_curr> *pn0 = c.createPopulation(0, N, Constant_curr(ConstantNeuron(ID(0, 0), 0.4f), ID(0, 0)));
-	Population<IF_curr_exp> *pn1 = c.createPopulation(1, N, IF_curr_exp(LIFNeuron(ID(0, 0), 0.0f, 0.0f, 0.0f, 1.0e-1f, 50.0e-4f, 0.0f, 15.0e-3f, 10.0e-1f), ID(0,0), 1.0f, 1.0f));
-	Population<IF_curr_exp> *pn2 = c.createPopulation(2, N, IF_curr_exp(LIFNeuron(ID(0, 0), 0.0f, 0.0f, 0.0f, 1.0e-1f, 50.0e-4f, 0.0f, 15.0e-3f, 0), ID(0, 0), 1.0f, 1.0f));
+	//createPopulation(int id, int N, LIFENeuron(ID id, real v_init, real v_rest, real v_reset, real cm, real tau_m, real tau_refrac, real tau_syn_E, real tau_syn_I, real v_thresh, real i_offset)), ID(0, 0), real tau_syn_E, real tau_syn_I);
+	Population<LIF_brian> *pn0 = c.createPopulation(0, N, LIF_brian(LIFENeuron(ID(0,0), 0.0f, 0.0f, 0.0f, 1.0e-1f, 50.0e-3f, 0.0f, 1.0f, 1.0f, 15.0e-3f, 10.0e-1f), ID(0, 0), 1.0f, 1.0f));
+	Population<LIF_brian> *pn1 = c.createPopulation(1, N, LIF_brian(LIFENeuron(ID(0,0), 0.0f, 0.0f, 0.0f, 1.0e-1f, 50.0e-3f, 0.0f, 1.0f, 1.0f, 15.0e-3f, 0.0e-3f), ID(0, 0), 1.0f, 1.0f));
 
 	real * weight0 = NULL;
 	real * weight1 = NULL;
@@ -33,20 +33,20 @@ int main(int argc, char **argv)
 		printf("LOAD DATA FINISHED\n");
 	} else {
 		printf("GENERATE DATA...\n");
-		weight0 = getRandomArray((real)20e-3, N*N);
-		weight1 = getRandomArray((real)20e-3, N*N);
+		//real * array = getConstArray(weight_value, num);
+		weight0 = getConstArray((real)20e-3, N*N);
+		weight1 = getConstArray((real)20e-3, N*N);
 		delay = getConstArray((real)1e-3, N*N);
 		printf("GENERATE DATA FINISHED\n");
 	}
 
+	//Network.connect(population1, population2, weight_array, delay_array, Exec or Inhi array, num)
 	c.connect(pn0, pn1, weight0, delay, NULL, N*N);
-	c.connect(pn1, pn2, weight1, delay, NULL, N*N);
 	STSim st(&c, 1.0e-3f);
 	SGSim sg(&c, 1.0e-3f);
-	MGSim mg(&c, 1.0e-3f);
 	st.run(0.1f);
+	//sg.compare_run(0.1f);
 	sg.run(0.1f);
-	mg.run(0.1f);
 
 	if (!load) {
 		printf("SAVE DATA...\n");

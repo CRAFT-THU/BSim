@@ -84,7 +84,7 @@ real *loadArray(const char *filename, int size)
 		return res;
 	}
 	for (int i =0; i<size; i++) {
-		fscanf(logFile, "%f, ", &(res[i]));
+		fscanf(logFile, "%f \t", &(res[i]));
 	}
 	fflush(logFile);
 	fclose(logFile);
@@ -100,7 +100,7 @@ int saveArray(const char *filename, real *array, int size)
 		return -1;
 	}
 	for (int i =0; i<size; i++) {
-		fprintf(logFile, "%f, ", array[i]);
+		fprintf(logFile, "%f \t", array[i]);
 	}
 	fflush(logFile);
 	fclose(logFile);

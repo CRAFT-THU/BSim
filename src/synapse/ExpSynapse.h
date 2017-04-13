@@ -33,7 +33,7 @@ public:
 
 	const static Type type;
 protected:
-	//real weight;
+	real weight;
 	//int delay_setps;
 	int active_steps;
 	int step_to_zero;
