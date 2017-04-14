@@ -16,10 +16,10 @@ using std::vector;
 
 class ArrayNeuron: public NeuronBase {
 public:
-	ArrayNeuron(ID id);
+	ArrayNeuron();
 	// The array must be ordered. from small to large.
-	ArrayNeuron(ID id, int *array, int num);
-	ArrayNeuron(const ArrayNeuron &templ, ID id);
+	ArrayNeuron(int *array, int num);
+	ArrayNeuron(const ArrayNeuron &templ);
 	~ArrayNeuron();
 
 	virtual Type getType();

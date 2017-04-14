@@ -31,7 +31,9 @@ public:
 		return _weight;
 	}
 
-	virtual void monitorOn();
+	virtual void monitorOn() {
+		monitored = true;
+	}
 
 protected:
 	real _weight;

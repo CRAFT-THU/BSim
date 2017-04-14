@@ -114,7 +114,7 @@ private:
 template<class Neuron>
 Population<Neuron>* Network::createPopulation(int id, int num, Neuron templ, bool empty)
 {
-	createPopulation(num, templ, empty);
+	return createPopulation(num, templ, empty);
 }
 
 template<class Neuron>
@@ -123,9 +123,9 @@ Population<Neuron>* Network::createPopulation(int num, Neuron templ, bool empty)
 	ID id = totalNeuronNum;
 	Population<Neuron> * pp1 = NULL;
 	if (empty) {
-		pp1 = new Population<Neuron>(id, num);
+		pp1 = new Population<Neuron>(num);
 	} else {
-		pp1 = new Population<Neuron>(id, num, templ);
+		pp1 = new Population<Neuron>(num, templ);
 	}
 
 	if (find(pPopulations.begin(), pPopulations.end(), pp1) == pPopulations.end()) {

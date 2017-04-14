@@ -13,7 +13,7 @@
 
 const Type MaxNeuron::type = Max;
 
-MaxNeuron::MaxNeuron(ID id, int N) : NeuronBase(id)
+MaxNeuron::MaxNeuron(int N) : NeuronBase()
 {
 	this->fired = false;
 	this->monitored = false;
@@ -24,19 +24,6 @@ MaxNeuron::MaxNeuron(ID id, int N) : NeuronBase(id)
 	this->_record = (int*)(malloc(sizeof(int)*N));
 	assert(this->_record != NULL);
 	memset(this->_record, 0, sizeof(int)*N);
-}
-
-MaxNeuron::MaxNeuron(const MaxNeuron &neuron, ID id) : NeuronBase(id)
-{
-	this->fired = false;
-	this->monitored = false;
-	this->_N = neuron._N;
-	assert(_N < 32 && _N >= 0);
-	this->_count = 0;
-	this->_idxs = 0;
-	this->_record = (int*)(malloc(sizeof(int)*this->_N));
-	assert(this->_record != NULL);
-	memset(this->_record, 0, sizeof(int)*this->_N);
 }
 
 MaxNeuron::MaxNeuron(const MaxNeuron &neuron) : NeuronBase(neuron)

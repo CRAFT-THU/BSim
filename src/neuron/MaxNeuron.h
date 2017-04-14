@@ -11,8 +11,7 @@
 
 class MaxNeuron : public NeuronBase {
 public:
-	MaxNeuron(ID id, int N);
-	MaxNeuron(const MaxNeuron &neuron, ID id);
+	MaxNeuron(int N);
 	MaxNeuron(const MaxNeuron &neuron);
 	~MaxNeuron();
 

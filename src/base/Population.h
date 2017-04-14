@@ -15,7 +15,8 @@ using std::vector;
 template<class Neuron>
 class Population : public PopulationBase {
 public:
-	Population(int id, size_t N);
+	Population(size_t N);
+	Population(size_t N, const Neuron &templ);
 	Population(int id, size_t N, const Neuron &templ);
 	~Population();
 
@@ -30,7 +31,7 @@ public:
 	virtual void monitor(SimInfo &info);
 
 	virtual int getData(void *data);
-	virtual int hardCopy(void *data, int idx, int base, map<ID, int> &id2idx, map<int, ID> &idx2id);
+	virtual int hardCopy(void *data, int idx, int base);
 
 	int addNeuron(Neuron templ);
 	NeuronBase* findNeuron(ID id);
@@ -48,19 +49,23 @@ template<class Neuron>
 const Type Population<Neuron>::type = Neuron::type;
 
 template<class Neuron>
-Population<Neuron>::Population(ID id, size_t N) : PopulationBase(id)
+Population<Neuron>::Population(size_t N) : PopulationBase()
 {
 	neurons.reserve(N);
 	this->N = N;
 }
 
 template<class Neuron>
-Population<Neuron>::Population(ID id, size_t N, const Neuron &templ) : PopulationBase(id)
+Population<Neuron>::Population(size_t N, const Neuron &templ) : PopulationBase()
 {
 	neurons.resize(N, templ);
-	for (unsigned int i=0; i<N; i++) {
-		neurons[i].setID(id + i);
-	}
+	this->N = N;
+}
+
+template<class Neuron>
+Population<Neuron>::Population(ID id, size_t N, const Neuron &templ) : PopulationBase()
+{
+	neurons.resize(N, templ);
 	this->N = N;
 }
 
@@ -163,12 +168,12 @@ int Population<Neuron>::addNeuron(Neuron templ)
 }
 
 template<class Neuron>
-int Population<Neuron>::hardCopy(void *data, int idx, int base, map<ID, int> &id2idx, map<int, ID> &idx2id)
+int Population<Neuron>::hardCopy(void *data, int idx, int base)
 {
 	size_t copiedIdxs = 0;
 	typename vector<Neuron>::iterator iter;
 	for (iter = neurons.begin(); iter != neurons.end(); iter++) {
-		size_t copied = iter->hardCopy(data, idx+copiedIdxs, base, id2idx, idx2id);
+		size_t copied = iter->hardCopy(data, idx+copiedIdxs, base);
 		copiedIdxs += copied;
 	}
 	return copiedIdxs;

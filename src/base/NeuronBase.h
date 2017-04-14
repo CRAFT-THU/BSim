@@ -11,7 +11,7 @@ class SynapseBase;
 
 class NeuronBase : public Base {
 public:
-	NeuronBase(ID id, int node = 0);
+	NeuronBase(int node = 0);
 	virtual ~NeuronBase() = 0;
 
 	virtual void monitorOn();

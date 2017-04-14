@@ -9,8 +9,8 @@ using std::list;
 
 class StaticSynapse : public SynapseBase {
 public:
-	StaticSynapse(ID id, real weight, real delay, real tau_syn);
-	StaticSynapse(const StaticSynapse &synapse, ID id);
+	StaticSynapse(real weight, real delay, real tau_syn);
+	StaticSynapse(const StaticSynapse &synapse);
 	~StaticSynapse();
 
 	virtual int recv()  override;

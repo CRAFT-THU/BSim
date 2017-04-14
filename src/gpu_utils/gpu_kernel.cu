@@ -783,7 +783,7 @@ __global__ void update_exp_hit(GExpSynapses *d_synapses, int num, int start_id)
 		d_synapses->p_I_syn[sid] *= d_synapses->p_C1[sid];
 		d_synapses->p_I_syn[sid] += d_synapses->p_weight[sid];
 		gSynapsesLogTable[start_id + sid] = gCurrentCycle;
-		atomicAdd(&(gNeuronInput[d_synapses->pDst[sid]]), d_synapses->p_I_syn[sid]);
+		atomicAdd(&(gNeuronInput[d_synapses->p_dst[sid]]), d_synapses->p_I_syn[sid]);
 	}
 	__syncthreads();
 
@@ -844,7 +844,7 @@ __global__ void update_exp_synapse(GExpSynapses *d_synapses, int num, int start_
 		d_synapses->p_I_syn[sid] *= d_synapses->p_C1[sid];
 
 		if (gSynapsesLogTable[sid] + d_synapses->p_active_steps[sid] <= gCurrentCycle) {
-			atomicAdd(&(gNeuronInput[d_synapses->pDst[sid]]), d_synapses->p_I_syn[sid]);
+			atomicAdd(&(gNeuronInput[d_synapses->p_dst[sid]]), d_synapses->p_I_syn[sid]);
 		} else {
 			d_synapses->p_I_syn[sid] = 0; 
 		}
@@ -861,7 +861,7 @@ __global__ void update_all_exp_synapse(GExpSynapses *d_synapses, int num, int st
 			d_synapses->p_I_syn[idx] *= d_synapses->p_C1[idx];
 
 			if (gSynapsesLogTable[idx] + d_synapses->p_active_steps[idx] <= gCurrentCycle) {
-				atomicAdd(&(gNeuronInput[d_synapses->pDst[idx]]), d_synapses->p_I_syn[idx]);
+				atomicAdd(&(gNeuronInput[d_synapses->p_dst[idx]]), d_synapses->p_I_syn[idx]);
 			} else {
 				d_synapses->p_I_syn[idx] = 0; 
 			}
@@ -879,9 +879,9 @@ __global__ void update_static_hit(GStaticSynapses *d_synapses, int num, int star
 		real weight = d_synapses->p_weight[sid];
 		gSynapsesLogTable[start_id + sid] = gCurrentCycle;
 		if (weight >= 0) {
-			atomicAdd(&(gNeuronInput[d_synapses->pDst[sid]]), weight);
+			atomicAdd(&(gNeuronInput[d_synapses->p_dst[sid]]), weight);
 		} else {
-			atomicAdd(&(gNeuronInput_I[d_synapses->pDst[sid]]), weight);
+			atomicAdd(&(gNeuronInput_I[d_synapses->p_dst[sid]]), weight);
 		}
 	}
 	__syncthreads();

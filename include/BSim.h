@@ -8,7 +8,7 @@
 //#include "../src/SNNReader.h"
 #include "../src/utils/utils.h"
 #include "../src/generator/generator.h"
-#include "../src/rw/SNNWriter.h"
+//#include "../src/rw/SNNWriter.h"
 
 #include "Simulator.h"
 

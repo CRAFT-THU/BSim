@@ -10,7 +10,7 @@
 
 const Type PoissonNeuron::type = Poisson;
 
-PoissonNeuron::PoissonNeuron(ID id, real rate, real refract, real startTime, real duration) : NeuronBase(id)
+PoissonNeuron::PoissonNeuron(real rate, real refract, real startTime, real duration) : NeuronBase()
 {
 	this->rate = rate;
 	this->refract = refract;
@@ -71,17 +71,12 @@ void PoissonNeuron::monitor(SimInfo &info)
 	if (monitored) {
 		if (file == NULL) {
 			char filename[128];
-			sprintf(filename, "PoissonNeuron_%s.log", getID().getInfo().c_str());
+			sprintf(filename, "PoissonNeuron_%d.log", getID());
 			file = fopen(filename, "w+");
 		}
 		fprintf(file, "%d:%d:%d:%d\n", info.currCycle, fireCycle, startCycle, fired);
 	}
 	return;
-}
-
-bool PoissonNeuron::isFired()
-{
-	return fired;
 }
 
 int PoissonNeuron::recv(real I) {

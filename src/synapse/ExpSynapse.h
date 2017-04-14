@@ -13,6 +13,9 @@ using std::list;
 
 class ExpSynapse : public SynapseBase {
 public:
+	ExpSynapse(real weight, real delay, real tau_syn);
+	~ExpSynapse(); 
+
 	virtual Type getType() override;
 
 	int init(real dt);
@@ -27,9 +30,6 @@ public:
 	virtual size_t getSize() override;
 	virtual int getData(void *data) override;
 	virtual int hardCopy(void *data, int idx, int base) override;
-
-	ExpSynapse(ID id, real weight, real delay, real tau_syn);
-	~ExpSynapse(); 
 
 	const static Type type;
 protected:

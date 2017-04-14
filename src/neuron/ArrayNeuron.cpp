@@ -11,7 +11,7 @@
 
 const Type ArrayNeuron::type = Array;
 
-ArrayNeuron::ArrayNeuron(ID id) : NeuronBase(id)
+ArrayNeuron::ArrayNeuron() : NeuronBase()
 {
 	file = NULL;
 	fired = false;
@@ -19,7 +19,7 @@ ArrayNeuron::ArrayNeuron(ID id) : NeuronBase(id)
 	idx = 0;
 }
 
-ArrayNeuron::ArrayNeuron(ID id, int *array, int num) : NeuronBase(id)
+ArrayNeuron::ArrayNeuron(int *array, int num) : NeuronBase()
 {
 	file = NULL;
 	fired = false;
@@ -28,7 +28,7 @@ ArrayNeuron::ArrayNeuron(ID id, int *array, int num) : NeuronBase(id)
 	fireTime.assign(array, array+num);
 }
 
-ArrayNeuron::ArrayNeuron(const ArrayNeuron &templ, ID id) : NeuronBase(id)
+ArrayNeuron::ArrayNeuron(const ArrayNeuron &templ) : NeuronBase()
 {
 	file = NULL;
 	fired = false;
@@ -85,7 +85,7 @@ void ArrayNeuron::monitor(SimInfo &info)
 			int size = fireTime.size();
 			if (size > 0) {
 				char filename[128];
-				sprintf(filename, "ArrayNeuron_%s.log", getID().getInfo().c_str());
+				sprintf(filename, "ArrayNeuron_%d.log", getID());
 				file = fopen(filename, "w+");
 				if (file == NULL) {
 					printf("Open File: %s failed\n", filename);

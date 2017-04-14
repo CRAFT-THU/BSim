@@ -7,15 +7,15 @@
 
 const Type LIFENeuron::type = LIFE;
 
-LIFENeuron::LIFENeuron(ID id, real v_init, real v_rest, real v_reset, real cm, real tau_m, real tau_refrac, real tau_syn_E, real tau_syn_I, real v_thresh, real i_offset)
-	: NeuronBase(id), _v_thresh(v_thresh), _v_reset(v_reset), _v_init(v_init), _v_rest(v_rest), _cm(cm), _tau_m(tau_m), _tau_refrac(tau_refrac), _tau_syn_E(tau_syn_E), _tau_syn_I(tau_syn_I), _i_offset(i_offset)
+LIFENeuron::LIFENeuron(real v_init, real v_rest, real v_reset, real cm, real tau_m, real tau_refrac, real tau_syn_E, real tau_syn_I, real v_thresh, real i_offset)
+	: NeuronBase(), _v_thresh(v_thresh), _v_reset(v_reset), _v_init(v_init), _v_rest(v_rest), _cm(cm), _tau_m(tau_m), _tau_refrac(tau_refrac), _tau_syn_E(tau_syn_E), _tau_syn_I(tau_syn_I), _i_offset(i_offset)
 {
 	this->_i_syn_E = 0.0f;
 	this->_i_syn_I = 0.0f;
 	this->monitored = false;
 }
 
-LIFENeuron::LIFENeuron(const LIFENeuron &neuron, ID id) : NeuronBase(id)
+LIFENeuron::LIFENeuron(const LIFENeuron &neuron) : NeuronBase()
 {
 	this->_vm = neuron._vm;
 	this->_CI = neuron._CI;
@@ -166,7 +166,7 @@ size_t LIFENeuron::getSize()
 int LIFENeuron::getData(void *data)
 {
 	Json::Value *p = (Json::Value *)data;
-	(*p)["id"] = getID().getId();
+	(*p)["id"] = getID();
 	(*p)["vm"] = _vm;
 	(*p)["CI"] = _CI;
 	(*p)["CE"] = _CE;

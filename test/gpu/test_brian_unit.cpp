@@ -18,8 +18,8 @@ int main(int argc, char **argv)
 	const int N = 2;
 	Network c;
 	//createPopulation(int id, int N, LIFENeuron(ID id, real v_init, real v_rest, real v_reset, real cm, real tau_m, real tau_refrac, real tau_syn_E, real tau_syn_I, real v_thresh, real i_offset)), ID(0, 0), real tau_syn_E, real tau_syn_I);
-	Population<LIF_brian> *pn0 = c.createPopulation(0, N, LIF_brian(LIFENeuron(ID(0,0), 0.0f, 0.0f, 0.0f, 1.0e-1f, 50.0e-3f, 0.0f, 1.0f, 1.0f, 15.0e-3f, 10.0e-1f), ID(0, 0), 1.0f, 1.0f));
-	Population<LIF_brian> *pn1 = c.createPopulation(1, N, LIF_brian(LIFENeuron(ID(0,0), 0.0f, 0.0f, 0.0f, 1.0e-1f, 50.0e-3f, 0.0f, 1.0f, 1.0f, 15.0e-3f, 0.0e-3f), ID(0, 0), 1.0f, 1.0f));
+	Population<LIF_brian> *pn0 = c.createPopulation(0, N, LIF_brian(LIFENeuron(0.0f, 0.0f, 0.0f, 1.0e-1f, 50.0e-3f, 0.0f, 1.0f, 1.0f, 15.0e-3f, 10.0e-1f), 1.0f, 1.0f));
+	Population<LIF_brian> *pn1 = c.createPopulation(1, N, LIF_brian(LIFENeuron(0.0f, 0.0f, 0.0f, 1.0e-1f, 50.0e-3f, 0.0f, 1.0f, 1.0f, 15.0e-3f, 0.0e-3f), 1.0f, 1.0f));
 
 	real * weight0 = NULL;
 	real * weight1 = NULL;

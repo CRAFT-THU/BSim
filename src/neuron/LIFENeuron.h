@@ -6,8 +6,8 @@
 
 class LIFENeuron : public NeuronBase {
 public:
-	LIFENeuron(ID id, real v_init, real v_rest, real v_reset, real cm, real tau_m, real tau_refrac, real tau_syn_E, real tau_syn_I, real v_thresh, real i_offset);
-	LIFENeuron(const LIFENeuron &neuron, ID id);
+	LIFENeuron(real v_init, real v_rest, real v_reset, real cm, real tau_m, real tau_refrac, real tau_syn_E, real tau_syn_I, real v_thresh, real i_offset);
+	LIFENeuron(const LIFENeuron &neuron);
 	~LIFENeuron();
 
 	virtual int recv(real I)  override;

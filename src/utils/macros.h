@@ -51,7 +51,7 @@ size_t get##name##Size() \
 int add##name##Connection(void *pCpu, int *pSynapsesDst) \
 { \
 	G##name##Synapses *p = (G##name##Synapses*)pCpu; \
-	p->pDst = pSynapsesDst; \
+	p->p_dst = pSynapsesDst; \
 	\
 	return 0; \
 }

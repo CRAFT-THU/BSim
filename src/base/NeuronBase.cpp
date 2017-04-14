@@ -6,8 +6,9 @@
 #include <stdio.h>
 
 #include "NeuronBase.h"
+#include "SynapseBase.h"
 
-NeuronBase::NeuronBase(ID id, int node) : Base(id, node)
+NeuronBase::NeuronBase(int node) : Base(node)
 {
 	fired = false;
 	monitored = false;
@@ -36,8 +37,7 @@ void NeuronBase::monitorOn()
 
 int NeuronBase::fire() 
 {
-	vector<SynapseBase*>::iterator iter;
-	for (iter=pSynapses.begin(); iter!=pSynapses.end(); iter++) {
+	for (auto iter=pSynapses.begin(); iter!=pSynapses.end(); iter++) {
 		(*iter)->recv();
 	}
 

@@ -18,8 +18,8 @@ template<class Neuron, class Synapse>
 class CompositeNeuron : public Neuron {
 public:
 	CompositeNeuron(real tau_syn_E, real tau_syn_I);
-	CompositeNeuron(const Neuron &templ, ID id, real tau_syn_E = 1e-3, real tau_syn_I = 1e-3);
-	CompositeNeuron(const CompositeNeuron<Neuron, Synapse> &templ, ID id);
+	CompositeNeuron(const Neuron &templ, real tau_syn_E = 1e-3, real tau_syn_I = 1e-3);
+	CompositeNeuron(const CompositeNeuron<Neuron, Synapse> &templ);
 	~CompositeNeuron();
 
 	//virtual SynapseBase* addSynapse(SynapseBase *synapse) override;
@@ -40,15 +40,15 @@ CompositeNeuron<Neuron, Synapse>::CompositeNeuron(real tau_syn_E, real tau_syn_I
 }
 
 template<class Neuron, class Synapse>
-CompositeNeuron<Neuron, Synapse>::CompositeNeuron(const Neuron &templ, ID id, real tau_syn_E, real tau_syn_I) : Neuron(templ, id) {
+CompositeNeuron<Neuron, Synapse>::CompositeNeuron(const Neuron &templ, real tau_syn_E, real tau_syn_I) : Neuron(templ) {
 	this->_tau_syn_E = tau_syn_E;
 	this->_tau_syn_I = tau_syn_I;
 }
 
 template<class Neuron, class Synapse>
-CompositeNeuron<Neuron, Synapse>::CompositeNeuron(const CompositeNeuron<Neuron, Synapse> &templ, ID id) : Neuron(templ, id) {
-	this->_tau_syn_E = templ.tau_syn_E;
-	this->_tau_syn_I = templ.tau_syn_I;
+CompositeNeuron<Neuron, Synapse>::CompositeNeuron(const CompositeNeuron<Neuron, Synapse> &templ) : Neuron(templ) {
+	this->_tau_syn_E = templ._tau_syn_E;
+	this->_tau_syn_I = templ._tau_syn_I;
 }
 
 template<class Neuron, class Synapse>
@@ -70,7 +70,7 @@ SynapseBase *CompositeNeuron<Neuron, Synapse>::createSynapse(real weight, real d
 		tau = this->_tau_syn_I;
 	}
 
-	Synapse *tmp = new Synapse(ID(pDest->getID().getGid(), sidTag.getTag()), weight, delay, tau);
+	Synapse *tmp = new Synapse(weight, delay, tau);
 	tmp->setDst(pDest);
 
 	SynapseBase *ret = (SynapseBase *)tmp;

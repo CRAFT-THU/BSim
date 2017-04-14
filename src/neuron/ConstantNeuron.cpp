@@ -11,7 +11,7 @@
 
 const Type ConstantNeuron::type = Constant;
 
-ConstantNeuron::ConstantNeuron(ID id, real fire_rate/*, real tau_syn_E, real tau_syn_I*/) : NeuronBase(id)
+ConstantNeuron::ConstantNeuron(real fire_rate/*, real tau_syn_E, real tau_syn_I*/) : NeuronBase()
 {
 	this->fire_rate = fire_rate;
 	//this->tau_syn_E = tau_syn_E;
@@ -22,7 +22,7 @@ ConstantNeuron::ConstantNeuron(ID id, real fire_rate/*, real tau_syn_E, real tau
 
 }
 
-ConstantNeuron::ConstantNeuron(const ConstantNeuron &templ, ID id) : NeuronBase(id)
+ConstantNeuron::ConstantNeuron(const ConstantNeuron &templ) : NeuronBase()
 {
 	file = NULL;
 	fired = false;
@@ -73,7 +73,7 @@ void ConstantNeuron::monitor(SimInfo &info)
 	if (monitored) {
 		if (file == NULL) {
 			char filename[128];
-			sprintf(filename, "ConstantNeuron_%s.log", getID().getInfo().c_str());
+			sprintf(filename, "ConstantNeuron_%d.log", getID());
 			file = fopen(filename, "w+");
 			if (file == NULL) {
 				printf("Open File: %s failed\n", filename);

@@ -40,7 +40,6 @@ public:
 	virtual size_t getSize() = 0;
 	virtual int getData(void *data) = 0;
 	virtual int hardCopy(void *data, int idx, int base) = 0;
-
 	
 private:
 	ID _id;

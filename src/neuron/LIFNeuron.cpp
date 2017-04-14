@@ -15,15 +15,15 @@ using std::map;
 
 const Type LIFNeuron::type = LIF;
 
-LIFNeuron::LIFNeuron(ID id, real v_init, real v_rest, real v_reset, real cm, real tau_m, real tau_refrac, /*real tau_syn_E, real tau_syn_I, */real v_thresh, real i_offset)
-	: NeuronBase(id), v_init(v_init), v_rest(v_rest), v_reset(v_reset), cm(cm), tau_m(tau_m), tau_refrac(tau_refrac), /*tau_syn_E(tau_syn_E), tau_syn_I(tau_syn_I), */v_thresh(v_thresh), i_offset(i_offset)
+LIFNeuron::LIFNeuron(real v_init, real v_rest, real v_reset, real cm, real tau_m, real tau_refrac, /*real tau_syn_E, real tau_syn_I, */real v_thresh, real i_offset)
+	: NeuronBase(), v_init(v_init), v_rest(v_rest), v_reset(v_reset), cm(cm), tau_m(tau_m), tau_refrac(tau_refrac), /*tau_syn_E(tau_syn_E), tau_syn_I(tau_syn_I), */v_thresh(v_thresh), i_offset(i_offset)
 {
 	this->i_syn = 0;
 	this->file = NULL;
 	this->monitored = false;
 }
 
-LIFNeuron::LIFNeuron(const LIFNeuron &neuron, ID id) : NeuronBase(id)
+LIFNeuron::LIFNeuron(const LIFNeuron &neuron) : NeuronBase()
 {
 	this->v_init = neuron.v_init;
 	this->v_rest = neuron.v_rest;
@@ -135,7 +135,7 @@ void LIFNeuron::monitor(SimInfo &info)
 	if (monitored) {
 		if (file == NULL) {
 			char filename[128];
-			sprintf(filename, "Neuron_%s.log", getID().getInfo().c_str());
+			sprintf(filename, "Neuron_%d.log", getID());
 			file = fopen(filename, "w+");
 
 			if (file == NULL) {
@@ -161,7 +161,7 @@ int LIFNeuron::getData(void *data)
 {
 	Json::Value *p = (Json::Value *)data;
 
-	(*p)["id"] = getID().getId();
+	(*p)["id"] = getID();
 	(*p)["v_init"] = v_init;
 	(*p)["v_rest"] = v_rest;
 	(*p)["v_reset"] = v_reset;

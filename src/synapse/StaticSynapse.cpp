@@ -7,13 +7,13 @@
 
 const Type StaticSynapse::type = Static;
 
-StaticSynapse::StaticSynapse(ID id, real weight, real delay, real tau_syn)
-	: SynapseBase(id), _weight(weight), _delay(delay), _tau_syn(tau_syn)
+StaticSynapse::StaticSynapse(real weight, real delay, real tau_syn)
+	: SynapseBase(0, weight), _delay(delay), _tau_syn(tau_syn)
 {
 	this->monitored = false;
 }
 
-StaticSynapse::StaticSynapse(const StaticSynapse &synapse, ID id) : SynapseBase(id)
+StaticSynapse::StaticSynapse(const StaticSynapse &synapse) : SynapseBase()
 {
 	this->_weight = synapse._weight;
 	this->_delay = synapse._delay;
@@ -26,14 +26,9 @@ StaticSynapse::~StaticSynapse()
 	delay_queue.clear();
 }
 
-void StaticSynapse::setDst(NeuronBase *p)
-{
-	pDest = p;
-}
-
 int StaticSynapse::recv()
 {
-	delay_queue.push_back(delay_steps);
+	delay_queue.push_back(_delay_steps);
 
 	return 0;
 }
@@ -46,8 +41,8 @@ Type StaticSynapse::getType()
 int StaticSynapse::reset(SimInfo &info)
 {
 	real dt = info.dt;
-	delay_steps = static_cast<int>(_delay/dt);
-        real _C1 = expf(-(_delay-dt*delay_steps)/_tau_syn);
+	_delay_steps = static_cast<int>(_delay/dt);
+        real _C1 = expf(-(_delay-dt*_delay_steps)/_tau_syn);
 	this->_weight = this->_weight * _C1;
 
 	return 0;
@@ -58,7 +53,7 @@ int StaticSynapse::update(SimInfo &info)
 	list<int>::iterator iter;
 
 	while (!delay_queue.empty() && (delay_queue.front() <= 0)) {
-		pDest->recv(_weight);
+		this->_p_dst->recv(_weight);
 		delay_queue.pop_front();
 	}
 
@@ -81,7 +76,7 @@ size_t StaticSynapse::getSize()
 int StaticSynapse::getData(void *data)
 {
 	Json::Value *p = (Json::Value *)data;
-	(*p)["id"] = getID().getId();
+	(*p)["id"] = getID();
 	(*p)["weight"] = _weight;
 
 	return 0;

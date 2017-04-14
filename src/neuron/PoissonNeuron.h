@@ -17,13 +17,10 @@ using std::poisson_distribution;
 
 class PoissonNeuron : public NeuronBase {
 public:
-	PoissonNeuron(ID id, real rate, real refract, real startTime = 0, real endTime = 1000);
+	PoissonNeuron(real rate, real refract, real startTime = 0, real endTime = 1000);
 	~PoissonNeuron();
 
 	virtual Type getType();
-
-	virtual int fire();
-	virtual bool isFired();
 
 	virtual void monitorOn();
 	virtual int update(SimInfo &info);

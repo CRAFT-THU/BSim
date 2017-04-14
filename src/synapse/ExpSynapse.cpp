@@ -13,7 +13,7 @@ const Type ExpSynapse::type = Exp;
 
 using std::map;
 
-ExpSynapse::ExpSynapse(real weight, real delay = 0, real tau_syn = 0) : SynapseBase(node, weight)
+ExpSynapse::ExpSynapse(real weight, real delay = 0, real tau_syn = 0) : SynapseBase(0, weight)
 {
 	this->delay = delay;
 	this->tau_syn = tau_syn;
@@ -67,14 +67,13 @@ int ExpSynapse::update(SimInfo &info)
 
 	while (!delay_queue.empty() && (delay_queue.front() <= 0)) {
 		I_syn += _weight/_C1;
-		//pDest->recv(I_syn);
 		delay_queue.pop_front();
 		//info.fired.push_back(getID());
 		step_to_zero = active_steps;
 	}
 
 	if (step_to_zero > 0) {
-		pDest->recv(I_syn);
+		this->_p_dst->recv(I_syn);
 		step_to_zero--;
 	} else {
 		I_syn = 0;
@@ -91,7 +90,7 @@ int ExpSynapse::update(SimInfo &info)
 
 int ExpSynapse::recv()
 {
-	delay_queue.push_back(delay_steps);
+	delay_queue.push_back(_delay_steps);
 
 	return 0;
 }
@@ -111,13 +110,13 @@ void ExpSynapse::monitor(SimInfo &info)
 	if (monitored) {
 		if (file == NULL) {
 			char filename[128];
-			sprintf(filename, "Synapse_%d.log", getID().getId());
+			sprintf(filename, "Synapse_%d.log", getID());
 			file = fopen(filename, "w+");
 			if (file == NULL) {
 				printf("Open file %s failed\n", filename);
 				return;
 			}
-			fprintf(file, "W: %f, D: %f, T:%f\n", weight, delay, tau_syn);
+			fprintf(file, "W: %f, D: %f, T:%f\n", _weight, delay, tau_syn);
 			fprintf(file, "C1: %f, ", C1);
 		}
 		fprintf(file, "Cycle %d: %f\n", info.currCycle, this->I_syn); 
