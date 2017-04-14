@@ -48,9 +48,6 @@ void MultiNetwork::countTypeNum(bool auto_splited)
 		PopulationBase * p = *piter;
 		Type type = p->getType();
 		int node = p->getNode();
-		if (auto_splited) {
-			node = _nID2node[p->getNeuron(0)->getID()];
-		}
 
 		if (_global_ntype_num[node].find(type) == _global_ntype_num[node].end()) {
 			_global_ntype_num[node][type] = p->getNum();
@@ -78,9 +75,6 @@ void MultiNetwork::countTypeNum(bool auto_splited)
 		SynapseBase * p = *siter;
 		Type type = p->getType();
 		int node = p->getNode();
-		if (auto_splited) {
-			node = _sID2node[(*siter)->getID()];
-		}
 
 		if (_global_stype_num[node].find(type) == _global_stype_num[node].end()) {
 			_global_stype_num[node][type] = 1;
@@ -114,9 +108,6 @@ GNetwork* MultiNetwork::arrangeData(int node_idx, bool auto_splited) {
 		for (piter = _network->pPopulations.begin(); piter != _network->pPopulations.end();  piter++) {
 			PopulationBase * p = *piter;
 			int node = p->getNode();
-			if (auto_splited) {
-				node = _nID2node[p->getNeuron(0)->getID()];
-			}
 
 			if (node == node_idx && p->getType() == type) {
 				size_t copied = p->hardCopy(pN, idx, net->neuronNums[index], _network->nid2idx, _global_idx2nID[node_idx]);
@@ -155,9 +146,6 @@ GNetwork* MultiNetwork::arrangeData(int node_idx, bool auto_splited) {
 		for (siter = _network->pSynapses.begin(); siter != _network->pSynapses.end();  siter++) {
 			SynapseBase * p = *siter;
 			int node = p->getNode();
-			if (auto_splited) {
-				node = _sID2node[(*siter)->getID()];
-			}
 
 			if (node == node_idx && p->getType() == type) {
 				int copied = p->hardCopy(pS, idx, net->synapseNums[index], _network->sid2idx, _global_idx2sID[node_idx]);

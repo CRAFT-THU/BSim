@@ -184,12 +184,10 @@ int LIFENeuron::getData(void *data)
 	return 0;
 }
 
-int LIFENeuron::hardCopy(void * data, int idx, int base, map<ID, int> &id2idx, map<int, ID> &idx2id)
+int LIFENeuron::hardCopy(void * data, int idx, int base)
 {
 	GLIFENeurons *p = (GLIFENeurons *) data;
-	id2idx[getID()] = idx + base;
-	setIdx(idx+base);
-	idx2id[idx+base] = getID();
+	setID(idx+base);
 	p->p_vm[idx] = _vm;
 	p->p_CI[idx] = _CI;
 	p->p_CE[idx] = _CE;

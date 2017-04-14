@@ -14,7 +14,10 @@ NeuronBase::NeuronBase(ID id, int node) : Base(id, node)
 	fireCount = 0;
 }
 
-NeuronBase::~NeuronBase() {}
+NeuronBase::~NeuronBase() 
+{
+	pSynapses.clear();
+}
 
 bool NeuronBase::isFired() 
 {
@@ -33,6 +36,11 @@ void NeuronBase::monitorOn()
 
 int NeuronBase::fire() 
 {
+	vector<SynapseBase*>::iterator iter;
+	for (iter=pSynapses.begin(); iter!=pSynapses.end(); iter++) {
+		(*iter)->recv();
+	}
+
 	return 0;
 }
 
@@ -43,5 +51,11 @@ SynapseBase * NeuronBase::createSynapse(real weight, real delay, SpikeType type,
 
 SynapseBase * NeuronBase::addSynapse(SynapseBase * synapse)
 {
-	return NULL;
+	pSynapses.push_back(synapse);
+	return synapse;
+}
+
+const vector<SynapseBase*> & NeuronBase::getSynapses() const 
+{
+	return pSynapses;
 }

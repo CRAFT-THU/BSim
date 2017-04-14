@@ -93,12 +93,10 @@ size_t PoissonNeuron::getSize() {
 }
 
 
-int PoissonNeuron::hardCopy(void *data, int idx, int base, map<ID, int> &id2idx, map<int, ID> &idx2id)
+int PoissonNeuron::hardCopy(void *data, int idx, int base)
 {
 	GPoissonNeurons *p = (GPoissonNeurons *) data;
-	id2idx[getID()] = idx + base;
-	setIdx(idx+base);
-	idx2id[idx+base] = getID();
+	setID(idx+base);
 
 	p->p_rate[idx] = rate;
 	p->p_fire_cycle[idx] = fireCycle;

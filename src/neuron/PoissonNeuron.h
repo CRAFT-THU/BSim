@@ -35,7 +35,7 @@ public:
 	virtual int getData(void*);
 
 	virtual size_t getSize();
-	virtual int hardCopy(void *data, int idx, int base, map<ID, int> &id2idx, map<int, ID> &idx2id);
+	virtual int hardCopy(void *data, int idx, int base);
 
 	int poisson(int input);
 

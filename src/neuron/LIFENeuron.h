@@ -20,7 +20,7 @@ public:
 
 	virtual size_t getSize() override;
 	virtual int getData(void *data) override;
-	virtual int hardCopy(void * data, int idx, int base, map<ID, int> &id2idx, map<int, ID> &idx2id) override;
+	virtual int hardCopy(void * data, int idx, int base) override;
 
 	const static Type type;
 protected:

@@ -122,12 +122,10 @@ int ArrayNeuron::getData(void *data)
 	return 0;
 }
 
-int ArrayNeuron::hardCopy(void *data, int idx, int base, map<ID, int> &id2idx, map<int, ID> &idx2id)
+int ArrayNeuron::hardCopy(void *data, int idx, int base)
 {
 	GArrayNeurons *p = (GArrayNeurons*) data;
-	id2idx[getID()] = idx + base;
-	setIdx(idx+base);
-	idx2id[idx+base] = getID();
+	setID(idx+base);
 
 	p->p_start[idx] = idx;
 	p->p_end[idx] = fireTime.size();

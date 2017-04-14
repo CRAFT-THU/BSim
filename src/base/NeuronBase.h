@@ -16,14 +16,16 @@ public:
 
 	virtual void monitorOn();
 
-	virtual bool isFired();
+	virtual bool isFired() final;
 	virtual int getFireCount() final;
 
-	virtual int fire();
+	virtual int fire() final;
 	virtual int recv(real I) = 0;
 
-	virtual SynapseBase *addSynapse(SynapseBase *addSynapse);
+	virtual SynapseBase *addSynapse(SynapseBase *addSynapse) final;
 	virtual SynapseBase *createSynapse(real weight, real delay, SpikeType type, real tau, NeuronBase *dst);
+
+	const vector<SynapseBase*> & getSynapses() const;
 protected:
 	vector<SynapseBase*> pSynapses;
 	bool fired;

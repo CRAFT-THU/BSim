@@ -87,13 +87,12 @@ int StaticSynapse::getData(void *data)
 	return 0;
 }
 
-int StaticSynapse::hardCopy(void * data, int idx, int base, map<ID, int> &id2idx, map<int, ID> &idx2id)
+int StaticSynapse::hardCopy(void * data, int idx, int base)
 {
 	GStaticSynapses *p = (GStaticSynapses *) data;
-	id2idx[getID()] = idx + base;
-	setIdx(idx+base);
-	idx2id[idx+base] = getID();
+	setID(idx+base);
 	p->p_weight[idx] = _weight;
+	p->p_dst[idx] = this->getDst()->getID();
 
 	return 1;
 }

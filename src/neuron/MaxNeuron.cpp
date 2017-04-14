@@ -117,15 +117,12 @@ int MaxNeuron::getData(void *data)
 	return 0;
 }
 
-int MaxNeuron::hardCopy(void *data, int idx, int base, map<ID, int> &id2idx, map<int, ID> &idx2id)
+int MaxNeuron::hardCopy(void *data, int idx, int base)
 {
 	GMaxNeurons *p = (GMaxNeurons*)data;
-	id2idx[getID()] = idx + base;
-	setIdx(idx+base);
-	idx2id[idx+base] = getID();
+	setID(idx+base);
 
 	p->p_N[idx] = _N;
-	//p->p_count[idx] = _count;
 	if (_N > p->max_N) {
 		p->max_N = _N;
 	}

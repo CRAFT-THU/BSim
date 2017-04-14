@@ -45,8 +45,8 @@ MultiNetwork::~MultiNetwork()
 	//	delete [] crossNodeData;
 	//}
 
-	_nID2node.clear();
-	_sID2node.clear();
+	//_nID2node.clear();
+	//_sID2node.clear();
 	_crossnode_IDs_send.clear();
 	_crossnode_IDs_receive.clear();
 	//_crossnode_nID2nodes.clear();

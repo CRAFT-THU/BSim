@@ -13,9 +13,8 @@ const Type ExpSynapse::type = Exp;
 
 using std::map;
 
-ExpSynapse::ExpSynapse(ID id, real weight, real delay = 0, real tau_syn = 0) : SynapseBase(id)
+ExpSynapse::ExpSynapse(real weight, real delay = 0, real tau_syn = 0) : SynapseBase(node, weight)
 {
-	this->weight = weight;
 	this->delay = delay;
 	this->tau_syn = tau_syn;
 	this->monitored = false;
@@ -32,10 +31,6 @@ ExpSynapse::~ExpSynapse()
 	delay_queue.clear();
 }
 
-void ExpSynapse::setDst(NeuronBase *p) {
-	pDest = p;
-}
-
 int ExpSynapse::reset(SimInfo &info) {
 	I_syn = 0;
 	init(info.dt);
@@ -45,10 +40,10 @@ int ExpSynapse::reset(SimInfo &info) {
 
 int ExpSynapse::init(real dt) {
 	//_dt = dt;
-	delay_steps = static_cast<int>(delay/dt);
+	_delay_steps = static_cast<int>(delay/dt);
 	if (tau_syn > 0) {
 		C1 = expf(-dt/tau_syn);
-		_C1 = expf(-(delay-dt*delay_steps)/tau_syn);
+		_C1 = expf(-(delay-dt*_delay_steps)/tau_syn);
 		active_steps = static_cast<int>(DECAY_MULTIPLE_TAU * tau_syn/dt + 0.5);
 		// To be identified with brian2
 		//this->weight = this->weight * expf(-dt/tau_syn/2.0f);
@@ -56,7 +51,7 @@ int ExpSynapse::init(real dt) {
 		C1 = 0;
 		_C1 = 1.0;
 		active_steps = 1;
-		printf("Tau of synapse %s is ZERO, Please make sure!\n", getID().getInfo().c_str());
+		printf("Tau of synapse %d is ZERO, Please make sure!\n", getID());
 		return -1;
 	}
 
@@ -71,7 +66,7 @@ int ExpSynapse::update(SimInfo &info)
 	list<int>::iterator iter;
 
 	while (!delay_queue.empty() && (delay_queue.front() <= 0)) {
-		I_syn += weight/_C1;
+		I_syn += _weight/_C1;
 		//pDest->recv(I_syn);
 		delay_queue.pop_front();
 		//info.fired.push_back(getID());
@@ -139,28 +134,22 @@ size_t ExpSynapse::getSize()
 int ExpSynapse::getData(void *data)
 {
 	Json::Value *p = (Json::Value *)data;
-	(*p)["weight"] = weight;
+	(*p)["weight"] = _weight;
 	(*p)["delay"] = delay;
 
 	return 0;
 }
 
-int ExpSynapse::hardCopy(void *data, int idx, int base, map<ID, int> &id2idx, map<int, ID> &idx2id)
+int ExpSynapse::hardCopy(void *data, int idx, int base)
 {
 	GExpSynapses *p = (GExpSynapses *)data;
-	id2idx[this->getID()] = idx + base;
-	setIdx(idx+base);
-	idx2id[idx+base] = this->getID();
-	//p->pID[idx] = id;
-	//p->pType[idx] = type;
-	p->p_weight[idx] = weight;
-	p->p_delay_steps[idx] = delay_steps;
-	//p->p_delay[idx] = delay;
+	setID(idx+base);
+	p->p_weight[idx] = _weight;
+	p->p_delay_steps[idx] = _delay_steps;
 	p->p_active_steps[idx] = active_steps;
 	p->p_C1[idx] = C1;
 	p->p__C1[idx] = _C1;
-	//p->p_tau_syn[idx] = tau_syn;
 	p->p_I_syn[idx] = I_syn;
-	//p->p__dt[idx] = _dt;
+	p->p_dst[idx] = this->getDst()->getID();
 	return 1;
 }

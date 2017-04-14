@@ -13,7 +13,7 @@ using std::map;
 
 class Base {
 public:
-	Base(ID id, int node=0) : _id(id), _node(node) {}
+	Base(int node=0) : _id(0), _node(node) {}
 	virtual ~Base() {}
 
 	inline ID getID() {

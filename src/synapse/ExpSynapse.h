@@ -33,8 +33,6 @@ public:
 
 	const static Type type;
 protected:
-	//real weight;
-	//int delay_setps;
 	int active_steps;
 	int step_to_zero;
 	real delay;
@@ -42,9 +40,7 @@ protected:
 	real _C1;
 	real tau_syn;
 	real I_syn;
-	//real _dt;
 	list<int> delay_queue;
-	//NeuronBase *pDest;
 	bool monitored;
 	FILE* file;
 };

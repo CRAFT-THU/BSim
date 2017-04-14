@@ -19,7 +19,7 @@ Network::Network()
 	totalNeuronNum = 0;
 	totalSynapseNum = 0;
 
-	n2sNetwork.clear();
+	//n2sNetwork.clear();
 }
 
 Network::~Network()
@@ -51,16 +51,16 @@ Network::~Network()
 	pPopulations.clear();
 	pSynapses.clear();
 	pOutputs.clear();
-	n2sNetwork.clear();
+	//n2sNetwork.clear();
 	//n2sTargetNetwork.clear();
-	s2nNetwork.clear();
-	s2nForwardNetwork.clear();
-	id2neuron.clear();
-	id2synapse.clear();
-	nid2idx.clear();
-	idx2nid.clear();
-	sid2idx.clear();
-	idx2sid.clear();
+	//s2nNetwork.clear();
+	//s2nForwardNetwork.clear();
+	//id2neuron.clear();
+	//id2synapse.clear();
+	//nid2idx.clear();
+	//idx2nid.clear();
+	//sid2idx.clear();
+	//idx2sid.clear();
 	neuronNums.clear();
 	connectNums.clear();
 	synapseNums.clear();
@@ -353,8 +353,8 @@ void Network::monitor(SimInfo &info)
 }
 
 void Network::logMap() {
-	FILE *f = fopen("NID.map", "w+");
-	for (map<int, ID>::const_iterator iter = idx2nid.begin(); iter != idx2nid.end(); iter++) {
-		fprintf(f, "%d:%s\n", iter->first, iter->second.getInfo().c_str());
-	}
+	//FILE *f = fopen("NID.map", "w+");
+	//for (map<int, ID>::const_iterator iter = idx2nid.begin(); iter != idx2nid.end(); iter++) {
+	//	fprintf(f, "%d:%s\n", iter->first, iter->second.getInfo().c_str());
+	//}
 }
