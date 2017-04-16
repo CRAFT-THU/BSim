@@ -13,9 +13,9 @@ int main(int argc, char **argv)
 	Network c;
 	//CreatePopulation(LIFNeuron::LIFNeuron(real v_init, real v_rest, real v_reset, real cm, real tau_m, real tau_refrac, real v_thresh, real i_offset), real tau_syn_E, real tau_syn_I));
 	//Population<Constant_curr> *pn0 = c.createPopulation(0, N, Constant_curr(ConstantNeuron(ID(0, 0), 0.4f), ID(0, 0)));
-	Population<IF_curr_exp> *pn0 = c.createPopulation(0, N, IF_curr_exp(LIFNeuron(ID(0, 0), -74e-3f, -74e-3f, -60e-3f, 0.2e-9f, 10e-3f, 0.0f, -54e-3f, 200.0e-9f), ID(0,0), 5e-3f, 100e-3f));
+	Population<IF_curr_exp> *pn0 = c.createPopulation(0, N, IF_curr_exp(LIFNeuron(-74e-3f, -74e-3f, -60e-3f, 0.2e-9f, 10e-3f, 0.0f, -54e-3f, 200.0e-9f), 5e-3f, 100e-3f));
 
-	Population<IF_curr_exp> *pn1 = c.createPopulation(1, N, IF_curr_exp(LIFNeuron(ID(0, 0), -74e-3f, -74e-3f, -60e-3f, 0.2e-9f, 10e-3f, 0.0f, -54e-3f, 0.0f), ID(0,0), 5e-3f, 100e-3f));
+	Population<IF_curr_exp> *pn1 = c.createPopulation(1, N, IF_curr_exp(LIFNeuron(-74e-3f, -74e-3f, -60e-3f, 0.2e-9f, 10e-3f, 0.0f, -54e-3f, 0.0f), 5e-3f, 100e-3f));
 
 	//real * array = getConstArray(weight_value, num);
 	real * weight = getConstArray((real)4e-9, N*N);

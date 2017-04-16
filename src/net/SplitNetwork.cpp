@@ -49,19 +49,19 @@ void MultiNetwork::splitNetwork()
 		PopulationBase * p = *piter;
 		for (int i=0; i<p->getNum(); i++) {
 			bool cross_node = false;
-			ID nID = p->getNeuron(i)->getID();
+			NeuronBase *n = p->getNeuron(i);
 			int n_node = p->getNeuron(i)->getNode();
 			const vector<SynapseBase*> &tmp = p->getNeuron(i)->getSynapses();
 			for (auto iter = tmp.begin(); iter != tmp.end(); iter++) {
 				int s_node = (*iter)->getNode();
 				if (s_node != n_node) {
 					cross_node = true;
-					_crossnode_IDs_receive[s_node].insert(nID);
+					_crossnode_neurons_recv[s_node].insert(n);
 				}
 			}
 
 			if (cross_node) {
-				_crossnode_IDs_send[n_node].insert(nID);
+				_crossnode_neurons_send[n_node].insert(n);
 			}
 		}
 

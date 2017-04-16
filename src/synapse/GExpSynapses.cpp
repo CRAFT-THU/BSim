@@ -23,6 +23,8 @@ int allocExp(void *pSynapses, int S)
 	p->p__C1 = (real*)malloc(S*sizeof(real));
 	p->p_I_syn = (real*)malloc(S*sizeof(real));
 
+	p->p_dst = (int*)malloc(S*sizeof(real));
+
 	return 0;
 }
 

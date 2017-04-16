@@ -8,16 +8,16 @@
 
 MultiNetwork::MultiNetwork(Network *net, int node_num)
 {
-	_crossnode_IDs_send.resize(node_num);
-	_crossnode_IDs_receive.resize(node_num);
-	_crossnode_nID2idx.resize(node_num);
+	_crossnode_neurons_send.resize(node_num);
+	_crossnode_neurons_recv.resize(node_num);
+	_crossnode_neuron2idx.resize(node_num);
 	//_crossnode_idx2idx.resize(node_num);
 
 	//crossNodeMap = NULL;
 	//crossNodeData = NULL;
 	
-	_global_idx2nID.resize(node_num);
-	_global_idx2sID.resize(node_num);
+	//_global_idx2nID.resize(node_num);
+	//_global_idx2sID.resize(node_num);
 	_global_ntype_num.resize(node_num);
 	_global_stype_num.resize(node_num);
 	
@@ -47,16 +47,14 @@ MultiNetwork::~MultiNetwork()
 
 	//_nID2node.clear();
 	//_sID2node.clear();
-	_crossnode_IDs_send.clear();
-	_crossnode_IDs_receive.clear();
+	_crossnode_neurons_send.clear();
+	_crossnode_neurons_recv.clear();
 	//_crossnode_nID2nodes.clear();
-	_crossnode_IDs_send.clear();
-	_crossnode_IDs_receive.clear();
-	_crossnode_nID2idx.clear();
+	_crossnode_neuron2idx.clear();
 	//_crossnode_idx2idx.clear();
 
-	_global_idx2nID.clear();
-	_global_idx2sID.clear();
+	//_global_idx2nID.clear();
+	//_global_idx2sID.clear();
 	_global_ntype_num.clear();
 	_global_stype_num.clear();
 }

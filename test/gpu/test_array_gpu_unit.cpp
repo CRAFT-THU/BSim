@@ -18,9 +18,9 @@ int main(int argc, char **argv)
 	const int N = 2;
 	Network c;
 	int array[30] = { 0, 1, 5, 10, 13, 17, 20, 26, 29, 30, 35, 37, 40, 44, 49, 50, 55, 56, 62, 65, 69, 71, 75, 79, 82, 85, 86, 90, 96, 99};
-	Population<Array_curr> *pn0 = c.createPopulation(0, N, Array_curr(ArrayNeuron(ID(0, 0), array, 30), ID(0, 0)));
-	Population<IF_curr_exp> *pn1 = c.createPopulation(1, N, IF_curr_exp(LIFNeuron(ID(0, 0), 0.0f, 0.0f, 0.0f, 1.0e-1f, 50.0e-4f, 0.0f, 15.0e-3f, 0), ID(0,0), 1.0f, 1.0f));
-	Population<IF_curr_exp> *pn2 = c.createPopulation(2, N, IF_curr_exp(LIFNeuron(ID(0, 0), 0.0f, 0.0f, 0.0f, 1.0e-1f, 50.0e-4f, 0.0f, 15.0e-3f, 0), ID(0, 0), 1.0f, 1.0f));
+	Population<Array_curr> *pn0 = c.createPopulation(0, N, Array_curr(ArrayNeuron(array, 30)));
+	Population<IF_curr_exp> *pn1 = c.createPopulation(1, N, IF_curr_exp(LIFNeuron(0.0f, 0.0f, 0.0f, 1.0e-1f, 50.0e-4f, 0.0f, 15.0e-3f, 0), 1.0f, 1.0f));
+	Population<IF_curr_exp> *pn2 = c.createPopulation(2, N, IF_curr_exp(LIFNeuron(0.0f, 0.0f, 0.0f, 1.0e-1f, 50.0e-4f, 0.0f, 15.0e-3f, 0), 1.0f, 1.0f));
 
 	real * weight0 = NULL;
 	real * weight1 = NULL;

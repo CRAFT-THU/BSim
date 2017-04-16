@@ -120,7 +120,7 @@ Population<Neuron>* Network::createPopulation(int id, int num, Neuron templ, boo
 template<class Neuron>
 Population<Neuron>* Network::createPopulation(int num, Neuron templ, bool empty)
 {
-	ID id = totalNeuronNum;
+	//ID id = totalNeuronNum;
 	Population<Neuron> * pp1 = NULL;
 	if (empty) {
 		pp1 = new Population<Neuron>(num);

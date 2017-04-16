@@ -29,9 +29,9 @@ public:
 	//Cross Node
 	//map<ID, int> _nID2node;
 	//map<ID, int> _sID2node;
-	vector<set<ID> > _crossnode_IDs_send;
-	vector<set<ID> > _crossnode_IDs_receive;
-	//vector<map<ID, int> > _crossnode_nID2idx;
+	vector<set<NeuronBase*> > _crossnode_neurons_send;
+	vector<set<NeuronBase*> > _crossnode_neurons_recv;
+	vector<map<NeuronBase*, int> > _crossnode_neuron2idx;
 
 	//Per Node
 	//vector<map<int, ID> > _global_idx2nID;
