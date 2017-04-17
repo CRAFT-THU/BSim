@@ -42,7 +42,7 @@ real v_thresh, real i_offset
 )), ID(0, 0), real tau_syn_E, real tau_syn_I);
 	*/
 	/*
-	Population<LIF_brian> *pn0 = c.createPopulation(0, N, LIF_brian(LIFENeuron(ID(0,0), 0.0f, 0.0f, 0.0f, 1.0e-1f, 50.0e-3f, 0.0f, 1.0f, 1.0f, 15.0e-3f, 10.0e-1f), ID(0, 0), 1.0f, 1.0f));
+	Population<LIF_brian> *pn0 = c.createPopulation(0, N, LIF_brian(LIFENeuron(ID(0,0), 0.0, 0.0, 0.0, 1.0e-1, 50.0e-3, 0.0, 1.0, 1.0, 15.0e-3, 10.0e-1), ID(0, 0), 1.0, 1.0));
 	*/
 	Population<LIF_brian> *g[depth+1];
 	

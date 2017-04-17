@@ -7,8 +7,8 @@ int main(int argc, char **argv)
 	Array_curr n = Array_curr(ArrayNeuron(array, 12));
 	Network c;
 	c.createPopulation(0, 1, n);
-	STSim st(&c, 1.0e-3f);
-	st.run(0.1f);
+	STSim st(&c, 1.0e-3);
+	st.run(0.1);
 
 	return 0;
 } 

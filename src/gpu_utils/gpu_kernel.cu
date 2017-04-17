@@ -42,6 +42,24 @@ __device__ int *gLayerInput;
 __device__ real *gXInput;
 __device__ int *gFireCount;
 
+
+#if !defined(__CUDA_ARCH__) || __CUDA_ARCH__ >= 600
+#else
+//__device__ double atomicAdd(double* address, double val)
+//{
+//	unsigned long long int* address_as_ull = (unsigned long long int*)address;
+//	unsigned long long int old = *address_as_ull, assumed;
+//	do {
+//		assumed = old;
+//		old = atomicCAS(address_as_ull, assumed,
+//				__double_as_longlong(val + __longlong_as_double(assumed)));
+//	} while (assumed != old);
+//	return __longlong_as_double(old);
+//}
+
+#endif
+
+
 __device__ int commit2globalTable(int *shared_buf, volatile unsigned int size, int *global_buf, int * global_size, int offset) 
 {
 	__shared__ volatile unsigned int start_loc;

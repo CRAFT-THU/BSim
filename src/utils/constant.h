@@ -9,7 +9,9 @@
 
 #define MPI_CREAL MPI_FLOAT
 
-typedef float real;
+//typedef float real;
+typedef double real;
+
 typedef int ID;
 
 const real ZERO = 1e-10;

@@ -274,7 +274,7 @@ int Network::connect(int populationIDSrc, int neuronIDSrc, int populationIDDst, 
 	}
 	
 	SpikeType type = Excitatory;
-	if (weight < 0.0f) {
+	if (weight < 0.0) {
 		type = Inhibitory;
 	}
 	connect(pnSrc, pnDst, weight, delay, type, tau, false);

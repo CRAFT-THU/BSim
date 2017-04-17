@@ -227,7 +227,7 @@ void * run_thread(void *para) {
 
 		//fprintf(dataFile, "Cycle %d: ", time);
 		for (int i=0; i<c_pGpuNet->neuronNums[lif_idx+1] - c_pGpuNet->neuronNums[lif_idx]; i++) {
-			fprintf(dataFile, "%lf ", c_vm[i]);
+			fprintf(dataFile, "%.10lf \t", c_vm[i]);
 		}
 		//for (int i=0; i<c_pGpuNet->synapseNums[1] - c_pGpuNet->synapseNums[0]; i++) {
 		//		fprintf(dataFile, ", %lf", c_I_syn[i]);

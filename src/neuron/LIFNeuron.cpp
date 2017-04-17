@@ -58,7 +58,7 @@ int LIFNeuron::init(real dt)
 		C1 = exp(-dt/tau_m);
 		C2 = rm*(1-C1);
 	} else {
-		C1 = 0.0f;
+		C1 = 0.0;
 		C2 = rm;
 	}
 

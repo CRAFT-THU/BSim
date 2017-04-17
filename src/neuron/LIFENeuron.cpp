@@ -10,8 +10,8 @@ const Type LIFENeuron::type = LIFE;
 LIFENeuron::LIFENeuron(real v_init, real v_rest, real v_reset, real cm, real tau_m, real tau_refrac, real tau_syn_E, real tau_syn_I, real v_thresh, real i_offset)
 	: NeuronBase(), _v_thresh(v_thresh), _v_reset(v_reset), _v_init(v_init), _v_rest(v_rest), _cm(cm), _tau_m(tau_m), _tau_refrac(tau_refrac), _tau_syn_E(tau_syn_E), _tau_syn_I(tau_syn_I), _i_offset(i_offset)
 {
-	this->_i_syn_E = 0.0f;
-	this->_i_syn_I = 0.0f;
+	this->_i_syn_E = 0.0;
+	this->_i_syn_I = 0.0;
 	this->monitored = false;
 }
 
@@ -41,8 +41,8 @@ LIFENeuron::LIFENeuron(const LIFENeuron &neuron) : NeuronBase()
 	this->_tau_syn_I = neuron._tau_syn_I;
 	this->_i_offset = neuron._i_offset;
 
-	this->_i_syn_E = 0.0f;
-	this->_i_syn_I = 0.0f;
+	this->_i_syn_E = 0.0;
+	this->_i_syn_I = 0.0;
 }
 
 LIFENeuron::~LIFENeuron()
@@ -76,19 +76,19 @@ int LIFENeuron::reset(SimInfo &info)
 	if (_tau_m > 0) {
 		_Cm = exp(-dt/_tau_m);
 	} else {
-		_Cm = 0.0f;
+		_Cm = 0.0;
 	}
 
 	if (_tau_syn_E > 0) {
 		_CE = exp(-dt/_tau_syn_E);
 	} else {
-		_CE = 0.0f;
+		_CE = 0.0;
 	}
 
 	if (_tau_syn_I > 0) {
 		_CI = exp(-dt/_tau_syn_I);
 	} else {
-		_CI = 0.0f;
+		_CI = 0.0;
 	}
 
 	_v_tmp = _i_offset * rm + _v_rest;

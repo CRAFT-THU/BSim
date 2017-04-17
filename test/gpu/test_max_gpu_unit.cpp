@@ -16,14 +16,14 @@ int main(int argc, char **argv)
 	Population<Array_curr> *p3 = c.createPopulation(2, 1, n3);
 	
 	Population<Max_curr_exp> *p4 = c.createPopulation(3, 1, max1);
-	c.connect(p1, p4, (real)(1), 1.0e-3f, Excitatory);
-	c.connect(p2, p4, (real)(1<<1), 1.0e-3f, Excitatory);
-	c.connect(p3, p4, (real)(1<<2), 1.0e-3f, Excitatory);
+	c.connect(p1, p4, (real)(1), 1.0e-3, Excitatory);
+	c.connect(p2, p4, (real)(1<<1), 1.0e-3, Excitatory);
+	c.connect(p3, p4, (real)(1<<2), 1.0e-3, Excitatory);
 
-	STSim st(&c, 1.0e-3f);
-	st.run(0.1f);
-	SGSim sg(&c, 1.0e-3f);
-	sg.run(0.1f);
+	STSim st(&c, 1.0e-3);
+	st.run(0.1);
+	SGSim sg(&c, 1.0e-3);
+	sg.run(0.1);
 
 	return 0;
 } 

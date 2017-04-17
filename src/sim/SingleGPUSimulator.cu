@@ -66,12 +66,20 @@ int SingleGPUSimulator::run(real time)
 	postSize.gridSize = (totalSynapseNum + (postSize.blockSize) - 1) / (postSize.blockSize);
 
 	real *c_vm = hostMalloc<real>(totalNeuronNum);
-	int lif_idx = getIndex(pCpuNet->nTypes, nTypeNum, LIFE);
-	GLIFENeurons *c_g_lif = NULL;
+
+	int life_idx = getIndex(pCpuNet->nTypes, nTypeNum, LIFE);
+	int lif_idx = getIndex(pCpuNet->nTypes, nTypeNum, LIF);
+	int copy_idx = -1;
 	real *c_g_vm = NULL;
-	if (lif_idx >= 0) {
-		c_g_lif = copyFromGPU<GLIFENeurons>(static_cast<GLIFENeurons*>(c_pGpuNet->pNeurons[lif_idx]), 1);
+	if (life_idx >= 0) {
+		GLIFENeurons *c_g_lif = copyFromGPU<GLIFENeurons>(static_cast<GLIFENeurons*>(c_pGpuNet->pNeurons[life_idx]), 1);
 		c_g_vm = c_g_lif->p_vm;
+		copy_idx = life_idx;
+	} else if (lif_idx >= 0) {
+		GLIFNeurons *c_g_lif = copyFromGPU<GLIFNeurons>(static_cast<GLIFNeurons*>(c_pGpuNet->pNeurons[lif_idx]), 1);
+		c_g_vm = c_g_lif->p_vm;
+		copy_idx = lif_idx;
+	} else {
 	}
 	//real *c_I_syn = hostMalloc<real>(totalSynapseNum);
 	//int exp_idx = getIndex(pCpuNet->sTypes, sTypeNum, Exp);
@@ -102,8 +110,8 @@ int SingleGPUSimulator::run(real time)
 		int copySize = 0;
 		copyFromGPU<int>(&copySize, buffers->c_gFiredTableSizes + currentIdx, 1);
 		copyFromGPU<int>(buffers->c_neuronsFired, buffers->c_gFiredTable + (totalNeuronNum*currentIdx), copySize);
-		if (lif_idx >= 0) {
-			copyFromGPU<real>(c_vm, c_g_vm, c_pGpuNet->neuronNums[lif_idx+1]-c_pGpuNet->neuronNums[lif_idx]);
+		if (copy_idx >= 0) {
+			copyFromGPU<real>(c_vm, c_g_vm, c_pGpuNet->neuronNums[copy_idx+1]-c_pGpuNet->neuronNums[copy_idx]);
 		}
 
 #ifdef LOG_DATA
@@ -119,8 +127,8 @@ int SingleGPUSimulator::run(real time)
 		fprintf(logFile, "\n");
 
 		//fprintf(dataFile, "Cycle %d: ", time);
-		if (lif_idx >= 0) {
-			for (int i=0; i<c_pGpuNet->neuronNums[lif_idx+1] - c_pGpuNet->neuronNums[lif_idx]; i++) {
+		if (copy_idx >= 0) {
+			for (int i=0; i<c_pGpuNet->neuronNums[copy_idx+1] - c_pGpuNet->neuronNums[copy_idx]; i++) {
 				fprintf(dataFile, "%.10lf \t", c_vm[i]);
 			}
 		}

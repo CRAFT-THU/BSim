@@ -61,7 +61,7 @@ CompositeNeuron<Neuron, Synapse>::~CompositeNeuron()
 template<class Neuron, class Synapse>
 SynapseBase *CompositeNeuron<Neuron, Synapse>::createSynapse(real weight, real delay, SpikeType type, real tau_in, NeuronBase *pDest)
 {
-	real tau = 0.0f;
+	real tau = 0.0;
 	if (fabs(tau_in) > ZERO) {
 		tau = tau_in;
 	} else if (type == Excitatory) {
