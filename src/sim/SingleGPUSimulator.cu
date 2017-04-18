@@ -71,6 +71,7 @@ int SingleGPUSimulator::run(real time)
 	int lif_idx = getIndex(pCpuNet->nTypes, nTypeNum, LIF);
 	int copy_idx = -1;
 	real *c_g_vm = NULL;
+
 	if (life_idx >= 0) {
 		GLIFENeurons *c_g_lif = copyFromGPU<GLIFENeurons>(static_cast<GLIFENeurons*>(c_pGpuNet->pNeurons[life_idx]), 1);
 		c_g_vm = c_g_lif->p_vm;
@@ -81,6 +82,7 @@ int SingleGPUSimulator::run(real time)
 		copy_idx = lif_idx;
 	} else {
 	}
+
 	//real *c_I_syn = hostMalloc<real>(totalSynapseNum);
 	//int exp_idx = getIndex(pCpuNet->sTypes, sTypeNum, Exp);
 	//GExpSynapses *c_g_exp = copyFromGPU<GExpSynapses>(static_cast<GExpSynapses*>(c_pGpuNet->pSynapses[exp_idx]), 1);
