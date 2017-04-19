@@ -6,7 +6,7 @@
 #include "gpu_macros.h"
 #include "gpu_kernel.h"
 
-#define MAXBLOCKSIZE 512
+#define MAXBLOCKSIZE 1024
 
 // Constant
 __constant__ int MAX_DELAY;

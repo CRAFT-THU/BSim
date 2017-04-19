@@ -5,6 +5,7 @@
 
 #include <sys/time.h>
 #include <stdio.h>
+#include <iostream>
 
 #include "../utils/utils.h"
 #include "../utils/TypeFunc.h"
@@ -13,6 +14,9 @@
 #include "../gpu_utils/gpu_utils.h"
 #include "../gpu_utils/gpu_kernel.h"
 #include "SingleGPUSimulator.h"
+
+using std::cout;
+using std::endl;
 
 SingleGPUSimulator::SingleGPUSimulator(Network *network, real dt) : SimulatorBase(network, dt)
 {
@@ -88,12 +92,19 @@ int SingleGPUSimulator::run(real time)
 	//GExpSynapses *c_g_exp = copyFromGPU<GExpSynapses>(static_cast<GExpSynapses*>(c_pGpuNet->pSynapses[exp_idx]), 1);
 	//real *c_g_I_syn = c_g_exp->p_I_syn;
 
+	for (int i=0; i<nTypeNum; i++) {
+		cout << pCpuNet->nTypes[i] << ": <<<" << updateSize[c_pGpuNet->nTypes[i]].gridSize << ", " << updateSize[c_pGpuNet->nTypes[i]].blockSize << ">>>" << endl;
+	}
+	for (int i=0; i<sTypeNum; i++) {
+		cout << pCpuNet->sTypes[i] << ": <<<" << updateSize[c_pGpuNet->sTypes[i]].gridSize << ", " << updateSize[c_pGpuNet->sTypes[i]].blockSize << ">>>" << endl;
+	}
+
 	vector<int> firedInfo;
 	printf("Start runing for %d cycles\n", sim_cycle);
 	struct timeval ts, te;
 	gettimeofday(&ts, NULL);
 	for (int time=0; time<sim_cycle; time++) {
-		//printf("\rCycle: %d", time);
+		//printf("Cycle: %d ", time);
 		//fflush(stdout);
 
 		for (int i=0; i<nTypeNum; i++) {
@@ -109,8 +120,12 @@ int SingleGPUSimulator::run(real time)
 
 		int currentIdx = time%(MAX_DELAY+1);
 
+		//printf("HERE %p %d ", buffers->c_gFiredTableSizes, currentIdx);
+		//fflush(stdout);
 		int copySize = 0;
 		copyFromGPU<int>(&copySize, buffers->c_gFiredTableSizes + currentIdx, 1);
+		//printf("HERE1\n");
+		//fflush(stdout);
 		copyFromGPU<int>(buffers->c_neuronsFired, buffers->c_gFiredTable + (totalNeuronNum*currentIdx), copySize);
 		if (copy_idx >= 0) {
 			copyFromGPU<real>(c_vm, c_g_vm, c_pGpuNet->neuronNums[copy_idx+1]-c_pGpuNet->neuronNums[copy_idx]);
