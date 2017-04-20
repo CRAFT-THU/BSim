@@ -15,8 +15,16 @@ public:
 
 	virtual int recv() = 0;
 
+	inline void setSrc(NeuronBase *p) {
+		this->_p_src = p;
+	}
+
 	inline void setDst(NeuronBase *p) {
 		this->_p_dst = p;
+	}
+
+	inline NeuronBase* getSrc() {
+		return _p_src;
 	}
 
 	inline NeuronBase* getDst() {
@@ -38,6 +46,7 @@ public:
 protected:
 	real _weight;
 	int _delay_steps;
+	NeuronBase * _p_src;
 	NeuronBase * _p_dst;
 	bool monitored;
 };
