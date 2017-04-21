@@ -93,12 +93,6 @@ GNetwork* Network::buildNetwork()
 		for (piter = pPopulations.begin(); piter != pPopulations.end();  piter++) {
 			PopulationBase * p = *piter;
 			if (p->getType() == nTypes[i]) {
-				size_t copied = p->hardCopy(pN, idx, pNeuronsNum[i]);
-				idx += copied;
-				if (p->getType() == Array) {
-					arrangeFireArray(array_neuron_fire_times, array_neuron_start, p);
-				}
-
 				for (int i=0; i<p->getNum(); i++) {
 					NeuronBase * n = p->getNeuron(i);
 					n->setStartExec(input_idx);
@@ -119,6 +113,13 @@ GNetwork* Network::buildNetwork()
 					}
 					n->setEnd(input_idx);
 				}
+
+				size_t copied = p->hardCopy(pN, idx, pNeuronsNum[i]);
+				idx += copied;
+				if (p->getType() == Array) {
+					arrangeFireArray(array_neuron_fire_times, array_neuron_start, p);
+				}
+
 			}
 		}
 

@@ -10,7 +10,7 @@
 
 class SynapseBase : public Base {
 public:
-	SynapseBase(int node = 0, real weight = 0, int delay = 0) : Base(node), _weight(weight), _delay_steps(delay), _p_dst(NULL) {}
+	SynapseBase(int node = 0, real weight = 0, int delay = 0) : Base(node), _p_src(NULL), _p_dst(NULL), _weight(weight), _delay_steps(delay), _idx_dst(-1) {}
 	virtual ~SynapseBase() {};
 
 	virtual int recv() = 0;

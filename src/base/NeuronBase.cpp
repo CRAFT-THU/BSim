@@ -13,6 +13,9 @@ NeuronBase::NeuronBase(int node) : Base(node)
 	fired = false;
 	monitored = false;
 	fireCount = 0;
+	_start_E = -1;
+	_start_I = -1;
+	_end = -1;
 }
 
 NeuronBase::~NeuronBase() 
