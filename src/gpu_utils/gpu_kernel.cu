@@ -807,21 +807,13 @@ __global__ void update_dense_life_neuron(GLIFENeurons *d_neurons, int num, int s
 				d_neurons->p_refrac_step[nid] = d_neurons->p_refrac_time[nid] - 1;
 				d_neurons->p_vm[nid] = d_neurons->p_v_reset[nid];
 
-				for (int i=d_neurons->p_start_E[nid]; i<d_neurons->p_start_I[nid]; i++) {
-					gNeuronInput[i] = 0;
-				}
-				for (int i=d_neurons->p_start_I[nid]; i<d_neurons->p_end[nid]; i++) {
-					gNeuronInput[i] = 0;
-				}
 			} else {
 				real input = 0, input_I = 0;
 				for (int i=d_neurons->p_start_E[nid]; i<d_neurons->p_start_I[nid]; i++) {
 					input += gNeuronInput[i];
-					gNeuronInput[i] = 0;
 				}
 				for (int i=d_neurons->p_start_I[nid]; i<d_neurons->p_end[nid]; i++) {
 					input_I += gNeuronInput[i];
-					gNeuronInput[i] = 0;
 				}
 				d_neurons->p_i_E[nid] += input;
 				d_neurons->p_i_I[nid] += input_I;
@@ -831,13 +823,6 @@ __global__ void update_dense_life_neuron(GLIFENeurons *d_neurons, int num, int s
 		} else {
 			d_neurons->p_refrac_step[idx] = d_neurons->p_refrac_step[idx] - 1;
 			gFiredTable[gFiredTableCap*gCurrentIdx + gnid] = 0;
-
-			for (int i=d_neurons->p_start_E[nid]; i<d_neurons->p_start_I[nid]; i++) {
-				gNeuronInput[i] = 0;
-			}
-			for (int i=d_neurons->p_start_I[nid]; i<d_neurons->p_end[nid]; i++) {
-				gNeuronInput[i] = 0;
-			}
 		}
 	}
 	__syncthreads();
@@ -969,8 +954,9 @@ __global__ void update_dense_static_hit(GStaticSynapses *d_synapses, int num, in
 		int time_idx = (gCurrentIdx+MAX_DELAY+1-d_synapses->p_delay[sid])%(MAX_DELAY+1);
 		bool fired = gFiredTable[time_idx*gFiredTableCap + d_synapses->p_src[sid]] > 0;
 		if (fired) {
-			real weight = d_synapses->p_weight[sid];
-			gNeuronInput[d_synapses->p_dst[sid]] = weight;
+			gNeuronInput[d_synapses->p_dst[sid]] = d_synapses->p_weight[sid];
+		} else {
+			gNeuronInput[d_synapses->p_dst[sid]] = 0;
 		}
 	}
 	__syncthreads();
