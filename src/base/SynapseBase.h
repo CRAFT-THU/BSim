@@ -23,6 +23,10 @@ public:
 		this->_p_dst = p;
 	}
 
+	inline void setDst(int idx) {
+		this->_idx_dst = idx;
+	}
+
 	inline NeuronBase* getSrc() {
 		return _p_src;
 	}
@@ -44,10 +48,11 @@ public:
 	}
 
 protected:
-	real _weight;
-	int _delay_steps;
 	NeuronBase * _p_src;
 	NeuronBase * _p_dst;
+	real _weight;
+	int _delay_steps;
+	int _idx_dst;
 	bool monitored;
 };
 

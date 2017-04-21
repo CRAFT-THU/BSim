@@ -44,6 +44,21 @@ int NeuronBase::fire()
 	return 0;
 }
 
+void NeuronBase::setStartExec(int idx)
+{
+	this->_start_E = idx;
+}
+
+void NeuronBase::setStartInhi(int idx)
+{
+	this->_start_I = idx;
+}
+
+void NeuronBase::setEnd(int idx)
+{
+	this->_end = idx;
+}
+
 SynapseBase * NeuronBase::createSynapse(real weight, real delay, SpikeType type, real tau, NeuronBase *dst) 
 {
 	return NULL;

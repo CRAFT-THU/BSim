@@ -89,7 +89,7 @@ int StaticSynapse::hardCopy(void * data, int idx, int base)
 	p->p_weight[idx] = _weight;
 	p->p_delay[idx] = this->getDelay();
 	p->p_src[idx] = this->getSrc()->getID();
-	p->p_dst[idx] = this->getDst()->getID();
+	p->p_dst[idx] = this->_idx_dst;
 
 	return 1;
 }

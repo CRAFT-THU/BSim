@@ -193,8 +193,6 @@ int LIFENeuron::hardCopy(void * data, int idx, int base)
 	p->p_CE[idx] = _CE;
 	p->p_C_I[idx] = _C_I;
 	p->p_C_E[idx] = _C_E;
-	p->p_refrac_step[idx] = _refrac_step;
-	p->p_refrac_time[idx] = _refrac_time;
 	p->p_v_tmp[idx] = _v_tmp;
 	p->p_i_I[idx] = _i_I;
 	p->p_i_E[idx] = _i_E;
@@ -202,6 +200,11 @@ int LIFENeuron::hardCopy(void * data, int idx, int base)
 	p->p_v_reset[idx] = _v_reset;
 	p->p_Cm[idx] = _Cm;
 
+	p->p_refrac_step[idx] = _refrac_step;
+	p->p_refrac_time[idx] = _refrac_time;
+	p->p_start_E[idx] = this->_start_I;
+	p->p_start_E[idx] = this->_start_E;
+	p->p_end[idx] = this->_end;
 	return 1;
 }
 
