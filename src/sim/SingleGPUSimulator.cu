@@ -92,7 +92,6 @@ int SingleGPUSimulator::run(real time)
 	for (int i=0; i<nTypeNum; i++) {
 		cout << pCpuNet->nTypes[i] << ": <<<" << updateSize[c_pGpuNet->nTypes[i]].gridSize << ", " << updateSize[c_pGpuNet->nTypes[i]].blockSize << ">>>" << endl;
 	}
-	cout << "Delivery: <<<" << preSize.gridSize << ", " << preSize.blockSize << ">>>" << endl;
 	for (int i=0; i<sTypeNum; i++) {
 		cout << pCpuNet->sTypes[i] << ": <<<" << updateSize[c_pGpuNet->sTypes[i]].gridSize << ", " << updateSize[c_pGpuNet->sTypes[i]].blockSize << ">>>" << endl;
 	}
