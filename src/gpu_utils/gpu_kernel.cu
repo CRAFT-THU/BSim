@@ -776,9 +776,8 @@ __global__ void update_pre_synapse(N2SConnection *pConnection)
 	__syncthreads();
 
 	int tid = blockIdx.x * blockDim.x + threadIdx.x;
-	int delta_t = tid % MAX_DELAY;
-	int s_idx = tid / MAX_DELAY;
-
+	int idx = tid / MAX_DELAY;
+	int delay = tid % MAX_DELAY;
 	int time_idx = (gCurrentIdx+MAX_DELAY-delta_t)%(MAX_DELAY+1);
 	int firedSize = gFiredTableSizes[time_idx];
 	for (int idx = s_idx; idx < firedSize; idx += blockDim.x*gridDim.x) {
