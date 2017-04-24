@@ -63,7 +63,7 @@ int SingleGPUSimulator::run(real time)
 
 	BlockSize *updateSize = getBlockSize(totalNeuronNum, totalSynapseNum);
 	BlockSize preSize = { 0, 0, 0};
-	cudaOccupancyMaxPotentialBlockSize(&(preSize.minGridSize), &(preSize.blockSize), update_lif_neuron, 0, totalNeuronNum); 
+	cudaOccupancyMaxPotentialBlockSize(&(preSize.minGridSize), &(preSize.blockSize), update_pre_synapse, 0, totalNeuronNum); 
 	preSize.gridSize = (totalNeuronNum + (preSize.blockSize) - 1) / (preSize.blockSize);
 
 	real *c_vm = hostMalloc<real>(totalNeuronNum);
@@ -252,11 +252,8 @@ int SingleGPUSimulator::compare_run(real time)
 
 	BlockSize *updateSize = getBlockSize(totalNeuronNum, totalSynapseNum);
 	BlockSize preSize = { 0, 0, 0};
-	BlockSize postSize = { 0, 0, 0};
 	cudaOccupancyMaxPotentialBlockSize(&(preSize.minGridSize), &(preSize.blockSize), update_pre_synapse, 0, totalNeuronNum); 
 	preSize.gridSize = (totalNeuronNum + (preSize.blockSize) - 1) / (preSize.blockSize);
-	cudaOccupancyMaxPotentialBlockSize(&(postSize.minGridSize), &(postSize.blockSize), update_lif_neuron, 0, totalSynapseNum); 
-	postSize.gridSize = (totalSynapseNum + (postSize.blockSize) - 1) / (postSize.blockSize);
 
 	real *c_vm = hostMalloc<real>(totalNeuronNum);
 	int lif_idx = getIndex(pCpuNet->nTypes, nTypeNum, LIF);
