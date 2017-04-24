@@ -64,7 +64,7 @@ int SingleGPUSimulator::run(real time)
 	BlockSize *updateSize = getBlockSize(totalNeuronNum, totalSynapseNum);
 	BlockSize preSize = { 0, 0, 0};
 	cudaOccupancyMaxPotentialBlockSize(&(preSize.minGridSize), &(preSize.blockSize), update_pre_synapse, 0, totalNeuronNum); 
-	preSize.gridSize = (totalNeuronNum + (preSize.blockSize) - 1) / (preSize.blockSize);
+	preSize.gridSize = (totalSynapseNum + (preSize.blockSize) - 1) / (preSize.blockSize);
 
 	real *c_vm = hostMalloc<real>(totalNeuronNum);
 
