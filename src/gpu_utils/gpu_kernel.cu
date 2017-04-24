@@ -776,20 +776,36 @@ __global__ void update_pre_synapse(N2SConnection *pConnection)
 	__syncthreads();
 
 	int tid = blockIdx.x * blockDim.x + threadIdx.x;
-	for (int delta_t = 0; delta_t<MAX_DELAY; delta_t++) {
-		int time_idx = (gCurrentIdx+MAX_DELAY-delta_t)%(MAX_DELAY+1);
-		int firedSize = gFiredTableSizes[time_idx];
-		for (int idx = tid; idx < firedSize; idx += blockDim.x*gridDim.x) {
-			int nid = gFiredTable[time_idx*gFiredTableCap + idx];
-			int start_loc = pConnection->delayStart[delta_t + nid * MAX_DELAY];
-			int synapseNum = pConnection->delayNum[delta_t + nid * MAX_DELAY];
-			int offset = atomicAdd(&gSynapsesActiveTableSize, synapseNum);
-			gLayerInput[nid]++;
-			for (int i=0; i<synapseNum; i++) {
-				gSynapsesActiveTable[offset+i] = pConnection->pSynapsesIdx[i+start_loc];
-			}
+	int delta_t = tid % MAX_DELAY;
+	int s_idx = tid / MAX_DELAY;
+
+	int time_idx = (gCurrentIdx+MAX_DELAY-delta_t)%(MAX_DELAY+1);
+	int firedSize = gFiredTableSizes[time_idx];
+	for (int idx = s_idx; idx < firedSize; idx += blockDim.x*gridDim.x) {
+		int nid = gFiredTable[time_idx*gFiredTableCap + idx];
+		int start_loc = pConnection->delayStart[delta_t + nid * MAX_DELAY];
+		int synapseNum = pConnection->delayNum[delta_t + nid * MAX_DELAY];
+		int offset = atomicAdd(&gSynapsesActiveTableSize, synapseNum);
+		gLayerInput[nid]++;
+		for (int i=0; i<synapseNum; i++) {
+			gSynapsesActiveTable[offset+i] = pConnection->pSynapsesIdx[i+start_loc];
 		}
 	}
+
+	//for (int delta_t = 0; delta_t<MAX_DELAY; delta_t++) {
+	//	int time_idx = (gCurrentIdx+MAX_DELAY-delta_t)%(MAX_DELAY+1);
+	//	int firedSize = gFiredTableSizes[time_idx];
+	//	for (int idx = tid; idx < firedSize; idx += blockDim.x*gridDim.x) {
+	//		int nid = gFiredTable[time_idx*gFiredTableCap + idx];
+	//		int start_loc = pConnection->delayStart[delta_t + nid * MAX_DELAY];
+	//		int synapseNum = pConnection->delayNum[delta_t + nid * MAX_DELAY];
+	//		int offset = atomicAdd(&gSynapsesActiveTableSize, synapseNum);
+	//		gLayerInput[nid]++;
+	//		for (int i=0; i<synapseNum; i++) {
+	//			gSynapsesActiveTable[offset+i] = pConnection->pSynapsesIdx[i+start_loc];
+	//		}
+	//	}
+	//}
 	__syncthreads();
 }
 
