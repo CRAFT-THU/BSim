@@ -42,6 +42,8 @@ __device__ int *gLayerInput;
 __device__ real *gXInput;
 __device__ int *gFireCount;
 
+// Connection
+__device__ N2SConnection *gConnection;
 
 #if !defined(__CUDA_ARCH__) || __CUDA_ARCH__ >= 600
 #else
@@ -830,21 +832,51 @@ __global__ void update_dense_life_neuron(GLIFENeurons *d_neurons, int num, int s
 
 __global__ void update_pre_synapse(N2SConnection *pConnection)
 {
+	__shared__ int fire_neuron_id[MAXBLOCKSIZE];
+	__shared__ int fire_synapse_id[MAXBLOCKSIZE];
+	__shared__ volatile int fire_cnt;
+	if (threadIdx.x == 0) {
+		fire_cnt = 0;
+	}
 	__syncthreads();
 
 	int tid = blockIdx.x * blockDim.x + threadIdx.x;
+	int block_idx = blockIdx.x;
 	for (int delta_t = 0; delta_t<MAX_DELAY; delta_t++) {
 		int time_idx = (gCurrentIdx+MAX_DELAY-delta_t)%(MAX_DELAY+1);
 		int firedSize = gFiredTableSizes[time_idx];
+		int block_nums = (firedSize + blockDim.x - 1) / blockDim.x;
 		for (int idx = tid; idx < firedSize; idx += blockDim.x*gridDim.x) {
-			int nid = gFiredTable[time_idx*gFiredTableCap + idx];
-			int start_loc = pConnection->delayStart[delta_t + nid * MAX_DELAY];
-			int synapseNum = pConnection->delayNum[delta_t + nid * MAX_DELAY];
-			int offset = atomicAdd(&gSynapsesActiveTableSize, synapseNum);
-			gLayerInput[nid]++;
-			for (int i=0; i<synapseNum; i++) {
-				gSynapsesActiveTable[offset+i] = pConnection->pSynapsesIdx[i+start_loc];
+			block_idx += gridDim.x;
+			fire_neuron_id[threadIdx.x] = gFiredTable[time_idx*gFiredTableCap + idx];
+			__syncthreads();
+
+			int size = 0;
+			if (block_idx == block_nums - 1) {
+				size = firedSize - block_idx * blockDim.x;
+			} else if (block_idx < block_nums - 1) {
+				size = blockDim.x;
+			} else {
+				size = 0;
 			}
+
+			for (int i=0; i<size; i++) {
+				int nid =  fire_neuron_id[i];
+				int start_loc = pConnection->delayStart[delta_t + nid * MAX_DELAY];
+				int synapseNum = pConnection->delayNum[delta_t + nid * MAX_DELAY];
+				for (int j=tid; j<synapseNum; j += blockDim.x) {
+					int test_loc = atomicAdd((int*)&fire_cnt, 1);
+					fire_synapse_id[threadIdx.x] = pConnection->pSynapsesIdx[j+start_loc];
+					__syncthreads();
+					//TODO
+				}
+			}
+			
+			//int offset = atomicAdd(&gSynapsesActiveTableSize, synapseNum);
+			//gLayerInput[nid]++;
+			//for (int i=0; i<synapseNum; i++) {
+			//	gSynapsesActiveTable[offset+i] = pConnection->pSynapsesIdx[i+start_loc];
+			//}
 		}
 	}
 	__syncthreads();
@@ -948,18 +980,57 @@ __global__ void update_all_exp_synapse(GExpSynapses *d_synapses, int num, int st
 
 __global__ void update_dense_static_hit(GStaticSynapses *d_synapses, int num, int start_id)
 {
+	__shared__ int fire_neuron_id[MAXBLOCKSIZE];
+
 	int tid = blockIdx.x * blockDim.x + threadIdx.x;
-	for (int idx = tid; idx < num; idx += blockDim.x*gridDim.x) {
-		int sid = idx;
-		int time_idx = (gCurrentIdx+MAX_DELAY+1-d_synapses->p_delay[sid])%(MAX_DELAY+1);
-		bool fired = gFiredTable[time_idx*gFiredTableCap + d_synapses->p_src[sid]] > 0;
-		if (fired) {
-			gNeuronInput[d_synapses->p_dst[sid]] = d_synapses->p_weight[sid];
-		} else {
-			gNeuronInput[d_synapses->p_dst[sid]] = 0;
+	int block_idx = blockIdx.x;
+	for (int delta_t = 0; delta_t<MAX_DELAY; delta_t++) {
+		int time_idx = (gCurrentIdx+MAX_DELAY-delta_t)%(MAX_DELAY+1);
+		int firedSize = gFiredTableSizes[time_idx];
+		int block_nums = (firedSize + blockDim.x - 1) / blockDim.x;
+		for (int idx = tid; idx < firedSize; idx += blockDim.x*gridDim.x) {
+			block_idx += gridDim.x;
+			fire_neuron_id[threadIdx.x] = gFiredTable[time_idx*gFiredTableCap + idx];
+			__syncthreads();
+
+			int size = 0;
+			if (block_idx == block_nums - 1) {
+				size = firedSize - block_idx * blockDim.x;
+			} else if (block_idx < block_nums - 1) {
+				size = blockDim.x;
+			} else {
+				size = 0;
+			}
+
+			for (int i=0; i<size; i++) {
+				int nid =  fire_neuron_id[i];
+				int start_loc = gConnection->delayStart[delta_t + nid * MAX_DELAY];
+				int synapseNum = gConnection->delayNum[delta_t + nid * MAX_DELAY];
+				for (int j=tid; j<synapseNum; j += blockDim.x) {
+					int sid = gConnection->pSynapsesIdx[j+start_loc];
+					real weight = d_synapses->p_weight[sid];
+					if (weight >= 0) {
+						atomicAdd(&(gNeuronInput[d_synapses->p_dst[sid]]), weight);
+					} else {
+						atomicAdd(&(gNeuronInput_I[d_synapses->p_dst[sid]]), weight);
+					}
+				}
+			}
 		}
 	}
 	__syncthreads();
+	//int tid = blockIdx.x * blockDim.x + threadIdx.x;
+	//for (int idx = tid; idx < num; idx += blockDim.x*gridDim.x) {
+	//	int sid = idx;
+	//	int time_idx = (gCurrentIdx+MAX_DELAY+1-d_synapses->p_delay[sid])%(MAX_DELAY+1);
+	//	bool fired = gFiredTable[time_idx*gFiredTableCap + d_synapses->p_src[sid]] > 0;
+	//	if (fired) {
+	//		gNeuronInput[d_synapses->p_dst[sid]] = d_synapses->p_weight[sid];
+	//	} else {
+	//		gNeuronInput[d_synapses->p_dst[sid]] = 0;
+	//	}
+	//}
+	//__syncthreads();
 
 }
 
@@ -1010,6 +1081,13 @@ __global__ void add_cross_neuron(int *ids, int num)
 //	}
 //	__syncthreads();
 //}
+
+__global__ void init_connection(N2SConnection *pConnection)
+{
+	if ((threadIdx.x == 0) && (blockIdx.x == 0)) {
+		gConnection = pConnection;
+	}
+}
 
 __global__ void init_buffers(/*int *c_gTimeTable,*/ real *c_gNeuronInput, real *c_gNeuronInput_I, int *c_gFiredTable, int *c_gFiredTableSizes, int *c_gActiveTable, int *c_gSynapsesActiveTable, int *c_gSynapsesLogTable) 
 {

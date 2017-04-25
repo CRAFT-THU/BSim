@@ -60,6 +60,8 @@ int SingleGPUSimulator::run(real time)
 	int MAX_DELAY = pCpuNet->MAX_DELAY;
 	printf("MAX_DELAY: %d\n", pCpuNet->MAX_DELAY);
 
+	init_connection<<<1, 1>>>(c_pGpuNet->pN2SConnection);
+
 	GBuffers *buffers = alloc_buffers(totalNeuronNum, totalSynapseNum, MAX_DELAY);
 
 	BlockSize *updateSize = getBlockSize(totalNeuronNum, totalSynapseNum);
@@ -285,7 +287,7 @@ int SingleGPUSimulator::compare_run(real time)
 			cudaUpdateAllType[pCpuNet->nTypes[i]](c_pGpuNet->pNeurons[i], c_pGpuNet->neuronNums[i+1]-c_pGpuNet->neuronNums[i], c_pGpuNet->neuronNums[i], &updateSize[c_pGpuNet->nTypes[i]]);
 		}
 
-		update_pre_synapse<<<preSize.gridSize, preSize.blockSize>>>(c_pGpuNet->pN2SConnection);
+		//update_pre_synapse<<<preSize.gridSize, preSize.blockSize>>>(c_pGpuNet->pN2SConnection);
 
 		for (int i=0; i<sTypeNum; i++) {
 			cudaUpdateAllType[pCpuNet->sTypes[i]](c_pGpuNet->pSynapses[i], c_pGpuNet->synapseNums[i+1]-c_pGpuNet->synapseNums[i], c_pGpuNet->synapseNums[i], &updateSize[pCpuNet->nTypes[i]]);

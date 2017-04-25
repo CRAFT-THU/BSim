@@ -33,6 +33,8 @@ struct GBuffers {
 	int *c_gFireCount;
 };
 
+__global__ void init_connection(N2SConnection *pConnection);
+
 __global__ void init_buffers(/*int *c_gTimeTable,*/ real *c_gNeuronInput, int *c_gFiredTable, int *c_gFiredTableSizes, int *c_gActiveTable, int *c_gSynapsesFiredTable, int *c_gSynapsesLogTable);
 
 __global__ void update_time();
