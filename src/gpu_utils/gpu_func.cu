@@ -49,6 +49,7 @@ int cudaUpdateLIFE(void *data, int num, int start_id, BlockSize *pSize)
 {
 	find_life_neuron<<<pSize->gridSize, pSize->blockSize>>>((GLIFENeurons*)data, num, start_id);
 	update_life_neuron<<<pSize->gridSize, pSize->blockSize>>>((GLIFENeurons*)data, num, start_id);
+	//update_dense_life_neuron<<<pSize->gridSize, pSize->blockSize>>>((GLIFENeurons*)data, num, start_id);
 
 	return 0;
 }
@@ -88,8 +89,9 @@ int cudaUpdateAllExp(void *data, int num, int start_id, BlockSize *pSize)
 
 int cudaUpdateStatic(void *data, int num, int start_id, BlockSize *pSize)
 {
-	update_static_hit<<<pSize->gridSize, pSize->blockSize>>>((GStaticSynapses*)data, num, start_id);
-	reset_active_synapse<<<1, 1>>>();
+	//update_static_hit<<<pSize->gridSize, pSize->blockSize>>>((GStaticSynapses*)data, num, start_id);
+	//reset_active_synapse<<<1, 1>>>();
+	update_dense_static_hit<<<pSize->gridSize, pSize->blockSize>>>((GStaticSynapses*)data, num, start_id);
 
 	return 0;
 }

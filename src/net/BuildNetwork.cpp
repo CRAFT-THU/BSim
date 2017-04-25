@@ -69,6 +69,19 @@ GNetwork* Network::buildNetwork()
 	vector<int> array_neuron_start;
 	vector<int> array_neuron_fire_times;
 
+	map<NeuronBase*, vector<SynapseBase*>> n2s_exec;
+	map<NeuronBase*, vector<SynapseBase*>> n2s_inhi;
+	for (auto siter = pSynapses.begin(); siter != pSynapses.end(); siter++) {
+		SynapseBase * p = *siter;
+		NeuronBase* n = p->getDst();
+		if (p->getWeight() >= 0) {
+			n2s_exec[n].push_back(p);
+		} else {
+			n2s_inhi[n].push_back(p);
+		}
+	}
+
+	int input_idx = 0;
 	for (int i=0; i<neuronTypeNum; i++) {
 		pNTypes[i] = nTypes[i];
 
@@ -80,11 +93,33 @@ GNetwork* Network::buildNetwork()
 		for (piter = pPopulations.begin(); piter != pPopulations.end();  piter++) {
 			PopulationBase * p = *piter;
 			if (p->getType() == nTypes[i]) {
+				for (int i=0; i<p->getNum(); i++) {
+					NeuronBase * n = p->getNeuron(i);
+					n->setStartExec(input_idx);
+					auto iter_exec = n2s_exec.find(n);
+					if (iter_exec != n2s_exec.end()) {
+						for (auto iter = iter_exec->second.begin(); iter != iter_exec->second.end(); iter++) {
+							(*iter)->setDst(input_idx);
+							input_idx++;
+						}
+					}
+					n->setStartInhi(input_idx);
+					auto iter_inhi = n2s_inhi.find(n);
+					if (iter_inhi != n2s_inhi.end()) {
+						for (auto iter = iter_inhi->second.begin(); iter != iter_inhi->second.end(); iter++) {
+							(*iter)->setDst(input_idx);
+							input_idx++;
+						}
+					}
+					n->setEnd(input_idx);
+				}
+
 				size_t copied = p->hardCopy(pN, idx, pNeuronsNum[i]);
 				idx += copied;
 				if (p->getType() == Array) {
 					arrangeFireArray(array_neuron_fire_times, array_neuron_start, p);
 				}
+
 			}
 		}
 
@@ -129,7 +164,6 @@ GNetwork* Network::buildNetwork()
 	assert(pSynapsesNum[synapseTypeNum] == totalSynapseNum);
 
 	logMap();
-	//assert(checkIDtoIdx());
 
 	N2SConnection *pAllConnections = (N2SConnection*)malloc(sizeof(N2SConnection));
 	assert(pAllConnections != NULL);
@@ -169,61 +203,11 @@ GNetwork* Network::buildNetwork()
 		}
 	}
 
-	//int synapseIdx = 0;
-	//for (int nid=0; nid<totalNeuronNum; nid++) {
-	//	map<int, ID>::iterator iter = idx2nid.find(nid);
-	//	assert(iter != idx2nid.end());
-
-	//	map<ID, vector<ID>>::iterator n2siter = n2sNetwork.find(iter->second);
-	//	if (n2siter == n2sNetwork.end()) {
-	//		for (int delay_t=0; delay_t < maxDelaySteps; delay_t++) {
-	//			delayStart[delay_t + maxDelaySteps*nid] = synapseIdx;
-	//			delayNum[delay_t + maxDelaySteps*nid] = 0;
-	//		}
-	//		continue;
-	//	}
-
-	//	int synapsesNum_t = n2siter->second.size();
-	//	for (int delay_t=0; delay_t < maxDelaySteps; delay_t++) {
-	//		delayStart[delay_t + maxDelaySteps*nid] = synapseIdx;
-	//		for (int i=0; i<synapsesNum_t; i++) {
-	//			if (id2synapse[n2siter->second.at(i)]->getDelay() == delay_t+1) {
-	//				map<ID, int>::iterator sid2idxiter = sid2idx.find(n2siter->second.at(i));
-	//				assert(sid2idxiter != sid2idx.end());
-
-	//				int sid = sid2idxiter->second;
-	//				assert(synapseIdx < totalSynapseNum);
-	//				pSynapsesIdx[synapseIdx] = sid;
-	//				synapseIdx++;
-	//			}
-	//		}
-	//		delayNum[delay_t + maxDelaySteps*nid] = synapseIdx - delayStart[delay_t + maxDelaySteps*nid];
-	//	}
-
-	//}
 
 	pAllConnections->pSynapsesIdx = pSynapsesIdx;
 	pAllConnections->delayStart = delayStart;
 	pAllConnections->delayNum = delayNum;
 
-	//for (int i=0; i<synapseTypeNum; i++) {
-	//	int *pSynapsesDst = (int*)malloc(sizeof(int)*synapseNums[i]);
-	//	assert(pSynapsesDst != NULL);
-	//	map<ID, ID>::iterator s2nIter;
-	//	for (s2nIter = s2nNetwork.begin(); s2nIter != s2nNetwork.end(); s2nIter++) {
-	//		map<ID, int>::iterator iter = sid2idx.find(s2nIter->first);
-	//		assert(iter != sid2idx.end());
-	//		if (i != getType(pSynapsesNum, synapseTypeNum, iter->second)) {
-	//			continue;
-	//		}
-	//		int idx = getOffset(pSynapsesNum, synapseTypeNum, iter->second);
-	//		iter = nid2idx.find(s2nIter->second);
-	//		assert(iter != nid2idx.end());
-	//		pSynapsesDst[idx] = iter->second;
-	//	}
-
-	//	addTypeConnection[sTypes[i]](pAllSynapses[i], pSynapsesDst);
-	//}
 
 	GNetwork * ret = (GNetwork*)malloc(sizeof(GNetwork));
 	assert(ret != NULL);

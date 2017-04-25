@@ -6,6 +6,8 @@
 
 struct GStaticSynapses {
 	real *p_weight;
+	int *p_delay;
+	int *p_src;
 	int *p_dst;
 };
 

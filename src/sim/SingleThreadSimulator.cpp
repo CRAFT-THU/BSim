@@ -22,18 +22,19 @@ int SingleThreadSimulator::run(real time)
 {
 	int sim_cycle =  round((time)/dt);
 
-	FILE *logFile = fopen("Sim.log", "w+");
 	FILE *dataFile = fopen("Sim.data", "w+");
-	//FILE *outFile = fopen("Output.csv", "w+");
-	if (logFile == NULL) {
-		printf("Open file Sim.log failed\n");
-		return -1;
-	}
 	if (dataFile == NULL) {
 		printf("Open file Sim.data failed\n");
 		return -1;
 	}
 
+	//FILE *logFile = fopen("Sim.log", "w+");
+	//if (logFile == NULL) {
+	//	printf("Open file Sim.log failed\n");
+	//	return -1;
+	//}
+	
+	//FILE *outFile = fopen("Output.csv", "w+");
 	//if (outFile == NULL) {
 	//	printf("Open file Sim.log failed\n");
 	//	return -2;
@@ -82,12 +83,12 @@ int SingleThreadSimulator::run(real time)
 
 		fprintf(dataFile, "\n");
 
-		int size = info.fired.size();
-		fprintf(logFile, "Cycle %d: ", info.currCycle);
-		for (int i=0; i<size; i++) {
-			fprintf(logFile, "%d ", info.fired[i]);
-		}
-		fprintf(logFile, "\n");
+		//int size = info.fired.size();
+		//fprintf(logFile, "Cycle %d: ", info.currCycle);
+		//for (int i=0; i<size; i++) {
+		//	fprintf(logFile, "%d ", info.fired[i]);
+		//}
+		//fprintf(logFile, "\n");
 
 		//size = network->pOutputs.size();
 		//fprintf(outFile, "%d", info.currCycle);
@@ -112,8 +113,10 @@ int SingleThreadSimulator::run(real time)
 		seconds = seconds - 1;
 	}
 
-	fclose(logFile);
 	printf("\nSimulation finished in %ld:%ld:%ld.%06lds\n", hours, minutes, seconds, uSeconds);
+	fclose(dataFile);
+	//fclose(logFile);
+	//fclose(outFile);
 
 	FILE *rateFile = fopen("Fire.log", "w+");
 	if (rateFile == NULL) {

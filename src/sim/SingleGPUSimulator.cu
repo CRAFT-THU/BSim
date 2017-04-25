@@ -35,16 +35,17 @@ int SingleGPUSimulator::run(real time)
 
 	GNetwork *pCpuNet = network->buildNetwork();
 
-	FILE *logFile = fopen("GSim.log", "w+");
-	if (logFile == NULL) {
-		printf("ERROR: Open file SimGPU.log failed\n");
-		return -1;
-	}
 	FILE *dataFile = fopen("GSim.data", "w+");
 	if (dataFile == NULL) {
 		printf("ERROR: Open file SimGPU.log failed\n");
 		return -1;
 	}
+
+	//FILE *logFile = fopen("GSim.log", "w+");
+	//if (logFile == NULL) {
+	//	printf("ERROR: Open file SimGPU.log failed\n");
+	//	return -1;
+	//}
 
 	findCudaDevice(0, NULL);
 	GNetwork *c_pGpuNet = copyNetworkToGPU(pCpuNet);
@@ -58,6 +59,8 @@ int SingleGPUSimulator::run(real time)
 
 	int MAX_DELAY = pCpuNet->MAX_DELAY;
 	printf("MAX_DELAY: %d\n", pCpuNet->MAX_DELAY);
+
+	init_connection<<<1, 1>>>(c_pGpuNet->pN2SConnection);
 
 	GBuffers *buffers = alloc_buffers(totalNeuronNum, totalSynapseNum, MAX_DELAY);
 
@@ -108,7 +111,7 @@ int SingleGPUSimulator::run(real time)
 			cudaUpdateType[pCpuNet->nTypes[i]](c_pGpuNet->pNeurons[i], c_pGpuNet->neuronNums[i+1]-c_pGpuNet->neuronNums[i], c_pGpuNet->neuronNums[i], &updateSize[c_pGpuNet->nTypes[i]]);
 		}
 
-		update_pre_synapse<<<preSize.gridSize, preSize.blockSize>>>(c_pGpuNet->pN2SConnection);
+		//update_pre_synapse<<<preSize.gridSize, preSize.blockSize>>>(c_pGpuNet->pN2SConnection);
 
 		for (int i=0; i<sTypeNum; i++) {
 			cudaUpdateType[pCpuNet->sTypes[i]](c_pGpuNet->pSynapses[i], c_pGpuNet->synapseNums[i+1]-c_pGpuNet->synapseNums[i], c_pGpuNet->synapseNums[i], &updateSize[pCpuNet->nTypes[i]]);
@@ -123,25 +126,15 @@ int SingleGPUSimulator::run(real time)
 		copyFromGPU<int>(&copySize, buffers->c_gFiredTableSizes + currentIdx, 1);
 		//printf("HERE1\n");
 		//fflush(stdout);
-		copyFromGPU<int>(buffers->c_neuronsFired, buffers->c_gFiredTable + (totalNeuronNum*currentIdx), copySize);
-		if (copy_idx >= 0) {
-			copyFromGPU<real>(c_vm, c_g_vm, c_pGpuNet->neuronNums[copy_idx+1]-c_pGpuNet->neuronNums[copy_idx]);
-		}
+		//copyFromGPU<int>(buffers->c_neuronsFired, buffers->c_gFiredTable + (totalNeuronNum*currentIdx), copySize);
 
 #ifdef LOG_DATA
 		//LOG DATA
 		//copyFromGPU<real>(c_I_syn, c_g_I_syn, c_pGpuNet->synapseNums[exp_idx+1]-c_pGpuNet->synapseNums[exp_idx]);
 
-		fprintf(logFile, "Cycle %d: ", time);
-		for (int i=0; i<copySize; i++) {
-			//assert(network->idx2nid.find(buffers->c_neuronsFired[i]) != network->idx2nid.end());
-			//printf("%s ", network->idx2nid[buffers->c_neuronsFired[i]].getInfo().c_str());
-			fprintf(logFile, "%d ", buffers->c_neuronsFired[i]);
-		}
-		fprintf(logFile, "\n");
-
 		//fprintf(dataFile, "Cycle %d: ", time);
 		if (copy_idx >= 0) {
+			copyFromGPU<real>(c_vm, c_g_vm, c_pGpuNet->neuronNums[copy_idx+1]-c_pGpuNet->neuronNums[copy_idx]);
 			for (int i=0; i<c_pGpuNet->neuronNums[copy_idx+1] - c_pGpuNet->neuronNums[copy_idx]; i++) {
 				fprintf(dataFile, "%.10lf \t", c_vm[i]);
 			}
@@ -150,6 +143,14 @@ int SingleGPUSimulator::run(real time)
 		//		fprintf(dataFile, ", %lf", c_I_syn[i]);
 		//}
 		fprintf(dataFile, "\n");
+
+		//fprintf(logFile, "Cycle %d: ", time);
+		//for (int i=0; i<copySize; i++) {
+		//	//assert(network->idx2nid.find(buffers->c_neuronsFired[i]) != network->idx2nid.end());
+		//	//printf("%s ", network->idx2nid[buffers->c_neuronsFired[i]].getInfo().c_str());
+		//	fprintf(logFile, "%d ", buffers->c_neuronsFired[i]);
+		//}
+		//fprintf(logFile, "\n");
 
 		//LOG SYNAPSE
 		//copyFromGPU<int>(buffers->c_synapsesFired, buffers->c_gSynapsesLogTable, totalSynapseNum);
@@ -205,8 +206,8 @@ int SingleGPUSimulator::run(real time)
 
 	fclose(rateFile);
 
-	fclose(logFile);
 	fclose(dataFile);
+	//fclose(logFile);
 
 	free_buffers(buffers);
 	freeGPUNetwork(c_pGpuNet);
@@ -280,7 +281,7 @@ int SingleGPUSimulator::compare_run(real time)
 			cudaUpdateAllType[pCpuNet->nTypes[i]](c_pGpuNet->pNeurons[i], c_pGpuNet->neuronNums[i+1]-c_pGpuNet->neuronNums[i], c_pGpuNet->neuronNums[i], &updateSize[c_pGpuNet->nTypes[i]]);
 		}
 
-		update_pre_synapse<<<preSize.gridSize, preSize.blockSize>>>(c_pGpuNet->pN2SConnection);
+		//update_pre_synapse<<<preSize.gridSize, preSize.blockSize>>>(c_pGpuNet->pN2SConnection);
 
 		for (int i=0; i<sTypeNum; i++) {
 			cudaUpdateAllType[pCpuNet->sTypes[i]](c_pGpuNet->pSynapses[i], c_pGpuNet->synapseNums[i+1]-c_pGpuNet->synapseNums[i], c_pGpuNet->synapseNums[i], &updateSize[pCpuNet->nTypes[i]]);

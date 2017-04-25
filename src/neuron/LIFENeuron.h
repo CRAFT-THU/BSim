@@ -29,14 +29,15 @@ protected:
 	real _CE;
 	real _C_I;
 	real _C_E;
-	int _refrac_step;
-	int _refrac_time;
 	real _v_tmp;
 	real _i_I;
 	real _i_E;
 	real _v_thresh;
 	real _v_reset;
 	real _Cm;
+
+	int _refrac_step;
+	int _refrac_time;
 
 	real _v_init;
 	real _v_rest;
