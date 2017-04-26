@@ -11,8 +11,8 @@ int allocStatic(void *pCpu, int N)
 {
 	GStaticSynapses *p = (GStaticSynapses*)pCpu;
 	p->p_weight = (real*)malloc(N*sizeof(real));
-	p->p_delay = (int*)malloc(N*sizeof(int));
-	p->p_src = (int *)malloc(N*sizeof(int));
+	//p->p_delay = (int*)malloc(N*sizeof(int));
+	//p->p_src = (int *)malloc(N*sizeof(int));
 	p->p_dst = (int *)malloc(N*sizeof(int));
 	return 0;
 }
@@ -21,8 +21,8 @@ int freeStatic(void *pCpu)
 {
 	GStaticSynapses *pCpuSynapses = (GStaticSynapses*)pCpu;
 	free(pCpuSynapses->p_weight);
-	free(pCpuSynapses->p_delay);
-	free(pCpuSynapses->p_src);
+	//free(pCpuSynapses->p_delay);
+	//free(pCpuSynapses->p_src);
 	free(pCpuSynapses->p_dst);
 	return 0;
 }
