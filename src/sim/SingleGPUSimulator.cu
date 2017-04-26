@@ -37,15 +37,15 @@ int SingleGPUSimulator::run(real time)
 
 	FILE *dataFile = fopen("GSim.data", "w+");
 	if (dataFile == NULL) {
-		printf("ERROR: Open file SimGPU.log failed\n");
+		printf("ERROR: Open file GSim.data failed\n");
 		return -1;
 	}
 
-	//FILE *logFile = fopen("GSim.log", "w+");
-	//if (logFile == NULL) {
-	//	printf("ERROR: Open file SimGPU.log failed\n");
-	//	return -1;
-	//}
+	FILE *logFile = fopen("GSim.log", "w+");
+	if (logFile == NULL) {
+		printf("ERROR: Open file GSim.log failed\n");
+		return -1;
+	}
 
 	findCudaDevice(0, NULL);
 	GNetwork *c_pGpuNet = copyNetworkToGPU(pCpuNet);
@@ -118,6 +118,8 @@ int SingleGPUSimulator::run(real time)
 		}
 
 
+#ifdef LOG_DATA
+		//LOG DATA
 		int currentIdx = time%(MAX_DELAY+1);
 
 		//printf("HERE %p %d ", buffers->c_gFiredTableSizes, currentIdx);
@@ -126,10 +128,8 @@ int SingleGPUSimulator::run(real time)
 		copyFromGPU<int>(&copySize, buffers->c_gFiredTableSizes + currentIdx, 1);
 		//printf("HERE1\n");
 		//fflush(stdout);
-		//copyFromGPU<int>(buffers->c_neuronsFired, buffers->c_gFiredTable + (totalNeuronNum*currentIdx), copySize);
+		copyFromGPU<int>(buffers->c_neuronsFired, buffers->c_gFiredTable + (totalNeuronNum*currentIdx), copySize);
 
-#ifdef LOG_DATA
-		//LOG DATA
 		//copyFromGPU<real>(c_I_syn, c_g_I_syn, c_pGpuNet->synapseNums[exp_idx+1]-c_pGpuNet->synapseNums[exp_idx]);
 
 		//fprintf(dataFile, "Cycle %d: ", time);
@@ -145,12 +145,10 @@ int SingleGPUSimulator::run(real time)
 		fprintf(dataFile, "\n");
 
 		//fprintf(logFile, "Cycle %d: ", time);
-		//for (int i=0; i<copySize; i++) {
-		//	//assert(network->idx2nid.find(buffers->c_neuronsFired[i]) != network->idx2nid.end());
-		//	//printf("%s ", network->idx2nid[buffers->c_neuronsFired[i]].getInfo().c_str());
-		//	fprintf(logFile, "%d ", buffers->c_neuronsFired[i]);
-		//}
-		//fprintf(logFile, "\n");
+		for (int i=0; i<copySize; i++) {
+			fprintf(logFile, "%d ", buffers->c_neuronsFired[i]);
+		}
+		fprintf(logFile, "\n");
 
 		//LOG SYNAPSE
 		//copyFromGPU<int>(buffers->c_synapsesFired, buffers->c_gSynapsesLogTable, totalSynapseNum);
@@ -207,7 +205,7 @@ int SingleGPUSimulator::run(real time)
 	fclose(rateFile);
 
 	fclose(dataFile);
-	//fclose(logFile);
+	fclose(logFile);
 
 	free_buffers(buffers);
 	freeGPUNetwork(c_pGpuNet);

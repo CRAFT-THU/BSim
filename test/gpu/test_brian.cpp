@@ -15,15 +15,15 @@ int main(int argc, char **argv)
 		load = true;
 	}
 
-	const int N = 500;
+	const int N = 10;
 	Network c;
 	//createPopulation(int id, int N, LIFENeuron(ID id, real v_init, real v_rest, real v_reset, real cm, real tau_m, real tau_refrac, real tau_syn_E, real tau_syn_I, real v_thresh, real i_offset)), ID(0, 0), real tau_syn_E, real tau_syn_I);
-	Population<LIF_brian> *pn0 = c.createPopulation(N, LIF_brian(LIFENeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-3, 0.0, 1.0, 1.0, 15.0e-3, 10.0e-1), 1.0, 1.0));
-	Population<LIF_brian> *pn1 = c.createPopulation(N, LIF_brian(LIFENeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-3, 0.0, 1.0, 1.0, 15.0e-3, 0.0e-3), 1.0, 1.0));
-	Population<LIF_brian> *pn2 = c.createPopulation(N, LIF_brian(LIFENeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-3, 0.0, 1.0, 1.0, 15.0e-3, 0.0e-3), 1.0, 1.0));
-	Population<LIF_brian> *pn3 = c.createPopulation(N, LIF_brian(LIFENeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-3, 0.0, 1.0, 1.0, 15.0e-3, 0.0e-3), 1.0, 1.0));
-	Population<LIF_brian> *pn4 = c.createPopulation(N, LIF_brian(LIFENeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-3, 0.0, 1.0, 1.0, 15.0e-3, 0.0e-3), 1.0, 1.0));
-	Population<LIF_brian> *pn5 = c.createPopulation(N, LIF_brian(LIFENeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-3, 0.0, 1.0, 1.0, 15.0e-3, 0.0e-3), 1.0, 1.0));
+	Population<LIF_brian> *pn0 = c.createPopulation(0, N, LIF_brian(LIFENeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-3, 0.0, 1.0, 1.0, 15.0e-3, 10.0e-1), 1.0, 1.0));
+	Population<LIF_brian> *pn1 = c.createPopulation(1, N, LIF_brian(LIFENeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-3, 0.0, 1.0, 1.0, 15.0e-3, 0.0e-3), 1.0, 1.0));
+	Population<LIF_brian> *pn2 = c.createPopulation(2, N, LIF_brian(LIFENeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-3, 0.0, 1.0, 1.0, 15.0e-3, 0.0e-3), 1.0, 1.0));
+	Population<LIF_brian> *pn3 = c.createPopulation(3, N, LIF_brian(LIFENeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-3, 0.0, 1.0, 1.0, 15.0e-3, 0.0e-3), 1.0, 1.0));
+	Population<LIF_brian> *pn4 = c.createPopulation(4, N, LIF_brian(LIFENeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-3, 0.0, 1.0, 1.0, 15.0e-3, 0.0e-3), 1.0, 1.0));
+	Population<LIF_brian> *pn5 = c.createPopulation(5, N, LIF_brian(LIFENeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-3, 0.0, 1.0, 1.0, 15.0e-3, 0.0e-3), 1.0, 1.0));
 
 	real * weight0 = NULL;
 	real * weight1 = NULL;

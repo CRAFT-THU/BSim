@@ -617,7 +617,6 @@ __global__ void update_life_neuron(GLIFENeurons *d_neurons, int num, int start_i
 		d_neurons->p_vm[nid] = d_neurons->p_Cm[nid] * d_neurons->p_vm[nid] + d_neurons->p_v_tmp[nid] + d_neurons->p_i_E[nid] * d_neurons->p_C_E[nid] + d_neurons->p_i_I[nid] * d_neurons->p_C_I[nid];
 
 		//d_neurons->p_i_syn[nid] = 0;
-		gXInput[gnid] += gNeuronInput[gnid] + gNeuronInput_I[gnid];
 
 		d_neurons->p_i_E[nid] *= d_neurons->p_CE[nid];
 		d_neurons->p_i_I[nid] *= d_neurons->p_CI[nid];
@@ -636,9 +635,13 @@ __global__ void update_life_neuron(GLIFENeurons *d_neurons, int num, int start_i
 			d_neurons->p_refrac_step[nid] = d_neurons->p_refrac_time[nid] - 1;
 			d_neurons->p_vm[nid] = d_neurons->p_v_reset[nid];
 		} else {
+			gXInput[gnid] += gNeuronInput[gnid] + gNeuronInput_I[gnid];
 			d_neurons->p_i_E[nid] += gNeuronInput[gnid];
 			d_neurons->p_i_I[nid] += gNeuronInput_I[gnid];
 		}
+
+		gNeuronInput[gnid] = 0;
+		gNeuronInput_I[gnid] = 0;
 
 		__syncthreads();
 		if (fire_cnt >= MAXBLOCKSIZE) {
@@ -673,8 +676,6 @@ __global__ void update_life_neuron(GLIFENeurons *d_neurons, int num, int start_i
 			}
 		}
 
-		gNeuronInput[gnid] = 0;
-		gNeuronInput_I[gnid] = 0;
 	}
 	__syncthreads();
 	if (threadIdx.x == 0 && blockIdx.x == 0) {
@@ -1002,15 +1003,15 @@ __global__ void update_dense_static_hit(GStaticSynapses *d_synapses, int num, in
 	for (int delta_t = 0; delta_t<MAX_DELAY; delta_t++) {
 		int time_idx = (gCurrentIdx+MAX_DELAY-delta_t)%(MAX_DELAY+1);
 		int firedSize = gFiredTableSizes[time_idx];
-		int block_nums = (firedSize + blockDim.x - 1) / blockDim.x;
+		int block_nums_1 = (firedSize - 1) / blockDim.x;
 		for (int idx = tid; idx < firedSize; idx += blockDim.x*gridDim.x) {
 			fire_neuron_id[threadIdx.x] = gFiredTable[time_idx*gFiredTableCap + idx];
 			__syncthreads();
 
 			int size = 0;
-			if (block_idx == block_nums - 1) {
+			if (block_idx == block_nums_1) {
 				size = firedSize - block_idx * blockDim.x;
-			} else if (block_idx < block_nums - 1) {
+			} else if (block_idx < block_nums_1) {
 				size = blockDim.x;
 			} else {
 				size = 0;
