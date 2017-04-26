@@ -18,9 +18,9 @@ struct GLIFENeurons {
 	real *p_Cm;
 	int *p_refrac_step;
 	int *p_refrac_time;
-	int *p_start_E;
-	int *p_start_I;
-	int *p_end;
+	//int *p_start_E;
+	//int *p_start_I;
+	//int *p_end;
 };
 
 NEURON_GPU_FUNC_DEFINE(LIFE)

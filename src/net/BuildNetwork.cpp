@@ -69,17 +69,17 @@ GNetwork* Network::buildNetwork()
 	vector<int> array_neuron_start;
 	vector<int> array_neuron_fire_times;
 
-	map<NeuronBase*, vector<SynapseBase*>> n2s_exec;
-	map<NeuronBase*, vector<SynapseBase*>> n2s_inhi;
-	for (auto siter = pSynapses.begin(); siter != pSynapses.end(); siter++) {
-		SynapseBase * p = *siter;
-		NeuronBase* n = p->getDst();
-		if (p->getWeight() >= 0) {
-			n2s_exec[n].push_back(p);
-		} else {
-			n2s_inhi[n].push_back(p);
-		}
-	}
+	//map<NeuronBase*, vector<SynapseBase*>> n2s_exec;
+	//map<NeuronBase*, vector<SynapseBase*>> n2s_inhi;
+	//for (auto siter = pSynapses.begin(); siter != pSynapses.end(); siter++) {
+	//	SynapseBase * p = *siter;
+	//	NeuronBase* n = p->getDst();
+	//	if (p->getWeight() >= 0) {
+	//		n2s_exec[n].push_back(p);
+	//	} else {
+	//		n2s_inhi[n].push_back(p);
+	//	}
+	//}
 
 	int input_idx = 0;
 	for (int i=0; i<neuronTypeNum; i++) {
@@ -93,26 +93,26 @@ GNetwork* Network::buildNetwork()
 		for (piter = pPopulations.begin(); piter != pPopulations.end();  piter++) {
 			PopulationBase * p = *piter;
 			if (p->getType() == nTypes[i]) {
-				for (int i=0; i<p->getNum(); i++) {
-					NeuronBase * n = p->getNeuron(i);
-					n->setStartExec(input_idx);
-					auto iter_exec = n2s_exec.find(n);
-					if (iter_exec != n2s_exec.end()) {
-						for (auto iter = iter_exec->second.begin(); iter != iter_exec->second.end(); iter++) {
-							(*iter)->setDst(input_idx);
-							input_idx++;
-						}
-					}
-					n->setStartInhi(input_idx);
-					auto iter_inhi = n2s_inhi.find(n);
-					if (iter_inhi != n2s_inhi.end()) {
-						for (auto iter = iter_inhi->second.begin(); iter != iter_inhi->second.end(); iter++) {
-							(*iter)->setDst(input_idx);
-							input_idx++;
-						}
-					}
-					n->setEnd(input_idx);
-				}
+				//for (int i=0; i<p->getNum(); i++) {
+				//	NeuronBase * n = p->getNeuron(i);
+				//	n->setStartExec(input_idx);
+				//	auto iter_exec = n2s_exec.find(n);
+				//	if (iter_exec != n2s_exec.end()) {
+				//		for (auto iter = iter_exec->second.begin(); iter != iter_exec->second.end(); iter++) {
+				//			(*iter)->setDst(input_idx);
+				//			input_idx++;
+				//		}
+				//	}
+				//	n->setStartInhi(input_idx);
+				//	auto iter_inhi = n2s_inhi.find(n);
+				//	if (iter_inhi != n2s_inhi.end()) {
+				//		for (auto iter = iter_inhi->second.begin(); iter != iter_inhi->second.end(); iter++) {
+				//			(*iter)->setDst(input_idx);
+				//			input_idx++;
+				//		}
+				//	}
+				//	n->setEnd(input_idx);
+				//}
 
 				size_t copied = p->hardCopy(pN, idx, pNeuronsNum[i]);
 				idx += copied;

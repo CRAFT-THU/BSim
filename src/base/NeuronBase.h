@@ -22,9 +22,9 @@ public:
 	virtual int fire() final;
 	virtual int recv(real I) = 0;
 
-	virtual  void setStartExec(int idx) final;
-	virtual  void setStartInhi(int idx) final;
-	virtual  void setEnd(int idx) final;
+	//virtual  void setStartExec(int idx) final;
+	//virtual  void setStartInhi(int idx) final;
+	//virtual  void setEnd(int idx) final;
 
 	virtual SynapseBase *addSynapse(SynapseBase *addSynapse) final;
 	virtual SynapseBase *createSynapse(real weight, real delay, SpikeType type, real tau, NeuronBase *dst);
@@ -35,9 +35,9 @@ protected:
 	bool fired;
 	bool monitored;
 	int fireCount;
-	int _start_E;
-	int _start_I;
-	int _end;
+	//int _start_E;
+	//int _start_I;
+	//int _end;
 };
 
 #endif /* NEURONBASE_H */

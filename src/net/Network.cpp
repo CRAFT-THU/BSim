@@ -129,7 +129,7 @@ SynapseBase* Network::connect(NeuronBase *pn1, NeuronBase *pn2, real weight, rea
 	//}
 
 	SynapseBase * p = pn2->createSynapse(weight, delay, type, tau, pn2);
-	p->setSrc(pn1);
+	//p->setSrc(pn1);
 	pn1->addSynapse(p);
 
 	pSynapses.push_back(p);

@@ -20,9 +20,9 @@ int cudaAllocLIFE(void *pCpu, void *pGpu, int num)
 	pGpuNeurons->p_Cm = copyToGPU<real>(p->p_Cm, num);
 	pGpuNeurons->p_refrac_step = copyToGPU<int>(p->p_refrac_step, num);
 	pGpuNeurons->p_refrac_time = copyToGPU<int>(p->p_refrac_time, num);
-	pGpuNeurons->p_start_E = copyToGPU<int>(p->p_start_E, num);
-	pGpuNeurons->p_start_I = copyToGPU<int>(p->p_start_I, num);
-	pGpuNeurons->p_end = copyToGPU<int>(p->p_end, num);
+	//pGpuNeurons->p_start_E = copyToGPU<int>(p->p_start_E, num);
+	//pGpuNeurons->p_start_I = copyToGPU<int>(p->p_start_I, num);
+	//pGpuNeurons->p_end = copyToGPU<int>(p->p_end, num);
 	return 0;
 }
 
@@ -42,9 +42,9 @@ int cudaFreeLIFE(void *pGpu)
 	gpuFree(pGpuNeurons->p_Cm);
 	gpuFree(pGpuNeurons->p_refrac_step);
 	gpuFree(pGpuNeurons->p_refrac_time);
-	gpuFree(pGpuNeurons->p_start_E);
-	gpuFree(pGpuNeurons->p_start_I);
-	gpuFree(pGpuNeurons->p_end);
+	//gpuFree(pGpuNeurons->p_start_E);
+	//gpuFree(pGpuNeurons->p_start_I);
+	//gpuFree(pGpuNeurons->p_end);
 	return 0;
 }
 

@@ -23,9 +23,9 @@ int allocLIFE(void *pCpu, int N)
 	p->p_Cm = (real*)malloc(N*sizeof(real));
 	p->p_refrac_step = (int*)malloc(N*sizeof(int));
 	p->p_refrac_time = (int*)malloc(N*sizeof(int));
-	p->p_start_E = (int*)malloc(N*sizeof(int));
-	p->p_start_I = (int*)malloc(N*sizeof(int));
-	p->p_end = (int*)malloc(N*sizeof(int));
+	//p->p_start_E = (int*)malloc(N*sizeof(int));
+	//p->p_start_I = (int*)malloc(N*sizeof(int));
+	//p->p_end = (int*)malloc(N*sizeof(int));
 	return 0;
 }
 
@@ -45,9 +45,9 @@ int freeLIFE(void *pCpu)
 	free(pCpuNeurons->p_Cm);
 	free(pCpuNeurons->p_refrac_step);
 	free(pCpuNeurons->p_refrac_time);
-	free(pCpuNeurons->p_start_E);
-	free(pCpuNeurons->p_start_I);
-	free(pCpuNeurons->p_end);
+	//free(pCpuNeurons->p_start_E);
+	//free(pCpuNeurons->p_start_I);
+	//free(pCpuNeurons->p_end);
 	return 0;
 }
 

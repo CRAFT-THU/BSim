@@ -811,22 +811,27 @@ __global__ void update_dense_life_neuron(GLIFENeurons *d_neurons, int num, int s
 				d_neurons->p_vm[nid] = d_neurons->p_v_reset[nid];
 
 			} else {
-				real input = 0, input_I = 0;
-				for (int i=d_neurons->p_start_E[nid]; i<d_neurons->p_start_I[nid]; i++) {
-					input += gNeuronInput[i];
-				}
-				for (int i=d_neurons->p_start_I[nid]; i<d_neurons->p_end[nid]; i++) {
-					input_I += gNeuronInput[i];
-				}
-				d_neurons->p_i_E[nid] += input;
-				d_neurons->p_i_I[nid] += input_I;
-				gXInput[gnid] += input + input_I;
+				gXInput[gnid] += gNeuronInput[gnid] + gNeuronInput_I[gnid];
+				d_neurons->p_i_E[nid] += gNeuronInput[gnid];
+				d_neurons->p_i_I[nid] += gNeuronInput_I[gnid];
+				//real input = 0, input_I = 0;
+				//for (int i=d_neurons->p_start_E[nid]; i<d_neurons->p_start_I[nid]; i++) {
+				//	input += gNeuronInput[i];
+				//}
+				//for (int i=d_neurons->p_start_I[nid]; i<d_neurons->p_end[nid]; i++) {
+				//	input_I += gNeuronInput[i];
+				//}
+				//d_neurons->p_i_E[nid] += input;
+				//d_neurons->p_i_I[nid] += input_I;
+				//gXInput[gnid] += input + input_I;
 			}
 
 		} else {
 			d_neurons->p_refrac_step[idx] = d_neurons->p_refrac_step[idx] - 1;
 			gFiredTable[gFiredTableCap*gCurrentIdx + gnid] = 0;
 		}
+		gNeuronInput[gnid] = 0;
+		gNeuronInput_I[gnid] = 0;
 	}
 	__syncthreads();
 }

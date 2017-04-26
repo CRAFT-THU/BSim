@@ -202,9 +202,9 @@ int LIFENeuron::hardCopy(void * data, int idx, int base)
 
 	p->p_refrac_step[idx] = _refrac_step;
 	p->p_refrac_time[idx] = _refrac_time;
-	p->p_start_I[idx] = this->_start_I;
-	p->p_start_E[idx] = this->_start_E;
-	p->p_end[idx] = this->_end;
+	//p->p_start_I[idx] = this->_start_I;
+	//p->p_start_E[idx] = this->_start_E;
+	//p->p_end[idx] = this->_end;
 	return 1;
 }
 
