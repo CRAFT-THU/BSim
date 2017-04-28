@@ -28,6 +28,18 @@ int SingleThreadSimulator::run(real time)
 		return -1;
 	}
 
+	FILE *input_e_file = fopen("input_e.data", "w+");
+	if (input_e_file == NULL) {
+		printf("Open file input_e.data failed\n");
+		return -1;
+	}
+
+	FILE *input_i_file = fopen("input_i.data", "w+");
+	if (input_i_file == NULL) {
+		printf("Open file input_i.data failed\n");
+		return -1;
+	}
+
 	FILE *ie_file = fopen("ie.data", "w+");
 	if (ie_file == NULL) {
 		printf("Open file ie.data failed\n");
@@ -90,9 +102,13 @@ int SingleThreadSimulator::run(real time)
 		int isize = info.input.size();
 		//fprintf(dataFile, "Cycle %d: ", info.currCycle);
 		for (int i=0; i<isize; i++) {
-			if (i%3 == 0) {
+			if (i%5 == 0) {
 				fprintf(v_file, "%.10lf \t", info.input[i]);
-			} else if (i%3 == 1) {
+			} else if (i%5 == 1) {
+				fprintf(input_e_file, "%.10lf \t", info.input[i]);
+			} else if (i%5 == 2) {
+				fprintf(input_i_file, "%.10lf \t", info.input[i]);
+			} else if (i%5 == 3) {
 				fprintf(ie_file, "%.10lf \t", info.input[i]);
 			} else {
 				fprintf(ii_file, "%.10lf \t", info.input[i]);
@@ -100,6 +116,8 @@ int SingleThreadSimulator::run(real time)
 		}
 
 		fprintf(v_file, "\n");
+		fprintf(input_e_file, "\n");
+		fprintf(input_i_file, "\n");
 		fprintf(ie_file, "\n");
 		fprintf(ii_file, "\n");
 
@@ -135,6 +153,8 @@ int SingleThreadSimulator::run(real time)
 
 	printf("\nSimulation finished in %ld:%ld:%ld.%06lds\n", hours, minutes, seconds, uSeconds);
 	fclose(v_file);
+	fclose(input_e_file);
+	fclose(input_i_file);
 	fclose(ie_file);
 	fclose(ii_file);
 	fclose(log_file);

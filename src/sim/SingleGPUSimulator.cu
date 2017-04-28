@@ -41,6 +41,18 @@ int SingleGPUSimulator::run(real time)
 		return -1;
 	}
 
+	FILE *input_e_file = fopen("g_input_e.data", "w+");
+	if (input_e_file == NULL) {
+		printf("Open file input_e.data failed\n");
+		return -1;
+	}
+
+	FILE *input_i_file = fopen("g_input_i.data", "w+");
+	if (input_i_file == NULL) {
+		printf("Open file input_i.data failed\n");
+		return -1;
+	}
+
 	FILE *ie_file = fopen("g_ie.data", "w+");
 	if (ie_file == NULL) {
 		printf("ERROR: Open file GSim.data failed\n");
@@ -154,6 +166,18 @@ int SingleGPUSimulator::run(real time)
 			for (int i=0; i<c_pGpuNet->neuronNums[copy_idx+1] - c_pGpuNet->neuronNums[copy_idx]; i++) {
 				fprintf(v_file, "%.10lf \t", c_vm[i]);
 			}
+
+			//copyFromGPU<real>(c_vm, buffers->c_gNeuronInput + c_pGpuNet->neuronNums[copy_idx], c_pGpuNet->neuronNums[copy_idx+1]-c_pGpuNet->neuronNums[copy_idx]);
+			copyFromGPU<real>(c_vm, buffers->c_gNeuronInput, c_pGpuNet->neuronNums[copy_idx+1]-c_pGpuNet->neuronNums[copy_idx]);
+			for (int i=0; i<c_pGpuNet->neuronNums[copy_idx+1] - c_pGpuNet->neuronNums[copy_idx]; i++) {
+				fprintf(input_e_file, "%.10lf \t", c_vm[i]);
+			}
+			//copyFromGPU<real>(c_vm, buffers->c_gNeuronInput_I + c_pGpuNet->neuronNums[copy_idx], c_pGpuNet->neuronNums[copy_idx+1]-c_pGpuNet->neuronNums[copy_idx]);
+			copyFromGPU<real>(c_vm, buffers->c_gNeuronInput_I, c_pGpuNet->neuronNums[copy_idx+1]-c_pGpuNet->neuronNums[copy_idx]);
+			for (int i=0; i<c_pGpuNet->neuronNums[copy_idx+1] - c_pGpuNet->neuronNums[copy_idx]; i++) {
+				fprintf(input_i_file, "%.10lf \t", c_vm[i]);
+			}
+
 			if (life_idx >= 0) {
 				copyFromGPU<real>(c_vm, c_g_ie, c_pGpuNet->neuronNums[copy_idx+1]-c_pGpuNet->neuronNums[copy_idx]);
 				for (int i=0; i<c_pGpuNet->neuronNums[copy_idx+1] - c_pGpuNet->neuronNums[copy_idx]; i++) {
@@ -169,6 +193,8 @@ int SingleGPUSimulator::run(real time)
 		//		fprintf(dataFile, ", %lf", c_I_syn[i]);
 		//}
 		fprintf(v_file, "\n");
+		fprintf(input_e_file, "\n");
+		fprintf(input_i_file, "\n");
 		fprintf(ie_file, "\n");
 		fprintf(ii_file, "\n");
 
@@ -234,6 +260,8 @@ int SingleGPUSimulator::run(real time)
 	fclose(rateFile);
 
 	fclose(v_file);
+	fclose(input_e_file);
+	fclose(input_i_file);
 	fclose(ie_file);
 	fclose(ii_file);
 	fclose(log_file);
