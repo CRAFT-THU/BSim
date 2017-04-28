@@ -1009,8 +1009,13 @@ __global__ void update_dense_static_hit(GStaticSynapses *d_synapses, int num, in
 		int time_idx = (gCurrentIdx+MAX_DELAY-delta_t)%(MAX_DELAY+1);
 		int firedSize = gFiredTableSizes[time_idx];
 		int block_nums_1 = (firedSize - 1) / blockDim.x;
-		for (int idx = tid; idx < firedSize; idx += blockDim.x*gridDim.x) {
-			fire_neuron_id[threadIdx.x] = gFiredTable[time_idx*gFiredTableCap + idx];
+		int grid_nums = (firedSize - 1 + blockDim.x*gridDim.x)/(blockDim.x * gridDim.x);
+		int oid = tid;
+		for (int idx = 0; idx < grid_nums; idx++) {
+			if (oid < firedSize) {
+				fire_neuron_id[threadIdx.x] = gFiredTable[time_idx*gFiredTableCap + oid];
+			}
+			oid += blockDim.x * gridDim.x;
 			__syncthreads();
 
 			int size = 0;

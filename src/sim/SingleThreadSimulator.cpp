@@ -22,14 +22,26 @@ int SingleThreadSimulator::run(real time)
 {
 	int sim_cycle =  round((time)/dt);
 
-	FILE *dataFile = fopen("Sim.data", "w+");
-	if (dataFile == NULL) {
-		printf("Open file Sim.data failed\n");
+	FILE *v_file = fopen("v.data", "w+");
+	if (v_file == NULL) {
+		printf("Open file v.data failed\n");
 		return -1;
 	}
 
-	FILE *logFile = fopen("Sim.log", "w+");
-	if (logFile == NULL) {
+	FILE *ie_file = fopen("ie.data", "w+");
+	if (ie_file == NULL) {
+		printf("Open file ie.data failed\n");
+		return -1;
+	}
+
+	FILE *ii_file = fopen("ii.data", "w+");
+	if (ii_file == NULL) {
+		printf("Open file ii.data failed\n");
+		return -1;
+	}
+
+	FILE *log_file = fopen("Sim.log", "w+");
+	if (log_file == NULL) {
 		printf("Open file Sim.log failed\n");
 		return -1;
 	}
@@ -78,17 +90,25 @@ int SingleThreadSimulator::run(real time)
 		int isize = info.input.size();
 		//fprintf(dataFile, "Cycle %d: ", info.currCycle);
 		for (int i=0; i<isize; i++) {
-			fprintf(dataFile, "%.10lf \t", info.input[i]);
+			if (i%3 == 0) {
+				fprintf(v_file, "%.10lf \t", info.input[i]);
+			} else if (i%3 == 1) {
+				fprintf(ie_file, "%.10lf \t", info.input[i]);
+			} else {
+				fprintf(ii_file, "%.10lf \t", info.input[i]);
+			}
 		}
 
-		fprintf(dataFile, "\n");
+		fprintf(v_file, "\n");
+		fprintf(ie_file, "\n");
+		fprintf(ii_file, "\n");
 
 		int size = info.fired.size();
 		//fprintf(logFile, "Cycle %d: ", info.currCycle);
 		for (int i=0; i<size; i++) {
-			fprintf(logFile, "%d ", info.fired[i]);
+			fprintf(log_file, "%d ", info.fired[i]);
 		}
-		fprintf(logFile, "\n");
+		fprintf(log_file, "\n");
 
 		//size = network->pOutputs.size();
 		//fprintf(outFile, "%d", info.currCycle);
@@ -114,13 +134,15 @@ int SingleThreadSimulator::run(real time)
 	}
 
 	printf("\nSimulation finished in %ld:%ld:%ld.%06lds\n", hours, minutes, seconds, uSeconds);
-	fclose(dataFile);
-	fclose(logFile);
+	fclose(v_file);
+	fclose(ie_file);
+	fclose(ii_file);
+	fclose(log_file);
 	//fclose(outFile);
 
 	FILE *rateFile = fopen("Fire.log", "w+");
 	if (rateFile == NULL) {
-		printf("Open file Sim.log failed\n");
+		printf("Open file Fire.log failed\n");
 		return -1;
 	}
 

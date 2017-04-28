@@ -35,14 +35,26 @@ int SingleGPUSimulator::run(real time)
 
 	GNetwork *pCpuNet = network->buildNetwork();
 
-	FILE *dataFile = fopen("GSim.data", "w+");
-	if (dataFile == NULL) {
+	FILE *v_file = fopen("g_v.data", "w+");
+	if (v_file == NULL) {
 		printf("ERROR: Open file GSim.data failed\n");
 		return -1;
 	}
 
-	FILE *logFile = fopen("GSim.log", "w+");
-	if (logFile == NULL) {
+	FILE *ie_file = fopen("g_ie.data", "w+");
+	if (ie_file == NULL) {
+		printf("ERROR: Open file GSim.data failed\n");
+		return -1;
+	}
+
+	FILE *ii_file = fopen("g_ii.data", "w+");
+	if (ii_file == NULL) {
+		printf("ERROR: Open file GSim.data failed\n");
+		return -1;
+	}
+
+	FILE *log_file = fopen("GSim.log", "w+");
+	if (log_file == NULL) {
 		printf("ERROR: Open file GSim.log failed\n");
 		return -1;
 	}
@@ -75,10 +87,14 @@ int SingleGPUSimulator::run(real time)
 	int lif_idx = getIndex(pCpuNet->nTypes, nTypeNum, LIF);
 	int copy_idx = -1;
 	real *c_g_vm = NULL;
+	real *c_g_ie = NULL;
+	real *c_g_ii = NULL;
 
 	if (life_idx >= 0) {
 		GLIFENeurons *c_g_lif = copyFromGPU<GLIFENeurons>(static_cast<GLIFENeurons*>(c_pGpuNet->pNeurons[life_idx]), 1);
 		c_g_vm = c_g_lif->p_vm;
+		c_g_ie = c_g_lif->p_i_E;
+		c_g_ii = c_g_lif->p_i_I;
 		copy_idx = life_idx;
 	} else if (lif_idx >= 0) {
 		GLIFNeurons *c_g_lif = copyFromGPU<GLIFNeurons>(static_cast<GLIFNeurons*>(c_pGpuNet->pNeurons[lif_idx]), 1);
@@ -136,19 +152,31 @@ int SingleGPUSimulator::run(real time)
 		if (copy_idx >= 0) {
 			copyFromGPU<real>(c_vm, c_g_vm, c_pGpuNet->neuronNums[copy_idx+1]-c_pGpuNet->neuronNums[copy_idx]);
 			for (int i=0; i<c_pGpuNet->neuronNums[copy_idx+1] - c_pGpuNet->neuronNums[copy_idx]; i++) {
-				fprintf(dataFile, "%.10lf \t", c_vm[i]);
+				fprintf(v_file, "%.10lf \t", c_vm[i]);
+			}
+			if (life_idx >= 0) {
+				copyFromGPU<real>(c_vm, c_g_ie, c_pGpuNet->neuronNums[copy_idx+1]-c_pGpuNet->neuronNums[copy_idx]);
+				for (int i=0; i<c_pGpuNet->neuronNums[copy_idx+1] - c_pGpuNet->neuronNums[copy_idx]; i++) {
+					fprintf(ie_file, "%.10lf \t", c_vm[i]);
+				}
+				copyFromGPU<real>(c_vm, c_g_ii, c_pGpuNet->neuronNums[copy_idx+1]-c_pGpuNet->neuronNums[copy_idx]);
+				for (int i=0; i<c_pGpuNet->neuronNums[copy_idx+1] - c_pGpuNet->neuronNums[copy_idx]; i++) {
+					fprintf(ii_file, "%.10lf \t", c_vm[i]);
+				}
 			}
 		}
 		//for (int i=0; i<c_pGpuNet->synapseNums[1] - c_pGpuNet->synapseNums[0]; i++) {
 		//		fprintf(dataFile, ", %lf", c_I_syn[i]);
 		//}
-		fprintf(dataFile, "\n");
+		fprintf(v_file, "\n");
+		fprintf(ie_file, "\n");
+		fprintf(ii_file, "\n");
 
 		//fprintf(logFile, "Cycle %d: ", time);
 		for (int i=0; i<copySize; i++) {
-			fprintf(logFile, "%d ", buffers->c_neuronsFired[i]);
+			fprintf(log_file, "%d ", buffers->c_neuronsFired[i]);
 		}
-		fprintf(logFile, "\n");
+		fprintf(log_file, "\n");
 
 		//LOG SYNAPSE
 		//copyFromGPU<int>(buffers->c_synapsesFired, buffers->c_gSynapsesLogTable, totalSynapseNum);
@@ -173,6 +201,7 @@ int SingleGPUSimulator::run(real time)
 
 		update_time<<<1, 1>>>();
 	}
+	cudaDeviceSynchronize();
 
 	gettimeofday(&te, NULL);
 	long seconds = te.tv_sec - ts.tv_sec;
@@ -204,8 +233,10 @@ int SingleGPUSimulator::run(real time)
 
 	fclose(rateFile);
 
-	fclose(dataFile);
-	fclose(logFile);
+	fclose(v_file);
+	fclose(ie_file);
+	fclose(ii_file);
+	fclose(log_file);
 
 	free_buffers(buffers);
 	freeGPUNetwork(c_pGpuNet);
