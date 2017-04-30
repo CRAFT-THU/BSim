@@ -12,7 +12,7 @@ cmake_install.cmake
 Makefile
 build/bin/*
 build/*
-!build/bin/build.sh
+!build/bin/*.sh
 !build/bin
 !build
 src/utils/TypeFunc.cpp

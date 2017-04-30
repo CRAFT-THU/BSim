@@ -84,7 +84,11 @@ real *loadArray(const char *filename, int size)
 		return res;
 	}
 	for (int i =0; i<size; i++) {
+#ifndef USE_DOUBLE
 		fscanf(logFile, "%f \t", &(res[i]));
+#else
+		fscanf(logFile, "%lf \t", &(res[i]));
+#endif
 	}
 	fflush(logFile);
 	fclose(logFile);

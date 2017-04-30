@@ -81,7 +81,7 @@ GNetwork* Network::buildNetwork()
 	//	}
 	//}
 
-	int input_idx = 0;
+	//int input_idx = 0;
 	for (int i=0; i<neuronTypeNum; i++) {
 		pNTypes[i] = nTypes[i];
 

@@ -4,7 +4,7 @@ MODE=$(echo $1 | tr [A-Z] [a-z])
 
 PREC=$(echo $2 | tr [A-Z] [a-z])
 
-USE_DOUBLE="OFF"
+USE_DOUBLE="ON"
 
 if [ "$MODE" = "debug" ]; then
 	MODE="Debug"
@@ -12,8 +12,8 @@ else
 	MODE="Release"
 fi
 
-if [ "$PREC" = "double" ]; then
-	USE_DOUBLE="ON"
+if [ "$PREC" = "float" ]; then
+	USE_DOUBLE="OFF"
 fi
 
 THREAD_NUM=`getconf _NPROCESSORS_ONLN`
