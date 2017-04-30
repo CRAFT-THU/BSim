@@ -9,8 +9,11 @@
 
 #define MPI_CREAL MPI_FLOAT
 
+#ifndef USE_DOUBLE
 typedef float real;
-//typedef double real;
+#else
+typedef double real;
+#endif
 
 typedef int ID;
 

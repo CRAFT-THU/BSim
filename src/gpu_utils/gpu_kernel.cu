@@ -45,8 +45,8 @@ __device__ int *gFireCount;
 // Connection
 __device__ N2SConnection *gConnection;
 
-#if !defined(__CUDA_ARCH__) || __CUDA_ARCH__ >= 600
-#else
+//#if !defined(__CUDA_ARCH__) || __CUDA_ARCH__ >= 600
+//#else
 //__device__ double atomicAdd(double* address, double val)
 //{
 //	unsigned long long int* address_as_ull = (unsigned long long int*)address;
@@ -58,8 +58,7 @@ __device__ N2SConnection *gConnection;
 //	} while (assumed != old);
 //	return __longlong_as_double(old);
 //}
-
-#endif
+//#endif
 
 
 __device__ int commit2globalTable(int *shared_buf, volatile unsigned int size, int *global_buf, int * global_size, int offset) 
@@ -1008,7 +1007,7 @@ __global__ void update_dense_static_hit(GStaticSynapses *d_synapses, int num, in
 	for (int delta_t = 0; delta_t<MAX_DELAY; delta_t++) {
 		int time_idx = (gCurrentIdx+MAX_DELAY-delta_t)%(MAX_DELAY+1);
 		int firedSize = gFiredTableSizes[time_idx];
-		int block_nums_1 = (firedSize - 1) / blockDim.x;
+		int block_nums_minus_1 = (firedSize - 1 + blockDim.x) / blockDim.x - 1;
 		int grid_nums = (firedSize - 1 + blockDim.x*gridDim.x)/(blockDim.x * gridDim.x);
 		int oid = tid;
 		for (int idx = 0; idx < grid_nums; idx++) {
@@ -1019,9 +1018,9 @@ __global__ void update_dense_static_hit(GStaticSynapses *d_synapses, int num, in
 			__syncthreads();
 
 			int size = 0;
-			if (block_idx == block_nums_1) {
+			if (block_idx == block_nums_minus_1) {
 				size = firedSize - block_idx * blockDim.x;
-			} else if (block_idx < block_nums_1) {
+			} else if (block_idx < block_nums_minus_1) {
 				size = blockDim.x;
 			} else {
 				size = 0;
@@ -1044,7 +1043,6 @@ __global__ void update_dense_static_hit(GStaticSynapses *d_synapses, int num, in
 			block_idx += gridDim.x;
 		}
 	}
-	__syncthreads();
 	//int tid = blockIdx.x * blockDim.x + threadIdx.x;
 	//for (int idx = tid; idx < num; idx += blockDim.x*gridDim.x) {
 	//	int sid = idx;

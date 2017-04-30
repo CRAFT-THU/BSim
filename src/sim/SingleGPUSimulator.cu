@@ -135,6 +135,21 @@ int SingleGPUSimulator::run(real time)
 		//printf("Cycle: %d ", time);
 		//fflush(stdout);
 
+#ifdef LOG_DATA
+		if (copy_idx >= 0) {
+			//copyFromGPU<real>(c_vm, buffers->c_gNeuronInput + c_pGpuNet->neuronNums[copy_idx], c_pGpuNet->neuronNums[copy_idx+1]-c_pGpuNet->neuronNums[copy_idx]);
+			copyFromGPU<real>(c_vm, buffers->c_gNeuronInput, c_pGpuNet->neuronNums[copy_idx+1]-c_pGpuNet->neuronNums[copy_idx]);
+			for (int i=0; i<c_pGpuNet->neuronNums[copy_idx+1] - c_pGpuNet->neuronNums[copy_idx]; i++) {
+				fprintf(input_e_file, "%.10lf \t", c_vm[i]);
+			}
+			//copyFromGPU<real>(c_vm, buffers->c_gNeuronInput_I + c_pGpuNet->neuronNums[copy_idx], c_pGpuNet->neuronNums[copy_idx+1]-c_pGpuNet->neuronNums[copy_idx]);
+			copyFromGPU<real>(c_vm, buffers->c_gNeuronInput_I, c_pGpuNet->neuronNums[copy_idx+1]-c_pGpuNet->neuronNums[copy_idx]);
+			for (int i=0; i<c_pGpuNet->neuronNums[copy_idx+1] - c_pGpuNet->neuronNums[copy_idx]; i++) {
+				fprintf(input_i_file, "%.10lf \t", c_vm[i]);
+			}
+		}
+#endif
+
 		for (int i=0; i<nTypeNum; i++) {
 			cudaUpdateType[pCpuNet->nTypes[i]](c_pGpuNet->pNeurons[i], c_pGpuNet->neuronNums[i+1]-c_pGpuNet->neuronNums[i], c_pGpuNet->neuronNums[i], &updateSize[c_pGpuNet->nTypes[i]]);
 		}
@@ -167,16 +182,6 @@ int SingleGPUSimulator::run(real time)
 				fprintf(v_file, "%.10lf \t", c_vm[i]);
 			}
 
-			//copyFromGPU<real>(c_vm, buffers->c_gNeuronInput + c_pGpuNet->neuronNums[copy_idx], c_pGpuNet->neuronNums[copy_idx+1]-c_pGpuNet->neuronNums[copy_idx]);
-			copyFromGPU<real>(c_vm, buffers->c_gNeuronInput, c_pGpuNet->neuronNums[copy_idx+1]-c_pGpuNet->neuronNums[copy_idx]);
-			for (int i=0; i<c_pGpuNet->neuronNums[copy_idx+1] - c_pGpuNet->neuronNums[copy_idx]; i++) {
-				fprintf(input_e_file, "%.10lf \t", c_vm[i]);
-			}
-			//copyFromGPU<real>(c_vm, buffers->c_gNeuronInput_I + c_pGpuNet->neuronNums[copy_idx], c_pGpuNet->neuronNums[copy_idx+1]-c_pGpuNet->neuronNums[copy_idx]);
-			copyFromGPU<real>(c_vm, buffers->c_gNeuronInput_I, c_pGpuNet->neuronNums[copy_idx+1]-c_pGpuNet->neuronNums[copy_idx]);
-			for (int i=0; i<c_pGpuNet->neuronNums[copy_idx+1] - c_pGpuNet->neuronNums[copy_idx]; i++) {
-				fprintf(input_i_file, "%.10lf \t", c_vm[i]);
-			}
 
 			if (life_idx >= 0) {
 				copyFromGPU<real>(c_vm, c_g_ie, c_pGpuNet->neuronNums[copy_idx+1]-c_pGpuNet->neuronNums[copy_idx]);
