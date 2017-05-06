@@ -15,7 +15,7 @@ int main(int argc, char **argv)
 		load = true;
 	}
 
-	const int N = 200;
+	const int N = 500;
 	Network c;
 	//createPopulation(int id, int N, LIFENeuron(ID id, real v_init, real v_rest, real v_reset, real cm, real tau_m, real tau_refrac, real tau_syn_E, real tau_syn_I, real v_thresh, real i_offset)), ID(0, 0), real tau_syn_E, real tau_syn_I);
 	Population<LIF_brian> *pn0 = c.createPopulation(N, LIF_brian(LIFENeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-3, 0.0, 1.0, 1.0, 15.0e-3, 10.0e-1), 1.0, 1.0));
@@ -42,8 +42,8 @@ int main(int argc, char **argv)
 		//	weight0[i] = 1e-6*((i+1));
 		//	weight1[i] = 1e-6*((N*N-i));
 		//}
-		weight0 = getRandomArray((real)1e-3, N*N);
-		weight1 = getRandomArray((real)2e-3, N*N);
+		weight0 = getRandomArray((real)1e-5, N*N);
+		weight1 = getRandomArray((real)2e-5, N*N);
 		delay = getConstArray((real)1e-3, N*N);
 		printf("GENERATE DATA FINISHED\n");
 	}
