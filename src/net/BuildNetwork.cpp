@@ -203,6 +203,9 @@ GNetwork* Network::buildNetwork()
 		}
 	}
 
+	for (int i=0; i<totalSynapseNum; i++) {
+		assert(pSynapsesIdx[i] == i);
+	}
 
 	pAllConnections->pSynapsesIdx = pSynapsesIdx;
 	pAllConnections->delayStart = delayStart;

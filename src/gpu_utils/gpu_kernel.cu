@@ -1000,7 +1000,7 @@ __global__ void update_all_exp_synapse(GExpSynapses *d_synapses, int num, int st
 
 __global__ void update_dense_static_hit(GStaticSynapses *d_synapses, int num, int start_id)
 {
-#ifdef FAST
+#ifndef FAST_TEST
 	__shared__ int fire_neuron_id[MAXBLOCKSIZE];
 
 	int tid = blockIdx.x * blockDim.x + threadIdx.x;
@@ -1034,7 +1034,8 @@ __global__ void update_dense_static_hit(GStaticSynapses *d_synapses, int num, in
 				int start_loc = gConnection->delayStart[delta_t + nid * MAX_DELAY];
 				int synapseNum = gConnection->delayNum[delta_t + nid * MAX_DELAY];
 				for (int j=threadIdx.x; j<synapseNum; j += blockDim.x) {
-					int sid = gConnection->pSynapsesIdx[j+start_loc];
+					//int sid = gConnection->pSynapsesIdx[j+start_loc];
+					int sid = j+start_loc;
 					real weight = d_synapses->p_weight[sid];
 					if (weight >= 0) {
 						atomicAdd(&(gNeuronInput[d_synapses->p_dst[sid]]), weight);
@@ -1046,7 +1047,7 @@ __global__ void update_dense_static_hit(GStaticSynapses *d_synapses, int num, in
 			block_idx += gridDim.x;
 			__syncthreads();
 		}
-		__syncthreads();
+		//__syncthreads();
 	}
 #else
 	int tid = blockIdx.x * blockDim.x + threadIdx.x;
