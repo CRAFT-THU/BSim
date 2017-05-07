@@ -7,13 +7,6 @@
 #include "../neuron/ArrayNeuron.h"
 #include "../neuron/GArrayNeurons.h"
 
-//void Network::mapIDtoIdx(GNetwork *net)
-//{
-//	vector<PopulationBase*>::iterator piter;
-//	vector<NeuronBase*>::iterator niter;
-//	vector<SynapseBase*>::iterator siter;
-//}
-
 void arrangeFireArray(vector<int> &fire_array, vector<int> &start_loc, PopulationBase *popu)
 {
 	size_t num = popu->getNum();
@@ -69,19 +62,6 @@ GNetwork* Network::buildNetwork()
 	vector<int> array_neuron_start;
 	vector<int> array_neuron_fire_times;
 
-	//map<NeuronBase*, vector<SynapseBase*>> n2s_exec;
-	//map<NeuronBase*, vector<SynapseBase*>> n2s_inhi;
-	//for (auto siter = pSynapses.begin(); siter != pSynapses.end(); siter++) {
-	//	SynapseBase * p = *siter;
-	//	NeuronBase* n = p->getDst();
-	//	if (p->getWeight() >= 0) {
-	//		n2s_exec[n].push_back(p);
-	//	} else {
-	//		n2s_inhi[n].push_back(p);
-	//	}
-	//}
-
-	//int input_idx = 0;
 	for (int i=0; i<neuronTypeNum; i++) {
 		pNTypes[i] = nTypes[i];
 
@@ -93,27 +73,6 @@ GNetwork* Network::buildNetwork()
 		for (piter = pPopulations.begin(); piter != pPopulations.end();  piter++) {
 			PopulationBase * p = *piter;
 			if (p->getType() == nTypes[i]) {
-				//for (int i=0; i<p->getNum(); i++) {
-				//	NeuronBase * n = p->getNeuron(i);
-				//	n->setStartExec(input_idx);
-				//	auto iter_exec = n2s_exec.find(n);
-				//	if (iter_exec != n2s_exec.end()) {
-				//		for (auto iter = iter_exec->second.begin(); iter != iter_exec->second.end(); iter++) {
-				//			(*iter)->setDst(input_idx);
-				//			input_idx++;
-				//		}
-				//	}
-				//	n->setStartInhi(input_idx);
-				//	auto iter_inhi = n2s_inhi.find(n);
-				//	if (iter_inhi != n2s_inhi.end()) {
-				//		for (auto iter = iter_inhi->second.begin(); iter != iter_inhi->second.end(); iter++) {
-				//			(*iter)->setDst(input_idx);
-				//			input_idx++;
-				//		}
-				//	}
-				//	n->setEnd(input_idx);
-				//}
-
 				size_t copied = p->hardCopy(pN, idx, pNeuronsNum[i]);
 				idx += copied;
 				if (p->getType() == Array) {
@@ -123,13 +82,6 @@ GNetwork* Network::buildNetwork()
 			}
 		}
 
-		//for (niter = pNeurons.begin(); niter != pNeurons.end();  niter++) {
-		//	NeuronBase * p = *niter;
-		//	if (p->getType() == nTypes[i]) {
-		//		size_t copied = p->hardCopy(pN, idx, pNeuronsNum[i], nid2idx, idx2nid);
-		//		idx += copied;
-		//	}
-		//}
 		assert(idx == neuronNums[i]);
 
 		if (nTypes[i] == Array) {
@@ -149,13 +101,33 @@ GNetwork* Network::buildNetwork()
 		allocType[sTypes[i]](pS, synapseNums[i]);
 
 		int idx = 0;
-		for (siter = pSynapses.begin(); siter != pSynapses.end();  siter++) {
-			SynapseBase * p = *siter;
-			if (p->getType() == sTypes[i]) {
-				int copied = p->hardCopy(pS, idx, pSynapsesNum[i]);
-				idx += copied;
+		for (auto piter = pPopulations.begin(); piter != pPopulations.end(); piter++) {
+			PopulationBase * p = *piter;
+			for (int nidx=0; nidx<p->getNum(); nidx++) {
+				const vector<SynapseBase*> &s_vec = p->getNeuron(nidx)->getSynapses();
+				for (int delay_t=0; delay_t < maxDelaySteps; delay_t++) {
+					for (auto siter = s_vec.begin(); siter != s_vec.end(); siter++) {
+						if ((*siter)->getDelay() == delay_t + 1) {
+							if ((*siter)->getType() == sTypes[i]) {
+								//int sid = (*iter)->getID();
+								//assert(synapseIdx < totalSynapseNum);
+								//pSynapsesIdx[synapseIdx] = sid;
+								//synapseIdx++;
+								int copied = (*siter)->hardCopy(pS, idx, pSynapsesNum[i]);
+								idx += copied;
+							}
+						}
+					}
+				}
 			}
 		}
+		//for (siter = pSynapses.begin(); siter != pSynapses.end();  siter++) {
+		//	SynapseBase * p = *siter;
+		//	if (p->getType() == sTypes[i]) {
+		//		int copied = p->hardCopy(pS, idx, pSynapsesNum[i]);
+		//		idx += copied;
+		//	}
+		//}
 
 		assert(idx == synapseNums[i]);
 		pSynapsesNum[i+1] = idx + pSynapsesNum[i];

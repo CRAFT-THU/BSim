@@ -1045,7 +1045,7 @@ __global__ void update_dense_static_hit(GStaticSynapses *d_synapses, int num, in
 				}
 			}
 			block_idx += gridDim.x;
-			__syncthreads();
+			//__syncthreads();
 		}
 		//__syncthreads();
 	}
