@@ -48,20 +48,20 @@ const double fv=-74e-3;
 
         printf("GENERATE DATA...\n");
         //real * array = getConstArray(weight_value, num);
-        weight0 = getConstArray((real)0.4e-9, N*N);
-        weight1 = getConstArray((real)0.4e-9, N*N);
-        delay = getConstArray((real)0.3e-3, N*N);
+        weight0 = getConstArray((real)4.0e-10, N*N);
+        weight1 = getConstArray((real)4.0e-10, N*N);
+        delay = getConstArray((real)3.0e-4, N*N);
         printf("GENERATE DATA FINISHED\n");
 
         c.connect(pn0, pn1, weight0, delay, NULL, N*N);
         c.connect(pn1, pn2, weight1, delay, NULL, N*N);
 	
 
-        SGSim sg(&c, 1.0e-4);		//这是gpu的代码
-        sg.run(0.1);			//这是gpu的代码
+        SGSim sg(&c, (real)1.0e-4);		//这是gpu的代码
+        sg.run((real)0.1);			//这是gpu的代码
 
-        STSim st(&c, 1.0e-4);
-        st.run(0.1);
+        STSim st(&c, (real)1.0e-4);
+        st.run((real)0.1);
 
         return 0;
 }
