@@ -152,7 +152,7 @@ BlockSize * getBlockSize(int nSize, int sSize)
 	ret[Exp].gridSize = (upzero_else_set_one(sSize) + (ret[Exp].blockSize) - 1) / (ret[Exp].blockSize);
 
 	cudaOccupancyMaxPotentialBlockSize(&(ret[Static].minGridSize), &(ret[Static].blockSize), update_static_hit, 0, sSize); 
-	//ret[Static].blockSize = 1;
+	ret[Static].blockSize = 128;
 	ret[Static].gridSize = (upzero_else_set_one(nSize) + (ret[Static].blockSize) - 1) / (ret[Static].blockSize);
 
 	//cudaOccupancyMaxPotentialBlockSize(&(ret[Alpha].minGridSize), &(ret[Alpha].blockSize), update_alpha_synapse, 0, sSize); 
