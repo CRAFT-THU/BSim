@@ -57,11 +57,11 @@ const double fv=-74e-3;
         c.connect(pn1, pn2, weight1, delay, NULL, N*N);
 	
 
-        SGSim sg(&c, 1.0e-4f);		//这是gpu的代码
-        sg.run(0.1f);			//这是gpu的代码
+        SGSim sg(&c, 1.0e-4);		//这是gpu的代码
+        sg.run(0.1);			//这是gpu的代码
 
-        STSim st(&c, 1.0e-4f);
-        st.run(0.1f);
+        STSim st(&c, 1.0e-4);
+        st.run(0.1);
 
         return 0;
 }
