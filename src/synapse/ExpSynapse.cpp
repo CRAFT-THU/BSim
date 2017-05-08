@@ -40,7 +40,7 @@ int ExpSynapse::reset(SimInfo &info) {
 
 int ExpSynapse::init(real dt) {
 	//_dt = dt;
-	_delay_steps = static_cast<int>(delay/dt);
+	_delay_steps = static_cast<int>(round(delay/dt));
 	if (tau_syn > 0) {
 		C1 = expf(-dt/tau_syn);
 		_C1 = expf(-(delay-dt*_delay_steps)/tau_syn);

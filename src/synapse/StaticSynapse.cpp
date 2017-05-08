@@ -41,7 +41,7 @@ Type StaticSynapse::getType()
 int StaticSynapse::reset(SimInfo &info)
 {
 	real dt = info.dt;
-	_delay_steps = static_cast<int>(_delay/dt);
+	_delay_steps = static_cast<int>(round(_delay/dt));
         real _C1 = expf(-(_delay-dt*_delay_steps)/_tau_syn);
 	this->_weight = this->_weight * _C1;
 

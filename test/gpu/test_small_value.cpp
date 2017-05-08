@@ -50,7 +50,7 @@ const double fv=-74e-3;
         //real * array = getConstArray(weight_value, num);
         weight0 = getConstArray((real)4.0e-10, N*N);
         weight1 = getConstArray((real)4.0e-10, N*N);
-        delay = getConstArray((real)1.0e-4, N*N);
+        delay = getConstArray((real)3.0e-4, N*N);
         printf("GENERATE DATA FINISHED\n");
 
         c.connect(pn0, pn1, weight0, delay, NULL, N*N);

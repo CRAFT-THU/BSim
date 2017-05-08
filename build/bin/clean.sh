@@ -1,4 +1,4 @@
-!/bin/sh
+#!/bin/sh
 rm *.bak
 rm *.data
 rm *.head

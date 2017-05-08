@@ -1,4 +1,7 @@
 #!/bin/sh
+cp Sim.log Sim.log.bak
+cp GSim_sort.log GSim_sort.log.bak
+
 cp v.data v.data.bak
 cp input_e.data input_e.data.bak
 cp input_i.data input_i.data.bak

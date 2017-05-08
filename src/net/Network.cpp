@@ -285,7 +285,7 @@ int Network::connect(int populationIDSrc, int neuronIDSrc, int populationIDDst, 
 
 int Network::reset(SimInfo &info)
 {
-	maxDelaySteps = static_cast<int>(maxDelay/info.dt);
+	maxDelaySteps = static_cast<int>(round(maxDelay/info.dt));
 	vector<SynapseBase*>::iterator iterS;
 	vector<NeuronBase*>::iterator iterN;
 	vector<PopulationBase*>::iterator iterP;
