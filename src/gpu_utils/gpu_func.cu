@@ -70,20 +70,20 @@ int cudaUpdateMax(void *data, int num, int start_id, BlockSize *pSize)
 
 int cudaUpdateExp(void *data, int num, int start_id, BlockSize *pSize)
 {
-	update_exp_hit<<<pSize->gridSize, pSize->blockSize>>>((GExpSynapses*)data, num, start_id);
-	reset_active_synapse<<<1, 1>>>();
-	find_exp_synapse<<<pSize->gridSize, pSize->blockSize>>>((GExpSynapses*)data, num, start_id);
-	update_exp_synapse<<<pSize->gridSize, pSize->blockSize>>>((GExpSynapses*)data, num, start_id);
-
+//	update_exp_hit<<<pSize->gridSize, pSize->blockSize>>>((GExpSynapses*)data, num, start_id);
+//	reset_active_synapse<<<1, 1>>>();
+//	find_exp_synapse<<<pSize->gridSize, pSize->blockSize>>>((GExpSynapses*)data, num, start_id);
+//	update_exp_synapse<<<pSize->gridSize, pSize->blockSize>>>((GExpSynapses*)data, num, start_id);
+//
 	return 0;
 }
 
 int cudaUpdateAllExp(void *data, int num, int start_id, BlockSize *pSize)
 {
-	update_exp_hit<<<pSize->gridSize, pSize->blockSize>>>((GExpSynapses*)data, num, start_id);
-	reset_active_synapse<<<1, 1>>>();
-	update_all_exp_synapse<<<pSize->gridSize, pSize->blockSize>>>((GExpSynapses*)data, num, start_id);
-
+//	update_exp_hit<<<pSize->gridSize, pSize->blockSize>>>((GExpSynapses*)data, num, start_id);
+//	reset_active_synapse<<<1, 1>>>();
+//	update_all_exp_synapse<<<pSize->gridSize, pSize->blockSize>>>((GExpSynapses*)data, num, start_id);
+//
 	return 0;
 }
 
@@ -98,8 +98,8 @@ int cudaUpdateStatic(void *data, int num, int start_id, BlockSize *pSize)
 
 int cudaUpdateAllStatic(void *data, int num, int start_id, BlockSize *pSize)
 {
-	update_static_hit<<<pSize->gridSize, pSize->blockSize>>>((GStaticSynapses*)data, num, start_id);
-	reset_active_synapse<<<1, 1>>>();
+//	update_static_hit<<<pSize->gridSize, pSize->blockSize>>>((GStaticSynapses*)data, num, start_id);
+//	reset_active_synapse<<<1, 1>>>();
 
 	return 0;
 }
@@ -148,10 +148,10 @@ BlockSize * getBlockSize(int nSize, int sSize)
 	//cudaOccupancyMaxPotentialBlockSize(&(ret[Basic].minGridSize), &(ret[Basic].blockSize), update_basic_synapse, 0, sSize); 
 	//ret[Basic].gridSize = (sSize + (ret[Basic].blockSize) - 1) / (ret[Basic].blockSize);
 
-	cudaOccupancyMaxPotentialBlockSize(&(ret[Exp].minGridSize), &(ret[Exp].blockSize), update_exp_synapse, 0, sSize); 
-	ret[Exp].gridSize = (upzero_else_set_one(sSize) + (ret[Exp].blockSize) - 1) / (ret[Exp].blockSize);
+	//cudaOccupancyMaxPotentialBlockSize(&(ret[Exp].minGridSize), &(ret[Exp].blockSize), update_exp_synapse, 0, sSize); 
+	//ret[Exp].gridSize = (upzero_else_set_one(sSize) + (ret[Exp].blockSize) - 1) / (ret[Exp].blockSize);
 
-	cudaOccupancyMaxPotentialBlockSize(&(ret[Static].minGridSize), &(ret[Static].blockSize), update_static_hit, 0, sSize); 
+	//cudaOccupancyMaxPotentialBlockSize(&(ret[Static].minGridSize), &(ret[Static].blockSize), update_static_hit, 0, sSize); 
 	ret[Static].blockSize = 128;
 	ret[Static].gridSize = (upzero_else_set_one(nSize) + (ret[Static].blockSize) - 1) / (ret[Static].blockSize);
 
