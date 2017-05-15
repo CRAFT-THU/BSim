@@ -77,13 +77,13 @@ GNetwork* copyNetworkToGPU(GNetwork *pCpuNet)
 	N2SConnection * pConnection = (N2SConnection*)malloc(sizeof(N2SConnection));
 	N2SConnection * g_pConnection = NULL;
 	int *g_pSynapsesIdx = NULL, *g_delayStart = NULL, *g_delayNum = NULL;
-	checkCudaErrors(cudaMalloc((void**)&(g_pSynapsesIdx), sizeof(int)*conn_s_num));
-	checkCudaErrors(cudaMemcpy(g_pSynapsesIdx, pCpuNet->pN2SConnection->pSynapsesIdx, sizeof(int)*conn_s_num, cudaMemcpyHostToDevice));
+	//checkCudaErrors(cudaMalloc((void**)&(g_pSynapsesIdx), sizeof(int)*conn_s_num));
+	//checkCudaErrors(cudaMemcpy(g_pSynapsesIdx, pCpuNet->pN2SConnection->pSynapsesIdx, sizeof(int)*conn_s_num, cudaMemcpyHostToDevice));
 	checkCudaErrors(cudaMalloc((void**)&(g_delayStart), sizeof(int)*conn_n_num*MAX_DELAY));
 	checkCudaErrors(cudaMemcpy(g_delayStart, pCpuNet->pN2SConnection->delayStart, sizeof(int)*conn_n_num*MAX_DELAY, cudaMemcpyHostToDevice));
 	checkCudaErrors(cudaMalloc((void**)&(g_delayNum), sizeof(int)*conn_n_num*MAX_DELAY));
 	checkCudaErrors(cudaMemcpy(g_delayNum, pCpuNet->pN2SConnection->delayNum, sizeof(int)*conn_n_num*MAX_DELAY, cudaMemcpyHostToDevice));
-	pConnection->pSynapsesIdx = g_pSynapsesIdx;
+	//pConnection->pSynapsesIdx = g_pSynapsesIdx;
 	pConnection->delayStart = g_delayStart;
 	pConnection->delayNum = g_delayNum;
 	checkCudaErrors(cudaMalloc((void**)&(g_pConnection), sizeof(N2SConnection)));
@@ -136,7 +136,7 @@ int freeGPUNetwork(GNetwork *pGpuNet)
 
 	N2SConnection * pConnection = (N2SConnection*)malloc(sizeof(N2SConnection));
 	checkCudaErrors(cudaMemcpy(pConnection, pTmpNet->pN2SConnection, sizeof(N2SConnection), cudaMemcpyDeviceToHost));
-	checkCudaErrors(cudaFree(pConnection->pSynapsesIdx));
+	//checkCudaErrors(cudaFree(pConnection->pSynapsesIdx));
 	checkCudaErrors(cudaFree(pConnection->delayStart));
 	checkCudaErrors(cudaFree(pConnection->delayNum));
 	checkCudaErrors(cudaFree(pTmpNet->pN2SConnection));

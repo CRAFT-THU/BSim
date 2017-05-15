@@ -6,7 +6,7 @@
 #define CONNECTION_H
 
 struct N2SConnection {
-	int *pSynapsesIdx; 
+	//int *pSynapsesIdx; 
 	//int synapsesNum; 
 	int *delayStart;
 	int *delayNum;

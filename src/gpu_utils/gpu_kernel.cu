@@ -871,7 +871,8 @@ __global__ void update_pre_synapse(N2SConnection *pConnection)
 				int synapseNum = pConnection->delayNum[delta_t + nid * MAX_DELAY];
 				for (int j=tid; j<synapseNum; j += blockDim.x) {
 					int test_loc = atomicAdd((int*)&fire_cnt, 1);
-					fire_synapse_id[threadIdx.x] = pConnection->pSynapsesIdx[j+start_loc];
+					//fire_synapse_id[threadIdx.x] = pConnection->pSynapsesIdx[j+start_loc];
+					fire_synapse_id[threadIdx.x] = j + start_loc;
 					__syncthreads();
 					//TODO
 				}

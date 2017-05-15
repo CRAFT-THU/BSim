@@ -238,7 +238,8 @@ N2SConnection* MultiNetwork::arrangeConnect(int n_num, int s_num, int node_idx)
 	//	}
 	//}
 
-	connection->pSynapsesIdx = s_idxs;
+	//TODO assert s_idx is in order
+	//connection->pSynapsesIdx = s_idxs;
 	connection->delayStart = delay_start;
 	connection->delayNum = delay_num;
 
