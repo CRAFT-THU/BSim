@@ -179,6 +179,7 @@ GNetwork* Network::buildNetwork()
 		assert(pSynapsesIdx[i] == i);
 	}
 
+	free(pSynapsesIdx);
 	//pAllConnections->pSynapsesIdx = pSynapsesIdx;
 	pAllConnections->delayStart = delayStart;
 	pAllConnections->delayNum = delayNum;
