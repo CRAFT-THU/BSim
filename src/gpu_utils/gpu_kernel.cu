@@ -381,16 +381,15 @@ __global__ void find_lif_neuron(GLIFNeurons *d_neurons, int num, int start_id)
 			}
 		}
 		__syncthreads();
-	}
-	
-	if (active_cnt > 0) {
-		commit2globalTable(active_table_t, active_cnt, gActiveTable, &gActiveTableSize, 0);
-		if (threadIdx.x == 0) {
-			active_cnt = 0;
-		}
-	}
-	__syncthreads();
 
+		if (active_cnt > 0) {
+			commit2globalTable(active_table_t, active_cnt, gActiveTable, &gActiveTableSize, 0);
+			if (threadIdx.x == 0) {
+				active_cnt = 0;
+			}
+		}
+		__syncthreads();
+	}
 }
 
 __device__ void reset_lif_neuron(GLIFNeurons *d_neurons, int *shared_buf, volatile int size, int start_id) 
@@ -537,10 +536,10 @@ __global__ void find_life_neuron(GLIFENeurons *d_neurons, int num, int start_id)
 
 	int tid = blockIdx.x * blockDim.x + threadIdx.x;
 	for (int idx = tid; idx < num; idx += blockDim.x * gridDim.x) {
-		bool actived = false;
+		//bool actived = false;
 		int test_loc = 0;
 
-		actived = d_neurons->p_refrac_step[idx] <= 0;
+		bool actived = d_neurons->p_refrac_step[idx] <= 0;
 
 		if (actived) {
 			test_loc = atomicAdd((int*)&active_cnt, 1);
