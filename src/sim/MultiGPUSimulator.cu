@@ -73,15 +73,15 @@ int MultiGPUSimulator::run(real time)
 void * run_thread(void *para) {
 	DistriNetwork *network = (DistriNetwork*)para;
 
-	char logFilename[512];
-	sprintf(logFilename, "GSim_%d.log", network->_node_idx); 
-	FILE *logFile = fopen(logFilename, "w+");
-	assert(logFile != NULL);
+	char log_filename[512];
+	sprintf(log_filename, "GSim_%d.log", network->_node_idx); 
+	FILE *log_file = fopen(log_filename, "w+");
+	assert(log_file != NULL);
 
-	char dataFilename[512];
-	sprintf(dataFilename, "g_v_%d.data", network->_node_idx); 
-	FILE *dataFile = fopen(dataFilename, "w+");
-	assert(dataFile != NULL);
+	char v_filename[512];
+	sprintf(v_filename, "g_v_%d.data", network->_node_idx); 
+	FILE *v_file = fopen(v_filename, "w+");
+	assert(v_file != NULL);
 
 	checkCudaErrors(cudaSetDevice(network->_node_idx));
 
@@ -153,7 +153,7 @@ void * run_thread(void *para) {
 			copyFromGPU<int>(buffers->c_neuronsFired, buffers->c_gFiredTable + (pCpuNet->pN2SConnection->n_num*currentIdx), copySize);
 		}
 
-		if (lif_idx >= 0 && (c_pGpuNet->neuronNums[lif_idx+1]-c_pGpuNet->neuronNums[lif_idx]) > 0) {
+		if (copy_idx >= 0 && (c_pGpuNet->neuronNums[copy_idx+1]-c_pGpuNet->neuronNums[copy_idx]) > 0) {
 			copyFromGPU<real>(c_vm, c_g_vm, c_pGpuNet->neuronNums[lif_idx+1]-c_pGpuNet->neuronNums[lif_idx]);
 			//copyFromGPU<real>(c_I_syn, c_g_I_syn, c_pGpuNet->synapseNums[exp_idx+1]-c_pGpuNet->synapseNums[exp_idx]);
 		}
@@ -205,21 +205,15 @@ void * run_thread(void *para) {
 			addCrossNeurons(c_g_cross_id, global_cross_data[dataIdx]._fired_n_num);
 		}
 
-		fprintf(logFile, "Cycle %d: ", time);
 		for (int i=0; i<copySize; i++) {
-			//if (network->_node_idx == 1) printf("hehe\n");
-			fprintf(logFile, "%d ", buffers->c_neuronsFired[i]);
+			fprintf(log_file, "%d ", buffers->c_neuronsFired[i]);
 		}
-		fprintf(logFile, "\n");
+		fprintf(log_file, "\n");
 
-		//fprintf(dataFile, "Cycle %d: ", time);
 		for (int i=0; i<c_pGpuNet->neuronNums[lif_idx+1] - c_pGpuNet->neuronNums[lif_idx]; i++) {
-			fprintf(dataFile, "%.10lf \t", c_vm[i]);
+			fprintf(v_file, "%.10lf \t", c_vm[i]);
 		}
-		//for (int i=0; i<c_pGpuNet->synapseNums[1] - c_pGpuNet->synapseNums[0]; i++) {
-		//		fprintf(dataFile, ", %lf", c_I_syn[i]);
-		//}
-		fprintf(dataFile, "\n");
+		fprintf(v_file, "\n");
 
 		//copyFromGPU<int>(buffers->c_synapsesFired, buffers->c_gSynapsesLogTable, totalSynapseNum);
 
@@ -258,8 +252,8 @@ void * run_thread(void *para) {
 
 	printf("Thread %d Simulation finesed in %ld:%ld:%ld.%06lds\n", network->_node_idx, hours, minutes, seconds, uSeconds);
 
-	fclose(logFile);
-	fclose(dataFile);
+	fclose(log_file);
+	fclose(v_file);
 
 	free_buffers(buffers);
 	freeGPUNetwork(c_pGpuNet);

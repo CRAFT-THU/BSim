@@ -203,7 +203,6 @@ int SingleGPUSimulator::run(real time)
 		fprintf(ie_file, "\n");
 		fprintf(ii_file, "\n");
 
-		//fprintf(logFile, "Cycle %d: ", time);
 		for (int i=0; i<copySize; i++) {
 			fprintf(log_file, "%d ", buffers->c_neuronsFired[i]);
 		}
