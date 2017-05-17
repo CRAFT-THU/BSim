@@ -1,5 +1,7 @@
 #!/bin/sh
 mv Sim.log Sim.log.bak
+mv Fire.log Fire.log.bak
+mv GFire.log GFire.log.bak
 mv GSim.log GSim.log.bak
 mv GSim_sort.log GSim_sort.log.bak
 mv GSim.data GSim.data.bak
