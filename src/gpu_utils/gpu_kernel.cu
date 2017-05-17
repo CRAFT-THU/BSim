@@ -577,16 +577,14 @@ __global__ void find_life_neuron(GLIFENeurons *d_neurons, int num, int start_id)
 			}
 		}
 		__syncthreads();
-	}
-	
-	if (active_cnt > 0) {
-		commit2globalTable(active_table_t, active_cnt, gActiveTable, &gActiveTableSize, 0);
-		if (threadIdx.x == 0) {
-			active_cnt = 0;
+		if (active_cnt > 0) {
+			commit2globalTable(active_table_t, active_cnt, gActiveTable, &gActiveTableSize, 0);
+			if (threadIdx.x == 0) {
+				active_cnt = 0;
+			}
 		}
+		__syncthreads();
 	}
-	__syncthreads();
-
 }
 
 __global__ void update_life_neuron(GLIFENeurons *d_neurons, int num, int start_id)
