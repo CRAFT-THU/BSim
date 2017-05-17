@@ -457,9 +457,9 @@ __global__ void update_lif_neuron(GLIFNeurons *d_neurons, int num, int start_id)
 		}
 	}
 	__syncthreads();
-	if (threadIdx.x == 0 && blockIdx.x == 0) {
-		gActiveTableSize = 0;
-	}
+	//if (threadIdx.x == 0 && blockIdx.x == 0) {
+	//	gActiveTableSize = 0;
+	//}
 }
 
 __global__ void update_all_lif_neuron(GLIFNeurons *d_neurons, int num, int start_id)
@@ -577,6 +577,7 @@ __global__ void find_life_neuron(GLIFENeurons *d_neurons, int num, int start_id)
 			}
 		}
 		__syncthreads();
+
 		if (active_cnt > 0) {
 			commit2globalTable(active_table_t, active_cnt, gActiveTable, &gActiveTableSize, 0);
 			if (threadIdx.x == 0) {
@@ -636,8 +637,6 @@ __global__ void update_life_neuron(GLIFENeurons *d_neurons, int num, int start_i
 			d_neurons->p_i_I[nid] += gNeuronInput_I[gnid];
 		}
 
-		gNeuronInput[gnid] = 0;
-		gNeuronInput_I[gnid] = 0;
 
 		__syncthreads();
 		if (fire_cnt >= MAXBLOCKSIZE) {
@@ -672,11 +671,14 @@ __global__ void update_life_neuron(GLIFENeurons *d_neurons, int num, int start_i
 			}
 		}
 
+		gNeuronInput[gnid] = 0;
+		gNeuronInput_I[gnid] = 0;
+
 	}
-	__syncthreads();
-	if (threadIdx.x == 0 && blockIdx.x == 0) {
-		gActiveTableSize = 0;
-	}
+	//__syncthreads();
+	//if (threadIdx.x == 0 && blockIdx.x == 0) {
+	//	gActiveTableSize = 0;
+	//}
 }
 
 __global__ void update_all_life_neuron(GLIFENeurons *d_neurons, int num, int start_id)
