@@ -1061,7 +1061,8 @@ __global__ void update_dense_static_hit(GStaticSynapses *d_synapses, int num, in
 			int synapseNum = gConnection->delayNum[delta_t + nid * MAX_DELAY];
 			gLayerInput[nid]++;
 			for (int i=0; i<synapseNum; i++) {
-				int sid = gConnection->pSynapsesIdx[i+start_loc];
+				//int sid = gConnection->pSynapsesIdx[i+start_loc];
+				int sid = i+start_loc;
 				real weight = d_synapses->p_weight[sid];
 				if (weight >= 0) {
 					atomicAdd(&(gNeuronInput[d_synapses->p_dst[sid]]), weight);
