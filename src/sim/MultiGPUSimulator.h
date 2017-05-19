@@ -12,6 +12,7 @@ public:
 	MultiGPUSimulator(Network *network, real dt);
 	~MultiGPUSimulator();
 	virtual int run(real time);
+	virtual int single_run(real time);
 	int init(int argc, char**argv);
 protected:
 	int rank;
