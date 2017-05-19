@@ -58,6 +58,7 @@ int main(int argc, char **argv)
 	//sg.compare_run(0.1);
 	sg.run(0.1);
 	mg.run(0.1);
+	mg.single_run(0.1);
 	//st.run(0.1);
 
 	if (!load) {

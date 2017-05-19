@@ -264,7 +264,10 @@ int MultiGPUSimulator::single_run(real time)
 	FILE **v_files = (FILE**)malloc(sizeof(FILE*)*device_count);
 	GBuffers **node_buffers = (GBuffers **)malloc(sizeof(GBuffers*)*device_count);
 	BlockSize **node_update_sizes = (BlockSize **)malloc(sizeof(BlockSize*)*device_count);
-	int **c_g_cross_ids = (int **)malloc(sizeof(BlockSize*)*device_count); 
+	int **c_g_cross_ids = (int **)malloc(sizeof(int*)*device_count); 
+	int *copy_idxs = (int *)malloc(sizeof(int)*device_count); 
+	real **c_g_vms = (real**)malloc(sizeof(real*)*device_count);
+	real **c_vms = (real**)malloc(sizeof(real*)*device_count);
 
 	for (int i=0; i<device_count; i++) {
 		node_nets[i]._sim_cycle = sim_cycle;
@@ -282,13 +285,13 @@ int MultiGPUSimulator::single_run(real time)
 		int MAX_DELAY = pCpuNet->MAX_DELAY;
 
 		char log_filename[512];
-		sprintf(log_filename, "GSim_%d.log", node_nets[i]._node_idx); 
+		sprintf(log_filename, "GSim_single_%d.log", node_nets[i]._node_idx); 
 		FILE *log_file = fopen(log_filename, "w+");
 		assert(log_file != NULL);
 		log_files[i] = log_file;
 
 		char v_filename[512];
-		sprintf(v_filename, "g_v_%d.data", node_nets[i]._node_idx); 
+		sprintf(v_filename, "g_v_single_%d.data", node_nets[i]._node_idx); 
 		FILE *v_file = fopen(v_filename, "w+");
 		assert(v_file != NULL);
 		v_files[i] = v_file;
@@ -296,6 +299,11 @@ int MultiGPUSimulator::single_run(real time)
 		node_buffers[i] = alloc_buffers(pCpuNet->pN2SConnection->n_num, totalSynapseNum, MAX_DELAY);
 		node_update_sizes[i] = getBlockSize(totalNeuronNum, totalSynapseNum);
 		c_g_cross_ids[i] = gpuMalloc<int>(global_cross_data[dataIdx]._max_n_num); 
+		c_vms[i] = hostMalloc<real>(totalNeuronNum);
+		copy_idxs[i] = getIndex(pCpuNet->nTypes, nTypeNum, LIFE);
+		GLIFENeurons *c_g_lif = copyFromGPU<GLIFENeurons>(static_cast<GLIFENeurons*>(c_pGpuNet->pNeurons[copy_idxs[i]]), 1);
+		c_g_vms[i] = c_g_lif->p_vm;
+
 	}
 
 	checkCudaErrors(cudaSetDevice(0));
@@ -316,6 +324,11 @@ int MultiGPUSimulator::single_run(real time)
 
 			GBuffers *buffers = node_buffers[node];
 			BlockSize *updateSize = node_update_sizes[node];
+
+			int copy_idx = copy_idxs[node];
+			real *c_vm = c_vms[node];
+			real *c_g_vm = c_g_vms[node];
+			FILE *v_file = v_files[node];
 
 			if (time > 0) {
 				if (global_cross_data[dataIdx]._fired_n_num > 0) {
@@ -339,9 +352,9 @@ int MultiGPUSimulator::single_run(real time)
 				copyFromGPU<int>(buffers->c_neuronsFired, buffers->c_gFiredTable + (pCpuNet->pN2SConnection->n_num*currentIdx), copySize);
 			}
 
-			//if (copy_idx >= 0 && (c_pGpuNet->neuronNums[copy_idx+1]-c_pGpuNet->neuronNums[copy_idx]) > 0) {
-			//	copyFromGPU<real>(c_vm, c_g_vm, c_pGpuNet->neuronNums[copy_idx+1]-c_pGpuNet->neuronNums[copy_idx]);
-			//}
+			if (copy_idx >= 0 && (c_pGpuNet->neuronNums[copy_idx+1]-c_pGpuNet->neuronNums[copy_idx]) > 0) {
+				copyFromGPU<real>(c_vm, c_g_vm, c_pGpuNet->neuronNums[copy_idx+1]-c_pGpuNet->neuronNums[copy_idx]);
+			}
 
 			for (int i=0; i<sTypeNum; i++) {
 				assert(c_pGpuNet->synapseNums[i+1]-c_pGpuNet->synapseNums[i] > 0);
@@ -370,6 +383,12 @@ int MultiGPUSimulator::single_run(real time)
 				}
 
 			}
+
+			for (int i=0; i<c_pGpuNet->neuronNums[copy_idx+1] - c_pGpuNet->neuronNums[copy_idx]; i++) {
+				fprintf(v_file, "%.10lf \t", c_vm[i]);
+			}
+			fprintf(v_file, "\n");
+
 			freeGPUNetwork(c_pGpuNet);
 		}
 
