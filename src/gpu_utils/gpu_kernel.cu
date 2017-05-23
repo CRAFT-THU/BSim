@@ -1163,8 +1163,8 @@ GBuffers* alloc_buffers(int neuron_num, int synapse_num, int max_delay)
 	GBuffers *ret = (GBuffers*)malloc(sizeof(GBuffers));
 	memset(ret, 0, sizeof(GBuffers));
 	
-	checkCudaErrors(cudaMalloc((void**)&(ret->c_gNeuronInput), sizeof(real)*(synapse_num)));
-	checkCudaErrors(cudaMemset(ret->c_gNeuronInput, 0, sizeof(real)*(synapse_num)));
+	checkCudaErrors(cudaMalloc((void**)&(ret->c_gNeuronInput), sizeof(real)*(neuron_num)));
+	checkCudaErrors(cudaMemset(ret->c_gNeuronInput, 0, sizeof(real)*(neuron_num)));
 
 	checkCudaErrors(cudaMalloc((void**)&(ret->c_gNeuronInput_I), sizeof(real)*(neuron_num)));
 	checkCudaErrors(cudaMemset(ret->c_gNeuronInput_I, 0, sizeof(real)*(neuron_num)));
