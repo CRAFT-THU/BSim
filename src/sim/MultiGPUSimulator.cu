@@ -74,6 +74,32 @@ int MultiGPUSimulator::run(real time)
 	return 0;
 }
 
+void  deliverNeurons(DistriNetwork *network, GBuffers *buffers, int copySize)
+{
+	for (int i=0; i<network->_node_num; i++) {
+		int offset = i * network->_node_num + network->_node_idx; 
+		global_cross_data[offset]._fired_n_num = 0;
+	}
+
+	for (int i=0; i<copySize; i++) {
+		int nid = buffers->c_neuronsFired[i];
+		int tmp = network->_crossnode_map->_idx2index[nid];
+		if (tmp >= 0) {
+			for (int j=0; j<network->_node_num; j++) {
+				int tmp2 = tmp * network->_node_num + j;
+				int map_nid = network->_crossnode_map->_crossnode_index2idx[tmp2];
+				if (map_nid >= 0) {
+					//_node_idx to j 
+					int offset = j * network->_node_num + network->_node_idx; 
+					global_cross_data[offset]._fired_n_idxs[global_cross_data[offset]._fired_n_num] = map_nid; 
+					global_cross_data[offset]._fired_n_num++;
+				}
+			}
+		}
+
+	}
+}
+
 void * run_thread(void *para) {
 	DistriNetwork *network = (DistriNetwork*)para;
 
@@ -140,6 +166,8 @@ void * run_thread(void *para) {
 
 	vector<int> firedInfo;
 	struct timeval ts, te;
+	struct timeval t0, t1, t2, t3;
+	long long shadow_time = 0, comm_time = 0;
 	gettimeofday(&ts, NULL);
 	for (int time=0; time<network->_sim_cycle; time++) {
 
@@ -165,37 +193,44 @@ void * run_thread(void *para) {
 			cudaUpdateType[pCpuNet->sTypes[i]](c_pGpuNet->pSynapses[i], c_pGpuNet->synapseNums[i+1]-c_pGpuNet->synapseNums[i], c_pGpuNet->synapseNums[i], &updateSize[pCpuNet->sTypes[i]]);
 		}
 
-		for (int i=0; i<network->_node_num; i++) {
-			int offset = i * network->_node_num + network->_node_idx; 
-			global_cross_data[offset]._fired_n_num = 0;
-		}
+		gettimeofday(&t0, NULL);
+		deliverNeurons(network, buffers, copySize);
+		gettimeofday(&t1, NULL);
+		shadow_time += (t1.tv_sec - t0.tv_sec) * 1000000 + (t1.tv_usec - t0.tv_usec);
+		//for (int i=0; i<network->_node_num; i++) {
+		//	int offset = i * network->_node_num + network->_node_idx; 
+		//	global_cross_data[offset]._fired_n_num = 0;
+		//}
 
-		for (int i=0; i<copySize; i++) {
-			int nid = buffers->c_neuronsFired[i];
-			int tmp = network->_crossnode_map->_idx2index[nid];
-			if (tmp >= 0) {
-				for (int j=0; j<network->_node_num; j++) {
-					int tmp2 = tmp * network->_node_num + j;
-					int map_nid = network->_crossnode_map->_crossnode_index2idx[tmp2];
-					if (map_nid >= 0) {
-						//_node_idx to j 
-						int offset = j * network->_node_num + network->_node_idx; 
-						global_cross_data[offset]._fired_n_idxs[global_cross_data[offset]._fired_n_num] = map_nid; 
-						global_cross_data[offset]._fired_n_num++;
-					}
-				}
-			}
+		//for (int i=0; i<copySize; i++) {
+		//	int nid = buffers->c_neuronsFired[i];
+		//	int tmp = network->_crossnode_map->_idx2index[nid];
+		//	if (tmp >= 0) {
+		//		for (int j=0; j<network->_node_num; j++) {
+		//			int tmp2 = tmp * network->_node_num + j;
+		//			int map_nid = network->_crossnode_map->_crossnode_index2idx[tmp2];
+		//			if (map_nid >= 0) {
+		//				//_node_idx to j 
+		//				int offset = j * network->_node_num + network->_node_idx; 
+		//				global_cross_data[offset]._fired_n_idxs[global_cross_data[offset]._fired_n_num] = map_nid; 
+		//				global_cross_data[offset]._fired_n_num++;
+		//			}
+		//		}
+		//	}
 
-		}
+		//}
 
 		pthread_barrier_wait(&cycle_barrier);
 
+		gettimeofday(&t2, NULL);
 		for (int i=0; i<network->_node_num; i++) {
 			if (i != network->_node_idx) {
 				memcpy(global_cross_data[dataIdx]._fired_n_idxs + global_cross_data[dataIdx]._fired_n_num, global_cross_data[dataOffset+i]._fired_n_idxs, global_cross_data[dataOffset+i]._fired_n_num * sizeof(int));
 				global_cross_data[dataIdx]._fired_n_num += global_cross_data[dataOffset+i]._fired_n_num;
 			}
 		}
+		gettimeofday(&t3, NULL);
+		comm_time += (t3.tv_sec - t2.tv_sec) * 1000000 + (t3.tv_usec - t2.tv_usec);
 
 		
 		if (global_cross_data[dataIdx]._fired_n_num > 0) {
@@ -203,6 +238,7 @@ void * run_thread(void *para) {
 			addCrossNeurons(c_g_cross_id, global_cross_data[dataIdx]._fired_n_num);
 		}
 
+#ifdef LOG_DATA
 		for (int i=0; i<copySize; i++) {
 			fprintf(log_file, "%d ", buffers->c_neuronsFired[i]);
 		}
@@ -212,6 +248,7 @@ void * run_thread(void *para) {
 			fprintf(v_file, "%.10lf \t", c_vm[i]);
 		}
 		fprintf(v_file, "\n");
+#endif
 
 		pthread_barrier_wait(&cycle_barrier);
 		update_time<<<1, 1>>>();
@@ -229,6 +266,7 @@ void * run_thread(void *para) {
 	}
 
 	printf("Thread %d Simulation finesed in %ld:%ld:%ld.%06lds\n", network->_node_idx, hours, minutes, seconds, uSeconds);
+	printf("Thread %d Comm cost %lld:%lld\n", network->_node_idx, shadow_time, comm_time);
 
 	int *rate = (int*)malloc(sizeof(int)*totalNeuronNum);
 	copyFromGPU<int>(rate, buffers->c_gFireCount, totalNeuronNum);
