@@ -1043,9 +1043,9 @@ __global__ void update_dense_static_hit(GStaticSynapses *d_synapses, int num, in
 				}
 			}
 			block_idx += gridDim.x;
-			//__syncthreads();
+			__syncthreads();
 		}
-		//__syncthreads();
+		__syncthreads();
 	}
 #else
 	int tid = blockIdx.x * blockDim.x + threadIdx.x;
@@ -1161,8 +1161,8 @@ GBuffers* alloc_buffers(int neuron_num, int synapse_num, int max_delay)
 	GBuffers *ret = (GBuffers*)malloc(sizeof(GBuffers));
 	memset(ret, 0, sizeof(GBuffers));
 
-	checkCudaErrors(cudaMalloc((void**)&(ret->c_gNeuronInput), sizeof(real)*(synapse_num)));
-	checkCudaErrors(cudaMemset(ret->c_gNeuronInput, 0, sizeof(real)*(synapse_num)));
+	checkCudaErrors(cudaMalloc((void**)&(ret->c_gNeuronInput), sizeof(real)*(neuron_num)));
+	checkCudaErrors(cudaMemset(ret->c_gNeuronInput, 0, sizeof(real)*(neuron_num)));
 
 	checkCudaErrors(cudaMalloc((void**)&(ret->c_gNeuronInput_I), sizeof(real)*(neuron_num)));
 	checkCudaErrors(cudaMemset(ret->c_gNeuronInput_I, 0, sizeof(real)*(neuron_num)));
@@ -1202,6 +1202,12 @@ GBuffers* alloc_buffers(int neuron_num, int synapse_num, int max_delay)
 	init_log_buffers<<<1, 1, 0>>>(ret->c_gLayerInput, ret->c_gXInput, ret->c_gFireCount);
 
 	return ret;
+}
+
+void init_buffers(GBuffers * buf) {
+	init_buffers<<<1, 1, 0>>>(/*buf->c_gTimeTable,*/ buf->c_gNeuronInput, buf->c_gNeuronInput_I, buf->c_gFiredTable, buf->c_gFiredTableSizes, buf->c_gActiveTable, buf->c_gSynapsesActiveTable, buf->c_gSynapsesLogTable);
+
+	init_log_buffers<<<1, 1, 0>>>(buf->c_gLayerInput, buf->c_gXInput, buf->c_gFireCount);
 }
 
 int free_buffers(GBuffers *buf) 

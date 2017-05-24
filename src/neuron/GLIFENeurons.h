@@ -23,6 +23,8 @@ struct GLIFENeurons {
 	//int *p_end;
 };
 
+int cudaFetchLIFE(void *pGpu, void *pCpu, int num);
+
 NEURON_GPU_FUNC_DEFINE(LIFE)
 
 #endif /* GLIFENEURONS_H */

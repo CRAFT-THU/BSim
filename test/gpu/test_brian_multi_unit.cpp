@@ -15,13 +15,14 @@ int main(int argc, char **argv)
 		load = true;
 	}
 
-	const int N = 500;
+	const int N = 1000;
 	Network c;
 	//createPopulation(int id, int N, LIFENeuron(ID id, real v_init, real v_rest, real v_reset, real cm, real tau_m, real tau_refrac, real tau_syn_E, real tau_syn_I, real v_thresh, real i_offset)), ID(0, 0), real tau_syn_E, real tau_syn_I);
 	Population<LIF_brian> *pn0 = c.createPopulation(N, LIF_brian(LIFENeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-3, 0.0, 1.0, 1.0, 15.0e-3, 10.0e-1), 1.0, 1.0));
 	Population<LIF_brian> *pn1 = c.createPopulation(N, LIF_brian(LIFENeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-3, 0.0, 1.0, 1.0, 15.0e-3, 0.0e-3), 1.0, 1.0));
-	//Population<LIF_brian> *pn2 = c.createPopulation(N, LIF_brian(LIFENeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-3, 0.0, 1.0, 1.0, 15.0e-3, 0.0e-3), 1.0, 1.0));
-	//Population<LIF_brian> *pn3 = c.createPopulation(N, LIF_brian(LIFENeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-3, 0.0, 1.0, 1.0, 15.0e-3, 0.0e-3), 1.0, 1.0));
+	Population<LIF_brian> *pn2 = c.createPopulation(N, LIF_brian(LIFENeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-3, 0.0, 1.0, 1.0, 15.0e-3, 0.0e-3), 1.0, 1.0));
+	Population<LIF_brian> *pn3 = c.createPopulation(N, LIF_brian(LIFENeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-3, 0.0, 1.0, 1.0, 15.0e-3, 0.0e-3), 1.0, 1.0));
+	Population<LIF_brian> *pn4 = c.createPopulation(N, LIF_brian(LIFENeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-3, 0.0, 1.0, 1.0, 15.0e-3, 0.0e-3), 1.0, 1.0));
 
 	real * weight0 = NULL;
 	real * weight1 = NULL;
@@ -42,24 +43,26 @@ int main(int argc, char **argv)
 		//	weight0[i] = 1e-6*((i+1));
 		//	weight1[i] = 1e-6*((N*N-i));
 		//}
-		weight0 = getRandomArray((real)1e-5, N*N);
-		weight1 = getRandomArray((real)2e-5, N*N);
+		weight0 = getRandomArray((real)3e-3, N*N);
+		weight1 = getRandomArray((real)4e-3, N*N);
 		delay = getConstArray((real)1e-3, N*N);
 		printf("GENERATE DATA FINISHED\n");
 	}
 
 	//Network.connect(population1, population2, weight_array, delay_array, Exec or Inhi array, num)
 	c.connect(pn0, pn1, weight0, delay, NULL, N*N);
-	//c.connect(pn1, pn2, weight1, delay, NULL, N*N);
-	//c.connect(pn2, pn3, weight1, delay, NULL, N*N);
+	c.connect(pn1, pn2, weight1, delay, NULL, N*N);
+	c.connect(pn2, pn3, weight1, delay, NULL, N*N);
+	c.connect(pn3, pn4, weight0, delay, NULL, N*N);
 	//STSim st(&c, 1.0e-3);
-	SGSim sg(&c, 1.0e-3);
-	MGSim mg(&c, 1.0e-3);
-	//sg.compare_run(0.1);
-	sg.run(0.1);
-	mg.run(0.1);
-	mg.single_run(0.1);
 	//st.run(0.1);
+	SGSim sg(&c, 1.0e-3);
+	sg.run(0.1);
+	MGSim mg(&c, 1.0e-3);
+	mg.run(0.1);
+	//MGSim mg2(&c, 1.0e-3);
+	//sg.compare_run(0.1);
+	//mg.single_run(0.1);
 
 	if (!load) {
 		printf("SAVE DATA...\n");

@@ -4,20 +4,14 @@
 
 void MultiNetwork::splitNetwork()
 {
-	//vector<PopulationBase*>::iterator piter;
-	//vector<NeuronBase*>::iterator niter;
-	//vector<SynapseBase*>::iterator siter;
-	//map<ID, vector<ID> >::iterator n2siter;
-
 	int node_idx = 0;
 	int synapse_count = 0;
 	int synapse_per_node = _network->totalSynapseNum/_node_num;
 
-	map<ID, vector<SynapseBase*>> n2s_input;
+	map<NeuronBase*, vector<SynapseBase*>> n2s_input;
 	for (auto siter = _network->pSynapses.begin(); siter != _network->pSynapses.end(); siter++) {
 		SynapseBase * p = *siter;
-		ID nid = p->getDst()->getID();
-		n2s_input[nid].push_back(p);
+		n2s_input[p->getDst()].push_back(p);
 	}
 
 	for (auto piter = _network->pPopulations.begin(); piter != _network->pPopulations.end(); piter++) {
@@ -25,25 +19,21 @@ void MultiNetwork::splitNetwork()
 		p->setNode(node_idx);
 		for (int i=0; i<p->getNum(); i++) {
 			p->getNeuron(i)->setNode(node_idx);
-			ID nID = p->getNeuron(i)->getID();
-			//_nID2node[nID] = node_idx;
-			auto n2siter = n2s_input.find(nID);
+			auto n2siter = n2s_input.find(p->getNeuron(i));
 			if (n2siter != n2s_input.end()) {
 				synapse_count += n2siter->second.size();
 				for (auto viter = n2siter->second.begin(); viter != n2siter->second.end(); viter++) {
 					(*viter)->setNode(node_idx);
-					//_sID2node[*viter] = node_idx;
 				}
 			}
 
 		}
-		if (synapse_count >= (node_idx+1) * synapse_per_node && node_idx < _node_num) {
+		if (synapse_count >= (node_idx+1) * synapse_per_node && node_idx < _node_num - 1) {
 			node_idx++;	
 		}
 	}
 
 	n2s_input.clear();
-
 
 	for (auto piter= _network->pPopulations.begin(); piter != _network->pPopulations.end(); piter++) {
 		PopulationBase * p = *piter;

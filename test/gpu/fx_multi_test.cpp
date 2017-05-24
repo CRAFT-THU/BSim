@@ -99,8 +99,10 @@ real v_thresh, real i_offset
 		STSim st(&c, dt);
 		st.run(run_time);
 	#else
-		SGSim sg(&c, dt);	
-		sg.run(run_time);	
+		//SGSim sg(&c, dt);	
+		//sg.run(run_time);	
+		MGSim mg(&c, dt);	
+		mg.run(run_time);
 	#endif
 	
 	end=time(NULL);

@@ -26,6 +26,19 @@ int cudaAllocLIFE(void *pCpu, void *pGpu, int num)
 	return 0;
 }
 
+int cudaFetchLIFE(void *pGpu, void *pCpu, int num)
+{
+	GLIFENeurons *pGpuNeurons = copyFromGPU(static_cast<GLIFENeurons*>(pGpu), 1);
+	GLIFENeurons *p = (GLIFENeurons*)pCpu;
+	copyFromGPU<real>(p->p_vm, pGpuNeurons->p_vm, num);
+	copyFromGPU<real>(p->p_i_E, pGpuNeurons->p_i_E, num);
+	copyFromGPU<real>(p->p_i_I, pGpuNeurons->p_i_I, num);
+	copyFromGPU<int>(p->p_refrac_step, pGpuNeurons->p_refrac_step, num);
+	free(pGpuNeurons);
+
+	return 0;
+}
+
 int cudaFreeLIFE(void *pGpu)
 {
 	GLIFENeurons *pGpuNeurons = (GLIFENeurons*)pGpu;

@@ -1,4 +1,5 @@
 
+#include "../neuron/GLIFENeurons.h"
 #include "../utils/TypeFunc.h"
 #include "mem_op.h"
 #include "gpu_func.h"
@@ -105,6 +106,29 @@ GNetwork* copyNetworkToGPU(GNetwork *pCpuNet)
 	//tmpNet->gSynapseNums = pCpuNet->gSynapseNums;
 
 	return tmpNet;
+}
+
+int fetchNetworkFromGPU(GNetwork *pCpuNet, GNetwork *pGpuNet)
+{
+	if (pCpuNet == NULL && pGpuNet == NULL) {
+		printf("NULL POINTER: GNETWORK\n");
+		return -1;
+	}
+
+	int nTypeNum = pCpuNet->nTypeNum;
+	int sTypeNum = pCpuNet->sTypeNum;
+	int MAX_DELAY = pCpuNet->MAX_DELAY;
+
+	//TODO support multitype N and S
+	for (int i=0; i<nTypeNum; i++) {
+		if (pCpuNet->nTypes[i] == LIFE) {
+			cudaFetchLIFE(pGpuNet->pNeurons[i], pCpuNet->pNeurons[i], pCpuNet->neuronNums[i+1]-pCpuNet->neuronNums[i]);
+		}
+		//TODO: cudaFetchType
+		//cudaFetchType[pCpuNet->nTypes[i]](pGpuNet->pNeurons[i], pCpuNet->pNeurons[i], pCpuNet->neuronNums[i+1]-pCpuNet->neuronNums[i]);
+	}
+
+	return 0;
 }
 
 int freeGPUNetwork(GNetwork *pGpuNet)

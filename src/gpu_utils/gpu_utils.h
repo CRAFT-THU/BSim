@@ -8,6 +8,7 @@
 #include "../net/GNetwork.h"
 
 GNetwork* copyNetworkToGPU(GNetwork *);
+int fetchNetworkToGPU(GNetwork *, GNetwork*);
 int freeGPUNetwork(GNetwork *);
 
 #endif /* GPU_UTILS_H */

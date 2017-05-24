@@ -75,10 +75,6 @@ GNetwork* MultiNetwork::arrangeData(int node_idx) {
 
 	GNetwork * net = initGNetwork(ntype_num, stype_num);
 
-	vector<PopulationBase*>::iterator piter;
-	vector<NeuronBase*>::iterator niter;
-	vector<SynapseBase*>::iterator siter;
-
 	int index = 0;
 	for (map<Type, int>::const_iterator tmp_iter = _global_ntype_num[node_idx].begin(); tmp_iter != _global_ntype_num[node_idx].end(); tmp_iter++) {
 		Type type = tmp_iter->first;
@@ -89,7 +85,7 @@ GNetwork* MultiNetwork::arrangeData(int node_idx) {
 		allocType[type](pN, tmp_iter->second);
 
 		int idx = 0;
-		for (piter = _network->pPopulations.begin(); piter != _network->pPopulations.end();  piter++) {
+		for (auto piter = _network->pPopulations.begin(); piter != _network->pPopulations.end();  piter++) {
 			PopulationBase * p = *piter;
 			int node = p->getNode();
 
@@ -126,7 +122,7 @@ GNetwork* MultiNetwork::arrangeData(int node_idx) {
 		//}
 		
 		int idx = 0;
-		for (piter = _network->pPopulations.begin(); piter != _network->pPopulations.end(); piter++) {
+		for (auto piter = _network->pPopulations.begin(); piter != _network->pPopulations.end(); piter++) {
 			PopulationBase *pop = *piter;
 			if (pop->getNode() != node_idx)
 				continue;
@@ -137,6 +133,7 @@ GNetwork* MultiNetwork::arrangeData(int node_idx) {
 					for (auto siter = s_vec.begin(); siter != s_vec.end(); siter++) {
 						if ((*siter)->getDelay() == delay_t + 1) {
 							if ((*siter)->getType() == type && (*siter)->getNode() == node_idx) {
+								assert(idx < tmp_iter->second);
 								int copied = (*siter)->hardCopy(pS, idx, net->synapseNums[index]);
 								idx += copied;
 							}
@@ -151,7 +148,8 @@ GNetwork* MultiNetwork::arrangeData(int node_idx) {
 			for (int delay_t=0; delay_t < _network->maxDelaySteps; delay_t++) {
 				for (auto iter = s_vec.begin(); iter != s_vec.end(); iter++) {
 					if (((*iter)->getNode() == node_idx) && ((*iter)->getDelay() == delay_t + 1) && ((*iter)->getType() == type)) {
-						int copied = (*siter)->hardCopy(pS, idx, net->synapseNums[index]);
+						assert(idx < tmp_iter->second);
+						int copied = (*iter)->hardCopy(pS, idx, net->synapseNums[index]);
 						idx += copied;
 					}
 				}
