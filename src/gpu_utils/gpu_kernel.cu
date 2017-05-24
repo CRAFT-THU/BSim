@@ -135,7 +135,7 @@ __global__ void update_constant_neuron(GConstantNeurons *d_neurons, int num, int
 		}
 	}
 	__syncthreads();
-	
+
 	if (fire_cnt > 0) {
 		commit2globalTable(fire_table_t, fire_cnt, gFiredTable, &(gFiredTableSizes[gCurrentIdx]), gFiredTableCap*gCurrentIdx);
 		if (threadIdx.x == 0) {
@@ -201,7 +201,7 @@ __global__ void update_poisson_neuron(GPoissonNeurons *d_neurons, int num, int s
 		}
 	}
 	__syncthreads();
-	
+
 	if (fire_cnt > 0) {
 		commit2globalTable(fire_table_t, fire_cnt, gFiredTable, &(gFiredTableSizes[gCurrentIdx]), gFiredTableCap*gCurrentIdx);
 		reset_poisson_neuron(d_neurons, fire_table_t, fire_cnt, start_id);
@@ -257,7 +257,7 @@ __global__ void update_array_neuron(GArrayNeurons *d_neurons, int num, int start
 		}
 	}
 	__syncthreads();
-	
+
 	if (fire_cnt > 0) {
 		commit2globalTable(fire_table_t, fire_cnt, gFiredTable, &(gFiredTableSizes[gCurrentIdx]), gFiredTableCap*gCurrentIdx);
 		//advance_array_neuron(d_neurons, fire_table_t, fire_cnt, start_id);
@@ -318,7 +318,7 @@ __global__ void update_max_neuron(GMaxNeurons *d_neurons, int num, int start_id)
 		}
 	}
 	__syncthreads();
-	
+
 	if (fire_cnt > 0) {
 		commit2globalTable(fire_table_t, fire_cnt, gFiredTable, &(gFiredTableSizes[gCurrentIdx]), gFiredTableCap*gCurrentIdx);
 		//advance_array_neuron(d_neurons, fire_table_t, fire_cnt, start_id);
@@ -456,7 +456,7 @@ __global__ void update_lif_neuron(GLIFNeurons *d_neurons, int num, int start_id)
 			}
 		}
 	}
-	__syncthreads();
+	//__syncthreads();
 	//if (threadIdx.x == 0 && blockIdx.x == 0) {
 	//	gActiveTableSize = 0;
 	//}
@@ -577,7 +577,6 @@ __global__ void find_life_neuron(GLIFENeurons *d_neurons, int num, int start_id)
 			}
 		}
 		__syncthreads();
-
 		if (active_cnt > 0) {
 			commit2globalTable(active_table_t, active_cnt, gActiveTable, &gActiveTableSize, 0);
 			if (threadIdx.x == 0) {
@@ -607,7 +606,7 @@ __global__ void update_life_neuron(GLIFENeurons *d_neurons, int num, int start_i
 		int gnid = start_id + nid; 
 
 		//real I = sqrtf(d_neurons->p_CE[nid]) * d_neurons->p_i_E[nid] + sqrtf(d_neurons->p_CI[nid]) * d_neurons->p_i_I[nid] + d_neurons->p_i_tmp[nid];
- 
+
 		//real I = gNeuronInput[gnid] + d_neurons->p_i_tmp[nid];
 		//d_neurons->p_vm[nid] = d_neurons->p_vm[nid] * d_neurons->p_C1[nid] + d_neurons->p_C2[nid] * I;
 
@@ -637,6 +636,8 @@ __global__ void update_life_neuron(GLIFENeurons *d_neurons, int num, int start_i
 			d_neurons->p_i_I[nid] += gNeuronInput_I[gnid];
 		}
 
+		gNeuronInput[gnid] = 0;
+		gNeuronInput_I[gnid] = 0;
 
 		__syncthreads();
 		if (fire_cnt >= MAXBLOCKSIZE) {
@@ -671,9 +672,6 @@ __global__ void update_life_neuron(GLIFENeurons *d_neurons, int num, int start_i
 			}
 		}
 
-		gNeuronInput[gnid] = 0;
-		gNeuronInput_I[gnid] = 0;
-
 	}
 	//__syncthreads();
 	//if (threadIdx.x == 0 && blockIdx.x == 0) {
@@ -699,7 +697,7 @@ __global__ void update_all_life_neuron(GLIFENeurons *d_neurons, int num, int sta
 		int nid = idx;
 		int gnid = start_id + idx; 
 		bool actived = d_neurons->p_refrac_step[idx] <= 0;
-		
+
 		if (actived) {
 			//real I = sqrtf(d_neurons->p_CE[nid]) * d_neurons->p_i_E[nid] + sqrtf(d_neurons->p_CI[nid]) * d_neurons->p_i_I[nid] + d_neurons->p_i_tmp[nid];
 
@@ -791,7 +789,7 @@ __global__ void update_dense_life_neuron(GLIFENeurons *d_neurons, int num, int s
 		int nid = idx;
 		int gnid = start_id + idx; 
 		bool actived = d_neurons->p_refrac_step[idx] <= 0;
-		
+
 		if (actived) {
 			d_neurons->p_vm[nid] = d_neurons->p_Cm[nid] * d_neurons->p_vm[nid] + d_neurons->p_v_tmp[nid] + d_neurons->p_i_E[nid] * d_neurons->p_C_E[nid] + d_neurons->p_i_I[nid] * d_neurons->p_C_I[nid];
 
@@ -876,7 +874,7 @@ __global__ void update_pre_synapse(N2SConnection *pConnection)
 					//TODO
 				}
 			}
-			
+
 			//int offset = atomicAdd(&gSynapsesActiveTableSize, synapseNum);
 			//gLayerInput[nid]++;
 			//for (int i=0; i<synapseNum; i++) {
@@ -1000,7 +998,8 @@ __global__ void update_pre_synapse(N2SConnection *pConnection)
 
 __global__ void update_dense_static_hit(GStaticSynapses *d_synapses, int num, int start_id)
 {
-#ifndef FAST_TEST
+#define FAST_TEST 2
+#if  FAST_TEST == 1
 	__shared__ int fire_neuron_id[MAXBLOCKSIZE];
 
 	int tid = blockIdx.x * blockDim.x + threadIdx.x;
@@ -1045,9 +1044,44 @@ __global__ void update_dense_static_hit(GStaticSynapses *d_synapses, int num, in
 				}
 			}
 			block_idx += gridDim.x;
-			//__syncthreads();
+			__syncthreads();
 		}
-		//__syncthreads();
+		__syncthreads();
+	}
+#elif FAST_TEST == 2
+	int tid = blockIdx.x * blockDim.x + threadIdx.x;
+	for (int delta_t = 0; delta_t<MAX_DELAY; delta_t++) {
+		int block_idx = blockIdx.x;
+		int time_idx = (gCurrentIdx+MAX_DELAY-delta_t)%(MAX_DELAY+1);
+		int firedSize = gFiredTableSizes[time_idx];
+		int num_per_block = (firedSize - 1)/gridDim.x + 1;
+		int block_nums_minus_1 = (firedSize - 1) / num_per_block;
+
+		int fired_size_block = 0;
+		if (block_idx == block_nums_minus_1) {
+			fired_size_block = firedSize - block_idx * num_per_block;
+		} else if (block_idx < block_nums_minus_1) {
+			fired_size_block = num_per_block;
+		} else {
+			fired_size_block = 0;
+		}
+
+		for (int idx = 0; idx < fired_size_block; idx++) {
+			int nid = gFiredTable[time_idx*gFiredTableCap + (block_idx)*num_per_block + idx];
+			int start_loc = gConnection->delayStart[delta_t + nid * MAX_DELAY];
+			int synapseNum = gConnection->delayNum[delta_t + nid * MAX_DELAY];
+			for (int j=threadIdx.x; j<synapseNum; j += blockDim.x) {
+				//int sid = gConnection->pSynapsesIdx[j+start_loc];
+				int sid = j+start_loc;
+				real weight = d_synapses->p_weight[sid];
+				if (weight >= 0) {
+					atomicAdd(&(gNeuronInput[d_synapses->p_dst[sid]]), weight);
+				} else {
+					atomicAdd(&(gNeuronInput_I[d_synapses->p_dst[sid]]), weight);
+				}
+			}
+		}
+		__syncthreads();
 	}
 #else
 	int tid = blockIdx.x * blockDim.x + threadIdx.x;
@@ -1162,7 +1196,7 @@ GBuffers* alloc_buffers(int neuron_num, int synapse_num, int max_delay)
 {
 	GBuffers *ret = (GBuffers*)malloc(sizeof(GBuffers));
 	memset(ret, 0, sizeof(GBuffers));
-	
+
 	checkCudaErrors(cudaMalloc((void**)&(ret->c_gNeuronInput), sizeof(real)*(neuron_num)));
 	checkCudaErrors(cudaMemset(ret->c_gNeuronInput, 0, sizeof(real)*(neuron_num)));
 
@@ -1180,7 +1214,7 @@ GBuffers* alloc_buffers(int neuron_num, int synapse_num, int max_delay)
 
 	//checkCudaErrors(cudaMalloc((void**)&(ret->c_gSynapsesActiveTable), sizeof(int)*(synapse_num)));
 	//checkCudaErrors(cudaMemset(ret->c_gSynapsesActiveTable, 0, sizeof(int)*(synapse_num)));
-	
+
 	//checkCudaErrors(cudaMalloc((void**)&(ret->c_gSynapsesLogTable), sizeof(int)*(synapse_num)));
 	//checkCudaErrors(cudaMemset(ret->c_gSynapsesLogTable, 0, sizeof(int)*(synapse_num)));
 
@@ -1204,6 +1238,12 @@ GBuffers* alloc_buffers(int neuron_num, int synapse_num, int max_delay)
 	init_log_buffers<<<1, 1, 0>>>(ret->c_gLayerInput, ret->c_gXInput, ret->c_gFireCount);
 
 	return ret;
+}
+
+void init_buffers(GBuffers * buf) {
+	init_buffers<<<1, 1, 0>>>(/*buf->c_gTimeTable,*/ buf->c_gNeuronInput, buf->c_gNeuronInput_I, buf->c_gFiredTable, buf->c_gFiredTableSizes, buf->c_gActiveTable, buf->c_gSynapsesActiveTable, buf->c_gSynapsesLogTable);
+
+	init_log_buffers<<<1, 1, 0>>>(buf->c_gLayerInput, buf->c_gXInput, buf->c_gFireCount);
 }
 
 int free_buffers(GBuffers *buf) 
