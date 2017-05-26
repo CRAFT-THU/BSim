@@ -110,6 +110,12 @@ int addCrossNeurons(int *ids, int num)
 	return 0;
 }
 
+
+int cudaDeliverNeurons(int *idx2index, int *crossnode_index2idx, int *global_cross_data, int *fired_n_num, int node_num, int neuron_num)
+{
+	deliver_neurons<<<(neuron_num + MAXBLOCKSIZE-1)/MAXBLOCKSIZE, MAXBLOCKSIZE>>>(idx2index, crossnode_index2idx, global_cross_data, fired_n_num, node_num);
+}
+
 //int cudaUpdateAlpha(void *data, int num, int start_id, BlockSize *pSize)
 //{
 //	update_alpha_synapse<<<pSize->gridSize, pSize->blockSize>>>((GAlphaSynapses*)data, num, start_id);

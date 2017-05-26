@@ -4,6 +4,7 @@
 struct CrossNodeMap {
 	int *_idx2index;
 	int *_crossnode_index2idx;
+	int _cross_size;
 };
 
 struct CrossNodeData {

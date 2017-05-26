@@ -20,7 +20,9 @@ int cudaUpdateExp(void *data, int num, int start_id, BlockSize *pSize);
 int cudaUpdateStatic(void *data, int num, int start_id, BlockSize *pSize);
 int cudaUpdateAllExp(void *data, int num, int start_id, BlockSize *pSize);
 int cudaUpdateAllStatic(void *data, int num, int start_id, BlockSize *pSize);
+
 int addCrossNeurons(int *ids, int num);
+int cudaDeliverNeurons(int *idx2index, int *crossnode_index2idx, int *global_cross_data, int *fired_n_num, int node_num, int neuron_num);
 
 BlockSize * getBlockSize(int nSize, int sSize);
 

@@ -77,6 +77,8 @@ __global__ void update_static_hit(GStaticSynapses *d_synapses, int num, int star
 
 __global__ void add_cross_neuron(int *ids, int num);
 
+__global__ void deliver_neurons(int *idx2index, int *crossnode_index2idx, int *global_cross_data, int *fired_n_num, int node_num);
+
 void init_buffers(GBuffers * buf);
 GBuffers* alloc_buffers(int neuron_num, int synapse_num, int max_delay);
 int free_buffers(GBuffers *buf);
