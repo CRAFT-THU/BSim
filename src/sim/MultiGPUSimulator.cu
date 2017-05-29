@@ -74,7 +74,7 @@ int MultiGPUSimulator::run(real time)
 	return 0;
 }
 
-void  deliverNeurons(DistriNetwork *network, GBuffers *buffers, int copySize)
+void deliverNeurons(DistriNetwork *network, GBuffers *buffers, int copySize)
 {
 	for (int i=0; i<network->_node_num; i++) {
 		int offset = i * network->_node_num + network->_node_idx; 
@@ -98,6 +98,10 @@ void  deliverNeurons(DistriNetwork *network, GBuffers *buffers, int copySize)
 		}
 
 	}
+}
+
+void collectNeurons()
+{
 }
 
 void * run_thread(void *para) {

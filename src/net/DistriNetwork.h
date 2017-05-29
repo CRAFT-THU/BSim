@@ -13,6 +13,12 @@ struct CrossNodeData {
 	int *_fired_n_idxs;
 };
 
+struct CrossNodeDataGPU {
+	int *_max_num;
+	int *_fired_num;
+	int **_fired_arrays;
+};
+
 struct DistriNetwork {
 	int _sim_cycle;
 	int _node_idx;

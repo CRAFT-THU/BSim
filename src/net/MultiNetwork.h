@@ -16,7 +16,7 @@ public:
 
 	DistriNetwork * buildNetworks(bool auto_splited = true);
 	CrossNodeData* arrangeCrossNodeData(int node_num);
-	CrossNodeData* arrangeCrossNodeDataGPU(int node_num);
+	CrossNodeDataGPU* arrangeCrossNodeDataGPU(int node_num);
 	//int addConnectionInfo(ID nID, int nid, int offset, int *delayStart, int *delayNum, int *pSynapsesIdx, int nodeIdx =0);
 
 private:
