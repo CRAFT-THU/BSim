@@ -44,23 +44,26 @@ def column_sub(file1="", file2=""):
 
 
 def main(argv):
-    inputfile = ''
-    outputfile = ''
+    file1 = ''
+    file2 = ''
+
+    usuage_msg = sys.argv[0] + ' -1 <file1> -2 <file2>'
+
     try:
         opts, args = getopt.getopt(argv,"h1:2:",["file1=","file2="])
     except getopt.GetoptError:
-        print 'test.py -i <file1> -o <file2>'
+        print usuage_msg
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
-            print 'test.py -i <file1> -o <file2>'
+            print usuage_msg 
             sys.exit()
         elif opt in ("-1", "--file1"):
-            inputfile = arg
+            file1 = arg
         elif opt in ("-2", "--file2"):
-            outputfile = arg
+            file2 = arg
     
-    column_sub(inputfile, outputfile);
+    column_sub(file1, file2);
 
 
 if __name__ == "__main__":

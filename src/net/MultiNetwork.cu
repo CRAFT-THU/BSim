@@ -20,8 +20,9 @@ CrossNodeDataGPU* MultiNetwork::arrangeCrossNodeDataGPU(int node_num)
 	for (int i=0; i<_node_num; i++) {
 		for (int j=0; j<_node_num; j++) {
 			// i->j 
+			checkCudaErrors(cudaSetDevice(j));
 			int i2j = i * _node_num + j;
-			cross_data._fired_num = 0;
+			cross_data->_fired_num[i2j] = 0;
 
 			int count = 0;
 			for (auto iter = _crossnode_neurons_send[i].begin(); iter != _crossnode_neurons_send[i].end(); iter++) {
@@ -37,6 +38,8 @@ CrossNodeDataGPU* MultiNetwork::arrangeCrossNodeDataGPU(int node_num)
 			}
 		}
 	}
+
+	checkCudaErrors(cudaSetDevice(0));
 
 	return cross_data;
 }

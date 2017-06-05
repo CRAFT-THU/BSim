@@ -116,8 +116,8 @@ int fetchNetworkFromGPU(GNetwork *pCpuNet, GNetwork *pGpuNet)
 	}
 
 	int nTypeNum = pCpuNet->nTypeNum;
-	int sTypeNum = pCpuNet->sTypeNum;
-	int MAX_DELAY = pCpuNet->MAX_DELAY;
+	//int sTypeNum = pCpuNet->sTypeNum;
+	//int MAX_DELAY = pCpuNet->MAX_DELAY;
 
 	//TODO support multitype N and S
 	for (int i=0; i<nTypeNum; i++) {

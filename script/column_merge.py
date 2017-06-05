@@ -47,7 +47,7 @@ def main(argv):
     inputfile = []
     outputfile = ''
 
-    usuage_msg = sys.argv[0] + '-i <inputfile1> -i <inputfile2> ... -i <inputfileN> -o <outputfile>  or test.py -s <series filename without num>'
+    usuage_msg = sys.argv[0] + '-i <inputfile1> -i <inputfile2> ... -i <inputfileN> -o <outputfile>  or ' + sys.argv[0] + ' -s <series filename without num>'
 
     try:
         opts, args = getopt.getopt(argv,"hi:o:s:",["ifile=","ofile=","sfile="])

@@ -23,7 +23,7 @@ using std::endl;
 
 pthread_barrier_t cycle_barrier;
 
-CrossNodeData * global_cross_data;
+CrossNodeDataGPU * global_cross_data_gpu;
 
 MultiGPUSimulator::MultiGPUSimulator(Network *network, real dt) : SimulatorBase(network, dt)
 {
@@ -49,8 +49,8 @@ int MultiGPUSimulator::run(real time)
 	MultiNetwork multiNet(network, device_count);
 	DistriNetwork *node_nets = multiNet.buildNetworks();
 	assert(node_nets != NULL);
-	global_cross_data = multiNet.arrangeCrossNodeData(device_count);
-	assert(global_cross_data != NULL);
+	global_cross_data_gpu = multiNet.arrangeCrossNodeDataGPU(device_count);
+	assert(global_cross_data_gpu != NULL);
 
 	pthread_t *thread_ids = (pthread_t *)malloc(sizeof(pthread_t) * device_count);
 	assert(thread_ids != NULL);
@@ -72,36 +72,6 @@ int MultiGPUSimulator::run(real time)
 	pthread_barrier_destroy(&cycle_barrier);
 
 	return 0;
-}
-
-void deliverNeurons(DistriNetwork *network, GBuffers *buffers, int copySize)
-{
-	for (int i=0; i<network->_node_num; i++) {
-		int offset = i * network->_node_num + network->_node_idx; 
-		global_cross_data[offset]._fired_n_num = 0;
-	}
-
-	for (int i=0; i<copySize; i++) {
-		int nid = buffers->c_neuronsFired[i];
-		int tmp = network->_crossnode_map->_idx2index[nid];
-		if (tmp >= 0) {
-			for (int j=0; j<network->_node_num; j++) {
-				int tmp2 = tmp * network->_node_num + j;
-				int map_nid = network->_crossnode_map->_crossnode_index2idx[tmp2];
-				if (map_nid >= 0) {
-					//_node_idx to j 
-					int offset = j * network->_node_num + network->_node_idx; 
-					global_cross_data[offset]._fired_n_idxs[global_cross_data[offset]._fired_n_num] = map_nid; 
-					global_cross_data[offset]._fired_n_num++;
-				}
-			}
-		}
-
-	}
-}
-
-void collectNeurons()
-{
 }
 
 void * run_thread(void *para) {
@@ -130,8 +100,8 @@ void * run_thread(void *para) {
 	printf("Thread %d NeuronTypeNum: %d, SynapseTypeNum: %d\n", network->_node_idx, nTypeNum, sTypeNum);
 	printf("Thread %d NeuronNum: %d, SynapseNum: %d\n", network->_node_idx, nodeNeuronNum, nodeSynapseNum);
 
-	int dataOffset = network->_node_idx * network->_node_num;
-	int dataIdx = network->_node_idx * network->_node_num + network->_node_idx;
+	//int dataOffset = network->_node_idx * network->_node_num;
+	//int dataIdx = network->_node_idx * network->_node_num + network->_node_idx;
 
 	int MAX_DELAY = pCpuNet->MAX_DELAY;
 	printf("Thread %d MAX_DELAY: %d\n", network->_node_idx, pCpuNet->MAX_DELAY);
@@ -142,6 +112,7 @@ void * run_thread(void *para) {
 
 	BlockSize *updateSize = getBlockSize(allNeuronNum, nodeSynapseNum);
 
+#ifdef LOG_DATA
 	real *c_vm = hostMalloc<real>(nodeNeuronNum);
 	int life_idx = getIndex(pCpuNet->nTypes, nTypeNum, LIFE);
 	int lif_idx = getIndex(pCpuNet->nTypes, nTypeNum, LIF);
@@ -158,6 +129,7 @@ void * run_thread(void *para) {
 		copy_idx = lif_idx;
 	} else {
 	}
+#endif
 
 	for (int i=0; i<nTypeNum; i++) {
 		cout << "Thread " << network->_node_idx << " " << pCpuNet->nTypes[i] << ": <<<" << updateSize[c_pGpuNet->nTypes[i]].gridSize << ", " << updateSize[c_pGpuNet->nTypes[i]].blockSize << ">>>" << endl;
@@ -166,7 +138,7 @@ void * run_thread(void *para) {
 		cout << "Thread " << network->_node_idx << " " << pCpuNet->sTypes[i] << ": <<<" << updateSize[c_pGpuNet->sTypes[i]].gridSize << ", " << updateSize[c_pGpuNet->sTypes[i]].blockSize << ">>>" << endl;
 	}
 
-	int * c_g_cross_id = gpuMalloc<int>(global_cross_data[dataIdx]._max_n_num); 
+	//int * c_g_cross_id = gpuMalloc<int>(global_cross_data[dataIdx]._max_n_num); 
 
 	int * c_g_idx2index = copyToGPU<int>(network->_crossnode_map->_idx2index, allNeuronNum);
 	int * c_g_cross_index2idx = copyToGPU<int>(network->_crossnode_map->_crossnode_index2idx, network->_crossnode_map->_cross_size);
@@ -175,7 +147,7 @@ void * run_thread(void *para) {
 
 	vector<int> firedInfo;
 	struct timeval ts, te;
-	struct timeval t0, t1, t2, t3, t4, t5, t6, t7, t8, t9;
+	struct timeval t0, t1, t2, t3, t4, t5,/* t6, t7,*/ t8, t9;
 	double barrier1_time = 0, gpu_cpy_time = 0, cpu_cpy_time = 0, barrier2_time=0, copy_time = 0;
 	gettimeofday(&ts, NULL);
 	for (int time=0; time<network->_sim_cycle; time++) {
@@ -188,16 +160,27 @@ void * run_thread(void *para) {
 		pthread_barrier_wait(&cycle_barrier);
 		gettimeofday(&t1, NULL);
 		barrier1_time += (t1.tv_sec - t0.tv_sec) + (t1.tv_usec - t0.tv_usec)/1000000.0;
-		gettimeofday(&t2, NULL);
 		cudaMemset(c_g_fired_n_num, 0, sizeof(int)*network->_node_num);
+		gettimeofday(&t2, NULL);
+		//cudaDeliverNeurons(c_g_idx2index, c_g_cross_index2idx, c_g_global_cross_data, c_g_fired_n_num, network->_node_num, allNeuronNum);
+		//for (int i=0; i<network->_node_num; i++) {
+		//	int offset = i * network->_node_num + network->_node_idx; 
+		//	copyFromGPU<int>(&(global_cross_data[offset]._fired_n_num), c_g_fired_n_num + i, 1);
+		//	if (global_cross_data[offset]._fired_n_num > 0) {
+		//		copyFromGPU<int>(global_cross_data[offset]._fired_n_idxs, c_g_global_cross_data + allNeuronNum * i, global_cross_data[offset]._fired_n_num);
+		//	}
+		//}
 		cudaDeliverNeurons(c_g_idx2index, c_g_cross_index2idx, c_g_global_cross_data, c_g_fired_n_num, network->_node_num, allNeuronNum);
-		for (int i=0; i<network->_node_num; i++) {
-			int offset = i * network->_node_num + network->_node_idx; 
-			copyFromGPU<int>(&(global_cross_data[offset]._fired_n_num), c_g_fired_n_num + i, 1);
-			if (global_cross_data[offset]._fired_n_num > 0) {
-				copyFromGPU<int>(global_cross_data[offset]._fired_n_idxs, c_g_global_cross_data + allNeuronNum * i, global_cross_data[offset]._fired_n_num);
+		checkCudaErrors(cudaMemcpy(global_cross_data_gpu->_fired_num + network->_node_idx * network->_node_num, c_g_fired_n_num, sizeof(int)*network->_node_num, cudaMemcpyDeviceToHost));
+
+		for (int i=0; i< network->_node_num; i++) {
+			int idx2i = network->_node_idx * network->_node_num + i;
+			assert(global_cross_data_gpu->_fired_num[idx2i] <= global_cross_data_gpu->_max_num[idx2i]);
+			if (global_cross_data_gpu->_fired_num[idx2i] > 0) {
+				checkCudaErrors(cudaMemcpyPeer(global_cross_data_gpu->_fired_arrays[idx2i], i, c_g_global_cross_data + allNeuronNum * i, network->_node_idx, global_cross_data_gpu->_fired_num[idx2i] * sizeof(int)));
 			}
 		}
+
 		gettimeofday(&t3, NULL);
 		gpu_cpy_time += (t3.tv_sec - t2.tv_sec) + (t3.tv_usec - t2.tv_usec)/1000000.0;
 
@@ -220,52 +203,28 @@ void * run_thread(void *para) {
 			cudaUpdateType[pCpuNet->sTypes[i]](c_pGpuNet->pSynapses[i], c_pGpuNet->synapseNums[i+1]-c_pGpuNet->synapseNums[i], c_pGpuNet->synapseNums[i], &updateSize[pCpuNet->sTypes[i]]);
 		}
 
-		//gettimeofday(&t0, NULL);
-		//deliverNeurons(network, buffers, copySize);
-		//gettimeofday(&t1, NULL);
-		//shadow_time += (t1.tv_sec - t0.tv_sec) + (t1.tv_usec - t0.tv_usec)/1000000.0;
-		//for (int i=0; i<network->_node_num; i++) {
-		//	int offset = i * network->_node_num + network->_node_idx; 
-		//	global_cross_data[offset]._fired_n_num = 0;
-		//}
-
-		//for (int i=0; i<copySize; i++) {
-		//	int nid = buffers->c_neuronsFired[i];
-		//	int tmp = network->_crossnode_map->_idx2index[nid];
-		//	if (tmp >= 0) {
-		//		for (int j=0; j<network->_node_num; j++) {
-		//			int tmp2 = tmp * network->_node_num + j;
-		//			int map_nid = network->_crossnode_map->_crossnode_index2idx[tmp2];
-		//			if (map_nid >= 0) {
-		//				//_node_idx to j 
-		//				int offset = j * network->_node_num + network->_node_idx; 
-		//				global_cross_data[offset]._fired_n_idxs[global_cross_data[offset]._fired_n_num] = map_nid; 
-		//				global_cross_data[offset]._fired_n_num++;
-		//			}
-		//		}
-		//	}
-		//}
-
 		gettimeofday(&t4, NULL);
 		pthread_barrier_wait(&cycle_barrier);
 		gettimeofday(&t5, NULL);
 		barrier2_time += (t5.tv_sec - t4.tv_sec) + (t5.tv_usec - t4.tv_usec)/1000000.0;
 
-		gettimeofday(&t6, NULL);
-		for (int i=0; i<network->_node_num; i++) {
-			if ((i != network->_node_idx) && (global_cross_data[dataOffset+i]._fired_n_num > 0)) {
-				memcpy(global_cross_data[dataIdx]._fired_n_idxs + global_cross_data[dataIdx]._fired_n_num, global_cross_data[dataOffset+i]._fired_n_idxs, global_cross_data[dataOffset+i]._fired_n_num * sizeof(int));
-				global_cross_data[dataIdx]._fired_n_num += global_cross_data[dataOffset+i]._fired_n_num;
-			}
-		}
-		gettimeofday(&t7, NULL);
-		cpu_cpy_time += (t7.tv_sec - t6.tv_sec) + (t7.tv_usec - t6.tv_usec)/1000000.0;
+		//gettimeofday(&t6, NULL);
+		//collectNeurons();
+		//gettimeofday(&t7, NULL);
+		//cpu_cpy_time += (t7.tv_sec - t6.tv_sec) + (t7.tv_usec - t6.tv_usec)/1000000.0;
 		
 		gettimeofday(&t8, NULL);
-		if (global_cross_data[dataIdx]._fired_n_num > 0) {
-			copyToGPU(c_g_cross_id, global_cross_data[dataIdx]._fired_n_idxs, global_cross_data[dataIdx]._fired_n_num);
-			addCrossNeurons(c_g_cross_id, global_cross_data[dataIdx]._fired_n_num);
+		//if (global_cross_data[dataIdx]._fired_n_num > 0) {
+		//	copyToGPU(c_g_cross_id, global_cross_data[dataIdx]._fired_n_idxs, global_cross_data[dataIdx]._fired_n_num);
+		//	addCrossNeurons(c_g_cross_id, global_cross_data[dataIdx]._fired_n_num);
+		//}
+		for (int i=0; i< network->_node_num; i++) {
+			int i2idx = network->_node_idx + network->_node_num * i;
+			if (global_cross_data_gpu->_fired_num[i2idx] > 0) {
+				addCrossNeurons(global_cross_data_gpu->_fired_arrays[i2idx], global_cross_data_gpu->_fired_num[i2idx]);
+			}
 		}
+		
 		gettimeofday(&t9, NULL);
 		copy_time += (t9.tv_sec - t8.tv_sec) + (t9.tv_usec - t8.tv_usec)/1000000.0;
 
@@ -284,6 +243,7 @@ void * run_thread(void *para) {
 		//pthread_barrier_wait(&cycle_barrier);
 		update_time<<<1, 1>>>();
 	}
+	pthread_barrier_wait(&cycle_barrier);
 	gettimeofday(&te, NULL);
 	long seconds = te.tv_sec - ts.tv_sec;
 	long hours = seconds/3600;
@@ -320,181 +280,9 @@ void * run_thread(void *para) {
 	fclose(log_file);
 	fclose(v_file);
 
-	//free_buffers(buffers);
-	//freeGPUNetwork(c_pGpuNet);
+	free_buffers(buffers);
+	freeGPUNetwork(c_pGpuNet);
 
 	return NULL;
 }
 
-int MultiGPUSimulator::single_run(real time)
-{
-	int sim_cycle = round(time/dt);
-	reset();
-
-	int device_count = 1;
-	checkCudaErrors(cudaGetDeviceCount(&device_count));
-	assert(device_count != 0);
-
-	MultiNetwork multiNet(network, device_count);
-	DistriNetwork *node_nets = multiNet.buildNetworks();
-	assert(node_nets != NULL);
-	global_cross_data = multiNet.arrangeCrossNodeData(device_count);
-	assert(global_cross_data != NULL);
-
-	FILE **log_files = (FILE**)malloc(sizeof(FILE*)*device_count);
-	FILE **v_files = (FILE**)malloc(sizeof(FILE*)*device_count);
-	GBuffers **node_buffers = (GBuffers **)malloc(sizeof(GBuffers*)*device_count);
-	BlockSize **node_update_sizes = (BlockSize **)malloc(sizeof(BlockSize*)*device_count);
-	int **c_g_cross_ids = (int **)malloc(sizeof(int*)*device_count); 
-	int *copy_idxs = (int *)malloc(sizeof(int)*device_count); 
-
-	for (int i=0; i<device_count; i++) {
-		node_nets[i]._sim_cycle = sim_cycle;
-		node_nets[i]._node_idx = i;
-		node_nets[i]._node_num = device_count;
-
-		DistriNetwork *network = &(node_nets[i]);
-		GNetwork *pCpuNet = network->_network;
-		int nTypeNum = pCpuNet->nTypeNum;
-		int sTypeNum = pCpuNet->sTypeNum;
-		int nodeNeuronNum = pCpuNet->neuronNums[nTypeNum];
-		int allNeuronNum = pCpuNet->pN2SConnection->n_num;
-		int nodeSynapseNum = pCpuNet->synapseNums[sTypeNum];
-		int dataIdx = network->_node_idx * network->_node_num + network->_node_idx;
-		int MAX_DELAY = pCpuNet->MAX_DELAY;
-
-		char log_filename[512];
-		sprintf(log_filename, "GSim_single_%d.log", node_nets[i]._node_idx); 
-		FILE *log_file = fopen(log_filename, "w+");
-		assert(log_file != NULL);
-		log_files[i] = log_file;
-
-		char v_filename[512];
-		sprintf(v_filename, "g_v_single_%d.data", node_nets[i]._node_idx); 
-		FILE *v_file = fopen(v_filename, "w+");
-		assert(v_file != NULL);
-		v_files[i] = v_file;
-
-		node_buffers[i] = alloc_buffers(allNeuronNum, nodeSynapseNum, MAX_DELAY);
-		node_update_sizes[i] = getBlockSize(allNeuronNum, nodeSynapseNum);
-		c_g_cross_ids[i] = gpuMalloc<int>(global_cross_data[dataIdx]._max_n_num); 
-		copy_idxs[i] = getIndex(pCpuNet->nTypes, nTypeNum, LIFE);
-	}
-
-	checkCudaErrors(cudaSetDevice(0));
-
-	for (int time=0; time<sim_cycle; time++) {
-		for (int node=0; node<device_count; node++) {
-			DistriNetwork *network = &(node_nets[node]);
-			GNetwork *pCpuNet = network->_network;
-			GNetwork *c_pGpuNet = copyNetworkToGPU(pCpuNet);
-			int nTypeNum = pCpuNet->nTypeNum;
-			int sTypeNum = pCpuNet->sTypeNum;
-			int allNeuronNum = pCpuNet->pN2SConnection->n_num;
-			int dataIdx = network->_node_idx * network->_node_num + network->_node_idx;
-			int MAX_DELAY = pCpuNet->MAX_DELAY;
-			int *c_g_cross_id = c_g_cross_ids[node];
-
-			
-			GBuffers *buffers = node_buffers[node];
-			init_buffers(buffers);
-			init_connection<<<1, 1>>>(c_pGpuNet->pN2SConnection);
-			BlockSize *updateSize = node_update_sizes[node];
-
-			int copy_idx = copy_idxs[node];
-			FILE *v_file = v_files[node];
-			FILE *log_file = log_files[node];
-
-			if (time > 0) {
-				if (global_cross_data[dataIdx]._fired_n_num > 0) {
-					copyToGPU(c_g_cross_id, global_cross_data[dataIdx]._fired_n_idxs, global_cross_data[dataIdx]._fired_n_num);
-					addCrossNeurons(c_g_cross_id, global_cross_data[dataIdx]._fired_n_num);
-				}
-
-				update_time<<<1, 1>>>();
-			}
-			
-			for (int i=0; i<nTypeNum; i++) {
-				assert(c_pGpuNet->neuronNums[i+1]-c_pGpuNet->neuronNums[i] > 0);
-				cudaUpdateType[pCpuNet->nTypes[i]](c_pGpuNet->pNeurons[i], c_pGpuNet->neuronNums[i+1]-c_pGpuNet->neuronNums[i], c_pGpuNet->neuronNums[i], &updateSize[c_pGpuNet->nTypes[i]]);
-			}
-
-			int currentIdx = time%(MAX_DELAY+1);
-
-			int copySize = 0;
-			copyFromGPU<int>(&copySize, buffers->c_gFiredTableSizes + currentIdx, 1);
-			if (copySize > 0) {
-				copyFromGPU<int>(buffers->c_neuronsFired, buffers->c_gFiredTable + (allNeuronNum*currentIdx), copySize);
-			}
-
-			for (int i=0; i<sTypeNum; i++) {
-				assert(c_pGpuNet->synapseNums[i+1]-c_pGpuNet->synapseNums[i] > 0);
-				cudaUpdateType[pCpuNet->sTypes[i]](c_pGpuNet->pSynapses[i], c_pGpuNet->synapseNums[i+1]-c_pGpuNet->synapseNums[i], c_pGpuNet->synapseNums[i], &updateSize[pCpuNet->nTypes[i]]);
-			}
-
-			for (int i=0; i<network->_node_num; i++) {
-				int offset = i * network->_node_num + network->_node_idx; 
-				global_cross_data[offset]._fired_n_num = 0;
-			}
-
-			for (int i=0; i<copySize; i++) {
-				int nid = buffers->c_neuronsFired[i];
-				int tmp = network->_crossnode_map->_idx2index[nid];
-				if (tmp >= 0) {
-					for (int j=0; j<network->_node_num; j++) {
-						int tmp2 = tmp * network->_node_num + j;
-						int map_nid = network->_crossnode_map->_crossnode_index2idx[tmp2];
-						if (map_nid >= 0) {
-							//_node_idx to j 
-							int offset = j * network->_node_num + network->_node_idx; 
-							global_cross_data[offset]._fired_n_idxs[global_cross_data[offset]._fired_n_num] = map_nid; 
-							global_cross_data[offset]._fired_n_num++;
-						}
-					}
-				}
-
-			}
-
-			if (copy_idx >= 0 && (c_pGpuNet->neuronNums[copy_idx+1]-c_pGpuNet->neuronNums[copy_idx]) > 0) {
-				GLIFENeurons *c_g_lif = copyFromGPU<GLIFENeurons>(static_cast<GLIFENeurons*>(c_pGpuNet->pNeurons[copy_idx]), 1);
-				real *c_vm = copyFromGPU<real>(c_g_lif->p_vm, c_pGpuNet->neuronNums[copy_idx+1]-c_pGpuNet->neuronNums[copy_idx]);
-				for (int i=0; i<c_pGpuNet->neuronNums[copy_idx+1] - c_pGpuNet->neuronNums[copy_idx]; i++) {
-					fprintf(v_file, "%.10lf \t", c_vm[i]);
-				}
-				fprintf(v_file, "\n");
-				free(c_g_lif);
-				free(c_vm);
-			}
-
-			for (int i=0; i<copySize; i++) {
-				fprintf(log_file, "%d ", buffers->c_neuronsFired[i]);
-			}
-			fprintf(log_file, "\n");
-
-			freeGPUNetwork(c_pGpuNet);
-		}
-
-		for (int node=0; node<device_count; node++) {
-			DistriNetwork *network = &(node_nets[node]);
-			int dataOffset = network->_node_idx * network->_node_num;
-			int dataIdx = network->_node_idx * network->_node_num + network->_node_idx;
-			for (int i=0; i<network->_node_num; i++) {
-				if (i != network->_node_idx) {
-					memcpy(global_cross_data[dataIdx]._fired_n_idxs + global_cross_data[dataIdx]._fired_n_num, global_cross_data[dataOffset+i]._fired_n_idxs, global_cross_data[dataOffset+i]._fired_n_num * sizeof(int));
-					global_cross_data[dataIdx]._fired_n_num += global_cross_data[dataOffset+i]._fired_n_num;
-				}
-			}
-		}
-
-	}
-
-	for (int i=0; i<device_count; i++) {
-		fclose(log_files[i]);
-		fclose(v_files[i]);
-		free_buffers(node_buffers[i]);
-	}
-
-
-
-	return 0;
-}

@@ -7,7 +7,7 @@ import ast
 def column_sub(file1="", file2=""):
     infile1 = open(file1, "r+")
     infile2 = open(file2, "r+")
-    outfile = open("diff.res", "w+")
+    outfile = open("sub.res", "w+")
 
     inlines1 = infile1.readlines()
     inlines2 = infile2.readlines()
@@ -29,23 +29,26 @@ def column_sub(file1="", file2=""):
 
 
 def main(argv):
-    inputfile = ''
-    outputfile = ''
+    file1 = ''
+    file2 = ''
+
+    usuage_msg = sys.argv[0] + ' -1 <file1> -2 <file2>'
+
     try:
         opts, args = getopt.getopt(argv,"hi:o:",["ifile=","ofile="])
     except getopt.GetoptError:
-        print 'test.py -i <file1> -o <file2>'
+        print usuage_msg
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
-            print 'test.py -i <file1> -o <file2>'
+            print usuage_msg
             sys.exit()
-        elif opt in ("-i", "--ifile"):
-            inputfile = arg
-        elif opt in ("-o", "--ofile"):
-            outputfile = arg
+        elif opt in ("-1", "--file1"):
+            file1 = arg
+        elif opt in ("-2", "--file2"):
+            file2 = arg
     
-    column_sub(inputfile, outputfile);
+    column_sub(file1, file2);
 
 
 if __name__ == "__main__":
