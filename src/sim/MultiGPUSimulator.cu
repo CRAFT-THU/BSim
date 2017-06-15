@@ -43,6 +43,19 @@ int MultiGPUSimulator::run(real time)
 	int device_count = 4;
 	checkCudaErrors(cudaGetDeviceCount(&device_count));
 	assert(device_count != 0);
+	for (int i=0; i<device_count; i++) {
+		for (int j=0; j<device_count; j++) {
+			if (i!=j) {
+				int access = 0;
+				checkCudaErrors(cudaDeviceCanAccessPeer(&access, i, j));
+				if (access == 1) {
+					checkCudaErrors(cudaSetDevice(i));
+					checkCudaErrors(cudaDeviceEnablePeerAccess(j, 0));
+				}
+			}
+		}
+	}
+	checkCudaErrors(cudaSetDevice(0));
 
 	pthread_barrier_init(&cycle_barrier, NULL, device_count);
 
@@ -147,8 +160,8 @@ void * run_thread(void *para) {
 
 	vector<int> firedInfo;
 	struct timeval ts, te;
-	struct timeval t0, t1, t2, t3, t4, t5,/* t6, t7,*/ t8, t9;
-	double barrier1_time = 0, gpu_cpy_time = 0, cpu_cpy_time = 0, barrier2_time=0, copy_time = 0;
+	//struct timeval t0, t1, t2, t3, t4, t5,/* t6,*/ t7, t8, t9;
+	//double barrier1_time = 0, gpu_cpy_time = 0, peer_cpy_time = 0, barrier2_time=0, copy_time = 0;
 	gettimeofday(&ts, NULL);
 	for (int time=0; time<network->_sim_cycle; time++) {
 		for (int i=0; i<nTypeNum; i++) {
@@ -156,11 +169,12 @@ void * run_thread(void *para) {
 			cudaUpdateType[pCpuNet->nTypes[i]](c_pGpuNet->pNeurons[i], c_pGpuNet->neuronNums[i+1]-c_pGpuNet->neuronNums[i], c_pGpuNet->neuronNums[i], &updateSize[c_pGpuNet->nTypes[i]]);
 		}
 
-		gettimeofday(&t0, NULL);
+		//gettimeofday(&t0, NULL);
 		pthread_barrier_wait(&cycle_barrier);
-		gettimeofday(&t1, NULL);
-		barrier1_time += (t1.tv_sec - t0.tv_sec) + (t1.tv_usec - t0.tv_usec)/1000000.0;
+		//gettimeofday(&t1, NULL);
+		//barrier1_time += (t1.tv_sec - t0.tv_sec) + (t1.tv_usec - t0.tv_usec)/1000000.0;
 		cudaMemset(c_g_fired_n_num, 0, sizeof(int)*network->_node_num);
+		//cudaDeviceSynchronize();
 		gettimeofday(&t2, NULL);
 		//cudaDeliverNeurons(c_g_idx2index, c_g_cross_index2idx, c_g_global_cross_data, c_g_fired_n_num, network->_node_num, allNeuronNum);
 		//for (int i=0; i<network->_node_num; i++) {
@@ -172,6 +186,7 @@ void * run_thread(void *para) {
 		//}
 		cudaDeliverNeurons(c_g_idx2index, c_g_cross_index2idx, c_g_global_cross_data, c_g_fired_n_num, network->_node_num, allNeuronNum);
 		checkCudaErrors(cudaMemcpy(global_cross_data_gpu->_fired_num + network->_node_idx * network->_node_num, c_g_fired_n_num, sizeof(int)*network->_node_num, cudaMemcpyDeviceToHost));
+		//gettimeofday(&t3, NULL);
 
 		for (int i=0; i< network->_node_num; i++) {
 			int idx2i = network->_node_idx * network->_node_num + i;
@@ -180,9 +195,10 @@ void * run_thread(void *para) {
 				checkCudaErrors(cudaMemcpyPeer(global_cross_data_gpu->_fired_arrays[idx2i], i, c_g_global_cross_data + allNeuronNum * i, network->_node_idx, global_cross_data_gpu->_fired_num[idx2i] * sizeof(int)));
 			}
 		}
+		//gettimeofday(&t7, NULL);
 
-		gettimeofday(&t3, NULL);
-		gpu_cpy_time += (t3.tv_sec - t2.tv_sec) + (t3.tv_usec - t2.tv_usec)/1000000.0;
+		//gpu_cpy_time += (t3.tv_sec - t2.tv_sec) + (t3.tv_usec - t2.tv_usec)/1000000.0;
+		//peer_cpy_time += (t7.tv_sec - t3.tv_sec) + (t7.tv_usec - t3.tv_usec)/1000000.0;
 
 #ifdef LOG_DATA
 		int currentIdx = time%(MAX_DELAY+1);
@@ -202,11 +218,12 @@ void * run_thread(void *para) {
 			assert(c_pGpuNet->synapseNums[i+1]-c_pGpuNet->synapseNums[i] > 0);
 			cudaUpdateType[pCpuNet->sTypes[i]](c_pGpuNet->pSynapses[i], c_pGpuNet->synapseNums[i+1]-c_pGpuNet->synapseNums[i], c_pGpuNet->synapseNums[i], &updateSize[pCpuNet->sTypes[i]]);
 		}
+		//cudaDeviceSynchronize();
 
-		gettimeofday(&t4, NULL);
+		//gettimeofday(&t4, NULL);
 		pthread_barrier_wait(&cycle_barrier);
-		gettimeofday(&t5, NULL);
-		barrier2_time += (t5.tv_sec - t4.tv_sec) + (t5.tv_usec - t4.tv_usec)/1000000.0;
+		//gettimeofday(&t5, NULL);
+		//barrier2_time += (t5.tv_sec - t4.tv_sec) + (t5.tv_usec - t4.tv_usec)/1000000.0;
 
 		//gettimeofday(&t6, NULL);
 		//collectNeurons();
@@ -225,8 +242,8 @@ void * run_thread(void *para) {
 			}
 		}
 		
-		gettimeofday(&t9, NULL);
-		copy_time += (t9.tv_sec - t8.tv_sec) + (t9.tv_usec - t8.tv_usec)/1000000.0;
+		//gettimeofday(&t9, NULL);
+		//copy_time += (t9.tv_sec - t8.tv_sec) + (t9.tv_usec - t8.tv_usec)/1000000.0;
 
 #ifdef LOG_DATA
 		for (int i=0; i<copySize; i++) {
@@ -257,7 +274,7 @@ void * run_thread(void *para) {
 	}
 
 	printf("Thread %d Simulation finesed in %ld:%ld:%ld.%06lds\n", network->_node_idx, hours, minutes, seconds, uSeconds);
-	printf("Thread %d cost : barrier1 %lf, DtoH %lf, barrier2 %lf, HtoH %lf, HtoD %lf\n", network->_node_idx, barrier1_time, gpu_cpy_time, barrier2_time, cpu_cpy_time, copy_time);
+	printf("Thread %d cost : barrier1 %lf, DtoH %lf, DtoD %lf, barrier2 %lf, HtoD %lf\n", network->_node_idx, barrier1_time, gpu_cpy_time, peer_cpy_time, barrier2_time, copy_time);
 
 	int *rate = (int*)malloc(sizeof(int)*nodeNeuronNum);
 	copyFromGPU<int>(rate, buffers->c_gFireCount, nodeNeuronNum);
