@@ -153,9 +153,9 @@ int TJNeuron::hardCopy(void *data, int idx, int base)
 	setID(idx+base);
 	p->p_v_reset[idx] = v_reset;
 	p->p_v_thresh[idx] = v_thresh;
-	p->p_i_syn[idx] = i_syn;
 	p->p_vm[idx] = vm;
 	p->p_i_tmp[idx] = i_tmp;
+	p->p_cm[idx] = cm;
 	p->p_refrac_step[idx] = refrac_step;
 	p->p_refrac_time[idx] = refrac_time;
 	

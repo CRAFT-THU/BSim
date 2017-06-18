@@ -175,7 +175,7 @@ void * run_thread(void *para) {
 		//barrier1_time += (t1.tv_sec - t0.tv_sec) + (t1.tv_usec - t0.tv_usec)/1000000.0;
 		cudaMemset(c_g_fired_n_num, 0, sizeof(int)*network->_node_num);
 		//cudaDeviceSynchronize();
-		gettimeofday(&t2, NULL);
+		//gettimeofday(&t2, NULL);
 		//cudaDeliverNeurons(c_g_idx2index, c_g_cross_index2idx, c_g_global_cross_data, c_g_fired_n_num, network->_node_num, allNeuronNum);
 		//for (int i=0; i<network->_node_num; i++) {
 		//	int offset = i * network->_node_num + network->_node_idx; 
@@ -230,7 +230,7 @@ void * run_thread(void *para) {
 		//gettimeofday(&t7, NULL);
 		//cpu_cpy_time += (t7.tv_sec - t6.tv_sec) + (t7.tv_usec - t6.tv_usec)/1000000.0;
 		
-		gettimeofday(&t8, NULL);
+		//gettimeofday(&t8, NULL);
 		//if (global_cross_data[dataIdx]._fired_n_num > 0) {
 		//	copyToGPU(c_g_cross_id, global_cross_data[dataIdx]._fired_n_idxs, global_cross_data[dataIdx]._fired_n_num);
 		//	addCrossNeurons(c_g_cross_id, global_cross_data[dataIdx]._fired_n_num);
@@ -274,7 +274,7 @@ void * run_thread(void *para) {
 	}
 
 	printf("Thread %d Simulation finesed in %ld:%ld:%ld.%06lds\n", network->_node_idx, hours, minutes, seconds, uSeconds);
-	printf("Thread %d cost : barrier1 %lf, DtoH %lf, DtoD %lf, barrier2 %lf, HtoD %lf\n", network->_node_idx, barrier1_time, gpu_cpy_time, peer_cpy_time, barrier2_time, copy_time);
+	//printf("Thread %d cost : barrier1 %lf, DtoH %lf, DtoD %lf, barrier2 %lf, HtoD %lf\n", network->_node_idx, barrier1_time, gpu_cpy_time, peer_cpy_time, barrier2_time, copy_time);
 
 	int *rate = (int*)malloc(sizeof(int)*nodeNeuronNum);
 	copyFromGPU<int>(rate, buffers->c_gFireCount, nodeNeuronNum);

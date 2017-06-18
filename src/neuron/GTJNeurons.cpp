@@ -13,9 +13,8 @@ int allocTJ(void *pCpu, int N)
 	p->p_vm = (real*)malloc(N*sizeof(real));
 	p->p_v_thresh = (real*)malloc(N*sizeof(real));
 	p->p_v_reset = (real*)malloc(N*sizeof(real));
-	p->p_i_syn = (real*)malloc(N*sizeof(real));
 	p->p_i_tmp = (real*)malloc(N*sizeof(real));
-	p->p_i_E = (real*)malloc(N*sizeof(real));
+	p->p_cm = (real*)malloc(N*sizeof(real));
 	p->p_refrac_step = (int*)malloc(N*sizeof(int));
 	p->p_refrac_time = (int*)malloc(N*sizeof(int));
 	return 0;
@@ -27,8 +26,8 @@ int freeTJ(void *pCpu)
 	free(pCpuNeurons->p_vm);
 	free(pCpuNeurons->p_v_thresh);
 	free(pCpuNeurons->p_v_reset);
-	free(pCpuNeurons->p_i_syn);
 	free(pCpuNeurons->p_i_tmp);
+	free(pCpuNeurons->p_cm);
 	free(pCpuNeurons->p_refrac_step);
 	free(pCpuNeurons->p_refrac_time);
 	return 0;
