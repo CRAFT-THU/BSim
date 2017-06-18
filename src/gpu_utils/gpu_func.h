@@ -13,6 +13,7 @@ int cudaUpdateConstant(void *data, int num, int start_id, BlockSize *pSize);
 int cudaUpdateArray(void *data, int num, int start_id, BlockSize *pSize);
 int cudaUpdateLIF(void *data, int num, int start_id, BlockSize *pSize);
 int cudaUpdateLIFE(void *data, int num, int start_id, BlockSize *pSize);
+int cudaUpdateTJ(void *data, int num, int start_id, BlockSize *pSize);
 int cudaUpdateMax(void *data, int num, int start_id, BlockSize *pSize);
 int cudaUpdateAllLIF(void *data, int num, int start_id, BlockSize *pSize);
 int cudaUpdateAllLIFE(void *data, int num, int start_id, BlockSize *pSize);

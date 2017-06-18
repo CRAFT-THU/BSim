@@ -30,6 +30,13 @@ int cudaUpdateArray(void *data, int num, int start_id, BlockSize *pSize)
 	return 0;
 }
 
+int cudaUpdateTJ(void *data, int num, int start_id, BlockSize *pSize)
+{
+	update_tj_neuron<<<pSize->gridSize, pSize->blockSize>>>((GTJNeurons*)data, num, start_id);
+
+	return 0;
+}
+
 int cudaUpdateLIF(void *data, int num, int start_id, BlockSize *pSize)
 {
 	find_lif_neuron<<<pSize->gridSize, pSize->blockSize>>>((GLIFNeurons*)data, num, start_id);
