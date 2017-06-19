@@ -71,6 +71,7 @@ int TJNeuron::update(SimInfo &info)
 		}
 
 		info.input.push_back(vm);
+		info.input.push_back(i_syn);
 	}
 
 	i_syn = 0;

@@ -101,14 +101,15 @@ int SingleThreadSimulator::run(real time)
 #ifdef LOG_DATA
 		int isize = info.input.size();
 		//fprintf(dataFile, "Cycle %d: ", info.currCycle);
+		int total_record = 2;
 		for (int i=0; i<isize; i++) {
-			if (i%5 == 0) {
+			if (i%total_record == 0) {
 				fprintf(v_file, "%.10lf \t", info.input[i]);
-			} else if (i%5 == 1) {
+			} else if (i%total_record == 1) {
 				fprintf(input_e_file, "%.10lf \t", info.input[i]);
-			} else if (i%5 == 2) {
+			} else if (i%total_record == 2) {
 				fprintf(input_i_file, "%.10lf \t", info.input[i]);
-			} else if (i%5 == 3) {
+			} else if (i%total_record == 3) {
 				fprintf(ie_file, "%.10lf \t", info.input[i]);
 			} else {
 				fprintf(ii_file, "%.10lf \t", info.input[i]);

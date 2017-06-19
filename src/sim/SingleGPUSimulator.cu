@@ -96,6 +96,7 @@ int SingleGPUSimulator::run(real time)
 #ifdef LOG_DATA
 	real *c_vm = hostMalloc<real>(totalNeuronNum);
 
+	int tj_idx = getIndex(pCpuNet->nTypes, nTypeNum, TJ);
 	int life_idx = getIndex(pCpuNet->nTypes, nTypeNum, LIFE);
 	int lif_idx = getIndex(pCpuNet->nTypes, nTypeNum, LIF);
 	int copy_idx = -1;
@@ -113,6 +114,11 @@ int SingleGPUSimulator::run(real time)
 		GLIFNeurons *c_g_lif = copyFromGPU<GLIFNeurons>(static_cast<GLIFNeurons*>(c_pGpuNet->pNeurons[lif_idx]), 1);
 		c_g_vm = c_g_lif->p_vm;
 		copy_idx = lif_idx;
+	} else if (tj_idx >= 0) {
+		GTJNeurons *c_g_tj = copyFromGPU<GTJNeurons>(static_cast<GTJNeurons*>(c_pGpuNet->pNeurons[tj_idx]), 1);
+		c_g_vm = c_g_tj->p_vm;
+		copy_idx = tj_idx;
+
 	} else {
 	}
 #endif
@@ -140,12 +146,12 @@ int SingleGPUSimulator::run(real time)
 #ifdef LOG_DATA
 		if (copy_idx >= 0) {
 			//copyFromGPU<real>(c_vm, buffers->c_gNeuronInput + c_pGpuNet->neuronNums[copy_idx], c_pGpuNet->neuronNums[copy_idx+1]-c_pGpuNet->neuronNums[copy_idx]);
-			copyFromGPU<real>(c_vm, buffers->c_gNeuronInput, c_pGpuNet->neuronNums[copy_idx+1]-c_pGpuNet->neuronNums[copy_idx]);
+			copyFromGPU<real>(c_vm, buffers->c_gNeuronInput + c_pGpuNet->neuronNums[copy_idx], c_pGpuNet->neuronNums[copy_idx+1]-c_pGpuNet->neuronNums[copy_idx]);
 			for (int i=0; i<c_pGpuNet->neuronNums[copy_idx+1] - c_pGpuNet->neuronNums[copy_idx]; i++) {
 				fprintf(input_e_file, "%.10lf \t", c_vm[i]);
 			}
 			//copyFromGPU<real>(c_vm, buffers->c_gNeuronInput_I + c_pGpuNet->neuronNums[copy_idx], c_pGpuNet->neuronNums[copy_idx+1]-c_pGpuNet->neuronNums[copy_idx]);
-			copyFromGPU<real>(c_vm, buffers->c_gNeuronInput_I, c_pGpuNet->neuronNums[copy_idx+1]-c_pGpuNet->neuronNums[copy_idx]);
+			copyFromGPU<real>(c_vm, buffers->c_gNeuronInput_I + c_pGpuNet->neuronNums[copy_idx], c_pGpuNet->neuronNums[copy_idx+1]-c_pGpuNet->neuronNums[copy_idx]);
 			for (int i=0; i<c_pGpuNet->neuronNums[copy_idx+1] - c_pGpuNet->neuronNums[copy_idx]; i++) {
 				fprintf(input_i_file, "%.10lf \t", c_vm[i]);
 			}

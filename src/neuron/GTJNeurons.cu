@@ -19,8 +19,8 @@ int cudaAllocTJ(void *pCpu, void *pGpu, int num)
 	checkCudaErrors(cudaMalloc((void**)&(pGpuNeurons->p_v_thresh), sizeof(real)*num));
 	checkCudaErrors(cudaMemcpy(pGpuNeurons->p_v_thresh, p->p_v_thresh, sizeof(real)*num, cudaMemcpyHostToDevice));
 	checkCudaErrors(cudaMalloc((void**)&(pGpuNeurons->p_i_tmp), sizeof(real)*num));
-	checkCudaErrors(cudaMemcpy(pGpuNeurons->p_cm, p->p_cm, sizeof(real)*num, cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaMalloc((void**)&(pGpuNeurons->p_i_tmp), sizeof(real)*num));
+	checkCudaErrors(cudaMemcpy(pGpuNeurons->p_i_tmp, p->p_i_tmp, sizeof(real)*num, cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMalloc((void**)&(pGpuNeurons->p_cm), sizeof(real)*num));
 	checkCudaErrors(cudaMemcpy(pGpuNeurons->p_cm, p->p_cm, sizeof(real)*num, cudaMemcpyHostToDevice));
 
 	checkCudaErrors(cudaMalloc((void**)&(pGpuNeurons->p_refrac_step), sizeof(int)*num));

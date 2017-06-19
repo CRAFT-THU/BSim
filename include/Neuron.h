@@ -11,6 +11,7 @@
 #include "../src/neuron/ArrayNeuron.h"
 #include "../src/neuron/LIFNeuron.h"
 #include "../src/neuron/LIFENeuron.h"
+#include "../src/neuron/TJNeuron.h"
 #include "../src/neuron/MaxNeuron.h"
 //#include "NengoNeuron.h"
 //#include "ProbeNeuron.h"
@@ -21,12 +22,13 @@
 
 #include "../src/base/CompositeNeuron.h"
 
-typedef CompositeNeuron<ConstantNeuron, ExpSynapse> Constant_curr;
+typedef CompositeNeuron<ConstantNeuron, ExpSynapse> Constant_curr_exp;
 typedef CompositeNeuron<PoissonNeuron, ExpSynapse> Poisson_curr;
 typedef CompositeNeuron<ArrayNeuron, ExpSynapse> Array_curr;
 typedef CompositeNeuron<MaxNeuron, ExpSynapse> Max_curr_exp;
 typedef CompositeNeuron<LIFNeuron, ExpSynapse> IF_curr_exp;
 typedef CompositeNeuron<LIFENeuron, StaticSynapse> LIF_brian;
+typedef CompositeNeuron<TJNeuron, StaticSynapse> TJ_curr_static;
 
 //typedef CompositeNeuron<InputNeuron, LowpassSynapse> Input_lowpass;
 //typedef CompositeNeuron<ProbeNeuron, LowpassSynapse> Probe_lowpass;
