@@ -42,6 +42,8 @@ public:
 	int connect(Population<Neuron1> *pSrc, Population<Neuron2> *pDst, real weight, real delay, SpikeType type);
 	template<class Neuron1, class Neuron2>
 	int connect(Population<Neuron1> *pSrc, Population<Neuron2> *pDst, real *weight, real *delay, SpikeType *type, int size);
+	template<class Neuron1, class Neuron2>
+	int connectConv(Population<Neuron1> *pSrc, Population<Neuron2> *pDst, real *weight, real *delay, SpikeType *type, int height, int width, int k_height, int k_width);
 	
 	int connect(int populationIDSrc, int neuronIDSrc, int populationIDDst, int neuronIDDst, real weight, real delay, real tau = 0);
 	SynapseBase* connect(NeuronBase *pSrc, NeuronBase *pDst, real weight, real delay, SpikeType type = Excitatory, real tau = 0, bool store = true);
@@ -200,6 +202,14 @@ int Network::connect(Population<Neuron1> *pSrc, Population<Neuron2> *pDst, real 
 	}
 
 	return count;
+}
+
+template<class Neuron1, class Neuron2>
+int connectConv(Population<Neuron1> *pSrc, Population<Neuron2> *pDst, real *weight, real *delay, SpikeType *type, int height, int width, int k_height, int k_width) {
+	int srcSize = pSrc->getNum();
+	int dstSize = pDst->getNum();
+	assert(srcSize == height * width); 
+	assert(dstSize == height * width); 
 }
 
 #endif /* NETWORK_H */
