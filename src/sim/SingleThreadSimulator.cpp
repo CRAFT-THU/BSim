@@ -101,7 +101,7 @@ int SingleThreadSimulator::run(real time)
 #ifdef LOG_DATA
 		int isize = info.input.size();
 		//fprintf(dataFile, "Cycle %d: ", info.currCycle);
-		int total_record = 2;
+		int total_record = 5;
 		for (int i=0; i<isize; i++) {
 			if (i%total_record == 0) {
 				fprintf(v_file, "%.10lf \t", info.input[i]);

@@ -27,14 +27,12 @@ int main(int argc, char **argv)
 
 	real * weight0 = NULL;
 	real * weight1 = NULL;
-	real * weight2 = NULL;
 	real * delay = NULL;
 
 	if (load) { 
 		printf("LOAD DATA...\n");
 		weight0 = loadArray("weight0.csv", N*N);
 		weight1 = loadArray("weight1.csv", N*N);
-		weight2 = loadArray("weight2.csv", N*N);
 		delay = loadArray("delay.csv", N*N);
 		printf("LOAD DATA FINISHED\n");
 	} else {
