@@ -63,6 +63,7 @@ int ConstantNeuron::update(SimInfo &info)
 		fired = true;
 		fire_count++;
 		fire();
+		fireCount++;
 		info.fired.push_back(getID());
 	}
 	return 0;

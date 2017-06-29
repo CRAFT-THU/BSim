@@ -36,11 +36,11 @@ PoissonNeuron::~PoissonNeuron()
 int PoissonNeuron::reset(SimInfo &info)
 {
 	fired = false;
-	startCycle = (int) startTime/info.dt;
+	startCycle = static_cast<int>(startTime/info.dt);
 	startCycle += distribution(generator);
 	fireCycle = startCycle;
-	endCycle = (int) endTime/info.dt;
-	refract_step = (int) refract/info.dt;
+	endCycle = static_cast<int>(endTime/info.dt);
+	refract_step = static_cast<int>(refract/info.dt);
 	return 0;
 }
 
@@ -56,6 +56,7 @@ int PoissonNeuron::update(SimInfo &info)
 		fired = true;
 		fireCycle = fireCycle + 1 + distribution(generator); 
 		fire();
+		fireCount++;
 		info.fired.push_back(getID());
 	} 
 	return 0;

@@ -82,6 +82,7 @@ int MaxNeuron::update(SimInfo &info)
 	if (fired) {
 		_count++;
 		fire();
+		fireCount++;
 		info.fired.push_back(getID());
 		return 1;
 	} else {

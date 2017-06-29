@@ -44,6 +44,8 @@ public:
 	int connect(Population<Neuron1> *pSrc, Population<Neuron2> *pDst, real *weight, real *delay, SpikeType *type, int size);
 	template<class Neuron1, class Neuron2>
 	int connectConv(Population<Neuron1> *pSrc, Population<Neuron2> *pDst, real *weight, real *delay, SpikeType *type, int height, int width, int k_height, int k_width);
+	template<class Neuron1, class Neuron2>
+	int connectPooling(Population<Neuron1> *pSrc, Population<Neuron2> *pDst, int height, int width, int p_height, int p_width);
 	
 	int connect(int populationIDSrc, int neuronIDSrc, int populationIDDst, int neuronIDDst, real weight, real delay, real tau = 0);
 	SynapseBase* connect(NeuronBase *pSrc, NeuronBase *pDst, real weight, real delay, SpikeType type = Excitatory, real tau = 0, bool store = true);
@@ -230,6 +232,33 @@ int Network::connectConv(Population<Neuron1> *pSrc, Population<Neuron2> *pDst, r
 					}
 				}
 			}
+		}	
+	}
+
+	return count;
+}
+
+template<class Neuron1, class Neuron2>
+int Network::connectPooling(Population<Neuron1> *pSrc, Population<Neuron2> *pDst, int height, int width, int p_height, int p_width)
+{
+	int srcSize = pSrc->getNum();
+	int dstSize = pDst->getNum();
+	assert(dstSize == srcSize / p_height / p_width); 
+
+	//int d_height = height/p_height;
+	int d_width = width/p_width;
+
+	int count = 0;
+	for (int h = 0; h < height; h++) {
+		for (int w = 0; w < width; w++) {
+			int d_h = h/p_height;
+			int d_w = w/p_width;
+			int d_h_ = h % p_height;
+			int d_w_ = w % p_width;
+			int idx = d_h_ * p_width + d_w_;
+
+			count++;
+			connect(pSrc->getNeuron(h * width + w), pDst->getNeuron(d_h*d_width + d_w), (real)idx, 0.001 /*TODO: Change to dt*/, Excitatory, 0.0, false);
 		}	
 	}
 
