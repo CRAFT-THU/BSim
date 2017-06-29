@@ -7,15 +7,15 @@
 
 const Type LIFENeuron::type = LIFE;
 
-LIFENeuron::LIFENeuron(ID id, real v_init, real v_rest, real v_reset, real cm, real tau_m, real tau_refrac, real tau_syn_E, real tau_syn_I, real v_thresh, real i_offset)
-	: NeuronBase(id), _v_thresh(v_thresh), _v_reset(v_reset), _v_init(v_init), _v_rest(v_rest), _cm(cm), _tau_m(tau_m), _tau_refrac(tau_refrac), _tau_syn_E(tau_syn_E), _tau_syn_I(tau_syn_I), _i_offset(i_offset)
+LIFENeuron::LIFENeuron(real v_init, real v_rest, real v_reset, real cm, real tau_m, real tau_refrac, real tau_syn_E, real tau_syn_I, real v_thresh, real i_offset)
+	: NeuronBase(), _v_thresh(v_thresh), _v_reset(v_reset), _v_init(v_init), _v_rest(v_rest), _cm(cm), _tau_m(tau_m), _tau_refrac(tau_refrac), _tau_syn_E(tau_syn_E), _tau_syn_I(tau_syn_I), _i_offset(i_offset)
 {
-	this->_i_syn_E = 0.0f;
-	this->_i_syn_I = 0.0f;
+	this->_i_syn_E = 0.0;
+	this->_i_syn_I = 0.0;
 	this->monitored = false;
 }
 
-LIFENeuron::LIFENeuron(const LIFENeuron &neuron, ID id) : NeuronBase(id)
+LIFENeuron::LIFENeuron(const LIFENeuron &neuron) : NeuronBase()
 {
 	this->_vm = neuron._vm;
 	this->_CI = neuron._CI;
@@ -41,8 +41,8 @@ LIFENeuron::LIFENeuron(const LIFENeuron &neuron, ID id) : NeuronBase(id)
 	this->_tau_syn_I = neuron._tau_syn_I;
 	this->_i_offset = neuron._i_offset;
 
-	this->_i_syn_E = 0.0f;
-	this->_i_syn_I = 0.0f;
+	this->_i_syn_E = 0.0;
+	this->_i_syn_I = 0.0;
 }
 
 LIFENeuron::~LIFENeuron()
@@ -76,19 +76,19 @@ int LIFENeuron::reset(SimInfo &info)
 	if (_tau_m > 0) {
 		_Cm = exp(-dt/_tau_m);
 	} else {
-		_Cm = 0.0f;
+		_Cm = 0.0;
 	}
 
 	if (_tau_syn_E > 0) {
 		_CE = exp(-dt/_tau_syn_E);
 	} else {
-		_CE = 0.0f;
+		_CE = 0.0;
 	}
 
 	if (_tau_syn_I > 0) {
 		_CI = exp(-dt/_tau_syn_I);
 	} else {
-		_CI = 0.0f;
+		_CI = 0.0;
 	}
 
 	_v_tmp = _i_offset * rm + _v_rest;
@@ -101,7 +101,7 @@ int LIFENeuron::reset(SimInfo &info)
 	_C_I = _C_I * (_CI - _Cm);
 
 	_refrac_time = static_cast<int>(_tau_refrac/dt);
-	_refrac_step = _refrac_time;
+	_refrac_step = 0;
 
 	_i_I = 0;
 	_i_E = 0;
@@ -135,8 +135,10 @@ int LIFENeuron::update(SimInfo &info)
 	}
 	
 	info.input.push_back(_vm);
-	//info.input.push_back(_i_E);
-	//info.input.push_back(_i_I);
+	info.input.push_back(_i_syn_E);
+	info.input.push_back(_i_syn_I);
+	info.input.push_back(_i_E);
+	info.input.push_back(_i_I);
 	//info.input.push_back(_i_E + _i_I);
 
 
@@ -166,7 +168,7 @@ size_t LIFENeuron::getSize()
 int LIFENeuron::getData(void *data)
 {
 	Json::Value *p = (Json::Value *)data;
-	(*p)["id"] = getID().getId();
+	(*p)["id"] = getID();
 	(*p)["vm"] = _vm;
 	(*p)["CI"] = _CI;
 	(*p)["CE"] = _CE;
@@ -184,19 +186,15 @@ int LIFENeuron::getData(void *data)
 	return 0;
 }
 
-int LIFENeuron::hardCopy(void * data, int idx, int base, map<ID, int> &id2idx, map<int, ID> &idx2id)
+int LIFENeuron::hardCopy(void * data, int idx, int base)
 {
 	GLIFENeurons *p = (GLIFENeurons *) data;
-	id2idx[getID()] = idx + base;
-	setIdx(idx+base);
-	idx2id[idx+base] = getID();
+	setID(idx+base);
 	p->p_vm[idx] = _vm;
 	p->p_CI[idx] = _CI;
 	p->p_CE[idx] = _CE;
 	p->p_C_I[idx] = _C_I;
 	p->p_C_E[idx] = _C_E;
-	p->p_refrac_step[idx] = _refrac_step;
-	p->p_refrac_time[idx] = _refrac_time;
 	p->p_v_tmp[idx] = _v_tmp;
 	p->p_i_I[idx] = _i_I;
 	p->p_i_E[idx] = _i_E;
@@ -204,6 +202,11 @@ int LIFENeuron::hardCopy(void * data, int idx, int base, map<ID, int> &id2idx, m
 	p->p_v_reset[idx] = _v_reset;
 	p->p_Cm[idx] = _Cm;
 
+	p->p_refrac_step[idx] = _refrac_step;
+	p->p_refrac_time[idx] = _refrac_time;
+	//p->p_start_I[idx] = this->_start_I;
+	//p->p_start_E[idx] = this->_start_E;
+	//p->p_end[idx] = this->_end;
 	return 1;
 }
 

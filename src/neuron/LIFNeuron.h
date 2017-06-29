@@ -11,8 +11,8 @@
 
 class LIFNeuron : public NeuronBase {
 public:
-	LIFNeuron(ID id, real v_init, real v_rest, real v_reset, real cm, real tau_m, real tau_refrac, /*real tau_syn_E, real tau_syn_I, */real v_thresh, real i_offset);
-	LIFNeuron(const LIFNeuron &neuron, ID id);
+	LIFNeuron(real v_init, real v_rest, real v_reset, real cm, real tau_m, real tau_refrac, /*real tau_syn_E, real tau_syn_I, */real v_thresh, real i_offset);
+	LIFNeuron(const LIFNeuron &neuron);
 	~LIFNeuron();
 
 	virtual Type getType();
@@ -28,7 +28,7 @@ public:
 
 	virtual size_t getSize();
 	virtual int getData(void *data);
-	virtual int hardCopy(void * data, int idx, int base, map<ID, int> &id2idx, map<int, ID> &idx2id);
+	virtual int hardCopy(void * data, int idx, int base);
 
 	const static Type type;
 protected:

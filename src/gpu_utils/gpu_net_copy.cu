@@ -1,4 +1,5 @@
 
+#include "../neuron/GLIFENeurons.h"
 #include "../utils/TypeFunc.h"
 #include "mem_op.h"
 #include "gpu_func.h"
@@ -72,18 +73,19 @@ GNetwork* copyNetworkToGPU(GNetwork *pCpuNet)
 	}
 
 	int conn_n_num = pCpuNet->pN2SConnection->n_num;
-	int conn_s_num = pCpuNet->pN2SConnection->s_num;
+	//int conn_s_num = pCpuNet->pN2SConnection->s_num;
 
 	N2SConnection * pConnection = (N2SConnection*)malloc(sizeof(N2SConnection));
 	N2SConnection * g_pConnection = NULL;
-	int *g_pSynapsesIdx = NULL, *g_delayStart = NULL, *g_delayNum = NULL;
-	checkCudaErrors(cudaMalloc((void**)&(g_pSynapsesIdx), sizeof(int)*conn_s_num));
-	checkCudaErrors(cudaMemcpy(g_pSynapsesIdx, pCpuNet->pN2SConnection->pSynapsesIdx, sizeof(int)*conn_s_num, cudaMemcpyHostToDevice));
+	int *g_delayStart = NULL, *g_delayNum = NULL;
+	//int *g_pSynapsesIdx = NULL;
+	//checkCudaErrors(cudaMalloc((void**)&(g_pSynapsesIdx), sizeof(int)*conn_s_num));
+	//checkCudaErrors(cudaMemcpy(g_pSynapsesIdx, pCpuNet->pN2SConnection->pSynapsesIdx, sizeof(int)*conn_s_num, cudaMemcpyHostToDevice));
 	checkCudaErrors(cudaMalloc((void**)&(g_delayStart), sizeof(int)*conn_n_num*MAX_DELAY));
 	checkCudaErrors(cudaMemcpy(g_delayStart, pCpuNet->pN2SConnection->delayStart, sizeof(int)*conn_n_num*MAX_DELAY, cudaMemcpyHostToDevice));
 	checkCudaErrors(cudaMalloc((void**)&(g_delayNum), sizeof(int)*conn_n_num*MAX_DELAY));
 	checkCudaErrors(cudaMemcpy(g_delayNum, pCpuNet->pN2SConnection->delayNum, sizeof(int)*conn_n_num*MAX_DELAY, cudaMemcpyHostToDevice));
-	pConnection->pSynapsesIdx = g_pSynapsesIdx;
+	//pConnection->pSynapsesIdx = g_pSynapsesIdx;
 	pConnection->delayStart = g_delayStart;
 	pConnection->delayNum = g_delayNum;
 	checkCudaErrors(cudaMalloc((void**)&(g_pConnection), sizeof(N2SConnection)));
@@ -104,6 +106,29 @@ GNetwork* copyNetworkToGPU(GNetwork *pCpuNet)
 	//tmpNet->gSynapseNums = pCpuNet->gSynapseNums;
 
 	return tmpNet;
+}
+
+int fetchNetworkFromGPU(GNetwork *pCpuNet, GNetwork *pGpuNet)
+{
+	if (pCpuNet == NULL && pGpuNet == NULL) {
+		printf("NULL POINTER: GNETWORK\n");
+		return -1;
+	}
+
+	int nTypeNum = pCpuNet->nTypeNum;
+	//int sTypeNum = pCpuNet->sTypeNum;
+	//int MAX_DELAY = pCpuNet->MAX_DELAY;
+
+	//TODO support multitype N and S
+	for (int i=0; i<nTypeNum; i++) {
+		if (pCpuNet->nTypes[i] == LIFE) {
+			cudaFetchLIFE(pGpuNet->pNeurons[i], pCpuNet->pNeurons[i], pCpuNet->neuronNums[i+1]-pCpuNet->neuronNums[i]);
+		}
+		//TODO: cudaFetchType
+		//cudaFetchType[pCpuNet->nTypes[i]](pGpuNet->pNeurons[i], pCpuNet->pNeurons[i], pCpuNet->neuronNums[i+1]-pCpuNet->neuronNums[i]);
+	}
+
+	return 0;
 }
 
 int freeGPUNetwork(GNetwork *pGpuNet)
@@ -136,7 +161,7 @@ int freeGPUNetwork(GNetwork *pGpuNet)
 
 	N2SConnection * pConnection = (N2SConnection*)malloc(sizeof(N2SConnection));
 	checkCudaErrors(cudaMemcpy(pConnection, pTmpNet->pN2SConnection, sizeof(N2SConnection), cudaMemcpyDeviceToHost));
-	checkCudaErrors(cudaFree(pConnection->pSynapsesIdx));
+	//checkCudaErrors(cudaFree(pConnection->pSynapsesIdx));
 	checkCudaErrors(cudaFree(pConnection->delayStart));
 	checkCudaErrors(cudaFree(pConnection->delayNum));
 	checkCudaErrors(cudaFree(pTmpNet->pN2SConnection));

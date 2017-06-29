@@ -18,7 +18,7 @@ struct GExpSynapses {
 	real *p__C1;
 	real *p_I_syn;
 	
-	int *pDst;
+	int *p_dst;
 };
 
 SYNAPSE_GPU_FUNC_DEFINE(Exp)

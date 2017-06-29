@@ -6,15 +6,22 @@
 #include <stdio.h>
 
 #include "NeuronBase.h"
+#include "SynapseBase.h"
 
-NeuronBase::NeuronBase(ID id, int node) : Base(id, node)
+NeuronBase::NeuronBase(int node) : Base(node)
 {
 	fired = false;
 	monitored = false;
 	fireCount = 0;
+	//_start_E = -1;
+	//_start_I = -1;
+	//_end = -1;
 }
 
-NeuronBase::~NeuronBase() {}
+NeuronBase::~NeuronBase() 
+{
+	pSynapses.clear();
+}
 
 bool NeuronBase::isFired() 
 {
@@ -33,8 +40,27 @@ void NeuronBase::monitorOn()
 
 int NeuronBase::fire() 
 {
+	for (auto iter=pSynapses.begin(); iter!=pSynapses.end(); iter++) {
+		(*iter)->recv();
+	}
+
 	return 0;
 }
+
+//void NeuronBase::setStartExec(int idx)
+//{
+//	this->_start_E = idx;
+//}
+//
+//void NeuronBase::setStartInhi(int idx)
+//{
+//	this->_start_I = idx;
+//}
+//
+//void NeuronBase::setEnd(int idx)
+//{
+//	this->_end = idx;
+//}
 
 SynapseBase * NeuronBase::createSynapse(real weight, real delay, SpikeType type, real tau, NeuronBase *dst) 
 {
@@ -43,5 +69,11 @@ SynapseBase * NeuronBase::createSynapse(real weight, real delay, SpikeType type,
 
 SynapseBase * NeuronBase::addSynapse(SynapseBase * synapse)
 {
-	return NULL;
+	pSynapses.push_back(synapse);
+	return synapse;
+}
+
+const vector<SynapseBase*> & NeuronBase::getSynapses() const 
+{
+	return pSynapses;
 }

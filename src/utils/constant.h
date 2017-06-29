@@ -9,7 +9,14 @@
 
 #define MPI_CREAL MPI_FLOAT
 
+#ifndef USE_DOUBLE
 typedef float real;
+#else
+typedef double real;
+#endif
+
+typedef int ID;
+
 const real ZERO = 1e-10;
 
 const int MAXBLOCKSIZE = 1024;

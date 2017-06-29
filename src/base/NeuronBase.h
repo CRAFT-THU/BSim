@@ -11,23 +11,33 @@ class SynapseBase;
 
 class NeuronBase : public Base {
 public:
-	NeuronBase(ID id, int node = 0);
+	NeuronBase(int node = 0);
 	virtual ~NeuronBase() = 0;
 
 	virtual void monitorOn();
 
-	virtual bool isFired();
+	virtual bool isFired() final;
 	virtual int getFireCount() final;
 
-	virtual int fire();
+	virtual int fire() final;
 	virtual int recv(real I) = 0;
 
-	virtual SynapseBase *addSynapse(SynapseBase *addSynapse);
+	//virtual  void setStartExec(int idx) final;
+	//virtual  void setStartInhi(int idx) final;
+	//virtual  void setEnd(int idx) final;
+
+	virtual SynapseBase *addSynapse(SynapseBase *addSynapse) final;
 	virtual SynapseBase *createSynapse(real weight, real delay, SpikeType type, real tau, NeuronBase *dst);
+
+	const vector<SynapseBase*> & getSynapses() const;
 protected:
+	vector<SynapseBase*> pSynapses;
 	bool fired;
-	int fireCount;
 	bool monitored;
+	int fireCount;
+	//int _start_E;
+	//int _start_I;
+	//int _end;
 };
 
 #endif /* NEURONBASE_H */

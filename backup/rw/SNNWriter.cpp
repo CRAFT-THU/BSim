@@ -25,8 +25,8 @@ int writeNetwork(string filename, Network *net)
 	for (int i=0; i<(int)net->pPopulations.size()-1; i++) {
 		for (int j=i; j<(int)net->pPopulations.size(); j++) {
 			Json::Value projection;
-			projection["src"] = net->pPopulations[i]->getID().getId();
-			projection["dst"] = net->pPopulations[j]->getID().getId();
+			projection["src"] = net->pPopulations[i]->getID();
+			projection["dst"] = net->pPopulations[j]->getID();
 			Json::Value connections(Json::arrayValue);
 			int sizeA = net->pPopulations[i]->getNum();
 			int sizeB = net->pPopulations[j]->getNum();

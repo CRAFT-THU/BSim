@@ -6,7 +6,9 @@
 
 struct GStaticSynapses {
 	real *p_weight;
-	int *pDst;
+	//int *p_delay;
+	//int *p_src;
+	int *p_dst;
 };
 
 SYNAPSE_GPU_FUNC_DEFINE(Static)

@@ -23,6 +23,8 @@ int allocExp(void *pSynapses, int S)
 	p->p__C1 = (real*)malloc(S*sizeof(real));
 	p->p_I_syn = (real*)malloc(S*sizeof(real));
 
+	p->p_dst = (int*)malloc(S*sizeof(real));
+
 	return 0;
 }
 
@@ -38,7 +40,7 @@ void mpiSendExp(void *data, int rank, int offset, int size)
 
 	MPI_Send(&(synapses->p_I_syn[offset]), sizeof(real)*size, MPI_BYTE, rank, sendTag.getTag(), MPI_COMM_WORLD);
 
-	MPI_Send(&(synapses->pDst[offset]), size, MPI_INT, rank, sendTag.getTag(), MPI_COMM_WORLD);
+	MPI_Send(&(synapses->p_dst[offset]), size, MPI_INT, rank, sendTag.getTag(), MPI_COMM_WORLD);
 }
 
 void mpiRecvExp(void **data, int rank, int rankSize)
@@ -57,7 +59,7 @@ void mpiRecvExp(void **data, int rank, int rankSize)
 
 	MPI_Recv(synapses->p_I_syn, sizeof(real)*size, MPI_BYTE, rank, recvTag.getTag(), MPI_COMM_WORLD, &status);
 
-	MPI_Recv(synapses->pDst, size, MPI_INT, rank, recvTag.getTag(), MPI_COMM_WORLD, &status);
+	MPI_Recv(synapses->p_dst, size, MPI_INT, rank, recvTag.getTag(), MPI_COMM_WORLD, &status);
 
 	*data = (void*)synapses;
 }

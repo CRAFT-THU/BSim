@@ -5,7 +5,7 @@
 
 #include "PopulationBase.h"
 
-PopulationBase::PopulationBase(ID id, int node) : Base(id, node)
+PopulationBase::PopulationBase(int node) : Base(node)
 {
 	monitored = false;
 }

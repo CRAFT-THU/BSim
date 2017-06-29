@@ -18,19 +18,18 @@ template<class Neuron, class Synapse>
 class CompositeNeuron : public Neuron {
 public:
 	CompositeNeuron(real tau_syn_E, real tau_syn_I);
-	CompositeNeuron(const Neuron &templ, ID id, real tau_syn_E = 1e-3, real tau_syn_I = 1e-3);
-	CompositeNeuron(const CompositeNeuron<Neuron, Synapse> &templ, ID id);
+	CompositeNeuron(const Neuron &templ, real tau_syn_E = 1e-3, real tau_syn_I = 1e-3);
+	CompositeNeuron(const CompositeNeuron<Neuron, Synapse> &templ);
 	~CompositeNeuron();
 
-	SynapseBase* addSynapse(SynapseBase *synapse);
-	SynapseBase* createSynapse(real weight, real delay, SpikeType type, real tau_in, NeuronBase *pDest);
-	virtual int fire();
-	virtual int setNode(int node);
+	//virtual SynapseBase* addSynapse(SynapseBase *synapse) override;
+	virtual SynapseBase* createSynapse(real weight, real delay, SpikeType type, real tau_in, NeuronBase *pDest) override;
+	//virtual int fire() override;
+	//virtual int setNode(int node);
 private:
 	real _tau_syn_E;
 	real _tau_syn_I;
-	vector<SynapseBase*> pSynapses;
-	vector<SynapseBase*> pPreSynapses;
+	//vector<SynapseBase*> pPreSynapses;
 };
 
 template<class Neuron, class Synapse>
@@ -41,28 +40,28 @@ CompositeNeuron<Neuron, Synapse>::CompositeNeuron(real tau_syn_E, real tau_syn_I
 }
 
 template<class Neuron, class Synapse>
-CompositeNeuron<Neuron, Synapse>::CompositeNeuron(const Neuron &templ, ID id, real tau_syn_E, real tau_syn_I) : Neuron(templ, id) {
+CompositeNeuron<Neuron, Synapse>::CompositeNeuron(const Neuron &templ, real tau_syn_E, real tau_syn_I) : Neuron(templ) {
 	this->_tau_syn_E = tau_syn_E;
 	this->_tau_syn_I = tau_syn_I;
 }
 
 template<class Neuron, class Synapse>
-CompositeNeuron<Neuron, Synapse>::CompositeNeuron(const CompositeNeuron<Neuron, Synapse> &templ, ID id) : Neuron(templ, id) {
-	this->_tau_syn_E = templ.tau_syn_E;
-	this->_tau_syn_I = templ.tau_syn_I;
+CompositeNeuron<Neuron, Synapse>::CompositeNeuron(const CompositeNeuron<Neuron, Synapse> &templ) : Neuron(templ) {
+	this->_tau_syn_E = templ._tau_syn_E;
+	this->_tau_syn_I = templ._tau_syn_I;
 }
 
 template<class Neuron, class Synapse>
 CompositeNeuron<Neuron, Synapse>::~CompositeNeuron()
 {
-	pSynapses.clear();
-	pPreSynapses.clear();
+	//pSynapses.clear();
+	//pPreSynapses.clear();
 }
 
 template<class Neuron, class Synapse>
 SynapseBase *CompositeNeuron<Neuron, Synapse>::createSynapse(real weight, real delay, SpikeType type, real tau_in, NeuronBase *pDest)
 {
-	real tau = 0.0f;
+	real tau = 0.0;
 	if (fabs(tau_in) > ZERO) {
 		tau = tau_in;
 	} else if (type == Excitatory) {
@@ -71,44 +70,42 @@ SynapseBase *CompositeNeuron<Neuron, Synapse>::createSynapse(real weight, real d
 		tau = this->_tau_syn_I;
 	}
 
-	Synapse *tmp = new Synapse(ID(pDest->getID().getGid(), sidTag.getTag()), weight, delay, tau);
+	Synapse *tmp = new Synapse(weight, delay, tau);
 	tmp->setDst(pDest);
 
 	SynapseBase *ret = (SynapseBase *)tmp;
-	pPreSynapses.push_back(ret);
+	//pPreSynapses.push_back(ret);
 	return ret;
 }
 
-template<class Neuron, class Synapse>
-SynapseBase* CompositeNeuron<Neuron, Synapse>::addSynapse(SynapseBase * synapse)
-{
-	pSynapses.push_back(synapse);
-	return synapse;
-}
+//template<class Neuron, class Synapse>
+//SynapseBase* CompositeNeuron<Neuron, Synapse>::addSynapse(SynapseBase * synapse)
+//{
+//	pSynapses.push_back(synapse);
+//	return synapse;
+//}
 
-template<class Neuron, class Synapse>
-int CompositeNeuron<Neuron, Synapse>::fire()
-{
-	//printf("Fired: %d_%d\n", this->getID().groupId, this->getID().id);
-	//getchar();
-	vector<SynapseBase*>::iterator iter;
-	for (iter=pSynapses.begin(); iter!=pSynapses.end(); iter++) {
-		(*iter)->recv();
-	}
+//template<class Neuron, class Synapse>
+//int CompositeNeuron<Neuron, Synapse>::fire()
+//{
+//	vector<SynapseBase*>::iterator iter;
+//	for (iter=pSynapses.begin(); iter!=pSynapses.end(); iter++) {
+//		(*iter)->recv();
+//	}
+//
+//	return 0;
+//}
 
-	return 0;
-}
-
-template<class Neuron, class Synapse>
-int CompositeNeuron<Neuron, Synapse>::setNode(int node)
-{
-	vector<SynapseBase*>::iterator iter;
-	for (iter=pPreSynapses.begin(); iter!=pPreSynapses.end(); iter++) {
-		(*iter)->setNode(node);
-	}
-
-	return pPreSynapses.size();
-}
+//template<class Neuron, class Synapse>
+//int CompositeNeuron<Neuron, Synapse>::setNode(int node)
+//{
+//	vector<SynapseBase*>::iterator iter;
+//	for (iter=pPreSynapses.begin(); iter!=pPreSynapses.end(); iter++) {
+//		(*iter)->setNode(node);
+//	}
+//
+//	return pPreSynapses.size();
+//}
 
 #endif /* COMPOSITENEURON_H */
 

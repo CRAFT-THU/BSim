@@ -11,8 +11,7 @@
 
 class MaxNeuron : public NeuronBase {
 public:
-	MaxNeuron(ID id, int N);
-	MaxNeuron(const MaxNeuron &neuron, ID id);
+	MaxNeuron(int N);
 	MaxNeuron(const MaxNeuron &neuron);
 	~MaxNeuron();
 
@@ -26,7 +25,7 @@ public:
 
 	virtual size_t getSize();
 	virtual int getData(void *data);
-	virtual int hardCopy(void * data, int idx, int base, map<ID, int> &id2idx, map<int, ID> &idx2id);
+	virtual int hardCopy(void * data, int idx, int base);
 
 	const static Type type;
 protected:

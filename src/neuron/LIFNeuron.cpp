@@ -15,15 +15,15 @@ using std::map;
 
 const Type LIFNeuron::type = LIF;
 
-LIFNeuron::LIFNeuron(ID id, real v_init, real v_rest, real v_reset, real cm, real tau_m, real tau_refrac, /*real tau_syn_E, real tau_syn_I, */real v_thresh, real i_offset)
-	: NeuronBase(id), v_init(v_init), v_rest(v_rest), v_reset(v_reset), cm(cm), tau_m(tau_m), tau_refrac(tau_refrac), /*tau_syn_E(tau_syn_E), tau_syn_I(tau_syn_I), */v_thresh(v_thresh), i_offset(i_offset)
+LIFNeuron::LIFNeuron(real v_init, real v_rest, real v_reset, real cm, real tau_m, real tau_refrac, /*real tau_syn_E, real tau_syn_I, */real v_thresh, real i_offset)
+	: NeuronBase(), v_init(v_init), v_rest(v_rest), v_reset(v_reset), cm(cm), tau_m(tau_m), tau_refrac(tau_refrac), /*tau_syn_E(tau_syn_E), tau_syn_I(tau_syn_I), */v_thresh(v_thresh), i_offset(i_offset)
 {
 	this->i_syn = 0;
 	this->file = NULL;
 	this->monitored = false;
 }
 
-LIFNeuron::LIFNeuron(const LIFNeuron &neuron, ID id) : NeuronBase(id)
+LIFNeuron::LIFNeuron(const LIFNeuron &neuron) : NeuronBase()
 {
 	this->v_init = neuron.v_init;
 	this->v_rest = neuron.v_rest;
@@ -58,7 +58,7 @@ int LIFNeuron::init(real dt)
 		C1 = exp(-dt/tau_m);
 		C2 = rm*(1-C1);
 	} else {
-		C1 = 0.0f;
+		C1 = 0.0;
 		C2 = rm;
 	}
 
@@ -135,7 +135,7 @@ void LIFNeuron::monitor(SimInfo &info)
 	if (monitored) {
 		if (file == NULL) {
 			char filename[128];
-			sprintf(filename, "Neuron_%s.log", getID().getInfo().c_str());
+			sprintf(filename, "Neuron_%d.log", getID());
 			file = fopen(filename, "w+");
 
 			if (file == NULL) {
@@ -161,7 +161,7 @@ int LIFNeuron::getData(void *data)
 {
 	Json::Value *p = (Json::Value *)data;
 
-	(*p)["id"] = getID().getId();
+	(*p)["id"] = getID();
 	(*p)["v_init"] = v_init;
 	(*p)["v_rest"] = v_rest;
 	(*p)["v_reset"] = v_reset;
@@ -176,27 +176,14 @@ int LIFNeuron::getData(void *data)
 	return 0;
 }
 
-int LIFNeuron::hardCopy(void *data, int idx, int base, map<ID, int> &id2idx, map<int, ID> &idx2id)
+int LIFNeuron::hardCopy(void *data, int idx, int base)
 {
 	GLIFNeurons * p = (GLIFNeurons *) data;
-	id2idx[getID()] = idx + base;
-	setIdx(idx+base);
-	idx2id[idx+base] = getID();
-	//p->pID[idx] = id;
-	//p->pType[idx] = type;
-	//p->p_v_init[idx] = v_init;
-	//p->p_v_rest[idx] = v_rest;
+	setID(idx+base);
 	p->p_v_reset[idx] = v_reset;
-	//p->p_cm[idx] = cm;
-	//p->p_tau_m[idx] = tau_m;
-	//p->p_tau_refrac[idx] = tau_refrac;
-	//p->p_tau_syn_E[idx] = tau_syn_E;
-	//p->p_tau_syn_I[idx] = tau_syn_I;
 	p->p_v_thresh[idx] = v_thresh;
-	//p->p_i_offset[idx] = i_offset;
 	p->p_i_syn[idx] = i_syn;
 	p->p_vm[idx] = vm;
-	//p->p__dt[idx] = _dt;
 	p->p_C1[idx] = C1;
 	p->p_C2[idx] = C2;
 	p->p_i_tmp[idx] = i_tmp;

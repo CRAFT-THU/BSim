@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include <pthread.h>
+#include <iostream>
 
 #include "../utils/utils.h"
 #include "../utils/TypeFunc.h"
@@ -17,9 +18,12 @@
 #include "../net/MultiNetwork.h"
 #include "MultiGPUSimulator.h"
 
+using std::cout;
+using std::endl;
+
 pthread_barrier_t cycle_barrier;
 
-CrossNodeData * global_cross_data;
+CrossNodeDataGPU * global_cross_data_gpu;
 
 MultiGPUSimulator::MultiGPUSimulator(Network *network, real dt) : SimulatorBase(network, dt)
 {
@@ -36,17 +40,30 @@ int MultiGPUSimulator::run(real time)
 	int sim_cycle = round(time/dt);
 	reset();
 
-	int device_count = 1;
+	int device_count = 4;
 	checkCudaErrors(cudaGetDeviceCount(&device_count));
 	assert(device_count != 0);
+	for (int i=0; i<device_count; i++) {
+		for (int j=0; j<device_count; j++) {
+			if (i!=j) {
+				int access = 0;
+				checkCudaErrors(cudaDeviceCanAccessPeer(&access, i, j));
+				if (access == 1) {
+					checkCudaErrors(cudaSetDevice(i));
+					checkCudaErrors(cudaDeviceEnablePeerAccess(j, 0));
+				}
+			}
+		}
+	}
+	checkCudaErrors(cudaSetDevice(0));
 
 	pthread_barrier_init(&cycle_barrier, NULL, device_count);
 
 	MultiNetwork multiNet(network, device_count);
 	DistriNetwork *node_nets = multiNet.buildNetworks();
 	assert(node_nets != NULL);
-	global_cross_data = multiNet.arrangeCrossNodeData(device_count);
-	assert(global_cross_data != NULL);
+	global_cross_data_gpu = multiNet.arrangeCrossNodeDataGPU(device_count);
+	assert(global_cross_data_gpu != NULL);
 
 	pthread_t *thread_ids = (pthread_t *)malloc(sizeof(pthread_t) * device_count);
 	assert(thread_ids != NULL);
@@ -73,15 +90,15 @@ int MultiGPUSimulator::run(real time)
 void * run_thread(void *para) {
 	DistriNetwork *network = (DistriNetwork*)para;
 
-	char logFilename[512];
-	sprintf(logFilename, "GSim_%d.log", network->_node_idx); 
-	FILE *logFile = fopen(logFilename, "w+");
-	assert(logFile != NULL);
+	char log_filename[512];
+	sprintf(log_filename, "GSim_%d.log", network->_node_idx); 
+	FILE *log_file = fopen(log_filename, "w+");
+	assert(log_file != NULL);
 
-	char dataFilename[512];
-	sprintf(dataFilename, "GSim_%d.data", network->_node_idx); 
-	FILE *dataFile = fopen(dataFilename, "w+");
-	assert(dataFile != NULL);
+	char v_filename[512];
+	sprintf(v_filename, "g_v_%d.data", network->_node_idx); 
+	FILE *v_file = fopen(v_filename, "w+");
+	assert(v_file != NULL);
 
 	checkCudaErrors(cudaSetDevice(network->_node_idx));
 
@@ -90,173 +107,160 @@ void * run_thread(void *para) {
 
 	int nTypeNum = pCpuNet->nTypeNum;
 	int sTypeNum = pCpuNet->sTypeNum;
-	int totalNeuronNum = pCpuNet->neuronNums[nTypeNum];
-	int totalSynapseNum = pCpuNet->synapseNums[sTypeNum];
+	int nodeNeuronNum = pCpuNet->neuronNums[nTypeNum];
+	int allNeuronNum = pCpuNet->pN2SConnection->n_num;
+	int nodeSynapseNum = pCpuNet->synapseNums[sTypeNum];
 	printf("Thread %d NeuronTypeNum: %d, SynapseTypeNum: %d\n", network->_node_idx, nTypeNum, sTypeNum);
-	printf("Thread %d NeuronNum: %d, SynapseNum: %d\n", network->_node_idx, totalNeuronNum, totalSynapseNum);
+	printf("Thread %d NeuronNum: %d, SynapseNum: %d\n", network->_node_idx, nodeNeuronNum, nodeSynapseNum);
 
-	int dataOffset = network->_node_idx * network->_node_num;
-	int dataIdx = network->_node_idx * network->_node_num + network->_node_idx;
+	//int dataOffset = network->_node_idx * network->_node_num;
+	//int dataIdx = network->_node_idx * network->_node_num + network->_node_idx;
 
 	int MAX_DELAY = pCpuNet->MAX_DELAY;
-	//printf("MAX_DELAY: %d\n", pCpuNet->MAX_DELAY);
+	printf("Thread %d MAX_DELAY: %d\n", network->_node_idx, pCpuNet->MAX_DELAY);
 
-	GBuffers *buffers = alloc_buffers(pCpuNet->pN2SConnection->n_num, totalSynapseNum, MAX_DELAY);
+	init_connection<<<1, 1>>>(c_pGpuNet->pN2SConnection);
 
-	BlockSize *updateSize = getBlockSize(totalNeuronNum, totalSynapseNum);
-	BlockSize preSize = { 0, 0, 0};
-	cudaOccupancyMaxPotentialBlockSize(&(preSize.minGridSize), &(preSize.blockSize), update_pre_synapse, 0, totalNeuronNum); 
-	preSize.gridSize = (upzero_else_set_one(totalNeuronNum) + (preSize.blockSize) - 1) / (preSize.blockSize);
+	GBuffers *buffers = alloc_buffers(allNeuronNum, nodeSynapseNum, MAX_DELAY);
 
-	real *c_vm = hostMalloc<real>(totalNeuronNum);
+	BlockSize *updateSize = getBlockSize(allNeuronNum, nodeSynapseNum);
+
+#ifdef LOG_DATA
+	real *c_vm = hostMalloc<real>(nodeNeuronNum);
+	int life_idx = getIndex(pCpuNet->nTypes, nTypeNum, LIFE);
 	int lif_idx = getIndex(pCpuNet->nTypes, nTypeNum, LIF);
-	GLIFNeurons *c_g_lif = NULL;
+	int copy_idx = -1;
 	real *c_g_vm = NULL;
-	if (lif_idx >= 0) {
-		c_g_lif = copyFromGPU<GLIFNeurons>(static_cast<GLIFNeurons*>(c_pGpuNet->pNeurons[lif_idx]), 1);
-		c_g_vm = c_g_lif->p_vm;
-		//printf("Thread %d pointer vm %p\n", network->_node_idx, c_g_vm);
-	}
-	int * c_g_cross_id = gpuMalloc<int>(global_cross_data[dataIdx]._max_n_num); 
-	//real *c_I_syn = hostMalloc<real>(totalSynapseNum);
-	//int exp_idx = getIndex(pCpuNet->sTypes, sTypeNum, Exp);
-	//GExpSynapses *c_g_exp = copyFromGPU<GExpSynapses>(static_cast<GExpSynapses*>(c_pGpuNet->pSynapses[exp_idx]), 1);
-	//real *c_g_I_syn = c_g_exp->p_I_syn;
 
+	if (life_idx >= 0) {
+		GLIFENeurons *c_g_lif = copyFromGPU<GLIFENeurons>(static_cast<GLIFENeurons*>(c_pGpuNet->pNeurons[life_idx]), 1);
+		c_g_vm = c_g_lif->p_vm;
+		copy_idx = life_idx;
+	} else if (lif_idx >= 0) {
+		GLIFNeurons *c_g_lif = copyFromGPU<GLIFNeurons>(static_cast<GLIFNeurons*>(c_pGpuNet->pNeurons[lif_idx]), 1);
+		c_g_vm = c_g_lif->p_vm;
+		copy_idx = lif_idx;
+	} else {
+	}
+#endif
+
+	for (int i=0; i<nTypeNum; i++) {
+		cout << "Thread " << network->_node_idx << " " << pCpuNet->nTypes[i] << ": <<<" << updateSize[c_pGpuNet->nTypes[i]].gridSize << ", " << updateSize[c_pGpuNet->nTypes[i]].blockSize << ">>>" << endl;
+	}
+	for (int i=0; i<sTypeNum; i++) {
+		cout << "Thread " << network->_node_idx << " " << pCpuNet->sTypes[i] << ": <<<" << updateSize[c_pGpuNet->sTypes[i]].gridSize << ", " << updateSize[c_pGpuNet->sTypes[i]].blockSize << ">>>" << endl;
+	}
+
+	//int * c_g_cross_id = gpuMalloc<int>(global_cross_data[dataIdx]._max_n_num); 
+
+	int * c_g_idx2index = copyToGPU<int>(network->_crossnode_map->_idx2index, allNeuronNum);
+	int * c_g_cross_index2idx = copyToGPU<int>(network->_crossnode_map->_crossnode_index2idx, network->_crossnode_map->_cross_size);
+	int * c_g_global_cross_data = gpuMalloc<int>(allNeuronNum * network->_node_num);
+	int * c_g_fired_n_num = gpuMalloc<int>(network->_node_num);
 
 	vector<int> firedInfo;
-	//printf("Thread %d: Start runing for %d cycles\n", network->_node_idx, network->_sim_cycle);
 	struct timeval ts, te;
+	//struct timeval t0, t1, t2, t3, t4, t5,/* t6,*/ t7, t8, t9;
+	//double barrier1_time = 0, gpu_cpy_time = 0, peer_cpy_time = 0, barrier2_time=0, copy_time = 0;
 	gettimeofday(&ts, NULL);
 	for (int time=0; time<network->_sim_cycle; time++) {
-		//printf("Thread %d Cycle: %d\n", network->_node_idx, time);
-		//fflush(stdout);
-
 		for (int i=0; i<nTypeNum; i++) {
-			//printf("Thread %d update neuron size %d %d\n", network->_node_idx, updateSize[c_pGpuNet->nTypes[i]].gridSize, updateSize[c_pGpuNet->nTypes[i]].blockSize);
 			assert(c_pGpuNet->neuronNums[i+1]-c_pGpuNet->neuronNums[i] > 0);
 			cudaUpdateType[pCpuNet->nTypes[i]](c_pGpuNet->pNeurons[i], c_pGpuNet->neuronNums[i+1]-c_pGpuNet->neuronNums[i], c_pGpuNet->neuronNums[i], &updateSize[c_pGpuNet->nTypes[i]]);
 		}
-		//printf("Thread %d before copy size %p\n", network->_node_idx, buffers->c_gFiredTableSizes);
 
+		//gettimeofday(&t0, NULL);
+		pthread_barrier_wait(&cycle_barrier);
+		//gettimeofday(&t1, NULL);
+		//barrier1_time += (t1.tv_sec - t0.tv_sec) + (t1.tv_usec - t0.tv_usec)/1000000.0;
+		cudaMemset(c_g_fired_n_num, 0, sizeof(int)*network->_node_num);
+		//cudaDeviceSynchronize();
+		//gettimeofday(&t2, NULL);
+		//cudaDeliverNeurons(c_g_idx2index, c_g_cross_index2idx, c_g_global_cross_data, c_g_fired_n_num, network->_node_num, allNeuronNum);
+		//for (int i=0; i<network->_node_num; i++) {
+		//	int offset = i * network->_node_num + network->_node_idx; 
+		//	copyFromGPU<int>(&(global_cross_data[offset]._fired_n_num), c_g_fired_n_num + i, 1);
+		//	if (global_cross_data[offset]._fired_n_num > 0) {
+		//		copyFromGPU<int>(global_cross_data[offset]._fired_n_idxs, c_g_global_cross_data + allNeuronNum * i, global_cross_data[offset]._fired_n_num);
+		//	}
+		//}
+		cudaDeliverNeurons(c_g_idx2index, c_g_cross_index2idx, c_g_global_cross_data, c_g_fired_n_num, network->_node_num, allNeuronNum);
+		checkCudaErrors(cudaMemcpy(global_cross_data_gpu->_fired_num + network->_node_idx * network->_node_num, c_g_fired_n_num, sizeof(int)*network->_node_num, cudaMemcpyDeviceToHost));
+		//gettimeofday(&t3, NULL);
+
+		for (int i=0; i< network->_node_num; i++) {
+			int idx2i = network->_node_idx * network->_node_num + i;
+			assert(global_cross_data_gpu->_fired_num[idx2i] <= global_cross_data_gpu->_max_num[idx2i]);
+			if (global_cross_data_gpu->_fired_num[idx2i] > 0) {
+				checkCudaErrors(cudaMemcpyPeer(global_cross_data_gpu->_fired_arrays[idx2i], i, c_g_global_cross_data + allNeuronNum * i, network->_node_idx, global_cross_data_gpu->_fired_num[idx2i] * sizeof(int)));
+			}
+		}
+		//gettimeofday(&t7, NULL);
+
+		//gpu_cpy_time += (t3.tv_sec - t2.tv_sec) + (t3.tv_usec - t2.tv_usec)/1000000.0;
+		//peer_cpy_time += (t7.tv_sec - t3.tv_sec) + (t7.tv_usec - t3.tv_usec)/1000000.0;
+
+#ifdef LOG_DATA
 		int currentIdx = time%(MAX_DELAY+1);
-		//printf("Thread %d current idx %d\n", network->_node_idx, currentIdx);
 
 		int copySize = 0;
 		copyFromGPU<int>(&copySize, buffers->c_gFiredTableSizes + currentIdx, 1);
-		//printf("Thread %d copy size: %d\n", network->_node_idx, copySize);
 		if (copySize > 0) {
-			copyFromGPU<int>(buffers->c_neuronsFired, buffers->c_gFiredTable + (pCpuNet->pN2SConnection->n_num*currentIdx), copySize);
+			copyFromGPU<int>(buffers->c_neuronsFired, buffers->c_gFiredTable + (allNeuronNum*currentIdx), copySize);
 		}
 
-		if (lif_idx >= 0 && (c_pGpuNet->neuronNums[lif_idx+1]-c_pGpuNet->neuronNums[lif_idx]) > 0) {
-			copyFromGPU<real>(c_vm, c_g_vm, c_pGpuNet->neuronNums[lif_idx+1]-c_pGpuNet->neuronNums[lif_idx]);
-			//copyFromGPU<real>(c_I_syn, c_g_I_syn, c_pGpuNet->synapseNums[exp_idx+1]-c_pGpuNet->synapseNums[exp_idx]);
+		if (copy_idx >= 0 && (c_pGpuNet->neuronNums[copy_idx+1]-c_pGpuNet->neuronNums[copy_idx]) > 0) {
+			copyFromGPU<real>(c_vm, c_g_vm, c_pGpuNet->neuronNums[copy_idx+1]-c_pGpuNet->neuronNums[copy_idx]);
 		}
-
-		//printf("Thread %d before update connect\n", network->_node_idx);
-		//printf("Thread %d update connect size %d %d\n", network->_node_idx, preSize.gridSize, preSize.blockSize);
-		if (totalSynapseNum > 0) {
-			//printf("Thread %d update connect size %d %d\n", network->_node_idx, preSize.gridSize, preSize.blockSize);
-			update_pre_synapse<<<preSize.gridSize, preSize.blockSize>>>(c_pGpuNet->pN2SConnection);
-		}
-		//printf("Thread %d after update connect\n", network->_node_idx);
+#endif
 
 		for (int i=0; i<sTypeNum; i++) {
 			assert(c_pGpuNet->synapseNums[i+1]-c_pGpuNet->synapseNums[i] > 0);
-			cudaUpdateType[pCpuNet->sTypes[i]](c_pGpuNet->pSynapses[i], c_pGpuNet->synapseNums[i+1]-c_pGpuNet->synapseNums[i], c_pGpuNet->synapseNums[i], &updateSize[pCpuNet->nTypes[i]]);
+			cudaUpdateType[pCpuNet->sTypes[i]](c_pGpuNet->pSynapses[i], c_pGpuNet->synapseNums[i+1]-c_pGpuNet->synapseNums[i], c_pGpuNet->synapseNums[i], &updateSize[pCpuNet->sTypes[i]]);
 		}
+		//cudaDeviceSynchronize();
 
-		for (int i=0; i<network->_node_num; i++) {
-			int offset = i * network->_node_num + network->_node_idx; 
-			global_cross_data[offset]._fired_n_num = 0;
-		}
-
-		for (int i=0; i<copySize; i++) {
-			int nid = buffers->c_neuronsFired[i];
-			int tmp = network->_crossnode_map->_idx2index[nid];
-			if (tmp >= 0) {
-				for (int j=0; j<network->_node_num; j++) {
-					int tmp2 = tmp * network->_node_num + j;
-					int map_nid = network->_crossnode_map->_crossnode_index2idx[tmp2];
-					if (map_nid >= 0) {
-						//_node_idx to j 
-						int offset = j * network->_node_num + network->_node_idx; 
-						global_cross_data[offset]._fired_n_idxs[global_cross_data[offset]._fired_n_num] = map_nid; 
-						global_cross_data[offset]._fired_n_num++;
-					}
-				}
-			}
-
-		}
-
+		//gettimeofday(&t4, NULL);
 		pthread_barrier_wait(&cycle_barrier);
+		//gettimeofday(&t5, NULL);
+		//barrier2_time += (t5.tv_sec - t4.tv_sec) + (t5.tv_usec - t4.tv_usec)/1000000.0;
 
-		for (int i=0; i<network->_node_num; i++) {
-			if (i != network->_node_idx) {
-				memcpy(global_cross_data[dataIdx]._fired_n_idxs + global_cross_data[dataIdx]._fired_n_num, global_cross_data[dataOffset+i]._fired_n_idxs, global_cross_data[dataOffset+i]._fired_n_num * sizeof(int));
-				global_cross_data[dataIdx]._fired_n_num += global_cross_data[dataOffset+i]._fired_n_num;
-			}
-		}
-
+		//gettimeofday(&t6, NULL);
+		//collectNeurons();
+		//gettimeofday(&t7, NULL);
+		//cpu_cpy_time += (t7.tv_sec - t6.tv_sec) + (t7.tv_usec - t6.tv_usec)/1000000.0;
 		
-		if (global_cross_data[dataIdx]._fired_n_num > 0) {
-			copyToGPU(c_g_cross_id, global_cross_data[dataIdx]._fired_n_idxs, global_cross_data[dataIdx]._fired_n_num);
-			addCrossNeurons(c_g_cross_id, global_cross_data[dataIdx]._fired_n_num);
+		//gettimeofday(&t8, NULL);
+		//if (global_cross_data[dataIdx]._fired_n_num > 0) {
+		//	copyToGPU(c_g_cross_id, global_cross_data[dataIdx]._fired_n_idxs, global_cross_data[dataIdx]._fired_n_num);
+		//	addCrossNeurons(c_g_cross_id, global_cross_data[dataIdx]._fired_n_num);
+		//}
+		for (int i=0; i< network->_node_num; i++) {
+			int i2idx = network->_node_idx + network->_node_num * i;
+			if (global_cross_data_gpu->_fired_num[i2idx] > 0) {
+				addCrossNeurons(global_cross_data_gpu->_fired_arrays[i2idx], global_cross_data_gpu->_fired_num[i2idx]);
+			}
 		}
+		
+		//gettimeofday(&t9, NULL);
+		//copy_time += (t9.tv_sec - t8.tv_sec) + (t9.tv_usec - t8.tv_usec)/1000000.0;
 
-		//int copySize2 = 0;
-		//copyFromGPU<int>(&copySize2, buffers->c_gFiredTableSizes + currentIdx, 1);
-		//printf("Thread %d size1 %d added size %d size2 %d\n", network->_node_idx, copySize, global_cross_data[dataIdx]._fired_n_num, copySize2);
-		//assert(copySize + global_cross_data[dataIdx]._fired_n_num == copySize2);
-
-		//if (copySize2 > 0) {
-		//	copyFromGPU<int>(buffers->c_neuronsFired, buffers->c_gFiredTable + (pCpuNet->pN2SConnection->n_num*currentIdx), copySize2);
-		//}
-
-		//for (int i=0; i< global_cross_data[dataIdx]._fired_n_num; i++) {
-
-		//}
-
-		fprintf(logFile, "Cycle %d: ", time);
+#ifdef LOG_DATA
 		for (int i=0; i<copySize; i++) {
-			//if (network->_node_idx == 1) printf("hehe\n");
-			fprintf(logFile, "%d ", buffers->c_neuronsFired[i]);
+			fprintf(log_file, "%d ", buffers->c_neuronsFired[i]);
 		}
-		fprintf(logFile, "\n");
+		fprintf(log_file, "\n");
 
-		//fprintf(dataFile, "Cycle %d: ", time);
-		for (int i=0; i<c_pGpuNet->neuronNums[lif_idx+1] - c_pGpuNet->neuronNums[lif_idx]; i++) {
-			fprintf(dataFile, "%lf ", c_vm[i]);
+		for (int i=0; i<c_pGpuNet->neuronNums[copy_idx+1] - c_pGpuNet->neuronNums[copy_idx]; i++) {
+			fprintf(v_file, "%.10lf \t", c_vm[i]);
 		}
-		//for (int i=0; i<c_pGpuNet->synapseNums[1] - c_pGpuNet->synapseNums[0]; i++) {
-		//		fprintf(dataFile, ", %lf", c_I_syn[i]);
-		//}
-		fprintf(dataFile, "\n");
+		fprintf(v_file, "\n");
+#endif
 
-		//copyFromGPU<int>(buffers->c_synapsesFired, buffers->c_gSynapsesLogTable, totalSynapseNum);
-
-		//int synapseCount = 0;
-		//if (time > 0) {
-		//	for (int i=0; i<totalSynapseNum; i++) {
-		//		if (buffers->c_synapsesFired[i] == time) {
-		//			if (synapseCount ==  0) {
-		//				if (copySize > 0) {
-		//					fprintf(logFile, ", ");
-		//				}
-		//				fprintf(logFile, "%d", i);
-		//				synapseCount++;
-		//			} else {
-		//				fprintf(logFile, ", %d", i);
-		//			}
-		//		}
-		//	}
-		//	fprintf(logFile, "\n");
-		//}
-
-		pthread_barrier_wait(&cycle_barrier);
+		//pthread_barrier_wait(&cycle_barrier);
 		update_time<<<1, 1>>>();
 	}
+	pthread_barrier_wait(&cycle_barrier);
 	gettimeofday(&te, NULL);
 	long seconds = te.tv_sec - ts.tv_sec;
 	long hours = seconds/3600;
@@ -270,12 +274,32 @@ void * run_thread(void *para) {
 	}
 
 	printf("Thread %d Simulation finesed in %ld:%ld:%ld.%06lds\n", network->_node_idx, hours, minutes, seconds, uSeconds);
+	//printf("Thread %d cost : barrier1 %lf, DtoH %lf, DtoD %lf, barrier2 %lf, HtoD %lf\n", network->_node_idx, barrier1_time, gpu_cpy_time, peer_cpy_time, barrier2_time, copy_time);
 
-	fclose(logFile);
-	fclose(dataFile);
+	int *rate = (int*)malloc(sizeof(int)*nodeNeuronNum);
+	copyFromGPU<int>(rate, buffers->c_gFireCount, nodeNeuronNum);
+
+	char fire_filename[512];
+	sprintf(fire_filename, "GFire_%d.log", network->_node_idx); 
+	FILE *rate_file = fopen(fire_filename, "w+");
+	if (rate_file == NULL) {
+		printf("Open file Sim.log failed\n");
+		return NULL;
+	}
+
+	for (int i=0; i<nodeNeuronNum; i++) {
+		fprintf(rate_file, "%d \t", rate[i]);
+	}
+
+	free(rate);
+	fclose(rate_file);
+
+	fclose(log_file);
+	fclose(v_file);
 
 	free_buffers(buffers);
 	freeGPUNetwork(c_pGpuNet);
 
 	return NULL;
 }
+

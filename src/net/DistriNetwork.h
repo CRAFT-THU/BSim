@@ -4,12 +4,19 @@
 struct CrossNodeMap {
 	int *_idx2index;
 	int *_crossnode_index2idx;
+	int _cross_size;
 };
 
 struct CrossNodeData {
 	int _max_n_num;
 	int _fired_n_num;
 	int *_fired_n_idxs;
+};
+
+struct CrossNodeDataGPU {
+	int *_max_num;
+	int *_fired_num;
+	int **_fired_arrays;
 };
 
 struct DistriNetwork {

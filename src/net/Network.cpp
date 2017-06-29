@@ -19,7 +19,7 @@ Network::Network()
 	totalNeuronNum = 0;
 	totalSynapseNum = 0;
 
-	n2sNetwork.clear();
+	//n2sNetwork.clear();
 }
 
 Network::~Network()
@@ -49,19 +49,18 @@ Network::~Network()
 	}
 
 	pPopulations.clear();
-	//pNeurons.clear();
 	pSynapses.clear();
 	pOutputs.clear();
-	n2sNetwork.clear();
-	n2sTargetNetwork.clear();
-	s2nNetwork.clear();
-	s2nForwardNetwork.clear();
-	id2neuron.clear();
-	id2synapse.clear();
-	nid2idx.clear();
-	idx2nid.clear();
-	sid2idx.clear();
-	idx2sid.clear();
+	//n2sNetwork.clear();
+	//n2sTargetNetwork.clear();
+	//s2nNetwork.clear();
+	//s2nForwardNetwork.clear();
+	//id2neuron.clear();
+	//id2synapse.clear();
+	//nid2idx.clear();
+	//idx2nid.clear();
+	//sid2idx.clear();
+	//idx2sid.clear();
 	neuronNums.clear();
 	connectNums.clear();
 	synapseNums.clear();
@@ -129,28 +128,18 @@ SynapseBase* Network::connect(NeuronBase *pn1, NeuronBase *pn2, real weight, rea
 	//	}
 	//}
 
-	if (id2neuron.find(pn1->getID()) == id2neuron.end()) {
-		id2neuron[pn1->getID()] = pn1;
-	}
-	if (id2neuron.find(pn2->getID()) == id2neuron.end()) {
-		id2neuron[pn2->getID()] = pn2;
-	}
-
 	SynapseBase * p = pn2->createSynapse(weight, delay, type, tau, pn2);
+	//p->setSrc(pn1);
 	pn1->addSynapse(p);
-
-	if (id2synapse.find(p->getID()) == id2synapse.end()) {
-		id2synapse[p->getID()] = p;
-	}
 
 	pSynapses.push_back(p);
 	addConnectionNum(pn1->getType(), 1);
 	addSynapseNum(p->getType(), 1);
 
-	n2sTargetNetwork[pn2->getID()].push_back(p->getID());
-	n2sNetwork[pn1->getID()].push_back(p->getID());
-	s2nNetwork[p->getID()] = pn2->getID(); 
-	s2nForwardNetwork[p->getID()] = pn1->getID();
+	//n2sTargetNetwork[pn2->getID()].push_back(p->getID());
+	//n2sNetwork[pn1->getID()].push_back(p->getID());
+	//s2nNetwork[p->getID()] = pn2->getID(); 
+	//s2nForwardNetwork[p->getID()] = pn1->getID();
 
 
 	if (delay > maxDelay) {
@@ -162,50 +151,27 @@ SynapseBase* Network::connect(NeuronBase *pn1, NeuronBase *pn2, real weight, rea
 
 PopulationBase* Network::findPopulation(int populationID)
 {
-	PopulationBase *pP= NULL;
 	vector<PopulationBase*>::iterator iter;
-	for (iter = pPopulations.begin(); iter != pPopulations.end(); iter++) {
-		PopulationBase * t = *iter;
-		if (t->getID().getId() == populationID) {
-			pP = *iter;
-		}
-		if (pP != NULL) {
-			break;
-		}
+	if (populationID >= (int)pPopulations.size()) {
+		return NULL;
 	}
 
-	//if (pP == NULL) {
-	//	printf("Cann't find population: %d\n", populationID);
-	//	return NULL;
-	//}
-
-	return pP;
+	return pPopulations[populationID];
 }
 
 NeuronBase* Network::findNeuron(int populationIDSrc, int neuronIDSrc)
 {
-	//PopulationBase *pP= NULL;
-	//vector<PopulationBase*>::iterator iter;
-	//for (iter = pPopulations.begin(); iter != pPopulations.end(); iter++) {
-	//	PopulationBase * t = *iter;
-	//	if (t->getID().id == populationIDSrc) {
-	//		pP = *iter;
-	//	}
-	//	if (pP != NULL) {
-	//		break;
-	//	}
-	//}
-	
 	PopulationBase *pP = findPopulation(populationIDSrc);
+
 	if (pP == NULL) {
-		//printf("Cann't find population: %d\n", populationIDSrc);
+		printf("Cann't find population: %d\n", populationIDSrc);
 		return NULL;
 	}
 
 	NeuronBase *pN = NULL;
-	pN = pP->findNeuron(ID(populationIDSrc, neuronIDSrc));
+	pN = pP->getNeuron(neuronIDSrc);
 	if (pN == NULL) {
-		//printf("Cann't find neuron: %d:%d\n", populationIDSrc, neuronIDSrc);
+		printf("Cann't find neuron: %d:%d\n", populationIDSrc, neuronIDSrc);
 		return NULL;
 	}
 
@@ -309,7 +275,7 @@ int Network::connect(int populationIDSrc, int neuronIDSrc, int populationIDDst, 
 	}
 	
 	SpikeType type = Excitatory;
-	if (weight < 0.0f) {
+	if (weight < 0.0) {
 		type = Inhibitory;
 	}
 	connect(pnSrc, pnDst, weight, delay, type, tau, false);
@@ -319,7 +285,7 @@ int Network::connect(int populationIDSrc, int neuronIDSrc, int populationIDDst, 
 
 int Network::reset(SimInfo &info)
 {
-	maxDelaySteps = static_cast<int>(maxDelay/info.dt);
+	maxDelaySteps = static_cast<int>(round(maxDelay/info.dt));
 	vector<SynapseBase*>::iterator iterS;
 	vector<NeuronBase*>::iterator iterN;
 	vector<PopulationBase*>::iterator iterP;
@@ -388,8 +354,8 @@ void Network::monitor(SimInfo &info)
 }
 
 void Network::logMap() {
-	FILE *f = fopen("NID.map", "w+");
-	for (map<int, ID>::const_iterator iter = idx2nid.begin(); iter != idx2nid.end(); iter++) {
-		fprintf(f, "%d:%s\n", iter->first, iter->second.getInfo().c_str());
-	}
+	//FILE *f = fopen("NID.map", "w+");
+	//for (map<int, ID>::const_iterator iter = idx2nid.begin(); iter != idx2nid.end(); iter++) {
+	//	fprintf(f, "%d:%s\n", iter->first, iter->second.getInfo().c_str());
+	//}
 }

@@ -9,14 +9,14 @@ using namespace std;
 
 int main(int argc, char **argv)
 {
-	const int N = 500;
+	const int N = 10;
 	Network c;
-	Population<Constant_curr> *pn0 = c.createPopulation(0, N, Constant_curr(ConstantNeuron(ID(0, 0), 0.4f), ID(0, 0)));
-	Population<IF_curr_exp> *pn1 = c.createPopulation(1, N, IF_curr_exp(LIFNeuron(ID(0, 0), 0.0f, 0.0f, 0.0f, 1.0e-1f, 50.0e-4f, 0.0f, 15.0e-3f, 10.0e-1f), ID(0,0), 1.0f, 1.0f));
-	Population<IF_curr_exp> *pn2 = c.createPopulation(2, N, IF_curr_exp(LIFNeuron(ID(0, 0), 0.0f, 0.0f, 0.0f, 1.0e-1f, 50.0e-4f, 0.0f, 15.0e-3f, 0), ID(0, 0), 1.0f, 1.0f));
-	Population<IF_curr_exp> *pn3 = c.createPopulation(3, N, IF_curr_exp(LIFNeuron(ID(0, 0), 0.0f, 0.0f, 0.0f, 1.0e-1f, 50.0e-4f, 0.0f, 15.0e-3f, 0), ID(0, 0), 1.0f, 1.0f));
-	Population<IF_curr_exp> *pn4 = c.createPopulation(4, N, IF_curr_exp(LIFNeuron(ID(0, 0), 0.0f, 0.0f, 0.0f, 1.0e-1f, 50.0e-4f, 0.0f, 15.0e-3f, 0), ID(0, 0), 1.0f, 1.0f));
-	Population<IF_curr_exp> *pn5 = c.createPopulation(5, N, IF_curr_exp(LIFNeuron(ID(0, 0), 0.0f, 0.0f, 0.0f, 1.0e-1f, 50.0e-4f, 0.0f, 15.0e-3f, 0), ID(0, 0), 1.0f, 1.0f));
+	Population<Constant_curr_exp> *pn0 = c.createPopulation(0, N, Constant_curr_exp(ConstantNeuron(0.4)));
+	Population<IF_curr_exp> *pn1 = c.createPopulation(1, N, IF_curr_exp(LIFNeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-4, 0.0, 15.0e-3, 10.0e-1), 1.0, 1.0));
+	Population<IF_curr_exp> *pn2 = c.createPopulation(2, N, IF_curr_exp(LIFNeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-4, 0.0, 15.0e-3, 0), 1.0, 1.0));
+	Population<IF_curr_exp> *pn3 = c.createPopulation(3, N, IF_curr_exp(LIFNeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-4, 0.0, 15.0e-3, 0), 1.0, 1.0));
+	Population<IF_curr_exp> *pn4 = c.createPopulation(4, N, IF_curr_exp(LIFNeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-4, 0.0, 15.0e-3, 0), 1.0, 1.0));
+	Population<IF_curr_exp> *pn5 = c.createPopulation(5, N, IF_curr_exp(LIFNeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-4, 0.0, 15.0e-3, 0), 1.0, 1.0));
 
 	real * weight = getRandomArray((real)20e-3, N*N);
 	real * weight2 = getRandomArray((real)15e-3, N*N);
@@ -27,12 +27,12 @@ int main(int argc, char **argv)
 	c.connect(pn3, pn4, weight2, delay, NULL, N*N);
 	c.connect(pn4, pn5, weight2, delay, NULL, N*N);
 
-	STSim st(&c, 1.0e-3f);
-	SGSim sg(&c, 1.0e-3f);
-	MGSim mg(&c, 1.0e-3f);
-	st.run(0.1f);
-	sg.run(0.1f);
-	mg.run(0.1f);
+	STSim st(&c, 1.0e-3);
+	SGSim sg(&c, 1.0e-3);
+	MGSim mg(&c, 1.0e-3);
+	st.run(0.1);
+	sg.run(0.1);
+	mg.run(0.1);
 
 	printf("SAVE DATA...\n");
 	saveArray("weight0.csv", weight, N*N);

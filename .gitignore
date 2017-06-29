@@ -10,7 +10,10 @@ CMakeCache.txt
 CMakeFiles/ 
 cmake_install.cmake
 Makefile
-build/
-
+build/bin/*
+build/*
+!build/bin/*.sh
+!build/bin
+!build
 src/utils/TypeFunc.cpp
 src/utils/TypeFunc.cu

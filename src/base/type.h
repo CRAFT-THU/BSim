@@ -13,6 +13,7 @@ enum Type {
 	Max,
 	LIF, 
 	LIFE,
+	TJ,
 	Exp,
 	Static,
        	/*Basic, Alpha,*/

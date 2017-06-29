@@ -42,24 +42,24 @@ real v_thresh, real i_offset
 )), ID(0, 0), real tau_syn_E, real tau_syn_I);
 	*/
 	/*
-	Population<LIF_brian> *pn0 = c.createPopulation(0, N, LIF_brian(LIFENeuron(ID(0,0), 0.0f, 0.0f, 0.0f, 1.0e-1f, 50.0e-3f, 0.0f, 1.0f, 1.0f, 15.0e-3f, 10.0e-1f), ID(0, 0), 1.0f, 1.0f));
+	Population<LIF_brian> *pn0 = c.createPopulation(0, N, LIF_brian(LIFENeuron(ID(0,0), 0.0, 0.0, 0.0, 1.0e-1, 50.0e-3, 0.0, 1.0, 1.0, 15.0e-3, 10.0e-1), ID(0, 0), 1.0, 1.0));
 	*/
 	Population<LIF_brian> *g[depth+1];
 	
-	g[1]=c.createPopulation(1, N, LIF_brian(LIFENeuron(ID(0,0), 
+	g[1]=c.createPopulation(1, N, LIF_brian(LIFENeuron( 
 	fv,v_rest,freset,
 	c_m,tau_m,
 	frefractory,tau_syn_e,tau_syn_i,
 	fthreshold,i_offset
-	), ID(0, 0), tau_syn_e, tau_syn_i));
+	), tau_syn_e, tau_syn_i));
 	
 	for(int i=2;i<=depth;i++)
-		g[i] = c.createPopulation(i, N, LIF_brian(LIFENeuron(ID(0,0), 
+		g[i] = c.createPopulation(i, N, LIF_brian(LIFENeuron( 
 	fv,v_rest,freset,
 	c_m,tau_m,
 	frefractory,tau_syn_e,tau_syn_i,
 	fthreshold,0
-	), ID(0, 0), tau_syn_e, tau_syn_i));
+	), tau_syn_e, tau_syn_i));
 	
 	real * weight6 = getConstArray((real)(6e-9/N), N*N);
 	real * weight6_30 = getConstArray((real)(180e-9/N), N*N);
@@ -81,12 +81,12 @@ real v_thresh, real i_offset
 	int i=1;
 	while(i+1<=depth)
 	{
-		p[i] = c.createPopulation(i+depth, N, LIF_brian(LIFENeuron(ID(0,0), 
+		p[i] = c.createPopulation(i+depth, N, LIF_brian(LIFENeuron( 
 	fv,v_rest,freset,
 	c_m,tau_m,
 	frefractory,tau_syn_e,tau_syn_i,
 	fthreshold,0
-	), ID(0, 0), tau_syn_e, tau_syn_i));
+	), tau_syn_e, tau_syn_i));
 		c.connect(g[i], p[i], weight5, delay, NULL, N*N);
 		c.connect(p[i], g[i+1], weight3, delay, ii, N*N);
 		i+=4;
@@ -101,6 +101,8 @@ real v_thresh, real i_offset
 	#else
 		SGSim sg(&c, dt);	
 		sg.run(run_time);	
+		//MGSim mg(&c, dt);	
+		//mg.run(run_time);
 	#endif
 	
 	end=time(NULL);

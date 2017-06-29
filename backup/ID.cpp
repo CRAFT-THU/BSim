@@ -2,47 +2,86 @@
  * usually just for fun.
  * Wed October 28 2015
  */
+
+#include <sstream>
+
 #include "ID.h"
+
+using std::stringstream;
 
 ID::ID()
 {
-	id = 0;
+	this->_id.packed_id = 0;
 }
 
-ID::ID(int _id)
+ID::ID(int id)
 {
-	id = _id;
-	groupId = -1;
+	this->_id.detailed_id.grp_id = 0;
+	this->_id.detailed_id.id = id;
 }
 
-ID::ID(int _groupId, int _id)
+ID::ID(int grp_id, int id)
 {
-	id = _id;
-	groupId = _groupId;
+	this->_id.detailed_id.grp_id = grp_id;
+	this->_id.detailed_id.id = id;
+}
+
+ID::ID(ID &a)
+{
+	this->_id.packed_id = a._id.packed_id;
 }
 
 ID::ID(const ID &a)
 {
-	this->id = a.id;
-	this->groupId = a.groupId;
+	this->_id.packed_id = a._id.packed_id;
 }
 
 ID::~ID()
 {
 }
 
-bool ID::operator==(const ID &id1)const{  
-	return ((groupId == id1.groupId) && (id == id1.id));  
+void ID::setID(ID &id)
+{
+	this->_id.packed_id = id._id.packed_id;
+}
+
+string ID::getInfo() const
+{
+	stringstream changer;
+	changer << getGid() << "_" << getId();
+	string info;
+	changer >> info;
+	return info; 
+}
+
+bool ID::operator==(const ID &id1) const {  
+	return (this->_id.packed_id == id1._id.packed_id);  
 }    
 
-bool ID::operator<(const ID &id1)const{  
-	if (groupId < id1.groupId) {
-		return true;
-	} 
+bool ID::operator!=(const ID &id1) const {  
+	return (this->_id.packed_id != id1._id.packed_id);  
+}    
 
-	if ((groupId == id1.groupId) && (id < id1.id)) {
+bool ID::operator>(const ID &id1) const {  
+	if (this->_id.detailed_id.grp_id > id1._id.detailed_id.grp_id) {
 		return true;
 	}
 
-	return false;
+	if (this->_id.detailed_id.grp_id < id1._id.detailed_id.grp_id) {
+		return false;
+	}
+
+	return this->_id.detailed_id.id > id1._id.detailed_id.id;
+}    
+
+bool ID::operator<(const ID &id1) const {  
+	if (this->_id.detailed_id.grp_id < id1._id.detailed_id.grp_id) {
+		return true;
+	}
+
+	if (this->_id.detailed_id.grp_id > id1._id.detailed_id.grp_id) {
+		return false;
+	}
+
+	return this->_id.detailed_id.id < id1._id.detailed_id.id;
 }    
