@@ -128,7 +128,6 @@ void * run_thread(void *para) {
 #ifdef LOG_DATA
 	real *c_vm = hostMalloc<real>(nodeNeuronNum);
 	int life_idx = getIndex(pCpuNet->nTypes, nTypeNum, LIFE);
-	int lif_idx = getIndex(pCpuNet->nTypes, nTypeNum, LIF);
 	int copy_idx = -1;
 	real *c_g_vm = NULL;
 
@@ -136,10 +135,6 @@ void * run_thread(void *para) {
 		GLIFENeurons *c_g_lif = copyFromGPU<GLIFENeurons>(static_cast<GLIFENeurons*>(c_pGpuNet->pNeurons[life_idx]), 1);
 		c_g_vm = c_g_lif->p_vm;
 		copy_idx = life_idx;
-	} else if (lif_idx >= 0) {
-		GLIFNeurons *c_g_lif = copyFromGPU<GLIFNeurons>(static_cast<GLIFNeurons*>(c_pGpuNet->pNeurons[lif_idx]), 1);
-		c_g_vm = c_g_lif->p_vm;
-		copy_idx = lif_idx;
 	} else {
 	}
 #endif

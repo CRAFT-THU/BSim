@@ -17,9 +17,9 @@ int main(int argc, char **argv)
 
 	const int N = 2;
 	Network c;
-	Population<Constant_curr_exp> *pn0 = c.createPopulation(0, N, Constant_curr_exp(ConstantNeuron(0.4) ));
-	Population<IF_curr_exp> *pn1 = c.createPopulation(1, N, IF_curr_exp(LIFNeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-4, 0.0, 15.0e-3, 10.0e-1), 1.0, 1.0));
-	Population<IF_curr_exp> *pn2 = c.createPopulation(2, N, IF_curr_exp(LIFNeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-4, 0.0, 15.0e-3, 0), 1.0, 1.0));
+	Population<Constant_spikes> *pn0 = c.createPopulation(0, N, Constant_spikes(ConstantNeuron(0.4)));
+	Population<IF_curr_exp> *pn1 = c.createPopulation(1, N, IF_curr_exp(LIFENeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-4, 0.0, 1.0, 1.0, 15.0e-3, 10.0e-1), 1.0, 1.0));
+	Population<IF_curr_exp> *pn2 = c.createPopulation(2, N, IF_curr_exp(LIFENeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-4, 0.0, 1.0, 1.0, 15.0e-3, 0), 1.0, 1.0));
 
 	real * weight0 = NULL;
 	real * weight1 = NULL;
@@ -43,10 +43,8 @@ int main(int argc, char **argv)
 	c.connect(pn1, pn2, weight1, delay, NULL, N*N);
 	STSim st(&c, 1.0e-3);
 	SGSim sg(&c, 1.0e-3);
-	MGSim mg(&c, 1.0e-3);
 	st.run(0.1);
 	sg.run(0.1);
-	mg.run(0.1);
 
 	if (!load) {
 		printf("SAVE DATA...\n");

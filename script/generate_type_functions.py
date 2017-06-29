@@ -71,7 +71,7 @@ for (name, body) in zip(func_names, func_mains):
                     tmp += (" " + name.replace("AllType", type_name) + ",")
     elif name.find("Connection") >= 0:
         for type_name in type_content_main:
-            if type_content_main.index(type_name) < type_content_main.index("Exp"):
+            if type_content_main.index(type_name) < type_content_main.index("Static"):
                 tmp += (" NULL,")
             else:
                 tmp += (" " + name.replace("Type", type_name) + ",")

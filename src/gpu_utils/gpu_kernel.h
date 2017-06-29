@@ -44,8 +44,6 @@ __global__ void curand_setup_kernel(curandState *state, int num);
 
 __global__ void reset_active_synapse();
 
-//__global__ void update_pre_synapse(N2SConnection *pConnection);
-
 __global__ void update_constant_neuron(GConstantNeurons *d_neurons, int num, int start_id);
 
 __global__ void update_poisson_neuron(GPoissonNeurons *d_neurons, int num, int start_id);
@@ -53,11 +51,6 @@ __global__ void update_poisson_neuron(GPoissonNeurons *d_neurons, int num, int s
 __global__ void update_array_neuron(GArrayNeurons *d_neurons, int num, int start_id);
 
 __global__ void update_max_neuron(GMaxNeurons *d_neurons, int num, int start_id);
-
-__global__ void find_lif_neuron(GLIFNeurons *d_neurons, int num, int start_id);
-
-__global__ void update_lif_neuron(GLIFNeurons *d_neurons, int num, int start_id);
-__global__ void update_all_lif_neuron(GLIFNeurons *d_neurons, int num, int start_id);
 
 __global__ void find_life_neuron(GLIFENeurons *d_neurons, int num, int start_id);
 
@@ -67,16 +60,8 @@ __global__ void update_dense_life_neuron(GLIFENeurons *d_neurons, int num, int s
 
 __global__ void update_tj_neuron(GTJNeurons *d_neurons, int num, int start_id);
 
-__global__ void update_exp_hit(GExpSynapses *d_synapses, int num, int start_id);
-__global__ void find_exp_synapse(GExpSynapses *d_synapses, int num, int start_id);
-__global__ void update_exp_synapse(GExpSynapses *d_synapses, int num, int start_id);
-__global__ void update_all_exp_synapse(GExpSynapses *d_synapses, int num, int start_id);
-
 __global__ void update_dense_static_hit(GStaticSynapses *d_synapses, int num, int start_id);
 __global__ void update_static_hit(GStaticSynapses *d_synapses, int num, int start_id);
-
-//__global__ void update_basic_synapse(GBasicSynapses *d_synapses, int num, int start_id);
-//__global__ void update_alpha_synapse(GAlphaSynapses *d_synapses, int num, int start_id);
 
 __global__ void add_cross_neuron(int *ids, int num);
 
