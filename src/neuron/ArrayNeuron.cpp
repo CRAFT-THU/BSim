@@ -71,10 +71,11 @@ int ArrayNeuron::update(SimInfo &info)
 		if (fireTime[idx] <= info.currCycle) {
 			fired = true;
 			fire();
-			info.fired.push_back(getID());
 			idx++;
+			fireCount++;
 		}
 	}
+	info.fired.push_back(fired);
 	return 0;
 }
 

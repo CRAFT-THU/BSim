@@ -70,16 +70,20 @@ int TJNeuron::update(SimInfo &info)
 			vm = v_reset;
 		}
 
-		info.input.push_back(vm);
-		info.input.push_back(i_syn);
 	}
+
+	info.input.push_back(vm);
+	info.input.push_back(i_syn);
+	info.input.push_back(0);
+	info.input.push_back(0);
+	info.input.push_back(0);
 
 	i_syn = 0;
 
+	info.fired.push_back(fired);
 	if (fired) {
 	//TODO fire
 		fire();
-		info.fired.push_back(getID());
 		return 1;
 	} else {
 		return -1;

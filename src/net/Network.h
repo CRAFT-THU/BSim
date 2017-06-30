@@ -258,7 +258,7 @@ int Network::connectPooling(Population<Neuron1> *pSrc, Population<Neuron2> *pDst
 			int idx = d_h_ * p_width + d_w_;
 
 			count++;
-			connect(pSrc->getNeuron(h * width + w), pDst->getNeuron(d_h*d_width + d_w), (real)idx, 0.001 /*TODO: Change to dt*/, Excitatory, 0.0, false);
+			connect(pSrc->getNeuron(h * width + w), pDst->getNeuron(d_h*d_width + d_w), (real)(1 << idx), 0.001 /*TODO: Change to dt*/, Excitatory, 0.0, false);
 		}	
 	}
 

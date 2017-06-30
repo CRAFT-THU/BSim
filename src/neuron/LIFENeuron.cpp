@@ -145,11 +145,11 @@ int LIFENeuron::update(SimInfo &info)
 	_i_syn_E = 0;
 	_i_syn_I = 0;
 
+	info.fired.push_back(fired);
 	if (fired) {
 		//TODO fire
 		fire();
 		fireCount++;
-		info.fired.push_back(getID());
 		return 1;
 	} else {
 		return -1;

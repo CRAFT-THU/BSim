@@ -64,8 +64,8 @@ int ConstantNeuron::update(SimInfo &info)
 		fire_count++;
 		fire();
 		fireCount++;
-		info.fired.push_back(getID());
 	}
+	info.fired.push_back(getID());
 	return 0;
 }
 
@@ -87,6 +87,10 @@ void ConstantNeuron::monitor(SimInfo &info)
 		}
 	}
 	return;
+}
+
+void ConstantNeuron::setRate(real rate) {
+	this->fire_rate = rate;
 }
 
 size_t ConstantNeuron::getSize() {

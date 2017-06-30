@@ -8,6 +8,11 @@ int main(int argc, char **argv)
 
 	Network c;
 	Population<Constant_spikes> *pn0 = c.createPopulation(0, 36, Constant_spikes(ConstantNeuron(0.5), 1.0, 1.0));
+	for (int i = 0; i < pn0->getNum(); i++) {
+		Constant_spikes * n = static_cast<Constant_spikes*>(pn0->getNeuron(i));
+		n->setRate(i/36.0 * 0.7);
+	}
+
 	Population<LIF_brian> *pn1 = c.createPopulation(1, 36, LIF_brian(LIFENeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-3, 0.0, 1.0, 1.0, 15.0e-3, 0.0e-3), 1.0, 1.0));
 	Population<Max_pooling> *pn2 = c.createPopulation(2, 9, Max_pooling(MaxNeuron(4), 0, 0));
 	Population<LIF_brian> *pn3 = c.createPopulation(3, 9, LIF_brian(LIFENeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-3, 0.0, 1.0, 1.0, 15.0e-3, 0.0e-3), 1.0, 1.0));

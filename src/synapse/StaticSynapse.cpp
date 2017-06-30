@@ -1,4 +1,5 @@
 
+#include <assert.h>
 #include <math.h>
 
 #include "../third_party/json/json.h"
@@ -42,8 +43,11 @@ int StaticSynapse::reset(SimInfo &info)
 {
 	real dt = info.dt;
 	_delay_steps = static_cast<int>(round(_delay/dt));
-        real _C1 = expf(-(_delay-dt*_delay_steps)/_tau_syn);
-	this->_weight = this->_weight * _C1;
+	assert(fabs(_tau_syn) > ZERO || fabs(_delay-dt*_delay_steps) < ZERO);
+	if (fabs(_tau_syn) > ZERO && fabs(_delay-dt*_delay_steps) > ZERO) {
+		real _C1 = expf(-(_delay-dt*_delay_steps)/_tau_syn);
+		this->_weight = this->_weight * _C1;
+	}
 
 	return 0;
 }

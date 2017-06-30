@@ -57,8 +57,8 @@ int PoissonNeuron::update(SimInfo &info)
 		fireCycle = fireCycle + 1 + distribution(generator); 
 		fire();
 		fireCount++;
-		info.fired.push_back(getID());
 	} 
+	info.fired.push_back(fired);
 	return 0;
 }
 

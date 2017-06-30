@@ -31,6 +31,7 @@ public:
 	virtual int hardCopy(void *data, int idx, int base);
 
 	int addFireTime(int cycle);
+	void setRate(real rate);
 
 	const static Type type;
 protected:

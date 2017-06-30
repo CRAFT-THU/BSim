@@ -10,7 +10,7 @@ int main(int argc, char **argv)
 	Array_spikes n1 = Array_spikes(ArrayNeuron(array, 12));
 	Array_spikes n2 = Array_spikes(ArrayNeuron(array2, 10));
 	Array_spikes n3 = Array_spikes(ArrayNeuron(array3, 30));
-	Max_pooling max1 = Max_pooling(MaxNeuron(3), 0, 0);
+	Max_pooling max1 = Max_pooling(MaxNeuron(3), 1.0, 1.0);
 	Population<Array_spikes> *p1 = c.createPopulation(0, 1, n1);
 	Population<Array_spikes> *p2 = c.createPopulation(1, 1, n2);
 	Population<Array_spikes> *p3 = c.createPopulation(2, 1, n3);
@@ -21,7 +21,7 @@ int main(int argc, char **argv)
 	c.connect(p3, p4, (real)(1<<2), 1.0e-3, Excitatory);
 
 	STSim st(&c, 1.0e-3);
-	st.run(0.1);
+	st.run(0.15);
 
 	return 0;
 } 

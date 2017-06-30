@@ -20,10 +20,10 @@ int main(int argc, char **argv)
 	c.connect(p2, p4, (real)(1<<1), 1.0e-3, Excitatory);
 	c.connect(p3, p4, (real)(1<<2), 1.0e-3, Excitatory);
 
-	STSim st(&c, 1.0e-3);
-	st.run(0.1);
 	SGSim sg(&c, 1.0e-3);
 	sg.run(0.1);
+	STSim st(&c, 1.0e-3);
+	st.run(0.1);
 
 	return 0;
 } 

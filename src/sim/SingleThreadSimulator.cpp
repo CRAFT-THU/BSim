@@ -125,7 +125,9 @@ int SingleThreadSimulator::run(real time)
 		int size = info.fired.size();
 		//fprintf(logFile, "Cycle %d: ", info.currCycle);
 		for (int i=0; i<size; i++) {
-			fprintf(log_file, "%d ", info.fired[i]);
+			if (info.fired[i]) {
+				fprintf(log_file, "%d ", i);
+			}
 		}
 		fprintf(log_file, "\n");
 
