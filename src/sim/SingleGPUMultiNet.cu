@@ -102,7 +102,7 @@ int MultiGPUSimulator::single_run(real time)
 		assert(v_file != NULL);
 		v_files[i] = v_file;
 
-		node_buffers[i] = alloc_buffers(allNeuronNum, nodeSynapseNum, MAX_DELAY);
+		node_buffers[i] = alloc_buffers(allNeuronNum, nodeSynapseNum, MAX_DELAY, dt);
 		node_update_sizes[i] = getBlockSize(allNeuronNum, nodeSynapseNum);
 		c_g_cross_ids[i] = gpuMalloc<int>(global_cross_data[dataIdx]._max_n_num); 
 		copy_idxs[i] = getIndex(pCpuNet->nTypes, nTypeNum, LIFE);

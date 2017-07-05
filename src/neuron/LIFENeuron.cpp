@@ -147,7 +147,6 @@ int LIFENeuron::update(SimInfo &info)
 
 	info.fired.push_back(fired);
 	if (fired) {
-		//TODO fire
 		fire();
 		fireCount++;
 		return 1;

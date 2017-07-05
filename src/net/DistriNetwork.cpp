@@ -17,6 +17,8 @@ DistriNetwork* initDistriNet(int num)
 		ret_net[i]._node_idx = i;
 		ret_net[i]._node_num = num;
 
+		ret_net[i]._dt = 0;
+
 		ret_net[i]._network = NULL;
 		ret_net[i]._crossnode_map = NULL; 
 

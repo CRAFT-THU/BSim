@@ -45,7 +45,7 @@ public:
 	template<class Neuron1, class Neuron2>
 	int connectConv(Population<Neuron1> *pSrc, Population<Neuron2> *pDst, real *weight, real *delay, SpikeType *type, int height, int width, int k_height, int k_width);
 	template<class Neuron1, class Neuron2>
-	int connectPooling(Population<Neuron1> *pSrc, Population<Neuron2> *pDst, int height, int width, int p_height, int p_width);
+	int connectPooling(Population<Neuron1> *pSrc, Population<Neuron2> *pDst, real weight, int height, int width, int p_height, int p_width);
 	
 	int connect(int populationIDSrc, int neuronIDSrc, int populationIDDst, int neuronIDDst, real weight, real delay, real tau = 0);
 	SynapseBase* connect(NeuronBase *pSrc, NeuronBase *pDst, real weight, real delay, SpikeType type = Excitatory, real tau = 0, bool store = true);
@@ -239,7 +239,7 @@ int Network::connectConv(Population<Neuron1> *pSrc, Population<Neuron2> *pDst, r
 }
 
 template<class Neuron1, class Neuron2>
-int Network::connectPooling(Population<Neuron1> *pSrc, Population<Neuron2> *pDst, int height, int width, int p_height, int p_width)
+int Network::connectPooling(Population<Neuron1> *pSrc, Population<Neuron2> *pDst, real delay, int height, int width, int p_height, int p_width)
 {
 	int srcSize = pSrc->getNum();
 	int dstSize = pDst->getNum();
@@ -258,7 +258,7 @@ int Network::connectPooling(Population<Neuron1> *pSrc, Population<Neuron2> *pDst
 			int idx = d_h_ * p_width + d_w_;
 
 			count++;
-			connect(pSrc->getNeuron(h * width + w), pDst->getNeuron(d_h*d_width + d_w), (real)(1 << idx), 0.001 /*TODO: Change to dt*/, Excitatory, 0.0, false);
+			connect(pSrc->getNeuron(h * width + w), pDst->getNeuron(d_h*d_width + d_w), (real)(1 << idx), delay, Excitatory, 0.0, false);
 		}	
 	}
 

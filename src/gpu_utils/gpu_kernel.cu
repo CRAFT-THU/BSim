@@ -13,6 +13,7 @@ __constant__ int MAX_DELAY;
 __constant__ int gTimeTableCap;
 __constant__ int gFiredTableCap;
 __constant__ int gSynapsesTableCap;
+__constant__ real DT;
 
 // Variable
 __device__ int gCurrentIdx;
@@ -668,8 +669,7 @@ __global__ void update_tj_neuron(GTJNeurons *d_neurons, int num, int start_id)
 
 		int gnid = start_id + idx; 
 		bool actived = d_neurons->p_refrac_step[idx] <= 0;
-		// TODO: Global DT
-		real DT = 0.001;
+		//real DT = 0.001;
 		if (actived) {
 			real I = gNeuronInput[gnid] + gNeuronInput_I[gnid] + d_neurons->p_i_tmp[idx];
 			d_neurons->p_vm[idx] = d_neurons->p_vm[idx] + DT * I/d_neurons->p_cm[idx];
@@ -916,7 +916,7 @@ __global__ void init_log_buffers(int * layer_input, real * x_input, int * fire_c
 	}
 }
 
-GBuffers* alloc_buffers(int neuron_num, int synapse_num, int max_delay) 
+GBuffers* alloc_buffers(int neuron_num, int synapse_num, int max_delay, real dt) 
 {
 	GBuffers *ret = (GBuffers*)malloc(sizeof(GBuffers));
 	memset(ret, 0, sizeof(GBuffers));
@@ -951,6 +951,7 @@ GBuffers* alloc_buffers(int neuron_num, int synapse_num, int max_delay)
 	checkCudaErrors(cudaMemcpyToSymbol(gTimeTableCap, &timeTableCap, sizeof(int)));
 	checkCudaErrors(cudaMemcpyToSymbol(gFiredTableCap, &neuron_num, sizeof(int)));
 	checkCudaErrors(cudaMemcpyToSymbol(gSynapsesTableCap, &synapse_num, sizeof(int)));
+	checkCudaErrors(cudaMemcpyToSymbol(DT, &dt, sizeof(real)));
 	//checkCudaErrors(cudaMalloc((void**)&ret->c_gTimeTable, sizeof(int)*(max_delay+1)));
 	//checkCudaErrors(cudaMemset(ret->c_gTimeTable, 0, sizeof(int)*(max_delay+1)));
 

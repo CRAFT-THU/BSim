@@ -82,7 +82,6 @@ int TJNeuron::update(SimInfo &info)
 
 	info.fired.push_back(fired);
 	if (fired) {
-	//TODO fire
 		fire();
 		return 1;
 	} else {

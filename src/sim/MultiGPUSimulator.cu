@@ -73,6 +73,8 @@ int MultiGPUSimulator::run(real time)
 		node_nets[i]._sim_cycle = sim_cycle;
 		node_nets[i]._node_idx = i;
 		node_nets[i]._node_num = device_count;
+		node_nets[i]._dt = dt;
+
 
 		int ret = pthread_create(&(thread_ids[i]), NULL, &run_thread, (void*)&(node_nets[i]));
 		assert(ret == 0);
@@ -121,7 +123,7 @@ void * run_thread(void *para) {
 
 	init_connection<<<1, 1>>>(c_pGpuNet->pN2SConnection);
 
-	GBuffers *buffers = alloc_buffers(allNeuronNum, nodeSynapseNum, MAX_DELAY);
+	GBuffers *buffers = alloc_buffers(allNeuronNum, nodeSynapseNum, MAX_DELAY, network->_dt);
 
 	BlockSize *updateSize = getBlockSize(allNeuronNum, nodeSynapseNum);
 

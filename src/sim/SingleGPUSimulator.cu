@@ -86,7 +86,7 @@ int SingleGPUSimulator::run(real time)
 
 	init_connection<<<1, 1>>>(c_pGpuNet->pN2SConnection);
 
-	GBuffers *buffers = alloc_buffers(totalNeuronNum, totalSynapseNum, MAX_DELAY);
+	GBuffers *buffers = alloc_buffers(totalNeuronNum, totalSynapseNum, MAX_DELAY, dt);
 
 	BlockSize *updateSize = getBlockSize(totalNeuronNum, totalSynapseNum);
 	//BlockSize preSize = { 0, 0, 0};
