@@ -128,6 +128,7 @@ __global__ void update_constant_neuron(GConstantNeurons *d_neurons, int num, int
 		int test_loc = 0;
 
 		fired = (gCurrentCycle * d_neurons->p_fire_rate[idx]) > (d_neurons->p_fire_count[idx]);
+		gFireCount[start_id + idx] += fired;
 
 		for (int i=0; i<2; i++) {
 			if (fired) {
@@ -194,6 +195,7 @@ __global__ void update_poisson_neuron(GPoissonNeurons *d_neurons, int num, int s
 		int test_loc = 0;
 
 		fired = (gCurrentCycle == d_neurons->p_fire_cycle[idx]) && (gCurrentCycle <= d_neurons->p_end_cycle[idx]);
+		gFireCount[start_id + idx] += fired;
 
 		for (int i=0; i<2; i++) {
 			if (fired) {
@@ -241,6 +243,7 @@ __global__ void update_array_neuron(GArrayNeurons *d_neurons, int num, int start
 		int test_loc = 0;
 
 		fired = (d_neurons->p_start[idx] < d_neurons->p_end[idx]) &&  (gCurrentCycle >= d_neurons->p_fire_time[d_neurons->p_start[idx]]);
+		gFireCount[start_id + idx] += fired;
 
 		for (int i=0; i<2; i++) {
 			if (fired) {
@@ -302,6 +305,8 @@ __global__ void update_max_neuron(GMaxNeurons *d_neurons, int num, int start_id)
 			}
 			test = test << 1;
 		}
+
+		gFireCount[start_id + idx] += fired;
 
 		for (int i=0; i<2; i++) {
 			if (fired) {

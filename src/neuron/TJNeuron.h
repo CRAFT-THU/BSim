@@ -30,6 +30,8 @@ public:
 	virtual int getData(void *data);
 	virtual int hardCopy(void * data, int idx, int base);
 
+	inline void setI(real i) { this->i_offset = i; }
+
 	const static Type type;
 protected:
 	real v_init;
