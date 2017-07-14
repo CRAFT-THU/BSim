@@ -49,7 +49,7 @@ int TJNeuron::init(real dt)
 	i_tmp = i_offset;
 
 	refrac_time = static_cast<int>(tau_refrac/dt);
-	refrac_step = refrac_time;
+	refrac_step = 0;
 	
 	return 0;
 }

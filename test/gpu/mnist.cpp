@@ -40,7 +40,7 @@ int main(int argc, char **argv)
 	real * conv1_bias_data = reinterpret_cast<real*>(conv1_bias.data);
 	Population<TJ_curr_static> **conv1 = (Population<TJ_curr_static> **)malloc(32 * sizeof(Population<TJ_curr_static>*));
 	for (int i=0; i<32; i++) {
-		conv1[i] = c.createPopulation(i + 1, IMAGE_PIXELS, TJ_curr_static(TJNeuron(0.0, 0.0, 0.5, 4e-3, 1.0, conv1_bias_data[i]), 1.0, 1.0));
+		conv1[i] = c.createPopulation(i + 1, IMAGE_PIXELS, TJ_curr_static(TJNeuron(0.0, 0.0, 0.5, 4e-3, 1.0e-3, conv1_bias_data[i]/1000.0), 1.0, 1.0));
 	}
 
 	Population<Max_pooling> **pool1 = (Population<Max_pooling> **)malloc(32 * sizeof(Population<Max_pooling>*));
@@ -53,7 +53,7 @@ int main(int argc, char **argv)
 	real * conv2_bias_data = reinterpret_cast<real*>(conv2_bias.data);
 	Population<TJ_curr_static> **conv2 = (Population<TJ_curr_static> **)malloc(64 * sizeof(Population<TJ_curr_static>*));
 	for (int i=0; i<64; i++) {
-		conv2[i] = c.createPopulation(65 + i, IMAGE_PIXELS/4, TJ_curr_static(TJNeuron(0.0, 0.0, 0.5, 4e-3, 1.0, conv2_bias_data[i]), 1.0, 1.0));
+		conv2[i] = c.createPopulation(65 + i, IMAGE_PIXELS/4, TJ_curr_static(TJNeuron(0.0, 0.0, 0.5, 4e-3, 1.0e-3, conv2_bias_data[i]/1000.0), 1.0, 1.0));
 	}
 
 	Population<Max_pooling> **pool2 = (Population<Max_pooling> **)malloc(64 * sizeof(Population<Max_pooling>*));
@@ -61,7 +61,7 @@ int main(int argc, char **argv)
 		pool2[i] = c.createPopulation(129 + i, IMAGE_PIXELS/16, Max_pooling(MaxNeuron(4), 0.0, 0.0));
 	}
 
-	Population<TJ_curr_static> *fc1 = c.createPopulation(193, 1024, TJ_curr_static(TJNeuron(0.0, 0.0, 0.5, 4e-3, 1.0, 0.0), 1.0, 1.0));
+	Population<TJ_curr_static> *fc1 = c.createPopulation(193, 1024, TJ_curr_static(TJNeuron(0.0, 0.0, 0.5, 4e-3, 1.0e-3, 0.0), 1.0, 1.0));
 	cnpy::NpyArray fc1_bias = cnpy::npy_load("/home/yhx/train/mnist_TJ_cnn/fc1_bias:0.data.npy");
 	assert(calcAllSize(fc1_bias) == fc1->getNum());
 	real * fc1_bias_data = reinterpret_cast<real*>(fc1_bias.data);
