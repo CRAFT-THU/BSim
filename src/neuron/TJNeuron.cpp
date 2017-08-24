@@ -70,6 +70,11 @@ int TJNeuron::update(SimInfo &info)
 			vm = v_reset;
 		}
 
+		if (fired) {
+			fire();
+			fire_count++;
+		} 
+		input_current += i_syn;
 	}
 
 	info.input.push_back(vm);
@@ -81,12 +86,8 @@ int TJNeuron::update(SimInfo &info)
 	i_syn = 0;
 
 	info.fired.push_back(fired);
-	if (fired) {
-		fire();
-		return 1;
-	} else {
-		return -1;
-	}
+
+	return fired;
 }
 
 int TJNeuron::recv(real I)

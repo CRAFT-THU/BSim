@@ -19,6 +19,18 @@ int allocPoisson(void *pCpu, int N)
 	p->p_fire_cycle = (int*)malloc(N*sizeof(int));
 	p->p_end_cycle = (int*)malloc(N*sizeof(int));
 	p->p_refrac_step = (int*)malloc(N*sizeof(int));
+	p->p_state = NULL;
+
+	return 0;
+}
+
+int freePoisson(void *pCpu)
+{
+	GPoissonNeurons *p = (GPoissonNeurons *)pCpu;
+	free(p->p_rate); 
+	free(p->p_fire_cycle); 
+	free(p->p_end_cycle);
+	free(p->p_refrac_step);
 
 	return 0;
 }

@@ -35,7 +35,7 @@ public:
 
 	const static Type type;
 protected:
-	int fire_count;
+	//int fire_count;
 	real fire_rate;
 	//real tau_syn_E;
 	//real tau_syn_I;

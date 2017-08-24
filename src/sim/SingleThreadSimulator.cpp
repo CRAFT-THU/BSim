@@ -18,7 +18,7 @@ SingleThreadSimulator::~SingleThreadSimulator()
 {
 }
 
-int SingleThreadSimulator::run(real time)
+int SingleThreadSimulator::run(real time, FireInfo &log)
 {
 	int sim_cycle =  round((time)/dt);
 
@@ -173,7 +173,7 @@ int SingleThreadSimulator::run(real time)
 		PopulationBase * p = *piter;
 		for (int i=0; i<p->getNum(); i++) {
 			int rate = p->getNeuron(i)->getFireCount();
-			fprintf(rateFile, "%d \t", rate);
+			fprintf(rateFile, "%d ", rate);
 		}
 	}
 

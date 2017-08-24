@@ -26,4 +26,8 @@ THREAD_NUM=`getconf _NPROCESSORS_ONLN`
 ((THREAD_NUM=THREAD_NUM/2))
 
 set -x
-cd .. && cmake -DCMAKE_BUILD_TYPE=$C_MODE -DUSE_DOUBLE=$USE_DOUBLE -DUSE_LOG=$USE_LOG .. && make -j$THREAD_NUM && cd bin
+if [ "$MODE" = "clean" ]; then
+	cd .. && make clean-all
+else
+	cd .. && cmake -DCMAKE_BUILD_TYPE=$C_MODE -DUSE_DOUBLE=$USE_DOUBLE -DUSE_LOG=$USE_LOG .. && make -j$THREAD_NUM && cd bin
+fi

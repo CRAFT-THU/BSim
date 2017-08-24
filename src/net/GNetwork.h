@@ -34,7 +34,7 @@ struct GNetwork {
 
 //This func donot deal with the member of N2SConnection
 GNetwork * initGNetwork(int ntype_num, int stype_num);
-GNetwork * freeGNetwork(int ntype_num, int stype_num);
+void freeGNetwork(GNetwork * network);
 
 //TODO freeGNetwork
 

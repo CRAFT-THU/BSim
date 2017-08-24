@@ -72,7 +72,7 @@ int ArrayNeuron::update(SimInfo &info)
 			fired = true;
 			fire();
 			idx++;
-			fireCount++;
+			fire_count++;
 		}
 	}
 	info.fired.push_back(fired);

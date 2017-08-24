@@ -23,7 +23,7 @@ int main(int argc, char **argv)
 	//c.connect(pn0, pn1, weight0, delay, NULL, 6);
 
 	STSim st(&c, 1.0e-3);
-	st.run(0.01);
+	st.run(0.01f);
 
 	//SGSim sg(&c, 1.0e-3);
 	//sg.run(0.1);

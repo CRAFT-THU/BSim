@@ -11,6 +11,7 @@
 extern void* (*createType[TYPESIZE])();
 extern size_t (*getTypeSize[TYPESIZE])();
 extern int (*allocType[TYPESIZE])(void *, int);
+extern int (*freeType[TYPESIZE])(void *);
 extern int (*addTypeConnection[TYPESIZE])(void *, int *);
 
 extern int (*cudaAllocType[TYPESIZE])(void *, void *, int);

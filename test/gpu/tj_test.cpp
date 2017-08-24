@@ -49,10 +49,19 @@ int main(int argc, char **argv)
 	c.connect(pn0, pn1, weight0, delay, NULL, 784*128);
 	c.connect(pn1, pn2, weight1, delay, NULL, 128*32);
 	c.connect(pn2, pn3, weight2, delay, NULL, 32*10);
+
 	STSim st(&c, 1.0e-3);
 	SGSim sg(&c, 1.0e-3);
-	sg.run(0.1);
+
+	ArrayInfo zero_array = {0, NULL};
+	FireInfo fire_info;
+	fire_info["count"] = zero_array;
+
+	sg.run(0.1, fire_info);
 	st.run(0.1);
+
+	logFireInfo(fire_info, "count", "fire");
+
 
 	if (!load) {
 		printf("SAVE DATA...\n");

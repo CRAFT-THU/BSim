@@ -26,7 +26,7 @@ SingleGPUSimulator::~SingleGPUSimulator()
 {
 }
 
-int SingleGPUSimulator::run(real time)
+int SingleGPUSimulator::run(real time, FireInfo &log)
 {
 
 	int sim_cycle = round(time/dt);
@@ -37,31 +37,37 @@ int SingleGPUSimulator::run(real time)
 
 	FILE *v_file = fopen("g_v.data", "w+");
 	if (v_file == NULL) {
-		printf("ERROR: Open file GSim.data failed\n");
+		printf("ERROR: Open file g_v.data failed\n");
 		return -1;
 	}
 
 	FILE *input_e_file = fopen("g_input_e.data", "w+");
 	if (input_e_file == NULL) {
-		printf("Open file input_e.data failed\n");
+		printf("Open file g_input_e.data failed\n");
 		return -1;
 	}
 
 	FILE *input_i_file = fopen("g_input_i.data", "w+");
 	if (input_i_file == NULL) {
-		printf("Open file input_i.data failed\n");
+		printf("Open file g_input_i.data failed\n");
 		return -1;
 	}
 
 	FILE *ie_file = fopen("g_ie.data", "w+");
 	if (ie_file == NULL) {
-		printf("ERROR: Open file GSim.data failed\n");
+		printf("ERROR: Open file g_ie.data failed\n");
 		return -1;
 	}
 
 	FILE *ii_file = fopen("g_ii.data", "w+");
 	if (ii_file == NULL) {
-		printf("ERROR: Open file GSim.data failed\n");
+		printf("ERROR: Open file g_ii.data failed\n");
+		return -1;
+	}
+
+	FILE *info_file = fopen("GSim.info", "w+");
+	if (info_file == NULL) {
+		printf("ERROR: Open file GSim.info failed\n");
 		return -1;
 	}
 
@@ -71,18 +77,19 @@ int SingleGPUSimulator::run(real time)
 		return -1;
 	}
 
-	findCudaDevice(0, NULL);
+	//findCudaDevice(0, NULL);
+	checkCudaErrors(cudaSetDevice(0));
 	GNetwork *c_pGpuNet = copyNetworkToGPU(pCpuNet);
 
 	int nTypeNum = pCpuNet->nTypeNum;
 	int sTypeNum = pCpuNet->sTypeNum;
 	int totalNeuronNum = pCpuNet->neuronNums[nTypeNum];
 	int totalSynapseNum = pCpuNet->synapseNums[sTypeNum];
-	printf("NeuronTypeNum: %d, SynapseTypeNum: %d\n", nTypeNum, sTypeNum);
-	printf("NeuronNum: %d, SynapseNum: %d\n", totalNeuronNum, totalSynapseNum);
+	fprintf(info_file, "NeuronTypeNum: %d, SynapseTypeNum: %d\n", nTypeNum, sTypeNum);
+	fprintf(info_file, "NeuronNum: %d, SynapseNum: %d\n", totalNeuronNum, totalSynapseNum);
 
 	int MAX_DELAY = pCpuNet->MAX_DELAY;
-	printf("MAX_DELAY: %d\n", pCpuNet->MAX_DELAY);
+	fprintf(info_file, "MAX_DELAY: %d\n", pCpuNet->MAX_DELAY);
 
 	init_connection<<<1, 1>>>(c_pGpuNet->pN2SConnection);
 
@@ -123,15 +130,15 @@ int SingleGPUSimulator::run(real time)
 	//GExpSynapses *c_g_exp = copyFromGPU<GExpSynapses>(static_cast<GExpSynapses*>(c_pGpuNet->pSynapses[exp_idx]), 1);
 	//real *c_g_I_syn = c_g_exp->p_I_syn;
 
-	for (int i=0; i<nTypeNum; i++) {
-		cout << pCpuNet->nTypes[i] << ": <<<" << updateSize[c_pGpuNet->nTypes[i]].gridSize << ", " << updateSize[c_pGpuNet->nTypes[i]].blockSize << ">>>" << endl;
-	}
-	for (int i=0; i<sTypeNum; i++) {
-		cout << pCpuNet->sTypes[i] << ": <<<" << updateSize[c_pGpuNet->sTypes[i]].gridSize << ", " << updateSize[c_pGpuNet->sTypes[i]].blockSize << ">>>" << endl;
-	}
+	//for (int i=0; i<nTypeNum; i++) {
+	//	cout << pCpuNet->nTypes[i] << ": <<<" << updateSize[c_pGpuNet->nTypes[i]].gridSize << ", " << updateSize[c_pGpuNet->nTypes[i]].blockSize << ">>>" << endl;
+	//}
+	//for (int i=0; i<sTypeNum; i++) {
+	//	cout << pCpuNet->sTypes[i] << ": <<<" << updateSize[c_pGpuNet->sTypes[i]].gridSize << ", " << updateSize[c_pGpuNet->sTypes[i]].blockSize << ">>>" << endl;
+	//}
 
 	vector<int> firedInfo;
-	printf("Start runing for %d cycles\n", sim_cycle);
+	fprintf(info_file, "Start runing for %d cycles\n", sim_cycle);
 	struct timeval ts, te;
 	gettimeofday(&ts, NULL);
 	for (int time=0; time<sim_cycle; time++) {
@@ -248,33 +255,57 @@ int SingleGPUSimulator::run(real time)
 		seconds = seconds - 1;
 	}
 
-	printf("\nSimulation finesed in %ld:%ld:%ld.%06lds\n", hours, minutes, seconds, uSeconds);
+	fprintf(info_file, "Simulation finesed in %ld:%ld:%ld.%06lds\n", hours, minutes, seconds, uSeconds);
 
 	//CALC Firing Rate
-	int *rate = (int*)malloc(sizeof(int)*totalNeuronNum);
-	copyFromGPU<int>(rate, buffers->c_gFireCount, totalNeuronNum);
+	if (log.find("count") != log.end()) {
+		int *rate = (int*)malloc(sizeof(int)*totalNeuronNum);
+		copyFromGPU<int>(rate, buffers->c_gFireCount, totalNeuronNum);
 
-	FILE *rateFile = fopen("GFire.log", "w+");
-	if (rateFile == NULL) {
-		printf("Open file Sim.log failed\n");
-		return -1;
+		log["count"].size = totalNeuronNum;
+		log["count"].data = rate;
+
+		//FILE *rateFile = fopen("GFire.log", "w+");
+		//if (rateFile == NULL) {
+		//	printf("ERROR: Open file Sim.log failed\n");
+		//	return -1;
+		//}
+
+		//for (int i=0; i<totalNeuronNum; i++) {
+		//	fprintf(rateFile, "%d \t", rate[i]);
+		//}
+
+		//fflush(rateFile);
+		//fclose(rateFile);
 	}
 
-	for (int i=0; i<totalNeuronNum; i++) {
-		fprintf(rateFile, "%d \t", rate[i]);
+	if (log.find("Y") != log.end()) {
+		real *Y = (real*)malloc(sizeof(real)*totalNeuronNum);
+		copyFromGPU<real>(Y, buffers->c_gXInput, totalNeuronNum);
+		log["Y"].size = totalNeuronNum;
+		log["Y"].data = Y;
 	}
 
-	fclose(rateFile);
+	if (log.find("X") != log.end()) {
+		int *X = (int*)malloc(sizeof(int)*totalNeuronNum);
+		copyFromGPU<int>(X, buffers->c_gLayerInput, totalNeuronNum);
+		log["X"].size = totalNeuronNum;
+		log["X"].data = X;
+	}
+
+
 
 	fclose(v_file);
 	fclose(input_e_file);
 	fclose(input_i_file);
 	fclose(ie_file);
 	fclose(ii_file);
+	fclose(info_file);
 	fclose(log_file);
 
 	free_buffers(buffers);
 	freeGPUNetwork(c_pGpuNet);
+	freeGNetwork(pCpuNet);
 
 	return 0;
 }

@@ -33,6 +33,7 @@ int cudaFreePoisson(void *pGpu)
 	gpuFree(pGpuNeurons->p_fire_cycle);
 	gpuFree(pGpuNeurons->p_end_cycle);
 	gpuFree(pGpuNeurons->p_refrac_step);
+	gpuFree(pGpuNeurons->p_state);
 
 	return 0;
 }

@@ -17,7 +17,16 @@ int allocMax(void *pCpu, int N) {
 	GMaxNeurons *p = (GMaxNeurons *)pCpu;
 	p->p_N = (int*)malloc(N*sizeof(int));
 	p->p_count = (int*)malloc(N*sizeof(int));
+	p->p_record = NULL;
 	p->max_N = 0;
+	
+	return 0;
+}
+
+int freeMax(void *pCpu) {
+	GMaxNeurons *p = (GMaxNeurons *)pCpu;
+	free(p->p_N); 
+	free(p->p_count);
 	
 	return 0;
 }

@@ -35,7 +35,7 @@ MultiGPUSimulator::~MultiGPUSimulator()
 
 void *run_thread(void *para);
 
-int MultiGPUSimulator::run(real time)
+int MultiGPUSimulator::run(real time, FireInfo &log)
 {
 	int sim_cycle = round(time/dt);
 	reset();

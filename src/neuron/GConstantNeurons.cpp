@@ -13,13 +13,24 @@
 
 NEURON_GPU_FUNC_BASIC(Constant)
 
-int allocConstant(void *pCpu, int N) {
+int allocConstant(void *pCpu, int N) 
+{
 	GConstantNeurons *p = (GConstantNeurons *)pCpu;
 	p->p_fire_rate = (real*)malloc(N*sizeof(real));
 	p->p_fire_count = (int*)malloc(N*sizeof(int));
 	
 	return 0;
 }
+
+int freeConstant(void *pCpu) 
+{
+	GConstantNeurons *p = (GConstantNeurons *)pCpu;
+	free(p->p_fire_rate); 
+	free(p->p_fire_count);
+
+	return 0;
+}
+
 
 void mpiSendConstant(void *data, int rank, int offset, int size) {
 }

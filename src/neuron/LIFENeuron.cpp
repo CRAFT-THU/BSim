@@ -132,6 +132,15 @@ int LIFENeuron::update(SimInfo &info)
 			_i_E += _i_syn_E;
 			_i_I += _i_syn_I;
 		}
+
+		if (fired) {
+			fire();
+			fire_count++;
+			return 1;
+		} else {
+			input_current += _i_syn_E + _i_syn_I;
+			return -1;
+		}
 	}
 	
 	info.input.push_back(_vm);
@@ -146,13 +155,10 @@ int LIFENeuron::update(SimInfo &info)
 	_i_syn_I = 0;
 
 	info.fired.push_back(fired);
-	if (fired) {
-		fire();
-		fireCount++;
-		return 1;
-	} else {
-		return -1;
-	}
+
+	return fired;
+
+
 }
 
 void LIFENeuron::monitor(SimInfo &info)

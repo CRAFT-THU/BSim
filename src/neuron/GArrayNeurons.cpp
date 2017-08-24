@@ -21,6 +21,15 @@ int allocArray(void *pCpu, int N) {
 	return 0;
 }
 
+int freeArray(void *pCpu) {
+	GArrayNeurons *p = (GArrayNeurons *)pCpu;
+	free(p->p_start);
+	free(p->p_end);
+	free(p->p_fire_time);
+	
+	return 0;
+}
+
 void mpiSendArray(void *data, int rank, int offset, int size) {
 }
 

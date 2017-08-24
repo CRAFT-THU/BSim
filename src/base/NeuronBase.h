@@ -18,6 +18,7 @@ public:
 
 	virtual bool isFired() final;
 	virtual int getFireCount() final;
+	virtual real getInputCurrent() final;
 
 	virtual int fire() final;
 	virtual int recv(real I) = 0;
@@ -34,7 +35,8 @@ protected:
 	vector<SynapseBase*> pSynapses;
 	bool fired;
 	bool monitored;
-	int fireCount;
+	int fire_count;
+	real input_current;
 	//int _start_E;
 	//int _start_I;
 	//int _end;

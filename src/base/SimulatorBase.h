@@ -5,14 +5,18 @@
 #ifndef SIMULATORBASE_H
 #define SIMULATORBASE_H
 
+#include "../base/SimInfo.h"
 #include "../net/Network.h"
 
 class SimulatorBase {
 public:
 	SimulatorBase(Network* network, real dt);
 	virtual ~SimulatorBase();
-	virtual int run(real time) = 0;
+
+	virtual int run(real time, FireInfo &log) = 0;
 	virtual int reset();
+
+	int run(real time);
 protected:
 	Network* network;
 	real dt;
