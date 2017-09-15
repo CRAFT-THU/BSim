@@ -123,7 +123,7 @@ int main(int argc, char **argv)
 	fire_info["Y"] = zero_array;
 
 	SGSim sg(&c, 1.0e-3);
-	STSim st(&c, 1.0e-3);
+	//STSim st(&c, 1.0e-3);
 	
 	int matched_batches = 0;
 	for (int batch = 0; batch < 1; batch++) {
@@ -132,7 +132,7 @@ int main(int argc, char **argv)
 			n->setRate(dataset.test_images[batch][i]/1000.0);
 		}
 
-		st.run(1, fire_info);
+		//st.run(1, fire_info);
 		sg.run(1, fire_info);
 
 		int *rate = (int*) fire_info["count"].data;

@@ -1,4 +1,8 @@
 
+
+#include "../utils/constant.h"
+#include "../net/Connection.h"
+
 // Constant
 extern __constant__ int MAX_DELAY;
 extern __constant__ int gTimeTableCap;
@@ -24,7 +28,7 @@ extern __device__ real *gNeuronInput_I;
 extern __device__ int *gFiredTable;
 extern __device__ int *gFiredTableSizes;
 extern __device__ int *gActiveTable;
-extern 
+
 // Synapse Tables
 //extern __device__ int *gSynapsesActiveTable;
 //extern __device__ int *gSynapsesLogTable;

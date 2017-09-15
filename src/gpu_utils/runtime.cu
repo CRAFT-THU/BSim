@@ -4,7 +4,7 @@
 #include "../third_party/cuda/helper_cuda.h"
 #include "mem_op.h"
 #include "gpu_macros.h"
-#include "gpu_kernel.h"
+#include "runtime.h"
 
 #define MAXBLOCKSIZE 1024
 
@@ -23,6 +23,44 @@
 //	return __longlong_as_double(old);
 //}
 //#endif
+
+
+__constant__ int MAX_DELAY;
+__constant__ int gTimeTableCap;
+__constant__ int gFiredTableCap;
+__constant__ int gSynapsesTableCap;
+__constant__ real DT;
+
+// Variable
+__device__ int gCurrentIdx;
+__device__ int gCurrentCycle;
+__device__ int gFiredTableSize;
+__device__ int gActiveTableSize;
+__device__ int gSynapsesActiveTableSize;
+
+// Arrays
+//__device__ int *gTimeTable;
+
+// Neuron Arrays
+__device__ real *gNeuronInput;
+__device__ real *gNeuronInput_I;
+
+// Neuron Tables
+__device__ int *gFiredTable;
+__device__ int *gFiredTableSizes;
+__device__ int *gActiveTable;
+
+// Synapse Tables
+//__device__ int *gSynapsesActiveTable;
+//__device__ int *gSynapsesLogTable;
+
+// Log Arrays
+__device__ int *gLayerInput;
+__device__ real *gXInput;
+__device__ int *gFireCount;
+
+// Connection
+__device__ N2SConnection *gConnection;
 
 
 __device__ int commit2globalTable(int *shared_buf, volatile unsigned int size, int *global_buf, int * global_size, int offset) 

@@ -1,4 +1,6 @@
 
+#include "../utils/constant.h"
+
 struct GBuffers {
 	// Neuron Arrays
 	real *c_gNeuronInput;

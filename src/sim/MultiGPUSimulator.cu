@@ -14,7 +14,8 @@
 #include "../gpu_utils/mem_op.h"
 #include "../gpu_utils/gpu_func.h"
 #include "../gpu_utils/gpu_utils.h"
-#include "../gpu_utils/gpu_kernel.h"
+#include "../gpu_utils/runtime.h"
+#include "../gpu_utils/GBuffers.h"
 #include "../net/MultiNetwork.h"
 #include "MultiGPUSimulator.h"
 

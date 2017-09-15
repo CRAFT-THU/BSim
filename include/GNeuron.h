@@ -5,12 +5,19 @@
 #ifndef GNEURON_H
 #define GNEURON_H
 
-#include "../src/neuron/GConstantNeurons.h"
-#include "../src/neuron/GPoissonNeurons.h"
-#include "../src/neuron/GArrayNeurons.h"
-#include "../src/neuron/GLIFENeurons.h"
-#include "../src/neuron/GTJNeurons.h"
-#include "../src/neuron/GMaxNeurons.h"
+#include "../src/neuron/constant/GConstantNeurons.h"
+#include "../src/neuron/poisson/GPoissonNeurons.h"
+#include "../src/neuron/array/GArrayNeurons.h"
+#include "../src/neuron/lif/GLIFENeurons.h"
+#include "../src/neuron/max/GMaxNeurons.h"
+#include "../src/neuron/tj/GTJNeurons.h"
+
+//#include "../src/neuron/constant/GConstant.h"
+//#include "../src/neuron/poisson/GPoisson.h"
+//#include "../src/neuron/array/GArray.h"
+//#include "../src/neuron/lif/GLIF.h"
+//#include "../src/neuron/max/GMax.h"
+//#include "../src/neuron/tj/GTJ.h"
 
 #endif /* GNEURON_H */
 

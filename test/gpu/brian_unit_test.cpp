@@ -15,7 +15,7 @@ int main(int argc, char **argv)
 		load = true;
 	}
 
-	const int N = 500;
+	const int N = 5;
 	Network c;
 	//createPopulation(int id, int N, LIFENeuron(ID id, real v_init, real v_rest, real v_reset, real cm, real tau_m, real tau_refrac, real tau_syn_E, real tau_syn_I, real v_thresh, real i_offset)), ID(0, 0), real tau_syn_E, real tau_syn_I);
 	Population<LIF_brian> *pn0 = c.createPopulation(N, LIF_brian(LIFENeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-3, 0.0, 1.0, 1.0, 15.0e-3, 10.0e-1), 1.0, 1.0));
@@ -55,8 +55,8 @@ int main(int argc, char **argv)
 	STSim st(&c, 1.0e-3);
 	SGSim sg(&c, 1.0e-3);
 	//sg.compare_run(0.1);
-	sg.run(0.1);
 	st.run(0.1);
+	sg.run(0.1);
 
 	if (!load) {
 		printf("SAVE DATA...\n");

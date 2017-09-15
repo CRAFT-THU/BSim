@@ -1,4 +1,9 @@
 
+#include "../third_party/cuda/helper_cuda.h"
+#include "mem_op.h"
+#include "gpu_macros.h"
+#include "runtime.h"
+
 #include "GBuffers.h"
 
 GBuffers* alloc_buffers(int neuron_num, int synapse_num, int max_delay, real dt) 

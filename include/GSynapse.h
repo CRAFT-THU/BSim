@@ -5,7 +5,9 @@
 #ifndef GSYNAPSE_H
 #define GSYNAPSE_H
 
-#include "../src/synapse/GStaticSynapses.h"
+#include "../src/synapse/static/GStaticSynapses.h"
+
+//#include "../src/synapse/static/GStatic.h"
 
 #endif /* GSYNAPSE_H */
 

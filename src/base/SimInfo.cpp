@@ -11,6 +11,10 @@ int logFireInfo(FireInfo log, string type, string name)
 		return -1;
 	}
 
+	//printf("%d \n", log[type].size);
+	//int *data = reinterpret_cast<int*>(log[type].data);
+	//printf("%d \n", data[0]);
+	//printf("%s \n", type.c_str());
 
 	for (int j=0; j<log[type].size; j++) {
 		if (type == "Y") {

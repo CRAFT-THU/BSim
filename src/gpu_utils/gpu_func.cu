@@ -3,9 +3,20 @@
  * Sat March 12 2016
  */
 
-#include "../../include/GNeuron.h"
+#include "../neuron/lif/GLIF.h"
+#include "../neuron/tj/GTJ.h"
+#include "../neuron/max/GMax.h"
+#include "../neuron/poisson/GPoisson.h"
+#include "../neuron/array/GArray.h"
+#include "../neuron/constant/GConstant.h"
+
+#include "../synapse/static/GStatic.h"
+
+//#include "../../include/GNeuron.h"
+//#include "../../include/GSynapse.h"
+
 #include "../utils/utils.h"
-#include "gpu_kernel.h"
+#include "runtime.h"
 #include "gpu_func.h"
 
 

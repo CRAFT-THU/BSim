@@ -6,12 +6,12 @@
 #define NEURON_H
 
 
-#include "../src/neuron/ConstantNeuron.h"
-#include "../src/neuron/PoissonNeuron.h"
-#include "../src/neuron/ArrayNeuron.h"
-#include "../src/neuron/LIFENeuron.h"
-#include "../src/neuron/TJNeuron.h"
-#include "../src/neuron/MaxNeuron.h"
+#include "../src/neuron/constant/ConstantNeuron.h"
+#include "../src/neuron/poisson/PoissonNeuron.h"
+#include "../src/neuron/array/ArrayNeuron.h"
+#include "../src/neuron/lif/LIFENeuron.h"
+#include "../src/neuron/tj/TJNeuron.h"
+#include "../src/neuron/max/MaxNeuron.h"
 
 #include "GNeuron.h"
 #include "Synapse.h"

@@ -4,8 +4,8 @@
 #include "../utils/utils.h"
 #include "../utils/TypeFunc.h"
 #include "Network.h"
-#include "../neuron/ArrayNeuron.h"
-#include "../neuron/GArrayNeurons.h"
+#include "../neuron/array/ArrayNeuron.h"
+#include "../neuron/array/GArrayNeurons.h"
 
 void arrangeFireArray(vector<int> &fire_array, vector<int> &start_loc, PopulationBase *popu)
 {
