@@ -29,7 +29,7 @@ def column_sub(file1="", file2=""):
         columnum = 0
         for i,j in zip(data0, data1):
             diff = i-j
-            if abs(diff) > 1e-10:
+            if abs(diff) > 1e-7:
                 diffed = True
                 outfile.write(str(columnum) + ':' + str(diff) + ' \t');
             columnum = columnum + 1

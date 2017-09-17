@@ -10,6 +10,7 @@ C_MODE="Release"
 
 if [ "$MODE" = "debug" ]; then
 	C_MODE="Debug"
+	USE_LOG="ON"
 else
 	C_MODE="Release"
 fi

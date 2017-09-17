@@ -136,10 +136,8 @@ int LIFENeuron::update(SimInfo &info)
 		if (fired) {
 			fire();
 			fire_count++;
-			return 1;
 		} else {
 			input_current += _i_syn_E + _i_syn_I;
-			return -1;
 		}
 	}
 	
