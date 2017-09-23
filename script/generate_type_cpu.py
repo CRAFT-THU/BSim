@@ -14,7 +14,7 @@ def generate_h_file(paras, type_name, type_type, path_name):
     f.write('#include <stdio.h>\n')
     if type_type == "Synapse":
         f.write('#include <list>\n')
-    f.write('#include "../base/' + type_type + 'Base.h"\n')
+    f.write('#include "../../base/' + type_type + 'Base.h"\n')
     f.write('\n')
 
     if type_type == "Synapse":
