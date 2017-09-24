@@ -1,7 +1,7 @@
 
 #include "../../gpu_utils/runtime.h"
 
-#include "GConstant.h"
+#include "GFFTNeurons.h"
 
 __global__ void update_fft_neuron(GFFTNeurons *d_neurons, int num, int start_id)
 {
