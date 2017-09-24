@@ -12,6 +12,10 @@
 #include "../src/neuron/max/GMaxNeurons.h"
 #include "../src/neuron/tj/GTJNeurons.h"
 
+#include "../src/neuron/mem/GMemNeurons.h"
+#include "../src/neuron/decide/GDecideNeurons.h"
+#include "../src/neuron/fft/GFFTNeurons.h"
+
 //#include "../src/neuron/constant/GConstant.h"
 //#include "../src/neuron/poisson/GPoisson.h"
 //#include "../src/neuron/array/GArray.h"

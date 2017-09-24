@@ -209,7 +209,7 @@ int Network::connect(Population<Neuron1> *pSrc, Population<Neuron2> *pDst, real 
 }
 
 template<class Neuron1, class Neuron2>
-int Network::connect(Population<Neuron1> *pSrc, Population<Neuron2> *pDst, real *weight, real *delay, SpikeType *type, int size) {
+int Network::connectOne2One(Population<Neuron1> *pSrc, Population<Neuron2> *pDst, real *weight, real *delay, SpikeType *type, int size) {
 	int srcSize = pSrc->getNum();
 	int dstSize = pDst->getNum();
 	assert(size == srcSize);

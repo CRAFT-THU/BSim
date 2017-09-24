@@ -13,6 +13,10 @@
 #include "../src/neuron/tj/TJNeuron.h"
 #include "../src/neuron/max/MaxNeuron.h"
 
+#include "../src/neuron/mem/MemNeuron.h"
+#include "../src/neuron/decide/DecideNeuron.h"
+#include "../src/neuron/fft/FFTNeuron.h"
+
 #include "GNeuron.h"
 #include "Synapse.h"
 
@@ -27,9 +31,9 @@ typedef CompositeNeuron<LIFENeuron, StaticSynapse> IF_curr_exp;
 typedef CompositeNeuron<LIFENeuron, StaticSynapse> LIF_brian;
 typedef CompositeNeuron<TJNeuron, StaticSynapse> TJ_curr_static;
 
-typedef CompositeNeuron<MemNeuron, StaticSynapse> Mem;
+typedef CompositeNeuron<MemNeuron, StaticSynapse> Memory;
 
-typedef CompositeNeuron<FFTNeuron, StaticSynapse> FFT;
+typedef CompositeNeuron<FFTNeuron, StaticSynapse> FFTCompute;
 
 typedef CompositeNeuron<DecideNeuron, StaticSynapse> DecisionMaker;
 

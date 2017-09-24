@@ -24,7 +24,7 @@ int main(int argc, char **argv)
 		n->setRate((i + 0.5)/10.0);
 	}
 
-	Population<Mem> *pn1 = c.createPopulation(1, N, Mem(MemNeuron(0.0), 1.0, 1.0));
+	Population<Memory> *pn1 = c.createPopulation(1, N, Memory(MemNeuron(0.0), 1.0, 1.0));
 
 	real * weight0 = NULL;
 	real * delay = NULL;

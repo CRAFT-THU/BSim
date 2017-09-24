@@ -9,13 +9,13 @@
 
 #include "../../utils/macros.h"
 #include "../../utils/TagPool.h"
-#include "GMemNeurons.h"
+#include "GDecideNeurons.h"
 
-NEURON_GPU_FUNC_BASIC(Mem)
+NEURON_GPU_FUNC_BASIC(Decide)
 
-int allocMem(void *pCpu, int N) 
+int allocDecide(void *pCpu, int N) 
 {
-	GMemNeurons *p = (GMemNeurons *)pCpu;
+	GDecideNeurons *p = (GDecideNeurons *)pCpu;
 	p->p_tmp_rate = (real*)malloc(N*sizeof(real));
 	p->p_fire_rate = (real*)malloc(N*sizeof(real));
 	p->p_fire_count = (int*)malloc(N*sizeof(int));
@@ -23,9 +23,9 @@ int allocMem(void *pCpu, int N)
 	return 0;
 }
 
-int freeMem(void *pCpu) 
+int freeDecide(void *pCpu) 
 {
-	GMemNeurons *p = (GMemNeurons *)pCpu;
+	GDecideNeurons *p = (GDecideNeurons *)pCpu;
 	free(p->p_tmp_rate); 
 	free(p->p_fire_rate); 
 	free(p->p_fire_count);
@@ -34,8 +34,8 @@ int freeMem(void *pCpu)
 }
 
 
-void mpiSendMem(void *data, int rank, int offset, int size) {
+void mpiSendDecide(void *data, int rank, int offset, int size) {
 }
 
-void mpiRecvMem(void **data, int rank, int rankSize) {
+void mpiRecvDecide(void **data, int rank, int rankSize) {
 }

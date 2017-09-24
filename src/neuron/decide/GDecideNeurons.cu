@@ -5,12 +5,12 @@
 
 
 #include "../../third_party/cuda/helper_cuda.h"
-#include "GMemNeurons.h"
+#include "GDecideNeurons.h"
 
-int cudaAllocMem(void *pCpu, void *pGpu, int num)
+int cudaAllocDecide(void *pCpu, void *pGpu, int num)
 {
-	GMemNeurons *pGpuNeurons = (GMemNeurons*)pGpu;
-	GMemNeurons *p = (GMemNeurons*)pCpu;
+	GDecideNeurons *pGpuNeurons = (GDecideNeurons*)pGpu;
+	GDecideNeurons *p = (GDecideNeurons*)pCpu;
 
 	checkCudaErrors(cudaMalloc((void**)&(pGpuNeurons->p_tmp_rate), sizeof(real)*num));
 	checkCudaErrors(cudaMemcpy(pGpuNeurons->p_tmp_rate, p->p_tmp_rate, sizeof(real)*num, cudaMemcpyHostToDevice));
@@ -24,9 +24,9 @@ int cudaAllocMem(void *pCpu, void *pGpu, int num)
 	return 0;
 }
 
-int cudaFreeMem(void *pGpu)
+int cudaFreeDecide(void *pGpu)
 {
-	GMemNeurons *pGpuNeurons = (GMemNeurons*)pGpu;
+	GDecideNeurons *pGpuNeurons = (GDecideNeurons*)pGpu;
 
 	checkCudaErrors(cudaFree(pGpuNeurons->p_tmp_rate));
 	checkCudaErrors(cudaFree(pGpuNeurons->p_fire_rate));

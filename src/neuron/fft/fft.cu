@@ -18,15 +18,15 @@ __global__ void update_fft_neuron(GFFTNeurons *d_neurons, int num, int start_id)
 		bool fired = false;
 		int test_loc = 0;
 		int res = 0;
-		int gnid = nid + start_id;
+		int gnid = idx + start_id;
 
 		if (idx % 2 == 0) {
-			res = p_res[idx/2].x;
+			res = d_neurons->p_res[idx/2].x;
 		} else {
-			res = p_res[idx/2].y;
+			res = d_neurons->p_res[idx/2].y;
 		}
 
-		fired = res > p_fire_count[idx];
+		fired = res > d_neurons->p_fire_count[idx];
 
 		gFireCount[gnid] += fired;
 

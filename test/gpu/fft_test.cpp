@@ -24,7 +24,7 @@ int main(int argc, char **argv)
 		n->setRate((i + 0.5)/10.0);
 	}
 
-	Population<FFT> *pn1 = c.createPopulation(1, N, FFT(FFTNeuron(), 1.0, 1.0));
+	Population<FFTCompute> *pn1 = c.createPopulation(1, N, FFTCompute(FFTNeuron(), 1.0, 1.0));
 
 	real * weight0 = NULL;
 	real * delay = NULL;

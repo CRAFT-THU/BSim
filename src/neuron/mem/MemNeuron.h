@@ -2,8 +2,8 @@
  * usually just for fun
  * Wed January 06 2016
  */
-#ifndef CONSTANTNEURON_H
-#define CONSTANTNEURON_H
+#ifndef MEMNEURON_H
+#define MEMNEURON_H
 
 #include <stdio.h>
 #include <vector>
@@ -43,4 +43,4 @@ protected:
 	FILE *file;
 };
 
-#endif /* CONSTANTNEURON_H */
+#endif /* MEMNEURON_H */
