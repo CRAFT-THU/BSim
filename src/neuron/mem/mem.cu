@@ -17,7 +17,7 @@ __global__ void update_mem_neuron(GMemNeurons *d_neurons, int num, int start_id)
 	for (int idx = tid; idx < num; idx += blockDim.x * gridDim.x) {
 		bool fired = false;
 		int test_loc = 0;
-		int gnid = nid + start_id;
+		int gnid = idx + start_id;
 
 
 		fired = (gCurrentCycle * d_neurons->p_fire_rate[idx]) > (d_neurons->p_fire_count[idx]);

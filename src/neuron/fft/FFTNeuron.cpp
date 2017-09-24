@@ -56,8 +56,9 @@ Type FFTNeuron::getType()
 
 int FFTNeuron::update(SimInfo &info)
 {
+	//TODO
 	fired = false;
-	if (info.currCycle * fire_rate > fire_count) {
+	if (info.currCycle > fire_count) {
 		fired = true;
 		fire_count++;
 		fire();

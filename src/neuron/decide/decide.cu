@@ -1,7 +1,7 @@
 
 #include "../../gpu_utils/runtime.h"
 
-#include "GDecide.h"
+#include "GDecideNeurons.h"
 
 __global__ void update_decide_neuron(GDecideNeurons *d_neurons, int num, int start_id)
 {
@@ -19,13 +19,13 @@ __global__ void update_decide_neuron(GDecideNeurons *d_neurons, int num, int sta
 	for (int idx = tid; idx < num; idx += blockDim.x * gridDim.x) {
 		bool fired = false;
 		int test_loc = 0;
-		int gnid = nid + start_id;
+		int gnid = idx + start_id;
 
 
 		fired = (PERIOD * d_neurons->p_fire_rate[idx]) > (d_neurons->p_fire_count[idx]);
 		gFireCount[gnid] += fired;
 
-		p_tmp_rate[idx] += gNeuronInput[gnid] + gNeuronInput_I[gnid];
+		d_neurons->p_tmp_rate[idx] += gNeuronInput[gnid] + gNeuronInput_I[gnid];
 
 		if (gCurrentCycle % PERIOD == 0) {
 			d_neurons->p_fire_rate[idx] = 0.5 *d_neurons->p_fire_rate[idx] + d_neurons->p_tmp_rate[idx] * 0.05;

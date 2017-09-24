@@ -115,8 +115,10 @@ FOREACH(exec_path ${GPU_TEST})
 	GET_FILENAME_COMPONENT(exec_file ${exec_path} NAME_WE)
 	#MESSAGE("EXEC_FILE: ${exec_file}")
 	CUDA_ADD_EXECUTABLE(${exec_file} ${exec_path})
+	CUDA_ADD_CUFFT_TO_TARGET(${exec_file})
 	TARGET_LINK_LIBRARIES(${exec_file} ${GPU_LIB} ${CPU_LIB} ${MPI_LIBRARIES} blas ${BLAS_LIBRARIES})
 ENDFOREACH()
+
 
 #ADD_CUSTOM_COMMAND(TARGET multi-gpusim_test
 #	POST_BUILD
