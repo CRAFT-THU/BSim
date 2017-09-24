@@ -43,6 +43,8 @@ public:
 	template<class Neuron1, class Neuron2>
 	int connect(Population<Neuron1> *pSrc, Population<Neuron2> *pDst, real *weight, real *delay, SpikeType *type, int size);
 	template<class Neuron1, class Neuron2>
+	int connectOne2One(Population<Neuron1> *pSrc, Population<Neuron2> *pDst, real *weight, real *delay, SpikeType *type, int size);
+	template<class Neuron1, class Neuron2>
 	int connectConv(Population<Neuron1> *pSrc, Population<Neuron2> *pDst, real *weight, real *delay, SpikeType *type, int height, int width, int k_height, int k_width);
 	template<class Neuron1, class Neuron2>
 	int connectPooling(Population<Neuron1> *pSrc, Population<Neuron2> *pDst, real weight, int height, int width, int p_height, int p_width);
@@ -199,6 +201,39 @@ int Network::connect(Population<Neuron1> *pSrc, Population<Neuron2> *pDst, real 
 			connect(pSrc->getNeuron(iSrc), pDst->getNeuron(iDst), weight[i], delay[i], Excitatory, 0.0, false);
 		} else {
 			connect(pSrc->getNeuron(iSrc), pDst->getNeuron(iDst), weight[i], delay[i], type[i], 0.0, false);
+		}
+		count++;
+	}
+
+	return count;
+}
+
+template<class Neuron1, class Neuron2>
+int Network::connect(Population<Neuron1> *pSrc, Population<Neuron2> *pDst, real *weight, real *delay, SpikeType *type, int size) {
+	int srcSize = pSrc->getNum();
+	int dstSize = pDst->getNum();
+	assert(size == srcSize);
+	assert(size == dstSize); 
+
+	if (find(pPopulations.begin(), pPopulations.end(), pSrc) == pPopulations.end()) {
+		pPopulations.push_back(pSrc);
+		populationNum++;
+		//neuronNum += pSrc->getNum();
+		addNeuronNum(pSrc->getType(), pSrc->getNum());
+	}
+	if (find(pPopulations.begin(), pPopulations.end(), pDst) == pPopulations.end()) {
+		pPopulations.push_back(pDst);
+		populationNum++;
+		//neuronNum += pDst->getNum();
+		addNeuronNum(pDst->getType(), pDst->getNum());
+	}
+
+	int count = 0;
+	for (int i=0; i<size; i++) {
+		if (type == NULL) {
+			connect(pSrc->getNeuron(i), pDst->getNeuron(i), weight[i], delay[i], Excitatory, 0.0, false);
+		} else {
+			connect(pSrc->getNeuron(i), pDst->getNeuron(i), weight[i], delay[i], type[i], 0.0, false);
 		}
 		count++;
 	}

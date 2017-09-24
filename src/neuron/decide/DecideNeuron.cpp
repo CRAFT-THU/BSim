@@ -11,10 +11,11 @@
 
 const Type DecideNeuron::type = Decide;
 
-DecideNeuron::DecideNeuron(real fire_rate/*, real tau_syn_E, real tau_syn_I*/) : NeuronBase()
+DecideNeuron::DecideNeuron() : NeuronBase()
 {
-	this->fire_rate = fire_rate;
+	this->fire_rate = 0;
 	this->tmp_rate = 0;
+	this->fire_count = 0;
 	//this->tau_syn_E = tau_syn_E;
 	//this->tau_syn_I = tau_syn_I;
 	file = NULL;
@@ -29,6 +30,7 @@ DecideNeuron::DecideNeuron(const DecideNeuron &templ) : NeuronBase()
 	fired = false;
 	this->fire_rate = templ.fire_rate;
 	this->tmp_rate = templ.tmp_rate;
+	this->fire_count = templ.fire_count;
 	monitored = templ.monitored;
 }
 
@@ -45,7 +47,8 @@ int DecideNeuron::reset(SimInfo &info)
 {
 	fired = false;
 	this->fire_count = 0;
-	this->fire_tmp_rate = 0;
+	this->fire_rate = 0;
+	this->tmp_rate = 0;
 	
 	return 0;
 }
@@ -89,10 +92,6 @@ void DecideNeuron::monitor(SimInfo &info)
 		}
 	}
 	return;
-}
-
-void DecideNeuron::setRate(real rate) {
-	this->fire_rate = rate;
 }
 
 size_t DecideNeuron::getSize() {

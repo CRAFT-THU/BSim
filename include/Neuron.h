@@ -27,4 +27,10 @@ typedef CompositeNeuron<LIFENeuron, StaticSynapse> IF_curr_exp;
 typedef CompositeNeuron<LIFENeuron, StaticSynapse> LIF_brian;
 typedef CompositeNeuron<TJNeuron, StaticSynapse> TJ_curr_static;
 
+typedef CompositeNeuron<MemNeuron, StaticSynapse> Mem;
+
+typedef CompositeNeuron<FFTNeuron, StaticSynapse> FFT;
+
+typedef CompositeNeuron<DecideNeuron, StaticSynapse> DecisionMaker;
+
 #endif /* NEURON_H */

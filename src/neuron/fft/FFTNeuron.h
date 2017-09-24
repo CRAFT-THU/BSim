@@ -2,8 +2,8 @@
  * usually just for fun
  * Wed January 06 2016
  */
-#ifndef CONSTANTNEURON_H
-#define CONSTANTNEURON_H
+#ifndef FFTNEURON_H
+#define FFTNEURON_H
 
 #include <stdio.h>
 #include <vector>
@@ -12,11 +12,11 @@
 
 using std::vector;
 
-class ConstantNeuron: public NeuronBase {
+class FFTNeuron: public NeuronBase {
 public:
-	ConstantNeuron(real fire_rate/*, real tau_syn_E = 1e-3, real tau_syn_I = 1e-3*/);
-	ConstantNeuron(const ConstantNeuron &templ);
-	~ConstantNeuron();
+	FFTNeuron();
+	FFTNeuron(const FFTNeuron &templ);
+	~FFTNeuron();
 
 	virtual Type getType();
 
@@ -30,17 +30,10 @@ public:
 	virtual int getData(void *data);
 	virtual int hardCopy(void *data, int idx, int base);
 
-	int addFireTime(int cycle);
-	void setRate(real rate);
-
 	const static Type type;
 protected:
-	//int fire_count;
-	real fire_rate;
-	//real tau_syn_E;
-	//real tau_syn_I;
-	//real _dt;
+	int fire_count;
 	FILE *file;
 };
 
-#endif /* CONSTANTNEURON_H */
+#endif /* FFTNEURON_H */

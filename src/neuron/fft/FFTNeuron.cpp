@@ -6,31 +6,29 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include "ConstantNeuron.h"
-#include "GConstantNeurons.h"
+#include "FFTNeuron.h"
+#include "GFFTNeurons.h"
 
-const Type ConstantNeuron::type = Constant;
+const Type FFTNeuron::type = FFT;
 
-ConstantNeuron::ConstantNeuron(real fire_rate/*, real tau_syn_E, real tau_syn_I*/) : NeuronBase()
+FFTNeuron::FFTNeuron() : NeuronBase()
 {
-	this->fire_rate = fire_rate;
-	//this->tau_syn_E = tau_syn_E;
-	//this->tau_syn_I = tau_syn_I;
+	this->fire_count = 0;
 	file = NULL;
 	fired = false;
 	monitored = false;
 
 }
 
-ConstantNeuron::ConstantNeuron(const ConstantNeuron &templ) : NeuronBase()
+FFTNeuron::FFTNeuron(const FFTNeuron &templ) : NeuronBase()
 {
 	file = NULL;
 	fired = false;
-	this->fire_rate = templ.fire_rate;
+	this->fire_count = templ.fire_count;
 	monitored = templ.monitored;
 }
 
-ConstantNeuron::~ConstantNeuron()
+FFTNeuron::~FFTNeuron()
 {
 	if (file != NULL) {
 		fflush(file);
@@ -39,7 +37,7 @@ ConstantNeuron::~ConstantNeuron()
 	}
 }
 
-int ConstantNeuron::reset(SimInfo &info)
+int FFTNeuron::reset(SimInfo &info)
 {
 	fired = false;
 	this->fire_count = 0;
@@ -47,16 +45,16 @@ int ConstantNeuron::reset(SimInfo &info)
 	return 0;
 }
 
-int ConstantNeuron::recv(real I) {
+int FFTNeuron::recv(real I) {
 	return 0;
 }
 
-Type ConstantNeuron::getType()
+Type FFTNeuron::getType()
 {
 	return type;
 }
 
-int ConstantNeuron::update(SimInfo &info)
+int FFTNeuron::update(SimInfo &info)
 {
 	fired = false;
 	if (info.currCycle * fire_rate > fire_count) {
@@ -68,12 +66,12 @@ int ConstantNeuron::update(SimInfo &info)
 	return 0;
 }
 
-void ConstantNeuron::monitor(SimInfo &info)
+void FFTNeuron::monitor(SimInfo &info)
 {
 	if (monitored) {
 		if (file == NULL) {
 			char filename[128];
-			sprintf(filename, "ConstantNeuron_%d.log", getID());
+			sprintf(filename, "FFTNeuron_%d.log", getID());
 			file = fopen(filename, "w+");
 			if (file == NULL) {
 				printf("Open File: %s failed\n", filename);
@@ -88,25 +86,21 @@ void ConstantNeuron::monitor(SimInfo &info)
 	return;
 }
 
-void ConstantNeuron::setRate(real rate) {
-	this->fire_rate = rate;
+
+size_t FFTNeuron::getSize() {
+	return sizeof(GFFTNeurons);
 }
 
-size_t ConstantNeuron::getSize() {
-	return sizeof(GConstantNeurons);
-}
-
-int ConstantNeuron::getData(void *data)
+int FFTNeuron::getData(void *data)
 {
 	return 0;
 }
 
-int ConstantNeuron::hardCopy(void *data, int idx, int base)
+int FFTNeuron::hardCopy(void *data, int idx, int base)
 {
-	GConstantNeurons *p = (GConstantNeurons*) data;
+	GFFTNeurons *p = (GFFTNeurons*) data;
 	setID(idx+base);
 
-	p->p_fire_rate[idx] = fire_rate;
 	p->p_fire_count[idx] = fire_count;
 
 

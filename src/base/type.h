@@ -10,6 +10,9 @@
 enum Type { 
 	Constant = 0, Poisson = 1,
 	Array,
+	Decide,
+	FFT,
+	Mem,
 	Max,
 	LIFE,
 	TJ,
