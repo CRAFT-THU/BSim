@@ -15,16 +15,22 @@ int main(int argc, char **argv)
 		load = true;
 	}
 
-	const int N = 10;
+	const int N = 3;
 	Network c;
 
-	Population<Constant_spikes> *pn0 = c.createPopulation(0, N, Constant_spikes(ConstantNeuron(0.5), 1.0, 1.0));
-	for (int i = 0; i < pn0->getNum(); i++) {
-		Constant_spikes * n = static_cast<Constant_spikes*>(pn0->getNeuron(i));
-		n->setRate((i + 0.5)/10.0);
-	}
+	Population<Constant_spikes> *pn0 = c.createPopulation(0, N, Constant_spikes(ConstantNeuron(0.2, 0, 0.101), 1.0, 1.0));
+	Constant_spikes * n = static_cast<Constant_spikes*>(pn0->getNeuron(0));
+	n->setRate(0.8);
 
-	Population<DecisionMaker> *pn1 = c.createPopulation(1, N, DecisionMaker(DecideNeuron(), 1.0, 1.0));
+	Population<Constant_spikes> *pn1 = c.createPopulation(1, N, Constant_spikes(ConstantNeuron(0.2, 0.1, 0.201), 1.0, 1.0));
+	n = static_cast<Constant_spikes*>(pn1->getNeuron(1));
+	n->setRate(0.8);
+
+	Population<Constant_spikes> *pn2 = c.createPopulation(2, N, Constant_spikes(ConstantNeuron(0.2, 0.2, 0.301), 1.0, 1.0));
+	n = static_cast<Constant_spikes*>(pn2->getNeuron(2));
+	n->setRate(0.8);
+
+	Population<DecisionMaker> *pn3 = c.createPopulation(1, N, DecisionMaker(DecideNeuron(), 1.0, 1.0));
 
 	real * weight0 = NULL;
 	real * delay = NULL;
@@ -44,12 +50,14 @@ int main(int argc, char **argv)
 	}
 
 	//Network.connect(population1, population2, weight_array, delay_array, Exec or Inhi array, num)
-	c.connectOne2One(pn0, pn1, weight0, delay, NULL, N);
+	c.connectOne2One(pn0, pn3, weight0, delay, NULL, N);
+	c.connectOne2One(pn1, pn3, weight0, delay, NULL, N);
+	c.connectOne2One(pn2, pn3, weight0, delay, NULL, N);
 
 	//STSim st(&c, 1.0e-3);
 	SGSim sg(&c, 1.0e-3);
 
-	sg.run(0.1);
+	sg.run(0.301);
 	//st.run(0.1);
 
 	if (!load) {

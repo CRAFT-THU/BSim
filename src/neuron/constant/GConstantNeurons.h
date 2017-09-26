@@ -10,6 +10,8 @@
 
 struct GConstantNeurons {
 	real *p_fire_rate;
+	int *p_start_cycle;
+	int *p_end_cycle;
 	int *p_fire_count;
 };
 

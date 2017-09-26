@@ -5,7 +5,7 @@
 
 __global__ void update_dense_static_hit(GStaticSynapses *d_synapses, int num, int start_id)
 {
-#define FAST_TEST 2
+#define FAST_TEST 3
 #if  FAST_TEST == 1
 	__shared__ int fire_neuron_id[MAXBLOCKSIZE];
 
@@ -39,6 +39,7 @@ __global__ void update_dense_static_hit(GStaticSynapses *d_synapses, int num, in
 				int nid = fire_neuron_id[i];
 				int start_loc = gConnection->delayStart[delta_t + nid * MAX_DELAY];
 				int synapseNum = gConnection->delayNum[delta_t + nid * MAX_DELAY];
+				gLayerInput[nid]++;
 				for (int j=threadIdx.x; j<synapseNum; j += blockDim.x) {
 					//int sid = gConnection->pSynapsesIdx[j+start_loc];
 					int sid = j+start_loc;
@@ -77,6 +78,9 @@ __global__ void update_dense_static_hit(GStaticSynapses *d_synapses, int num, in
 			int nid = gFiredTable[time_idx*gFiredTableCap + (block_idx)*num_per_block + idx];
 			int start_loc = gConnection->delayStart[delta_t + nid * MAX_DELAY];
 			int synapseNum = gConnection->delayNum[delta_t + nid * MAX_DELAY];
+			if (threadIdx.x == 0) {
+				gLayerInput[nid]++;
+			}
 			for (int j=threadIdx.x; j<synapseNum; j += blockDim.x) {
 				//int sid = gConnection->pSynapsesIdx[j+start_loc];
 				int sid = j+start_loc;

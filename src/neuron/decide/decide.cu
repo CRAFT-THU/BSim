@@ -21,14 +21,24 @@ __global__ void update_decide_neuron(GDecideNeurons *d_neurons, int num, int sta
 		int test_loc = 0;
 		int gnid = idx + start_id;
 
+		int max_idx = 0;
+		real max = d_neurons->p_fire_rate[0];
+		for (int i=1; i<num; i++) {
+			if (d_neurons->p_fire_rate[i] > max) {
+				max = d_neurons->p_fire_rate[i];
+				max_idx = i;
+			}
+		}
 
-		fired = (PERIOD * d_neurons->p_fire_rate[idx]) > (d_neurons->p_fire_count[idx]);
+		//fired = (PERIOD * d_neurons->p_fire_rate[idx]) > (d_neurons->p_fire_count[idx]);
+		fired = (idx == max_idx);
 		gFireCount[gnid] += fired;
 
 		d_neurons->p_tmp_rate[idx] += gNeuronInput[gnid] + gNeuronInput_I[gnid];
 
 		if (gCurrentCycle % PERIOD == 0) {
 			d_neurons->p_fire_rate[idx] = 0.5 *d_neurons->p_fire_rate[idx] + d_neurons->p_tmp_rate[idx] * 0.05;
+			d_neurons->p_tmp_rate[idx] = 0;
 			d_neurons->p_fire_count[idx] = 0;
 		}
 

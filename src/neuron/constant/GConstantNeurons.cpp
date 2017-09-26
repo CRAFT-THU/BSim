@@ -17,6 +17,8 @@ int allocConstant(void *pCpu, int N)
 {
 	GConstantNeurons *p = (GConstantNeurons *)pCpu;
 	p->p_fire_rate = (real*)malloc(N*sizeof(real));
+	p->p_start_cycle = (int*)malloc(N*sizeof(int));
+	p->p_end_cycle = (int*)malloc(N*sizeof(int));
 	p->p_fire_count = (int*)malloc(N*sizeof(int));
 	
 	return 0;
@@ -26,6 +28,8 @@ int freeConstant(void *pCpu)
 {
 	GConstantNeurons *p = (GConstantNeurons *)pCpu;
 	free(p->p_fire_rate); 
+	free(p->p_start_cycle); 
+	free(p->p_end_cycle); 
 	free(p->p_fire_count);
 
 	return 0;

@@ -14,7 +14,7 @@ using std::vector;
 
 class ConstantNeuron: public NeuronBase {
 public:
-	ConstantNeuron(real fire_rate/*, real tau_syn_E = 1e-3, real tau_syn_I = 1e-3*/);
+	ConstantNeuron(real fire_rate, real start_time = 0.0, real end_time = 1.0e9);
 	ConstantNeuron(const ConstantNeuron &templ);
 	~ConstantNeuron();
 
@@ -31,15 +31,21 @@ public:
 	virtual int hardCopy(void *data, int idx, int base);
 
 	int addFireTime(int cycle);
+
 	void setRate(real rate);
+	void setStart(real time);
+	void setEnd(real time);
 
 	const static Type type;
 protected:
-	//int fire_count;
 	real fire_rate;
-	//real tau_syn_E;
-	//real tau_syn_I;
-	//real _dt;
+	int start_cycle;
+	int end_cycle;
+
+
+	real start_time;
+	real end_time;
+
 	FILE *file;
 };
 

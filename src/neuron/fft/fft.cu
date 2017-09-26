@@ -17,7 +17,7 @@ __global__ void update_fft_neuron(GFFTNeurons *d_neurons, int num, int start_id)
 	for (int idx = tid; idx < num; idx += blockDim.x * gridDim.x) {
 		bool fired = false;
 		int test_loc = 0;
-		int res = 0;
+		real res = 0;
 		int gnid = idx + start_id;
 
 		if (idx % 2 == 0) {
@@ -26,9 +26,18 @@ __global__ void update_fft_neuron(GFFTNeurons *d_neurons, int num, int start_id)
 			res = d_neurons->p_res[idx/2].y;
 		}
 
-		fired = res > d_neurons->p_fire_count[idx];
+		fired = res > (d_neurons->p_fire_count[idx] + 0.5);
 
 		gFireCount[gnid] += fired;
+
+		int input = gNeuronInput[gnid] + gNeuronInput_I[gnid];
+		gXInput[gnid] += input;
+
+		if (idx % 2 == 0) {
+			d_neurons->p_input[idx/2].x  += input;
+		} else {
+			d_neurons->p_input[idx/2].y  += input;
+		}
 
 		if (fired) {
 			test_loc = atomicAdd((int*)&fire_cnt, 1);
@@ -37,16 +46,8 @@ __global__ void update_fft_neuron(GFFTNeurons *d_neurons, int num, int start_id)
 				d_neurons->p_fire_count[idx] = d_neurons->p_fire_count[idx] + 1;
 				fired = false;
 			}
-		} else {
-			int input = gNeuronInput[gnid] + gNeuronInput_I[gnid];
-			gXInput[gnid] += input;
-
-			if (idx % 2 == 0) {
-				d_neurons->p_input[idx/2].x  += input;
-			} else {
-				d_neurons->p_input[idx/2].y  += input;
-			}
-		}
+		} 
+		
 		__syncthreads();
 		if (fire_cnt >= MAXBLOCKSIZE) {
 			commit2globalTable(fire_table_t, MAXBLOCKSIZE, gFiredTable, &(gFiredTableSizes[gCurrentIdx]), gFiredTableCap*gCurrentIdx);
@@ -94,7 +95,7 @@ int cudaUpdateFFT(void *data, int num, int start_id, BlockSize *pSize)
 	cudaMemcpy(&tmp, p, sizeof(GFFTNeurons), cudaMemcpyDeviceToHost);
 
 	cufftHandle plan;
-	cufftPlan1d(&plan, num, CUFFT_C2C, 1);
+	cufftPlan1d(&plan, num/2, CUFFT_C2C, 1);
 	cufftExecC2C(plan, tmp.p_input, tmp.p_res, CUFFT_FORWARD);
 
 	update_fft_neuron<<<pSize->gridSize, pSize->blockSize>>>((GFFTNeurons*)data, num, start_id);

@@ -3,6 +3,7 @@
  * Tue December 15 2015
  */
 
+#include <cufft.h>
 #include "../../include/BSim.h"
 
 using namespace std;
@@ -18,13 +19,13 @@ int main(int argc, char **argv)
 	const int N = 10;
 	Network c;
 
-	Population<Constant_spikes> *pn0 = c.createPopulation(0, N, Constant_spikes(ConstantNeuron(0.5, 0, 1.001), 1.0, 1.0));
+	Population<Constant_spikes> *pn0 = c.createPopulation(0, N, Constant_spikes(ConstantNeuron(0.05, 0, 0.101), 1.0, 0.101));
 	for (int i = 0; i < pn0->getNum(); i++) {
 		Constant_spikes * n = static_cast<Constant_spikes*>(pn0->getNeuron(i));
-		n->setRate((i + 0.5)/10.0);
+		n->setRate((N/2-i)*0.04 + 0.1);
 	}
 
-	Population<Memory> *pn1 = c.createPopulation(1, N, Memory(MemNeuron(0.0), 1.0, 1.0));
+	Population<FFTCompute> *pn1 = c.createPopulation(1, N, FFTCompute(FFTNeuron(), 1.0, 1.0));
 
 	real * weight0 = NULL;
 	real * delay = NULL;
@@ -46,6 +47,7 @@ int main(int argc, char **argv)
 	//Network.connect(population1, population2, weight_array, delay_array, Exec or Inhi array, num)
 	c.connectOne2One(pn0, pn1, weight0, delay, NULL, N);
 
+	//STSim st(&c, 1.0e-3);
 	ArrayInfo zero_array = {0, NULL};
 	FireInfo fire_info;
 	fire_info["count"] = zero_array;
@@ -54,15 +56,16 @@ int main(int argc, char **argv)
 
 	SGSim sg(&c, 1.0e-3);
 
-	sg.run(1.2, fire_info);
 
+	sg.run(0.11, fire_info);
+	
 	int *rate = (int*) fire_info["count"].data;
 	//int *X = (int*) fire_info["X"].data;
 	//real *Y = (real*) fire_info["Y"].data;
 
 	printf("Input:\t");
-	for (int i=0; i<N; i++) {
-		printf("%d ", rate[i]);
+	for (int i=0; i<N/2; i++) {
+		printf("%d+%di ", rate[i*2], rate[i*2+1]);
 	}
 	printf("\n");
 
@@ -78,11 +81,35 @@ int main(int argc, char **argv)
 	//}
 	//printf("\n");
 
-	printf("Output:\t");
-	for (int i=0; i<N; i++) {
-		printf("%d ", rate[N + i]);
+	printf("Result:\t");
+	for (int i=0; i<N/2; i++) {
+		printf("%d+%di ", rate[N + i*2], rate[N + i*2 + 1]);
 	}
 	printf("\n");
+
+	cufftComplex *data_dev = NULL;
+	cufftComplex *data_Host = (cufftComplex*)malloc(N/2*sizeof(cufftComplex));
+
+	for (int i =0; i < N/2; i++)
+	{
+		data_Host[i].x = rate[i*2];
+		data_Host[i].y = rate[i*2+1];
+	}
+
+	cudaMalloc((void**)&data_dev, sizeof(cufftComplex)*N/2);
+	cudaMemcpy(data_dev, data_Host, N/2 * sizeof(cufftComplex), cudaMemcpyHostToDevice);
+
+	cufftHandle plan;
+	cufftPlan1d(&plan, N/2, CUFFT_C2C, 1);
+	cufftExecC2C(plan, data_dev, data_dev, CUFFT_FORWARD);
+	cudaMemcpy(data_Host, data_dev, N/2 * sizeof(cufftComplex), cudaMemcpyDeviceToHost);
+
+	printf("Check:\t");
+	for (int i=0; i<N/2; i++) {
+		printf("%f+%fi ", data_Host[i].x, data_Host[i].y);
+	}
+	printf("\n");
+
 
 	//if (!load) {
 	//	printf("SAVE DATA...\n");

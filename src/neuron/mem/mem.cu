@@ -20,10 +20,12 @@ __global__ void update_mem_neuron(GMemNeurons *d_neurons, int num, int start_id)
 		int gnid = idx + start_id;
 
 
-		fired = (gCurrentCycle * d_neurons->p_fire_rate[idx]) > (d_neurons->p_fire_count[idx]);
+		//fired = (gCurrentCycle * d_neurons->p_fire_rate[idx]) > (d_neurons->p_fire_count[idx]);
+		d_neurons->p_fire_rate[idx] = d_neurons->p_fire_rate[idx] + gNeuronInput[gnid] + gNeuronInput_I[gnid];
+		fired = d_neurons->p_fire_rate[idx] > d_neurons->p_fire_count[idx];
 		gFireCount[gnid] += fired;
 
-		d_neurons->p_fire_rate[idx] = (d_neurons->p_fire_rate[idx] * (gCurrentCycle) + gNeuronInput[gnid] + gNeuronInput_I[gnid])/(gCurrentCycle + 1);
+		//d_neurons->p_fire_rate[idx] = (d_neurons->p_fire_rate[idx] * (gCurrentCycle) + gNeuronInput[gnid] + gNeuronInput_I[gnid])/(gCurrentCycle + 1);
 
 		for (int i=0; i<2; i++) {
 			if (fired) {
@@ -43,6 +45,9 @@ __global__ void update_mem_neuron(GMemNeurons *d_neurons, int num, int start_id)
 			}
 			__syncthreads();
 		}
+
+		gXInput[gnid] += gNeuronInput[gnid] + gNeuronInput_I[gnid];
+
 		gNeuronInput[gnid] = 0;
 		gNeuronInput_I[gnid] = 0;
 		__syncthreads();

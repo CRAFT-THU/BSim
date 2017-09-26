@@ -1,7 +1,7 @@
 
 #include "../../gpu_utils/runtime.h"
 
-#include "GConstant.h"
+#include "GConstantNeurons.h"
 
 __global__ void update_constant_neuron(GConstantNeurons *d_neurons, int num, int start_id)
 {
@@ -18,7 +18,7 @@ __global__ void update_constant_neuron(GConstantNeurons *d_neurons, int num, int
 		bool fired = false;
 		int test_loc = 0;
 
-		fired = (gCurrentCycle * d_neurons->p_fire_rate[idx]) > (d_neurons->p_fire_count[idx]);
+		fired = (gCurrentCycle < d_neurons->p_end_cycle[idx]) && (((gCurrentCycle - d_neurons->p_start_cycle[idx]) * d_neurons->p_fire_rate[idx]) > (d_neurons->p_fire_count[idx]));
 		gFireCount[start_id + idx] += fired;
 
 		for (int i=0; i<2; i++) {
