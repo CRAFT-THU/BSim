@@ -1,47 +1,38 @@
 @neuron IF_curr_exp:    # Define the neuron type
-begin
 	@parameter:         # Neuron parameters
 		real : i_offset, i_injection, cm, tau_m, tau_e, tau_i, vm, v_thresh, v_reset, v_reset, i_E, i_I
 		int : refrac_time, refrac_step 
 	@func update: 	    # Neuron update function
-	begin
-	    @input:         # Excitatory and inhibitory input currents,
+		@input:         # Excitatory and inhibitory input currents,
 			real: e_input, i_input, dt   # timestep 
-	    @output:        # Whether the neuron fires or not
+		@output:        # Whether the neuron fires or not
 			boolean : fired	                      
-        real rm = tau_m / cm
-        if refrac_step <= 0:
-	    	vm = exp(-dt/tau_m)*vm + (1-exp(-dt/tau_m))*((i_offset+ i_injection)*rm+v_rest) + rm*tau_e/(tau_e每tau_m)*(exp(-dt/tau_e)每exp(-dt/tau_m))*i_E + rm*tau_i/(tau_i每tau_m)*(exp(-dt/tau_i)每exp(-dt/tau_m))*i_I
-	    	i_E = exp(-dt/tau_e) * i_E
-	    	i_I = exp(-dt/tau_i) * i_I
-        else:
-	    	refract_step = refract_step - 1
-        endif
-	    fired = (vm >= v_thresh)
-        if (fired):
-	    	refract_step = refract_time
-	    	vm = v_reset
-        else:
-	    	i_E += e_input
-	    	i_I += i_input
-        endif
-	    e_input = 0
-	    i_input = 0
-	end
-end
+        	real rm = tau_m / cm
+        	if refrac_step <= 0:
+	    		vm = exp(-dt/tau_m)*vm + (1-exp(-dt/tau_m))*((i_offset+ i_injection)*rm+v_rest) + rm*tau_e/(tau_e每tau_m)*(exp(-dt/tau_e)每exp(-dt/tau_m))*i_E + rm*tau_i/(tau_i每tau_m)*(exp(-dt/tau_i)每exp(-dt/tau_m))*i_I
+	    		i_E = exp(-dt/tau_e) * i_E
+	    		i_I = exp(-dt/tau_i) * i_I
+        	else:
+	    		refract_step = refract_step - 1
+	    	fired = (vm >= v_thresh)
+        	if (fired):
+	    		refract_step = refract_time
+	    		vm = v_reset
+        	else:
+	    		i_E += e_input
+	    		i_I += i_input
+	    	e_input = 0
+	    	i_input = 0
+
 @synapse StaticSynpase: # Define the synapse type
-begin
 	@parameter:         # Synapse parameters
 		real : weight  
 	@func update:       # Synapse update function 
-	begin
-  	    @output:        # Input current to destination neuron
+		@output:        # Input current to destination neuron
 			real:i_syn
-	    i_syn = weight
-	end
-end
+		i_syn = weight
+
 @backward:              # Define the BP function
-begin
 	@input:             # These symbols have same meanings with
 		real array: 汛_l_1, W, b, i_input, fire_rate # that of ANN
 		real: lr        # Learning rate
