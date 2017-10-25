@@ -25,9 +25,9 @@ def generate_h_file(paras, type_name, type_type, path_name):
     f.write("public:\n")
 
     f.write("\t" + obj_type + "(ID id")
-    for para in paras:
-        t = paras[para]
-        f.write(", " + t + " " + para)
+    for t in paras:
+        for para in paras[t]:
+            f.write(", " + t + " " + para)
         if type_type == "Synapse":
             f.write(", real delay, real tau_syn")
     f.write(");\n")
@@ -60,9 +60,9 @@ def generate_h_file(paras, type_name, type_type, path_name):
     f.write("\tconst static Type type;\n")
     f.write("protected:")
     f.write('\n')
-    for para in paras:
-        t = paras[para]
-        f.write("\t" + t + " _" + para + ";\n")
+    for t in paras:
+        for para in paras[t]:
+            f.write("\t" + t + " _" + para + ";\n")
 
     if type_type == "Synapse":
         f.write("\tlist<int> delay_queue;\n")
@@ -94,16 +94,16 @@ def generate_cpp_file(paras, type_name, type_type, path_name):
     f.write("\n")
 
     f.write(obj_type + "::" + obj_type + "(ID id")
-    for para in paras:
-        t = paras[para]
-        f.write(", " + t + " " + para)
+    for t in paras:
+        for para in paras[t]:
+            f.write(", " + t + " " + para)
         if type_type == "Synapse":
             f.write(", real delay, real tau_syn")
     f.write(")\n")
     f.write("\t: " + type_type + "Base(id)")
-    for para in paras:
-        t = paras[para]
-        f.write(", _" + para + "(" + para + ")")
+    for t in paras:
+        for para in paras[t]:
+            f.write(", _" + para + "(" + para + ")")
     f.write("\n")
     f.write("{\n")
     f.write("\tthis->monitored = false;\n")
@@ -112,9 +112,9 @@ def generate_cpp_file(paras, type_name, type_type, path_name):
 
     f.write(obj_type + "::" + obj_type + "(const " + obj_type + " &" + type_type.lower() + ", ID id) : " + type_type + "Base(id)\n")
     f.write("{\n")
-    for para in paras:
-        t = paras[para]
-        f.write("\tthis->_" + para + " = " + type_type.lower() + "._" + para + ";\n")
+    for t in paras:
+        for para in paras[t]:
+            f.write("\tthis->_" + para + " = " + type_type.lower() + "._" + para + ";\n")
     f.write("\tthis->monitored = false;\n")
     f.write("}\n\n")
 
@@ -169,8 +169,9 @@ def generate_cpp_file(paras, type_name, type_type, path_name):
     f.write("{\n")
     f.write("\tJson::Value *p = (Json::Value *)data;\n")
     f.write('\t(*p)["id"] = getID().getId();\n')
-    for para in paras:
-        f.write('\t(*p)["' + para + '"] = _' + para + ";\n")
+    for t in paras:
+        for para in paras[t]:
+            f.write('\t(*p)["' + para + '"] = _' + para + ";\n")
     f.write("\n")
     f.write("\treturn 0;\n")
     f.write("}\n\n")
@@ -181,8 +182,9 @@ def generate_cpp_file(paras, type_name, type_type, path_name):
     f.write("\tid2idx[getID()] = idx + base;\n")
     f.write("\tsetIdx(idx+base);\n")
     f.write("\tidx2id[idx+base] = getID();\n")
-    for para in paras:
-        f.write("\tp->p_" + para + "[idx] = _" + para + ";\n")
+    for t in paras:
+        for para in paras[t]:
+            f.write("\tp->p_" + para + "[idx] = _" + para + ";\n")
     f.write("\n")
     f.write("\treturn 1;\n")
     f.write("}\n\n")

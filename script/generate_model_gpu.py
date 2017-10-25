@@ -16,9 +16,9 @@ def generate_h_file(paras, type_name, type_type, path_name):
     f.write('\n')
 
     f.write("struct " + obj_type + " {\n")
-    for para in paras:
-        t = paras[para]
-        f.write("\t" + t + " *p_" + para + ";\n")
+    for t in paras:
+        for para in paras[t]:
+            f.write("\t" + t + " *p_" + para + ";\n")
 
     if type_type == "Synapses":
         f.write("\tint *pDst;\n")
@@ -31,8 +31,6 @@ def generate_h_file(paras, type_name, type_type, path_name):
     f.write('\n')
 
     f.write("#endif /* " + obj_type.upper() + "_H */\n")
-
-        
 
     f.close()
 
@@ -56,9 +54,9 @@ def generate_cpp_file(paras, type_name, type_type, path_name):
     f.write("{\n")
     f.write("\t" + obj_type + " *p = " + "(" + obj_type + "*)pCpu;\n")
 
-    for para in paras:
-        t = paras[para]
-        f.write("\tp->p_" + para + " = (" + t + "*)malloc(N*sizeof(" + t + "));\n")
+    for t in paras:
+        for para in paras[t]:
+            f.write("\tp->p_" + para + " = (" + t + "*)malloc(N*sizeof(" + t + "));\n")
         
     if type_type == "Synapses":
         f.write("\tp->pDst = (int *)malloc(N*sizeof(int));\n")
@@ -70,8 +68,9 @@ def generate_cpp_file(paras, type_name, type_type, path_name):
     f.write("{\n")
     f.write("\t" + obj_type + " *pCpu" + type_type + " = " + "(" + obj_type + "*)pCpu;\n")
 
-    for para in paras:
-        f.write("\t" + "free(" + "pCpu" +  type_type + "->p_" + para + ");\n")
+    for t in paras:
+        for para in paras[t]:
+            f.write("\t" + "free(" + "pCpu" +  type_type + "->p_" + para + ");\n")
 
     if type_type == "Synapses":
         f.write("\t" + "free(" + "pCpu" +  type_type + "->pDst);\n")
@@ -108,9 +107,9 @@ def generate_cu_file(paras, type_name, type_type, path_name):
     f.write("\t" + obj_type + " *pGpu" + type_type + " = " + "(" + obj_type + "*)pGpu;\n")
     f.write("\t" + obj_type + " *p = " + "(" + obj_type + "*)pCpu;\n")
 
-    for para in paras:
-        t = paras[para]
-        f.write("\t" + "pGpu" +  type_type + "->p_" + para + " = copyToGPU<" + t + ">(p->p_" + para + ", num);\n")
+    for t in paras:
+        for para in paras[t]:
+            f.write("\t" + "pGpu" +  type_type + "->p_" + para + " = copyToGPU<" + t + ">(p->p_" + para + ", num);\n")
 
     if type_type == "Synapses":
         f.write("\t" + "pGpu" +  type_type + "->pDst = copyToGPU<int>(p->pDst, num);\n")
@@ -123,8 +122,9 @@ def generate_cu_file(paras, type_name, type_type, path_name):
     f.write("{\n")
     f.write("\t" + obj_type + " *pGpu" + type_type + " = " + "(" + obj_type + "*)pGpu;\n")
 
-    for para in paras:
-        f.write("\t" + "gpuFree(" + "pGpu" +  type_type + "->p_" + para + ");\n")
+    for t in paras:
+        for para in paras[t]:
+            f.write("\t" + "gpuFree(" + "pGpu" +  type_type + "->p_" + para + ");\n")
         
     if type_type == "Synapses":
         f.write("\t" + "gpuFree(" + "pGpu" +  type_type + "->pDst);\n")

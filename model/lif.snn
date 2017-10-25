@@ -1,4 +1,4 @@
-@neuron IF_curr_exp:    # Define the neuron type
+@neuron LIFCurrExp:    # Define the neuron type
 	@parameter:         # Neuron parameters
 		real : i_offset, i_injection, cm, tau_m, tau_e, tau_i, vm, v_thresh, v_reset, v_reset, i_E, i_I
 		int : refrac_time, refrac_step 

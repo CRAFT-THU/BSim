@@ -1,0 +1,7 @@
+@synapse Static: # Define the synapse type
+	@parameter:         # Synapse parameters
+		real : weight  
+	@func update:       # Synapse update function 
+		@output:        # Input current to destination neuron
+			real:i_syn
+		i_syn = weight

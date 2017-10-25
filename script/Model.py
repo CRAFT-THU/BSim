@@ -1,41 +1,145 @@
 
+import os
 import re 
 
+import generate_model_cpu
+import generate_model_gpu
+import generate_func_gpu
+
 class Func:
-    
-    def __init__(self, name, func_type):
+    def __init__(self, name):
         self.name = name
         self.output = {}
         self.input = {}
-        self.operation = []
+        self.body = []
 
-    def load_func(content):
-        return None
+    def load_input(self, content):
+        self.input = parase_para(content)
 
+    def load_output(self, content):
+        self.output = parase_para(content)
+
+    def load_operation(self, content):
+        self.body = content
+        
+    def load_none(self, name):
+        return
+
+    def load_error(self, name):
+        print "Unsupported " + name + " defined in function " + self.name 
+        return self.load_none
+
+    def load_type(self, content, type_name):
+        load_types = {'input':self.load_input, 'output':self.load_output, 'body':self.load_operation}
+        if type_name in load_types:
+            load_types[type_name](content) 
+        else:
+            self.load_error(type_name)
+
+    def load_content(self, content):
+        blocks = parase_blocks(content)
+
+        for block in blocks:
+            block_obj = re.search('@(\w*)\W*(\w*)', block)
+            if block_obj == None:
+                continue
+
+            block_type = block_obj.group(1)
+            block_name = block_obj.group(2)
+            self.load_type(blocks[block], block_type)
 
 
 class Model:
 
-    def __init__(self, name, model_type):
+    def __init__(self, model_type, name, model):
         self.name = name
         self.type = model_type
-        self.para = {}
-        self.func = []
+        self.paras = {}
+        self.funcs = []
+        self.model = model
 
+    def __init__(self, filename):
+        f = open(filename)
+        self.__init__(f.readlines())
 
-    def load_para(content):
-        self.para = parase_para(content)
+    def __init__(self, content):
 
-    def load_func(func):
-        self.func.append(func)
+        if type(content) == str and os.path.exists(content):
+            content = open(content).readlines()
 
-
-
-    def load_model(content):
         blocks = parase_blocks(content)
 
-        for block in blocks:
+        if len(blocks) != 1:
+            print "Don't support load multiple or None Models yet"
+            self.name = 'Unknown'
+            self.type = 'Unknown'
+            self.model = ''
+        else: 
+            for block in blocks:
+                block_obj = re.search('@(\w*)\W*(\w*)', block)
+                if block_obj == None:
+                    continue
 
+                self.type = block_obj.group(1)
+                self.name = block_obj.group(2)
+                self.model = blocks[block]
+
+        self.paras = {}
+        self.funcs = []
+
+        self.build_model()
+
+    def load_para(self, content, name):
+        self.paras = parase_para(content)
+
+    def load_func(self, content, name):
+        func = Func(name)
+        func.load_content(content)
+        self.funcs.append(func)
+
+    def load_none(self, content, name):
+        return
+
+    def load_error(self, name):
+        print "Unsupported " + name + " defined in " + self.type + " " + self.name 
+        return self.load_none
+
+
+    def load_type(self, content, type_name, name):
+        load_types = {'parameter':self.load_para, 'func':self.load_func}
+        if type_name in load_types:
+            load_types[type_name](content, name) 
+        else:
+            self.load_error(type_name)
+
+    def build_model(self):
+        blocks = parase_blocks(self.model)
+
+        for block in blocks:
+            block_obj = re.search('@(\w*)\W*(\w*)', block)
+            if block_obj == None:
+                continue
+
+            block_type = block_obj.group(1)
+            block_name = block_obj.group(2)
+            self.load_type(blocks[block], block_type, block_name)
+
+    def gen_code(self):
+        type_name = self.name#.capitalize() 
+        type_type = self.type.capitalize()
+        path_name = "./" + type_type.lower() + "/" + type_name
+
+        if not os.path.exists(path_name):
+            os.makedirs(path_name)
+
+
+        generate_type_cpu.generate_h_file(self.paras, type_name, type_type, path_name)
+        generate_type_cpu.generate_cpp_file(self.paras, type_name, type_type, path_name)
+
+        type_type += "s"
+        generate_type_gpu.generate_h_file(self.paras, type_name, type_type, path_name)
+        generate_type_gpu.generate_cpp_file(self.paras, type_name, type_type, path_name)
+        generate_type_gpu.generate_cu_file(self.paras, type_name, type_type, path_name)
 
 def parase_blocks(content):
     blocks = {}
@@ -58,33 +162,43 @@ def parase_blocks(content):
                 block.append(line)
             elif (offset == std_offset):
                 if len(block) > 0:
-                    blocks[block_meta] = block
-                block_meta = line
-                block = []
+                    if block_meta in blocks:
+                        blocks[block_meta].extend(block)
+                    else:
+                        blocks[block_meta] = block
+
+                if re.search('@', line) != None:
+                    block_meta = line
+                    block = []
+                else:
+                    block_meta = '@body:'
+                    block = [line]
+
             else:
                 print "Wrong style: Outer block inside a block"
 
     if len(block) > 0:
-        blocks[block_meta] = block
+        if block_meta in blocks:
+            blocks[block_meta].extend(block)
+        else:
+            blocks[block_meta] = block
 
     return blocks
-
-
 
 def parase_para(content):
     para = {}
     for line in content:
         line_obj = re.search('(\S[^#]*)#?', line)
-        if not line_obj:
+        if line_obj == None:
             continue
 
         line = line_obj.group(1)
 
         para_obj = re.search('(\S*)\s*:\s*(\S.*)', line)
 
-        if not para_obj:
+        if para_obj == None:
             print "Parameter style wrong!"
 
         para[para_obj.group(1)] = para_obj.group(2).split(', ')
 
-        return para
+    return para
