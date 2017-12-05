@@ -2,9 +2,9 @@
 import os
 import re 
 
-import generate_model_cpu
-import generate_model_gpu
-import generate_func_gpu
+import generate_model_cpu as gmc
+import generate_model_gpu as gmg
+import generate_kernel_gpu as gkg
 
 class Func:
     def __init__(self, name):
@@ -58,9 +58,9 @@ class Model:
         self.funcs = []
         self.model = model
 
-    def __init__(self, filename):
-        f = open(filename)
-        self.__init__(f.readlines())
+    #def __init__(self, filename):
+    #    f = open(filename)
+    #    self.__init__(f.readlines())
 
     def __init__(self, content):
 
@@ -133,13 +133,16 @@ class Model:
             os.makedirs(path_name)
 
 
-        generate_type_cpu.generate_h_file(self.paras, type_name, type_type, path_name)
-        generate_type_cpu.generate_cpp_file(self.paras, type_name, type_type, path_name)
+        gmc.generate_h_file(self.paras, type_name, type_type, path_name)
+        gmc.generate_cpp_file(self.paras, type_name, type_type, path_name)
 
         type_type += "s"
-        generate_type_gpu.generate_h_file(self.paras, type_name, type_type, path_name)
-        generate_type_gpu.generate_cpp_file(self.paras, type_name, type_type, path_name)
-        generate_type_gpu.generate_cu_file(self.paras, type_name, type_type, path_name)
+        gmg.generate_h_file(self.paras, type_name, type_type, path_name)
+        gmg.generate_cpp_file(self.paras, type_name, type_type, path_name)
+        gmg.generate_cu_file(self.paras, type_name, type_type, path_name)
+
+        gkg.generate_h_file(self.paras, type_name, type_type, path_name)
+        gkg.generate_cu_file(self.paras, type_name, type_type, path_name)
 
 def parase_blocks(content):
     blocks = {}

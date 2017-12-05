@@ -18,3 +18,8 @@ build/*
 !build
 src/utils/TypeFunc.cpp
 src/utils/TypeFunc.cu
+*.tmp
+*.swp
+*.test
+*.data
+*.pyc
