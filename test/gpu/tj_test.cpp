@@ -18,7 +18,7 @@ int main(int argc, char **argv)
 	const int N = 500;
 	Network c;
 
-	Population<Constant_curr_exp> *pn0 = c.createPopulation(0, 784, Constant_curr_exp(ConstantNeuron(256.0/1000.0), 1.0, 1.0));
+	Population<Constant_spikes> *pn0 = c.createPopulation(0, 784, Constant_spikes(ConstantNeuron(256.0/1000.0), 1.0, 1.0));
 	Population<TJ_curr_static> *pn1 = c.createPopulation(1, 128, TJ_curr_static(TJNeuron(0.0, 0.0, 1.0e-1, 0.0, 15.0e-3, 0.0e-3), 1.0, 1.0));
 	Population<TJ_curr_static> *pn2 = c.createPopulation(2, 32, TJ_curr_static(TJNeuron(0.0, 0.0, 1.0e-1, 0.0, 15.0e-3, 0.0e-3), 1.0, 1.0));
 	Population<TJ_curr_static> *pn3 = c.createPopulation(3, 10, TJ_curr_static(TJNeuron(0.0, 0.0, 1.0e-1, 0.0, 15.0e-3, 0.0e-3), 1.0, 1.0));
@@ -49,10 +49,19 @@ int main(int argc, char **argv)
 	c.connect(pn0, pn1, weight0, delay, NULL, 784*128);
 	c.connect(pn1, pn2, weight1, delay, NULL, 128*32);
 	c.connect(pn2, pn3, weight2, delay, NULL, 32*10);
+
 	STSim st(&c, 1.0e-3);
 	SGSim sg(&c, 1.0e-3);
-	sg.run(0.1);
+
+	ArrayInfo zero_array = {0, NULL};
+	FireInfo fire_info;
+	fire_info["count"] = zero_array;
+
+	sg.run(0.1, fire_info);
 	st.run(0.1);
+
+	logFireInfo(fire_info, "count", "fire");
+
 
 	if (!load) {
 		printf("SAVE DATA...\n");

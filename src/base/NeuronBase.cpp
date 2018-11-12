@@ -12,7 +12,8 @@ NeuronBase::NeuronBase(int node) : Base(node)
 {
 	fired = false;
 	monitored = false;
-	fireCount = 0;
+	fire_count = 0;
+	input_current = 0.0;
 	//_start_E = -1;
 	//_start_I = -1;
 	//_end = -1;
@@ -30,7 +31,12 @@ bool NeuronBase::isFired()
 
 int NeuronBase::getFireCount() 
 {
-	return fireCount;
+	return fire_count;
+}
+
+real NeuronBase::getInputCurrent()
+{
+	return input_current;
 }
 
 void NeuronBase::monitorOn() 

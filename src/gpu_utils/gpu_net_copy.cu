@@ -1,5 +1,5 @@
 
-#include "../neuron/GLIFENeurons.h"
+#include "../neuron/lif/GLIFENeurons.h"
 #include "../utils/TypeFunc.h"
 #include "mem_op.h"
 #include "gpu_func.h"

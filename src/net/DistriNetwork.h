@@ -23,6 +23,7 @@ struct DistriNetwork {
 	int _sim_cycle;
 	int _node_idx;
 	int _node_num;
+	real _dt;
 	GNetwork * _network;
 	CrossNodeMap *_crossnode_map;
 	//CrossNodeData *_crossnode_data;

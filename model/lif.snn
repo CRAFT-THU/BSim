@@ -1,0 +1,26 @@
+@neuron LIFCurrExp:    # Define the neuron type
+	@parameter:         # Neuron parameters
+		real : i_offset, i_injection, cm, tau_m, tau_e, tau_i, vm, v_thresh, v_reset, v_reset, i_E, i_I
+		int : refrac_time, refrac_step 
+	@func update: 	    # Neuron update function
+		@input:         # Excitatory and inhibitory input currents,
+			real: e_input, i_input, dt   # timestep 
+		@output:        # Whether the neuron fires or not
+			boolean : fired	                      
+		real rm = tau_m / cm
+		if refrac_step <= 0:
+			vm = exp(-dt/tau_m)*vm + (1-exp(-dt/tau_m))*((i_offset+ i_injection)*rm+v_rest) + rm*tau_e/(tau_e–tau_m)*(exp(-dt/tau_e)–exp(-dt/tau_m))*i_E + rm*tau_i/(tau_i–tau_m)*(exp(-dt/tau_i)–exp(-dt/tau_m))*i_I
+			i_E = exp(-dt/tau_e) * i_E
+			i_I = exp(-dt/tau_i) * i_I
+		else:
+			refract_step = refract_step - 1
+		fired = (vm >= v_thresh)
+		if (fired):
+			refract_step = refract_time
+			vm = v_reset
+		else:
+			i_E += e_input
+			i_I += i_input
+		e_input = 0
+		i_input = 0
+

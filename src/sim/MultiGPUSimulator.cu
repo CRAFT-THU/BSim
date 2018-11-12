@@ -14,7 +14,8 @@
 #include "../gpu_utils/mem_op.h"
 #include "../gpu_utils/gpu_func.h"
 #include "../gpu_utils/gpu_utils.h"
-#include "../gpu_utils/gpu_kernel.h"
+#include "../gpu_utils/runtime.h"
+#include "../gpu_utils/GBuffers.h"
 #include "../net/MultiNetwork.h"
 #include "MultiGPUSimulator.h"
 
@@ -35,7 +36,7 @@ MultiGPUSimulator::~MultiGPUSimulator()
 
 void *run_thread(void *para);
 
-int MultiGPUSimulator::run(real time)
+int MultiGPUSimulator::run(real time, FireInfo &log)
 {
 	int sim_cycle = round(time/dt);
 	reset();
@@ -73,6 +74,8 @@ int MultiGPUSimulator::run(real time)
 		node_nets[i]._sim_cycle = sim_cycle;
 		node_nets[i]._node_idx = i;
 		node_nets[i]._node_num = device_count;
+		node_nets[i]._dt = dt;
+
 
 		int ret = pthread_create(&(thread_ids[i]), NULL, &run_thread, (void*)&(node_nets[i]));
 		assert(ret == 0);
@@ -121,14 +124,13 @@ void * run_thread(void *para) {
 
 	init_connection<<<1, 1>>>(c_pGpuNet->pN2SConnection);
 
-	GBuffers *buffers = alloc_buffers(allNeuronNum, nodeSynapseNum, MAX_DELAY);
+	GBuffers *buffers = alloc_buffers(allNeuronNum, nodeSynapseNum, MAX_DELAY, network->_dt);
 
 	BlockSize *updateSize = getBlockSize(allNeuronNum, nodeSynapseNum);
 
 #ifdef LOG_DATA
 	real *c_vm = hostMalloc<real>(nodeNeuronNum);
 	int life_idx = getIndex(pCpuNet->nTypes, nTypeNum, LIFE);
-	int lif_idx = getIndex(pCpuNet->nTypes, nTypeNum, LIF);
 	int copy_idx = -1;
 	real *c_g_vm = NULL;
 
@@ -136,10 +138,6 @@ void * run_thread(void *para) {
 		GLIFENeurons *c_g_lif = copyFromGPU<GLIFENeurons>(static_cast<GLIFENeurons*>(c_pGpuNet->pNeurons[life_idx]), 1);
 		c_g_vm = c_g_lif->p_vm;
 		copy_idx = life_idx;
-	} else if (lif_idx >= 0) {
-		GLIFNeurons *c_g_lif = copyFromGPU<GLIFNeurons>(static_cast<GLIFNeurons*>(c_pGpuNet->pNeurons[lif_idx]), 1);
-		c_g_vm = c_g_lif->p_vm;
-		copy_idx = lif_idx;
 	} else {
 	}
 #endif

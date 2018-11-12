@@ -10,14 +10,13 @@
 enum Type { 
 	Constant = 0, Poisson = 1,
 	Array,
+	Decide,
+	FFT,
+	Mem,
 	Max,
-	LIF, 
 	LIFE,
 	TJ,
-	Exp,
 	Static,
-       	/*Basic, Alpha,*/
-	/*Nengo, Probe, Lowpass,*/ 
 	TYPESIZE
 }; 
 

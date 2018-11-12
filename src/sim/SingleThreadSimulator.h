@@ -11,7 +11,9 @@ class SingleThreadSimulator : public SimulatorBase {
 public:
 	SingleThreadSimulator(Network *network, real dt);
 	~SingleThreadSimulator();
-	virtual int run(real time);
+
+	using SimulatorBase::run;
+	virtual int run(real time, FireInfo &log);
 };
 
 #endif /* SINGLETHREADSIMULATOR_H */

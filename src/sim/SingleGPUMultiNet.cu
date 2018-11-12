@@ -6,11 +6,13 @@
 
 #include "../utils/utils.h"
 #include "../utils/TypeFunc.h"
+#include "../net/MultiNetwork.h"
 #include "../gpu_utils/mem_op.h"
+#include "../gpu_utils/runtime.h"
 #include "../gpu_utils/gpu_func.h"
 #include "../gpu_utils/gpu_utils.h"
-#include "../gpu_utils/gpu_kernel.h"
-#include "../net/MultiNetwork.h"
+#include "../gpu_utils/GBuffers.h"
+
 #include "MultiGPUSimulator.h"
 
 CrossNodeData * global_cross_data;
@@ -102,7 +104,7 @@ int MultiGPUSimulator::single_run(real time)
 		assert(v_file != NULL);
 		v_files[i] = v_file;
 
-		node_buffers[i] = alloc_buffers(allNeuronNum, nodeSynapseNum, MAX_DELAY);
+		node_buffers[i] = alloc_buffers(allNeuronNum, nodeSynapseNum, MAX_DELAY, dt);
 		node_update_sizes[i] = getBlockSize(allNeuronNum, nodeSynapseNum);
 		c_g_cross_ids[i] = gpuMalloc<int>(global_cross_data[dataIdx]._max_n_num); 
 		copy_idxs[i] = getIndex(pCpuNet->nTypes, nTypeNum, LIFE);

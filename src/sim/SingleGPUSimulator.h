@@ -11,7 +11,9 @@ class SingleGPUSimulator : public SimulatorBase {
 public:
 	SingleGPUSimulator(Network *network, real dt);
 	~SingleGPUSimulator();
-	virtual int run(real time);
+
+	using SimulatorBase::run;
+	virtual int run(real time, FireInfo &log);
 	//int compare_run(real time);
 	//int cudaAllocGlobal();
 	//int cudaFreeGlobal();

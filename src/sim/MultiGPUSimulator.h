@@ -11,7 +11,8 @@ class MultiGPUSimulator : public SimulatorBase {
 public:
 	MultiGPUSimulator(Network *network, real dt);
 	~MultiGPUSimulator();
-	virtual int run(real time);
+	using SimulatorBase::run;
+	virtual int run(real time, FireInfo &log);
 	virtual int single_run(real time);
 	int init(int argc, char**argv);
 protected:

@@ -40,6 +40,30 @@ GNetwork *initGNetwork(int ntype_num, int stype_num) {
 	return ret_net;
 }
 
+
+void freeGNetwork(GNetwork * network)
+{
+	for (int i=0; i<network->nTypeNum; i++) {
+		freeType[network->nTypes[i]](network->pNeurons[i]);
+	}
+	free(network->pNeurons);
+
+	for (int i=0; i<network->sTypeNum; i++) {
+		freeType[network->sTypes[i]](network->pSynapses[i]);
+	}
+	free(network->pSynapses);
+
+	free(network->pN2SConnection->delayStart);
+	free(network->pN2SConnection->delayNum);
+	free(network->pN2SConnection);
+
+	free(network->neuronNums);
+	free(network->synapseNums);
+
+	free(network->nTypes);
+	free(network->sTypes);
+}
+
 int copyNetwork(GNetwork *dNet, GNetwork *sNet, int rank, int rankSize)
 {
 	dNet->pNeurons = sNet->pNeurons;

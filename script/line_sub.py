@@ -35,7 +35,7 @@ def main(argv):
     usuage_msg = sys.argv[0] + ' -1 <file1> -2 <file2>'
 
     try:
-        opts, args = getopt.getopt(argv,"hi:o:",["ifile=","ofile="])
+        opts, args = getopt.getopt(argv,"h1:2:",["ifile=","ofile="])
     except getopt.GetoptError:
         print usuage_msg
         sys.exit(2)

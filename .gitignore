@@ -6,6 +6,7 @@ obj/
 bin/
 *.log
 *.res
+*.npy
 CMakeCache.txt 
 CMakeFiles/ 
 cmake_install.cmake
@@ -17,3 +18,8 @@ build/*
 !build
 src/utils/TypeFunc.cpp
 src/utils/TypeFunc.cu
+*.tmp
+*.swp
+*.test
+*.data
+*.pyc

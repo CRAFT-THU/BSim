@@ -17,9 +17,21 @@ SimulatorBase::~SimulatorBase()
 
 int SimulatorBase::reset()
 {
-	SimInfo info = { 0, dt };
+	SimInfo info;
+	info.currCycle = 0;
+	info.dt = dt;
 
 	network->reset(info);
 
 	return 0;
+}
+
+int SimulatorBase::run (real time) {
+	FireInfo fire_info;
+	ArrayInfo zero_array = {0, NULL};
+	fire_info["count"] = zero_array;
+	int ret = run(time, fire_info);
+	logFireInfo(fire_info, "count", "GFire");
+
+	return ret;
 }

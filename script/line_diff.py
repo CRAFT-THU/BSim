@@ -4,7 +4,7 @@ import sys, getopt
 import re
 import ast
 
-def column_sub(file1="", file2=""):
+def line_diff(file1="", file2=""):
     infile1 = open(file1, "r+")
     infile2 = open(file2, "r+")
     outfile = open("diff.res", "w+")
@@ -20,20 +20,20 @@ def column_sub(file1="", file2=""):
         line1 = l1.strip()
         string0 = filter(None, re.split(r'\s*[;,:\s]\s*', line0))
         string1 = filter(None, re.split(r'\s*[;,:\s]\s*', line1))
-        data0 = map(ast.literal_eval, string0)
-        data1 = map(ast.literal_eval, string1)
+        set0 = set(string0)
+        set1 = set(string1)
 
-        assert len(data0)==len(data1)
 
         outfile.write('Line ' + str(linenum) + ' \t')
-        columnum = 0
-        for i,j in zip(data0, data1):
-            diff = i-j
-            if abs(diff) > 1e-10:
-                diffed = True
-                outfile.write(str(columnum) + ':' + str(diff) + ' \t');
-            columnum = columnum + 1
+        diff0 = set0 - set1
+        diff1 = set1 - set0
+        outfile.write('+++\t' + diff1)
+        outfile.write('---\t' + diff0)
         outfile.write('\n')
+
+        if (len(diff0) > 0 or len(diff1) > 0):
+            diffed = True
+
         linenum = linenum + 1
 
     if diffed:
