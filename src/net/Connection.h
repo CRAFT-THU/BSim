@@ -10,6 +10,9 @@ struct N2SConnection {
 	//int synapsesNum; 
 	int *delayStart;
 	int *delayNum;
+	int *rev_delayStart;
+	int *rev_delayNum;
+	int *rev_map2sid;
 
 	int n_num;
 	int s_num;

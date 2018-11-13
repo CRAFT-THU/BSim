@@ -17,6 +17,9 @@ extern __device__ int gFiredTableSize;
 extern __device__ int gActiveTableSize;
 extern __device__ int gSynapsesActiveTableSize;
 
+#define gMin   0
+#define gMax 0.01
+
 // Arrays
 //extern __device__ int *gTimeTable;
 
