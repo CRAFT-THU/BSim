@@ -24,3 +24,4 @@ src/utils/TypeFunc.cu
 *.data
 *.pyc
 *.idea
+*.DS_Store
