@@ -1,4 +1,6 @@
 
+from bsim.arrayobj import ArrayObj
+
 class Synapse(ArrayObj):
     def __init__(self, name = '', num = 1):
         self.name = name
