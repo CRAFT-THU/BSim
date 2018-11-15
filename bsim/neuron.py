@@ -1,7 +1,7 @@
 
 from bsim.arrayobj import  ArrayObj
 
-class LIF_Curr(ArrayObj):
+class Neuron(ArrayObj):
 
     def __init__(self, name = '', num = 1, 
             v = 0.0, v_reset = -60e-3, v_rest=-74e-3, v_thresh = -54e-3,
