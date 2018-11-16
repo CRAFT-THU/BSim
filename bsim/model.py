@@ -1,6 +1,7 @@
 
+import typing
+
 from bsim.compiler import compile
-from bsim.arrayobj import ArrayObj
 
 class NeuronModel(object):
     def __init__(self, computation = '', threshold = 'v > vt', reset = 'v = vr', name = ''):
@@ -41,30 +42,51 @@ class ModelArray(object):
 
     def __init__(self, model, num = 1, name = '', **kwargs):
         """
-
-        :param model: NeuronModel
-        :param num:
-        :param name:
-        :param kwargs:
+        :param model: Model
+        :param num: ArrayNumber
+        :param name: Name of the array of models
+        :param kwargs: Model parameters
         """
-        super(ModelArray, self).__init__(name, num)
 
-        assert num >= 1, "%s, the number in %s is invalid" % (name, str(num))
+        assert num >= 0 and isinstance(num, int), "%s, the number in %s is invalid" % (num, name)
 
-        if set(kwargs) < model.parameters['origin']:
-            raise ValueError('Projection %s Parameters not match, expect %s' % (name, model.parameters['origin'] ))
 
-        self.expression = model.expressions['assignment']
-
-        self.parameter_origin = model.parameters['origin']
-        self.parameter_folded = model.expresions['fold']
-        self.parameter_variable = model.parameters['variable']
-        self.parameter_constant = model.parameters['constant']
-
-        # TODO: deal with fold operation
+        self.name = name
+        self.type = model.name
+        self.expressions = model.expressions['assignment']
+        self.parameters = {i:[] for i in model.parameters['variable'] + model.parameters['constant']}
+        self.shared = model.expressions['constant']
+        self.idx_shared = []
         self.pre = [[] for _ in range(num)]
         self.post = [[] for _ in range(num)]
 
+        if num > 0:
+            # TODO: deal with data
+            if set(kwargs) < model.parameters['origin']:
+                raise ValueError('Projection %s Parameters not match, expect %s' % (name, model.parameters['origin'] ))
+
+                for i in self.parameters:
+                    if i in model.parameters['origin']:
+                        value = kwargs[i]
+                        if i in model.parameters['variable']:
+                            if isinstance(value, typing.Iterable) and len(value) == self.num:
+                                self.parameters[i] = value
+                            else:
+                                self.parameters[i] = [value ] * self.num
+
+
+
+
+
+
+
+
+
+    def __len__(self):
+        return self.num
+
+    def __getitem__(self, item):
+        t = self.__class__(model=self.model, name=self.name, num=0)
 
 
 
