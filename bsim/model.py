@@ -3,8 +3,9 @@ import typing
 
 from bsim.model_compiler import compile
 
+
 class NeuronModel(object):
-    def __init__(self, computation = '', threshold = 'v > vt', reset = 'v = vr', name = ''):
+    def __init__(self, computation='', threshold='v > vt', reset='v = vr', name=''):
         """
         Create NeuronModel: find out variables and constants for further optimization.
         This func may be modified.
@@ -17,14 +18,15 @@ class NeuronModel(object):
             'computation': computation,
         })
 
+
 class SynapseModel(object):
-    def __init__(self, computation = '', pre = '', post = '', name = ''):
+    def __init__(self, computation='', pre='', post='', name=''):
         """
         Create SynapseModel: find out variables and constants for further optimization.
         This func may be modified.
         """
         self.name = name
-        self.learn = not (pre=='' and post=='')
+        self.learn = not (pre == '' and post == '')
         self.expression, self.parameter = compile({
             'computation': computation,
             'pre': pre,
@@ -39,7 +41,7 @@ class ModelArray(object):
     TODO: deal with the neurons in same population but different constant parameters
     """
 
-    def __init__(self, model, num = 1, name = '', **kwargs):
+    def __init__(self, model, num=1, name='', **kwargs):
         """
         Initialize model,
         :param model: Model
@@ -52,23 +54,22 @@ class ModelArray(object):
 
         self.name = name
         self.type = model.name
+        self.model = model
         self.expressions = model.expressions['assignment']
-        self.parameters = {i:[] for i in model.parameters['variable'] + model.parameters['constant']}
+        self.parameters = {i: [] for i in model.parameters['variable'] + model.parameters['constant']}
         self.shared = model.expressions['constant']
-        self.idx_shared = []
-        self.pre = [[] for _ in range(num)]
-        self.post = [[] for _ in range(num)]
 
         if num > 0:
             # TODO: deal with data
             if set(kwargs) < model.parameters['origin']:
-                raise ValueError('Projection %s Parameters not match, expect %s' % (name, model.parameters['origin'] ))
+                raise ValueError('Projection %s Parameters not match, expect %s' % (name, model.parameters['origin']))
 
             for para in self.parameters:
                     if para in self.model.parameters['variable']:
                         value = kwargs[para]
                         if isinstance(value, typing.Iterable):
-                            assert len(list(value)) == self.num, 'input parameters should have the same length as the population size'
+                            assert len(list(value)) == self.num, \
+                                'input parameters should have the same length as the population size'
                             self.parameters[para] = list(value)
                         else:
                             self.parameters[para] = [value ] * self.num
@@ -79,16 +80,19 @@ class ModelArray(object):
                             for i in (self.model.parameters['origin'] & self.model.parameters['constant']):
                                 for e, j in enumerate(self.parameters[para]):
                                     value = kwargs[i]
-                                    assert not isinstance(value, typing.Iterable), 'currently we assume that the neuron in a population has same parameters'
+                                    assert not isinstance(value, typing.Iterable), \
+                                        'currently we assume that the neuron in a population has same parameters'
                                     if isinstance(value, typing.Iterable):
-                                        assert len(list(value)) == self.num, 'input parameters should have the same length as the population size'
+                                        assert len(list(value)) == self.num, \
+                                            'input parameters should have the same length as the population size'
                                         j.replace(i, str(value[e]))
                                     else:
                                         j.replace(i, str(value))
                         else:
                             value = kwargs[para]
                             if isinstance(value, typing.Iterable):
-                                assert len(list(value)) == self.num, 'input parameters should have the same length as the population size'
+                                assert len(list(value)) == self.num, \
+                                    'input parameters should have the same length as the population size'
                                 self.parameters[para] = list(value)
                             else:
                                 self.parameters[para] = [value ] * self.num
@@ -97,15 +101,16 @@ class ModelArray(object):
         return self.num
 
     def __getitem__(self, item):
+        ret = {'population': self, 'idx': item} if self.num > 1 else self
+        return ret
 
-        parameters = {}
-        for i in self.parameters:
-            if isinstance(self.parameters[i], typing.Iterable):
-                parameters[i] = self.parameters[i][item]
-            else:
-                parameters[i] = self.parameters[i]
-
-        return parameters
+        # parameters = {}
+        # for i in self.parameters:
+        #     if isinstance(self.parameters[i], typing.Iterable):
+        #         parameters[i] = self.parameters[i][item]
+        #     else:
+        #         parameters[i] = self.parameters[i]
+        # return parameters
 
 
 
