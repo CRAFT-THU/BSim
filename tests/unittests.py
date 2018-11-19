@@ -2,7 +2,7 @@
 import unittest
 
 import bsim.utils as utils
-import bsim.compiler as parser
+import bsim.model_compiler as parser
 
 class TestExpressionMethods(unittest.TestCase):
     def test_standard(self):

@@ -10,10 +10,6 @@ def constant_folding_propagation(expressions, parameters):
 
     return expressions, parameters
 
-
-
-
-
 def compile(formular={'i_exec':'i_exc * exp(-dt/tau_exec)'}):
     """
     Optimize computation expressions, constant folding and propagation
