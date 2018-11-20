@@ -1,11 +1,12 @@
 
 import typing
+from typing import Dict, Union, List
 
-from bsim.model_compiler import compile
+from bsim.model_compiler import compile_
 
 
 class NeuronModel(object):
-    def __init__(self, computation='', threshold='v > vt', reset='v = vr', name=''):
+    def __init__(self, computation:str='', threshold:str='v > vt', reset:str='v = vr', name:str=''):
         """
         Create NeuronModel: find out variables and constants for further optimization.
         This func may be modified.
@@ -14,20 +15,20 @@ class NeuronModel(object):
         self.threshold = threshold
         self.reset = reset
 
-        self.expression, self.parameter = compile({
+        self.expressions, self.parameters = compile_({
             'computation': computation,
         })
 
 
 class SynapseModel(object):
-    def __init__(self, computation='', pre='', post='', name=''):
+    def __init__(self, computation:str='', pre:str='', post:str='', name:str=''):
         """
         Create SynapseModel: find out variables and constants for further optimization.
         This func may be modified.
         """
         self.name = name
         self.learn = not (pre == '' and post == '')
-        self.expression, self.parameter = compile({
+        self.expressions, self.parameters = compile_({
             'computation': computation,
             'pre': pre,
             'post': post
@@ -41,67 +42,68 @@ class ModelArray(object):
     TODO: deal with the neurons in same population but different constant parameters
     """
 
-    def __init__(self, model, num=1, name='', **kwargs):
+    def __init__(self, model:typing.Union[NeuronModel, SynapseModel], num:int=1, name:str='', **kwargs:typing.Dict):
         """
-        Initialize model,
-        :param model: Model
-        :param num: ArrayNumber
-        :param name: Name of the array of models
-        :param kwargs: Model parameters
+        Parameters
+        ----------
+        model: description of neuron model or synapse model
+        num: number of objects in the ModelArray
+        name: identifier for the ModelArray
+        kwargs: init parameters for the ModelArray
         """
-
         assert num >= 0 and isinstance(num, int), "%s, the number in %s is invalid" % (num, name)
 
-        self.name = name
-        self.type = model.name
-        self.model = model
-        self.expressions = model.expressions['assignment']
-        self.parameters = {i: [] for i in model.parameters['variable'] + model.parameters['constant']}
-        self.shared = model.expressions['constant']
+        # name of this array
+        self.name = name # type: str
+        # name of the model
+        self.type = model.name # type: str
+        # description of the model
+        self.model = model # type: Union[NeuronModel, SynapseModel]
+        # computations of the model
+        self.expressions = model.expressions['assignment'] # type: Dict
+        # parameters that should stored as a List
+        self.parameters = {} #  type: Dict[str:List]
+        # parameters that stored as number and shared across the array
+        self.shared = {} # type: typing.Dict[str:Union[int, float]] # type: typing.Dict[str:
 
         if num > 0:
-            # TODO: deal with data
             if set(kwargs) < model.parameters['origin']:
                 raise ValueError('Projection %s Parameters not match, expect %s' % (name, model.parameters['origin']))
 
-            for para in self.parameters:
-                    if para in self.model.parameters['variable']:
-                        value = kwargs[para]
-                        if isinstance(value, typing.Iterable):
-                            assert len(list(value)) == self.num, \
-                                'input parameters should have the same length as the population size'
-                            self.parameters[para] = list(value)
-                        else:
-                            self.parameters[para] = [value ] * self.num
-                    elif para in self.model.parameters['constant']:
-                        if para in model.expressions['fold']:
-                            express = self.model.expressions['fold'][para]
-                            self.parameters[para] = [express] * self.num
-                            for i in (self.model.parameters['origin'] & self.model.parameters['constant']):
-                                for e, j in enumerate(self.parameters[para]):
-                                    value = kwargs[i]
-                                    assert not isinstance(value, typing.Iterable), \
-                                        'currently we assume that the neuron in a population has same parameters'
-                                    if isinstance(value, typing.Iterable):
-                                        assert len(list(value)) == self.num, \
-                                            'input parameters should have the same length as the population size'
-                                        j.replace(i, str(value[e]))
-                                    else:
-                                        j.replace(i, str(value))
-                        else:
-                            value = kwargs[para]
-                            if isinstance(value, typing.Iterable):
-                                assert len(list(value)) == self.num, \
-                                    'input parameters should have the same length as the population size'
-                                self.parameters[para] = list(value)
-                            else:
-                                self.parameters[para] = [value ] * self.num
+            for para in self.model.parameters['variable']:
+                value = kwargs[para]
+                if isinstance(value, typing.Iterable):
+                    assert len(list(value)) == self.num, \
+                        'input parameters should have the same length as the population size'
+                    self.parameters[para] = list(value)
+                else:
+                    self.parameters[para] = [value] * self.num
+
+            for para in self.model.parameters['constant']:
+                if para in model.expressions['fold']:
+                    express = self.model.expressions['fold'][para]
+                    for i in (self.model.parameters['origin'] - self.model.parameters['variable']):
+                            value = kwargs[i]
+                            # TODO: Currently, we assume that all neurons in the same population have same constant parameters
+                            assert not isinstance(value, typing.Iterable), \
+                                'currently we assume that the neuron in a population has same parameters'
+                            express.replace(i, str(value))
+                    self.shared[para] = express
+                else:
+                    value = kwargs[para]
+                    # TODO: Currently, we assume that all neurons in the same population have same constant parameters
+                    assert not isinstance(value, typing.Iterable), \
+                        'currently we assume that the neuron in a population has same parameters'
+                    self.shared[para] = value
 
     def __len__(self):
         return self.num
 
-    def __getitem__(self, item):
-        ret = {'population': self, 'idx': item} if self.num > 1 else self
+    def __getitem__(self, index):
+        ret = self.__class__(model=self.model, num=0, name='%s_%s' % (self.name, index))
+        for i in ret.parameters:
+            ret.parameters[i] = self.parameters[i] if i in ret.shared else self.parameters[i][index]
+
         return ret
 
         # parameters = {}

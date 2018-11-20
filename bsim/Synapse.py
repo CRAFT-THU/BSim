@@ -1,5 +1,4 @@
 
-from bsim.arrayobj import ArrayObj
 from bsim.model import ModelArray
 
 

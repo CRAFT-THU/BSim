@@ -10,21 +10,21 @@ def constant_folding_propagation(expressions, parameters):
 
     return expressions, parameters
 
-def compile(formular={'i_exec':'i_exc * exp(-dt/tau_exec)'}):
+def compile_(formula:str ={'i_exec':'i_exc * exp(-dt/tau_exec)'}):
     """
     Optimize computation expressions, constant folding and propagation
-    :param formular: dict, labeled equations as dict of strings, each string separated by '\n' or ';'
+    :param formula: dict, labeled equations as dict of strings, each string separated by '\n' or ';'
     :return: (expression:{}, parameters: {})
     !elements are the elements in the original expression
     """
-    expressions = {'assign': { {} for i in formular}, 'fold': {} }
+    expressions = {'assign': { {} for i in formula}, 'fold': {} }
     parameters = {'variable': set(), 'constant': set(), 'original': set()}
 
-    for i in formular:
-        formular[i] = re.split('\n;', formular[i])
+    for i in formula:
+        formula[i] = re.split('\n;', formula[i])
 
-    for label in formular:
-        for line in formular[label]:
+    for label in formula:
+        for line in formula[label]:
             line = standardize(line)
 
             if line.count('=') == 1:
