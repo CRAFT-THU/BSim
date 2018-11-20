@@ -6,7 +6,7 @@ from bsim.model_compiler import compile_
 
 
 class NeuronModel(object):
-    def __init__(self, computation:str='', threshold:str='v > vt', reset:str='v = vr', name:str=''):
+    def __init__(self, computation: str='', threshold: str='v > vt', reset: str='v = vr', name: str=''):
         """
         Create NeuronModel: find out variables and constants for further optimization.
         This func may be modified.
@@ -21,7 +21,7 @@ class NeuronModel(object):
 
 
 class SynapseModel(object):
-    def __init__(self, computation:str='', pre:str='', post:str='', name:str=''):
+    def __init__(self, computation: str='', pre: str='', post: str='', name: str=''):
         """
         Create SynapseModel: find out variables and constants for further optimization.
         This func may be modified.
@@ -82,9 +82,9 @@ class ModelArray(object):
             for para in self.model.parameters['constant']:
                 if para in model.expressions['fold']:
                     express = self.model.expressions['fold'][para]
+                    # TODO: Currently, we assume that all neurons in the same population have same constant parameters
                     for i in (self.model.parameters['origin'] - self.model.parameters['variable']):
                             value = kwargs[i]
-                            # TODO: Currently, we assume that all neurons in the same population have same constant parameters
                             assert not isinstance(value, typing.Iterable), \
                                 'currently we assume that the neuron in a population has same parameters'
                             express.replace(i, str(value))

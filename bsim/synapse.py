@@ -10,4 +10,4 @@ class Projection(ModelArray):
 
 class Synapse(Projection):
     def __init__(self, model, name='', **kwargs):
-        super(Synapse, self).__init__(model= model, num=1, name=name, **kwargs)
+        super(Synapse, self).__init__(model=model, num=1, name=name, **kwargs)
