@@ -2,7 +2,7 @@
 import unittest
 
 import bsim.utils as utils
-import bsim.model_compiler as parser
+from bsim.model import LIF_curr_exp, StaticSynapse
 
 class TestExpressionMethods(unittest.TestCase):
     def test_standard(self):
@@ -11,7 +11,8 @@ class TestExpressionMethods(unittest.TestCase):
         self.assertEqual(utils.standardize('a_bsfdfd ++   \n'), 'a_bsfdfd = a_bsfdfd + 1')
         self.assertEqual(utils.standardize('a_bsfdfd --   \n'), 'a_bsfdfd = a_bsfdfd - 1')
 
-    def test_model(self):
+    #def test_model(self):
+    #    self.assertEqual(LIF_curr_exp.expressions['computation'])
 
     # def test_compiler(self):
     #     assignments = {'test': {'d': 'a + exp ( a + c * b ) - ( a + c ) * b', 'b':'a + 1'}}

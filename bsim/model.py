@@ -4,9 +4,56 @@ from typing import Dict, Union, List
 
 from bsim.model_compiler import compile_
 
+class BaseModel(object):
+    def __init__(self):
+        self.name =''
+        self.parameters = {}
+
+    def compile_(self):
+        c_file = open(self.name + ".cpp")
+        cu_file = open(self.name + ".cpp")
+        py_file = open(self.name + ".py")
+
+    def _compile_h(self):
+        h_file = open(self.name + ".h", "w+")
+        h_file.write("#ifndef " + self.name.upper() + "_H\n")
+        h_file.write("#define " + self.name.upper() + "_H\n")
+        h_file.write("\n\n")
+
+        h_file.write("struct" + self.name + " {\n")
+        for i in self.parameters['variable']:
+            h_file.write("\tfloat *p_" + i + ";")
+        h_file.write("};")
+        h_file.write('\n')
+
+        h_file.write('extern "C" {')
+        h_file.write("void update_" + self.name.lower() + "(" + self.name + " *neuron_data, int num, int start_id);")
+        h_file.write("}\n")
+
+        h_file.write('extern "C" {')
+        h_file.write("void to_gpu_" + self.name.lower() + "(" + self.name + " *neuron_data, int num, int start_id);")
+        h_file.write("}\n")
+
+        h_file.write("\n")
+        h_file.write("__global void update_" + self.name.lower() + "_gpu(" + self.name + " *neuron_data, int num, int start_id);")
+        h_file.write("\n")
+
+        h_file.write("#endif /* " + self.name.upper() + "_H */\n")
+
+        return
+
+    def _compile_c(self):
+        return
+
+    def _compile_cu(self):
+        return
+
+    def _compile_py(self):
+        return
+
 
 class NeuronModel(object):
-    def __init__(self, computation: str='', threshold: str='v > vt', reset: str='v = vr', name: str=''):
+    def __init__(self, computation: str='', threshold: str='v > vt', reset: str='v = vr', refract: bool=True, name: str=''):
         """
         Create NeuronModel: find out variables and constants for further optimization.
         This func may be modified.
@@ -14,6 +61,7 @@ class NeuronModel(object):
         self.name = name
         self.threshold = threshold
         self.reset = reset
+        self.refract = refract
 
         self.expressions, self.parameters = compile_({
             'computation': computation,
@@ -33,6 +81,8 @@ class SynapseModel(object):
             'pre': pre,
             'post': post
         })
+        self.parameters['variable'].add('weight')
+        self.parameters['constant'].add('delay')
 
 
 class ModelArray(object):
@@ -59,8 +109,8 @@ class ModelArray(object):
         self.type = model.name # type: str
         # description of the model
         self.model = model # type: Union[NeuronModel, SynapseModel]
-        # computations of the model
-        self.expressions = model.expressions['assignment'] # type: Dict
+        ## computations of the model
+        #self.expressions = model.expressions['assignment'] # type: Dict
         # parameters that should stored as a List
         self.parameters = {} #  type: Dict[str:List]
         # parameters that stored as number and shared across the array
@@ -114,6 +164,17 @@ class ModelArray(object):
         #         parameters[i] = self.parameters[i]
         # return parameters
 
-LIF_curr = NeuronModel(computation='v = Cm * v + v_tmp + i_exc * C_exc + i_inh * C_inh', threshold='V > v_threshold', reset='v = v_reset', name='LIF_curr')
+LIF_curr_exp = NeuronModel(
+    computation='v = Cm * v + v_tmp + i_exc * C_exc + i_inh * C_inh;i_exec *= Cexc; i_inh *= Cinh',
+    threshold='V > v_threshold',
+    reset='v = v_reset',
+    name='LIF_curr_exp')
+
+STDPSynapse = SynapseModel(
+    computation='apre*=exp(last_update-t)/tau_pre; apost*=exp(last_update-t)/tau_post',
+    pre='apre += d_apre; weight=clip(weight+apost, gMin, gMax); last_update=t',
+    post='apost+=d_apost; weight=clip(weight+apre, gMin, gMax); last_update=t',
+    name='STDPSynapse'
+)
 
 

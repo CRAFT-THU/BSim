@@ -74,3 +74,6 @@ class Network(object):
 
         return 1
 
+    def compile_(self):
+
+        return
