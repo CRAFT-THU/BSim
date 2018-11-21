@@ -114,7 +114,6 @@ class ModelArray(object):
         #         parameters[i] = self.parameters[i]
         # return parameters
 
-
-
+LIF_curr = NeuronModel(computation='v = Cm * v + v_tmp + i_exc * C_exc + i_inh * C_inh', threshold='V > v_threshold', reset='v = v_reset', name='LIF_curr')
 
 

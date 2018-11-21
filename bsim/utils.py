@@ -37,8 +37,3 @@ def standardize(expression):
 
     return standard
 
-if __name__ == '__main__':
-    print(standardize('a= b+c_-aaa'))
-    print(standardize('a += b+c_-aaa'))
-    print(standardize('a_bsfdfd ++   \n'))
-    print(standardize('a_bsfdfd --   \n'))

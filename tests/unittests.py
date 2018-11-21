@@ -11,6 +11,8 @@ class TestExpressionMethods(unittest.TestCase):
         self.assertEqual(utils.standardize('a_bsfdfd ++   \n'), 'a_bsfdfd = a_bsfdfd + 1')
         self.assertEqual(utils.standardize('a_bsfdfd --   \n'), 'a_bsfdfd = a_bsfdfd - 1')
 
+    def test_model(self):
+
     # def test_compiler(self):
     #     assignments = {'test': {'d': 'a + exp ( a + c * b ) - ( a + c ) * b', 'b':'a + 1'}}
     #     expressions = {'test': 'b + a'}
