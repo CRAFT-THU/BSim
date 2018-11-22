@@ -14,31 +14,12 @@ class BaseModel(object):
         cu_file = open(self.name + ".cpp")
         py_file = open(self.name + ".py")
 
+        self._compile_h()
+        self._compile_c()
+        self._compile_cu()
+        self._compile_py()
+
     def _compile_h(self):
-        h_file = open(self.name + ".h", "w+")
-        h_file.write("#ifndef " + self.name.upper() + "_H\n")
-        h_file.write("#define " + self.name.upper() + "_H\n")
-        h_file.write("\n\n")
-
-        h_file.write("struct" + self.name + " {\n")
-        for i in self.parameters['variable']:
-            h_file.write("\tfloat *p_" + i + ";")
-        h_file.write("};")
-        h_file.write('\n')
-
-        h_file.write('extern "C" {')
-        h_file.write("void update_" + self.name.lower() + "(" + self.name + " *neuron_data, int num, int start_id);")
-        h_file.write("}\n")
-
-        h_file.write('extern "C" {')
-        h_file.write("void to_gpu_" + self.name.lower() + "(" + self.name + " *neuron_data, int num, int start_id);")
-        h_file.write("}\n")
-
-        h_file.write("\n")
-        h_file.write("__global void update_" + self.name.lower() + "_gpu(" + self.name + " *neuron_data, int num, int start_id);")
-        h_file.write("\n")
-
-        h_file.write("#endif /* " + self.name.upper() + "_H */\n")
 
         return
 
@@ -66,6 +47,44 @@ class NeuronModel(object):
         self.expressions, self.parameters = compile_({
             'computation': computation,
         })
+
+    def _compile_h(self):
+        h_file = open(self.name + ".h", "w+")
+        h_file.write("#ifndef " + self.name.upper() + "_H\n")
+        h_file.write("#define " + self.name.upper() + "_H\n")
+        h_file.write("\n\n")
+
+        h_file.write("struct" + self.name + " {\n")
+        if self.refract:
+            h_file.write("int *refract_step")
+
+        for i in self.parameters['variable']:
+            h_file.write("\tfloat *p_" + i + ";")
+        h_file.write("};")
+        h_file.write('\n')
+
+        h_file.write('extern "C" {')
+        h_file.write("void update_" + self.name.lower() + "(" + self.name + " *neuron_data, int num, int start_id);")
+        h_file.write("}\n")
+
+        h_file.write('extern "C" {')
+        h_file.write("void to_gpu_" + self.name.lower() + "(" + self.name + " *neuron_data, int num, int start_id);")
+        h_file.write("}\n")
+
+        h_file.write("\n")
+        h_file.write("__global void find_" + self.name.lower() + "_gpu(" + self.name + " *neuron_data, int num, int start_id);")
+        h_file.write("\n")
+
+        h_file.write("\n")
+        h_file.write("__global void update_" + self.name.lower() + "_gpu(" + self.name + " *neuron_data, int num, int start_id);")
+        h_file.write("\n")
+
+        h_file.write("#endif /* " + self.name.upper() + "_H */\n")
+
+        return
+
+    def _compile_py(self):
+        return
 
 
 class SynapseModel(object):
