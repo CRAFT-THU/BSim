@@ -1,5 +1,5 @@
 
-from bsim.model import ModelArray
+from bsim.model_array import ModelArray
 
 
 class Population(ModelArray):
