@@ -1,3 +1,4 @@
+from typing import List, Dict
 
 from bsim.neuron import Population
 from bsim.synapse import Projection
@@ -6,9 +7,11 @@ from bsim.synapse import Projection
 class Network(object):
     def __init__(self, dt: float=0.0001, name: str=''):
         self.dt = dt
-        self.populations = {}
-        self.projections = {}
         self.name = name
+        self.populations = {} # type: Dict[NeuronModel, List[Population]]
+        self.projections = {} # type: Dict[SynapseModel, List[Projection]]
+        self.data = {}
+        self.connection = {}
 
     def add_population(self, population: Population, warn: bool=True):
         """
@@ -86,5 +89,24 @@ class Network(object):
             model.compile()
 
         # TODO compile the network datastructure
+        for model in self.populations:
+            count = 0
+            data = self.populations[model][0].__class__(model=model, num=0, name="%s_compact" % model.name)
+            for i in self.populations[model]:
+                self._merge_parameters(data.parameters, i.parameters)
+                self._compile_synapse_and_connection(i)
+                count += len(i)
 
-        return
+        return 1
+
+    def __compile_synapse_and_connection(self, population: Population):
+        return 1
+
+    @staticmethod
+    def _merge_parameters(para1: Dict[str, List], para2: Dict[str: List]):
+        assert set(para1.keys()) == set(para2.keys()), 'Only neurons/synapse of the same type could be merged'
+        for i in para1:
+            para1[i].extend(para2[i])
+
+        return para1
+
