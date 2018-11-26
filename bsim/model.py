@@ -1,7 +1,10 @@
 
-class BaseModel(object):
+from abc import ABC, abstractmethod
+
+
+class BaseModel(ABC):
     def __init__(self):
-        self.name =''
+        self.name = ''
         self.expressions = {}
         self.parameters = {}
 
@@ -13,17 +16,26 @@ class BaseModel(object):
 
         return
 
+    @abstractmethod
     def _compile_h(self):
+        """
+        Generate .h file for the model
+        """
 
-        return
-
-    def _compile_c(self):
-        return
-
-    def _compile_cu(self):
-        return
-
+    @abstractmethod
     def _compile_py(self):
-        return
+        """
+        Generate .py file for the model
+        """
 
+    @abstractmethod
+    def _compile_c(self):
+        """
+        Generate .cpp file for the model
+        """
 
+    @abstractmethod
+    def _compile_cu(self):
+        """
+        Generate .cu file for the model
+        """

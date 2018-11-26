@@ -33,15 +33,15 @@ __global__ void update_dense_static_hit(GStaticSynapses *d_synapses, int num, in
 				//int sid = gConnection->pSynapsesIdx[j+start_loc];
 				int sid = j+start_loc;
 
-				d_synapse->p_apre[sid] *= exp((d_synapse->p_last_update[sid] - t)/(d_synapse->p_tau_pre[sid]));
-				d_synapse->p_apost[sid] *= exp((d_synapse->p_last_update[sid] - t)/(d_synapse->p_tau_post[sid]));
-
 				real weight = d_synapses->p_weight[sid];
 				if (weight >= 0) {
 					atomicAdd(&(gNeuronInput[d_synapses->p_dst[sid]]), weight);
 				} else {
 					atomicAdd(&(gNeuronInput_I[d_synapses->p_dst[sid]]), weight);
 				}
+
+				d_synapse->p_apre[sid] *= exp((d_synapse->p_last_update[sid] - t)/(d_synapse->p_tau_pre[sid]));
+				d_synapse->p_apost[sid] *= exp((d_synapse->p_last_update[sid] - t)/(d_synapse->p_tau_post[sid]));
 
 				d_synapse->p_apre[sid] += d_synapse->p_d_apre[sid];
 				d_synapse->p_weight[sid] = _clip(weight + d_synapse->p_apost[sid], gMin, gMax);
@@ -75,11 +75,7 @@ __global__ void learn_stdp_post(GStaticSynapses *d_synapses, int num, int start_
 			int nid = gFiredTable[time_idx*gFiredTableCap + (block_idx)*num_per_block + idx];
 			int start_loc = gConnection->rev_delayStart[delta_t + nid * MAX_DELAY];
 			int synapseNum = gConnection->rev_delayNum[delta_t + nid * MAX_DELAY];
-			if (threadIdx.x == 0) {
-				gLayerInput[nid]++;
-			}
 			for (int j=threadIdx.x; j<synapseNum; j += blockDim.x) {
-				//int sid = gConnection->pSynapsesIdx[j+start_loc];
 				int sid = gConnection->rev_map2sid[j+start_loc];
 
 				d_synapse->p_apre[sid] *= exp((d_synapse->p_last_update[sid] - t)/(d_synapse->p_tau_pre[sid]));

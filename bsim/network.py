@@ -38,14 +38,18 @@ class Network(object):
 
         if synapse.model in self.projections:
             self.projections[synapse.model].append({
-                'pre_neuron': (pre_population, pre_id),
-                'post_neuron': (post_population, post_id),
+                'pre_population': pre_population,
+                'pre_neuron': pre_id,
+                'post_neuron': post_id,
+                'post_population': post_population,
                 'synapse': synapse
                  })
         else:
             self.projections[synapse.model] = [{
-                'pre_neuron': (pre_population, pre_id),
-                'post_neuron': (post_population, post_id),
+                'pre_population': pre_population,
+                'pre_neuron': pre_id,
+                'post_neuron': post_id,
+                'post_population': post_population,
                 'synapse': synapse
                  }]
 
@@ -75,5 +79,12 @@ class Network(object):
         return 1
 
     def compile_(self):
+
+        for model in self.populations:
+            model.compile()
+        for model in self.projections:
+            model.compile()
+
+        # TODO compile the network datastructure
 
         return
