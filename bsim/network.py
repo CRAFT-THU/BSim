@@ -10,7 +10,10 @@ class Network(object):
         self.name = name
         self.populations = {} # type: Dict[NeuronModel, List[Population]]
         self.projections = {} # type: Dict[SynapseModel, List[Projection]]
-        self.data = {}
+        self.neuron_data = {}
+        self.synapse_data = {}
+        self.neuron2synapse = {}
+        self.neuron2synapse_reverse = {}
         self.connection = {}
 
     def add_population(self, population: Population, warn: bool=True):
@@ -85,22 +88,23 @@ class Network(object):
 
         for model in self.populations:
             model.compile()
+            self.neuron_data[model] = self.populations[model][0].__class__(model=model, num=0, name="%s_compact" % model.name)
+
         for model in self.projections:
             model.compile()
+            self.synapse_data[model] = self.projections[model][0].__class__(model=model, num=0, name="%s_compact" % model.name)
 
         # TODO compile the network datastructure
         for model in self.populations:
             count = 0
-            data = self.populations[model][0].__class__(model=model, num=0, name="%s_compact" % model.name)
-            for i in self.populations[model]:
-                self._merge_parameters(data.parameters, i.parameters)
-                self._compile_synapse_and_connection(i)
-                count += len(i)
+            data = self.neuron_data[model]
+            for population in self.populations[model]:
+                self._merge_parameters(data.parameters, population.parameters)
+                self._compile_synapse_and_connection(population, count)
+                count += len(population)
 
         return 1
 
-    def __compile_synapse_and_connection(self, population: Population):
-        return 1
 
     @staticmethod
     def _merge_parameters(para1: Dict[str, List], para2: Dict[str: List]):
