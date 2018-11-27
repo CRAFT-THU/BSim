@@ -10,8 +10,8 @@ class SynapseModel(BaseModel):
         This func may be modified.
         """
         self.name = name
-        self.prelearn = not (pre == '')
-        self.postlearn = not (post == '')
+        self.pre_learn = not (pre == '')
+        self.post_learn = not (post == '')
 
         self.expressions, self.parameters = compile_({
             'computation': computation,
@@ -59,7 +59,7 @@ class SynapseModel(BaseModel):
                      (self.name.lower(), self.name))
         h_file.write("\n")
 
-        if self.postlearn:
+        if self.post_learn:
             h_file.write("__global void learn_%s_post(%s *data, int num, int start_id);\n" %
                          (self.name.lower(), self.name))
             h_file.write("\n")
@@ -126,7 +126,7 @@ class SynapseModel(BaseModel):
         #              (self.name.lower(), self.name.capitalize()))
         cu_file.write("\t\tupdate_%s_gpu<<<size=>gridSize, size->blockSize>>>((%s*)data, num, start_id)\n;" %
                       (self.name.lower(), self.name.capitalize()))
-        if self.postlearn:
+        if self.post_learn:
             cu_file.write("\t\tlearn_%s_post<<<size=>gridSize, size->blockSize>>>((%s*)data, num, start_id)\n;" %
                           (self.name.lower(), self.name.capitalize()))
         cu_file.write("\t}\n")
@@ -169,7 +169,7 @@ class SynapseModel(BaseModel):
         cu_file.write("\t\t\t\t}\n")
         cu_file.write("\n")
 
-        if (self.prelearn):
+        if (self.pre_learn):
             cu_file.write("\t\t\t\td_synapse->p_apre[sid] *= exp((d_synapse->p_last_update[sid] - t) / (d_synapse->p_tau_pre[sid]));\n")
             cu_file.write("\t\t\t\td_synapse->p_apost[sid] *= exp((d_synapse->p_last_update[sid] - t) / (d_synapse->p_tau_post[sid]));\n")
             cu_file.write("\n")
@@ -184,7 +184,7 @@ class SynapseModel(BaseModel):
         cu_file.write("}\n")
         cu_file.write("\n")
 
-        if self.postlearn:
+        if self.post_learn:
             cu_file.write("__global void update_%s_gpu(%s *data, int num, int start_id)\n" %
                           (self.name.lower(), self.name))
             cu_file.write("{\n")

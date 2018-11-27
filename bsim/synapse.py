@@ -1,8 +1,8 @@
 
-from bsim.model import ModelArray
+from bsim.model import ModelOfArray
 
 
-class Projection(ModelArray):
+class Projection(ModelOfArray):
 
     def __init__(self, model, num=2, name='', **kwargs):
         super(Projection, self).__init__(model=model, num=num, name=name, **kwargs)

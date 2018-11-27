@@ -1,6 +1,13 @@
 
 from ctypes import *
 
+class Connection(object):
+    def __init__(self):
+        self.delay_start = []
+        self.delay_num = []
+        self.rev_delay_start = []
+        self.rev_delay_num = []
+        self.rev_map2sid = []
 
 class CConnection(Structure):
     _fields_ = [

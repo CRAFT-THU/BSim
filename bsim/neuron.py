@@ -1,8 +1,8 @@
 
-from bsim.model_array import ModelArray
+from bsim.model import ModelOfArray
 
 
-class Population(ModelArray):
+class Population(ModelOfArray):
 
     def __init__(self, model, num=2, name='', **kwargs):
         super(Population, self).__init__(model=model, num=num, name=name, **kwargs)
