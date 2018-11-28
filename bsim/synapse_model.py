@@ -19,6 +19,8 @@ class SynapseModel(BaseModel):
             'post': post
         })
 
+        self.parameters['origin'].add('weight')
+        self.parameters['origin'].add('delay')
         self.parameters['variable'].add('weight')
         self.parameters['constant'].add('delay')
 

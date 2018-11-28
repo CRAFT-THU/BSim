@@ -92,13 +92,14 @@ class ModelOfArray(object):
                     # TODO: Currently, we assume that all neurons in the same population have same constant parameters
                     for i in (self.model.parameters['origin'] - self.model.parameters['variable']):
                         value = kwargs[i]
-                        assert not isinstance(value, typing.Iterable), \
+                        assert not isinstance(value, Iterable), \
                             'currently we assume that the neuron in a population has same parameters'
                         express.replace(i, str(value))
                     self.shared[para] = express
                 else:
                     value = kwargs[para]
                     # TODO: Currently, we assume that all neurons in the same population have same constant parameters
+                    # TODO: support parameter shared
                     assert not isinstance(value, Iterable), \
                         'currently we assume that the neuron in a population has same parameters'
                     self.shared[para] = value
