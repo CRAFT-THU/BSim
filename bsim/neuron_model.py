@@ -93,12 +93,14 @@ class NeuronModel(BaseModel):
         c_file.write("\t%s * to_gpu_%s(%s *cpu, int num)\n" %
                      (self.name.lower(), self.name.capitalize(), self.name.capitalize()))
         c_file.write("\t{\n")
-        c_file.write('\t\t%s * ret = malloc(sizeof(%s);\n', (self.name.capitalize(), self.name.capitalize()))
+        c_file.write('\t\t%s * gpu = malloc(sizeof(%s);\n', (self.name.capitalize(), self.name.capitalize()))
         if self.refract:
             c_file.write('\t\tgpu->p_refract_step = copyToGPU<real>(cpu->p_refract_step, num);\n')
 
         for i in self.parameters['variable']:
             c_file.write('\t\tgpu->%s = copyToGPU<real>(cpu->%s, num);\n', (i, i))
+
+        c_file.write('\t\t%s * ret = copyToGPU<%s>(gpu, 1);\n', (self.name.capitalize(), self.name.capitalize()))
 
         c_file.write('\n\t\treturn ret;\n')
         c_file.write("\t}\n")
