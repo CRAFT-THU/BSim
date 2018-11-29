@@ -5,7 +5,7 @@
 #ifndef MEM_OP_H
 #define MEM_OP_H
 
-#include "../third_party/cuda/helper_cuda.h"
+#include "helper_cuda.h"
 
 template<typename T>
 T* hostMalloc(int size)

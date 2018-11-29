@@ -23,7 +23,8 @@ class CUDAMemOp(object):
 
         return subprocess.call('/usr/local/cuda/bin/nvcc -I/usr/local/cuda/include/ -shared '
                                '--compiler-options "-Wall -Wfatal-errors -Ofast -fPIC" -c '
-                               '%s/c_code/cudamemop.cu -o %s/c_so/cudamemop.so',
+                               '%s/c_code/cudamemop.cu -o %s/c_so/cudamemop.so' %
+                               (os.path.dirname(__file__), os.path.dirname(__file__)),
                                shell=True) == 0
 
     def _compile_h(self):
@@ -58,7 +59,7 @@ class CUDAMemOp(object):
         cu_file.write('#include "cudamemop.h"\n')
         cu_file.write("\n\n")
 
-        cu_file.write('extern "C" {\n')
+        #cu_file.write('extern "C" {\n')
 
         for i in self.types:
 
@@ -68,19 +69,19 @@ class CUDAMemOp(object):
             cu_file.write("\t}\n")
             cu_file.write("\n")
 
-            cu_file.write("\tvoid cpu2gpu_%s(%s *cpu, %s *gpu, int size);\n" % (i, i, i))
+            cu_file.write("\tvoid cpu2gpu_%s(%s *cpu, %s *gpu, int size)\n" % (i, i, i))
             cu_file.write("\t{\n")
             cu_file.write("\t\tcopyToGPU<%s>(gpu, cpu, size);\n" % i)
             cu_file.write("\t}\n")
             cu_file.write("\n")
 
-            cu_file.write("\tvoid gpu2cpu_%s(%s *gpu, %s *cpu, int size);\n" % (i, i, i))
+            cu_file.write("\tvoid gpu2cpu_%s(%s *gpu, %s *cpu, int size)\n" % (i, i, i))
             cu_file.write("\t{\n")
             cu_file.write("\t\tcopyFromGPU<%s>(cpu, gpu, size);\n" % i)
             cu_file.write("\t}\n")
             cu_file.write("\n")
 
-        cu_file.write("}\n")
+        #cu_file.write("}\n")
         cu_file.write("\n")
 
         cu_file.close()
