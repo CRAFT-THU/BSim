@@ -1,5 +1,7 @@
 from typing import List, Dict
 
+import importlib
+
 from bsim.connection import Connection
 from bsim.neuron import Population
 from bsim.synapse import Projection
@@ -242,6 +244,29 @@ class Network(object):
         return 1
 
     def _compile_c_types(self):
+        for i, model in enumerate(self.neuron_models):
+            c_model = importlib.import_module(model.name.capitalize(), model.name.lower())
+            tmp_model = c_model()
+            for name, _ in tmp_model._fields_:
+                origin_data = self.neuron_data[i].parameters[name]
+                setattr(tmp_model, i,
+                        getattr(tmp_model, i)._type_*len(origin_data)(*origin_data)
+                        )
+            self.neuron_data_c.append(tmp_model)
+
+        for i, model in enumerate(self.synapse_models):
+            c_model = importlib.import_module(model.name.capitalize(), model.name.lower())
+            tmp_model = c_model()
+            for name, _ in tmp_model._fields_:
+                origin_data = self.synapse_data[i].parameters[name]
+                setattr(tmp_model, i,
+                        getattr(tmp_model, i)._type_*len(origin_data)(*origin_data)
+                        )
+            self.synapse_data_c.append(tmp_model)
+
+        for connection in self.connection_data:
+            self.connection_data_c.append(connection.to_c())
+
 
         return 1
 

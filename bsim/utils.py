@@ -1,5 +1,7 @@
 
 import re
+from ctypes import Structure
+
 
 def standardize(expression):
     names = '[a-zA-Z0-9_]'
@@ -33,7 +35,7 @@ def standardize(expression):
         standard = "%s= %s- 1" % (search.group(1), search.group(1))
 
     eq = standard.count('=')
-    assert eq <= 1, 'Only one assign per line'
+    assert eq <= 1, '%s should only one assign per line' % standard
 
     return standard
 

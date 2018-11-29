@@ -25,7 +25,7 @@ class SynapseModel(BaseModel):
         self.parameters['constant'].add('delay')
 
     def _compile_h(self):
-        h_file = open("../model/%s.h" % self.name)
+        h_file = open("./c_code/%s.h" % self.name)
 
         h_file.write("\n\n")
         h_file.write("#ifndef %s_H\n " % self.name.upper())
@@ -72,7 +72,7 @@ class SynapseModel(BaseModel):
         return
 
     def _compile_py(self):
-        py_file = open('../model/%s.py' % self.name )
+        py_file = open('./c_code/%s.py' % self.name )
 
         py_file.write("from ctypes import *\n\n\n")
         py_file.write("class " + self.name.capitalize() + "(Structure):\n")
@@ -89,13 +89,13 @@ class SynapseModel(BaseModel):
         return
 
     def _compile_c(self):
-        c_file = open('../model/%s.cpp' % self.name )
+        c_file = open('./c_code/%s.cpp' % self.name )
 
         c_file.write("\n\n")
         c_file.write('#include <stdlib.h>\n')
         c_file.write("\n")
         c_file.write('#include "../gpu_utils/mem_op.h"\n')
-        c_file.write("#include " + self.name + ".h\n")
+        c_file.write('#include "%s.h"\n' % self.name)
         c_file.write("\n\n")
 
         c_file.write('extern "C" {\n')
@@ -118,7 +118,7 @@ class SynapseModel(BaseModel):
         return
 
     def _compile_cu(self):
-        cu_file = open('../model/%s.cu' % self.name)
+        cu_file = open('./c_code/%s.cu' % self.name)
 
         cu_file.write('extern "C" {\n')
         cu_file.write("\tvoid update_%s(%s *data, int num, int start_id, BlockSize *size)\n" %

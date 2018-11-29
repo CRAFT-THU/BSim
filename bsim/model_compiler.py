@@ -1,11 +1,11 @@
 
 import re
 from collections import OrderedDict
-from typing import Dict
+from typing import Dict, Tuple
 
 from bsim.utils import standardize
 
-Operators = set('+', '-', '*', '/', 'exp', 'log', '(', ')')
+Operators = set(['+', '-', '*', '/', 'exp', 'log', '(', ')'])
 
 
 def constant_folding_propagation(expressions, parameters):
@@ -14,7 +14,7 @@ def constant_folding_propagation(expressions, parameters):
     return expressions, parameters
 
 
-def compile_(formula: Dict[str:str] = {'i_exec': 'i_exc * exp(-dt/tau_exec)'}) -> (Dict, Dict):
+def compile_(formula: Dict[str, str] = {'i_exec': 'i_exc * exp(-dt/tau_exec)'}) -> Tuple[Dict, Dict]:
     """
     Optimize computation expressions, constant folding and propagation
     :param formula: dict, labeled equations as dict of strings, each string separated by '\n' or ';'

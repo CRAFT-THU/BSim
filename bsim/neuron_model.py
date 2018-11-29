@@ -19,7 +19,7 @@ class NeuronModel(BaseModel):
         })
 
     def _compile_h(self):
-        h_file = open("../model/%s.h" % self.name)
+        h_file = open("./c_code/%s.h" % self.name)
 
         h_file.write("\n\n")
         h_file.write("#ifndef %s_H\n " % self.name.upper())
@@ -62,7 +62,7 @@ class NeuronModel(BaseModel):
         return
 
     def _compile_py(self):
-        py_file = open('../model/%s.py' % self.name )
+        py_file = open('./c_code/%s.py' % self.name )
 
         py_file.write("from ctypes import *\n\n\n")
         py_file.write("class " + self.name.capitalize() + "(Structure):\n")
@@ -80,7 +80,7 @@ class NeuronModel(BaseModel):
         return
 
     def _compile_c(self):
-        c_file = open('../model/%s.cpp' % self.name )
+        c_file = open('./c_code/%s.cpp' % self.name )
 
         c_file.write("\n\n")
         c_file.write('#include <stdlib.h>\n')
@@ -111,7 +111,7 @@ class NeuronModel(BaseModel):
         return
 
     def _compile_cu(self):
-        cu_file = open('../model/%s.cu' % self.name)
+        cu_file = open('./c_code/%s.cu' % self.name)
 
         cu_file.write("\n")
         cu_file.write('#include "../../gpu_utils/runtime.h"\n')
