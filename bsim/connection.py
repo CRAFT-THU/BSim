@@ -15,6 +15,7 @@ class CConnection(Structure):
         ("s_length", c_int)
     ]
 
+
 class Connection(object):
     def __init__(self):
         self.delay_start = []
@@ -50,13 +51,14 @@ class Connection(object):
 
         return None
 
-
     def compile_(self):
         self._compile_h()
         self._compile_data_cu()
 
-        return subprocess.call('nvcc -I/usr/local/cuda/include/ --compiler-options "-Wall -Wfatal-errors -Ofast -fPIC" -c '
-                        './c_code/connection.data.cu -o ./c_so/connection.data.so', shell=True) == 0
+        return subprocess.call('nvcc -I/usr/local/cuda/include/ -shared'
+                               '--compiler-options "-Wall -Wfatal-errors -Ofast -fPIC" -c '
+                               './c_code/connection.data.cu -o ./c_so/connection.data.so',
+                               shell=True) == 0
 
     @staticmethod
     def _compile_h():

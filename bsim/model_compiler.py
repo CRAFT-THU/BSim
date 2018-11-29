@@ -26,7 +26,7 @@ def compile_(formula: Dict[str, str] = {'i_exec': 'i_exc * exp(-dt/tau_exec)'}) 
     formulas = {i: [] for i in formula}
 
     for i in formula:
-        formulas[i] = re.split('\n;', formula[i])
+        formulas[i] = re.split('[\n;]+', formula[i])
 
     for label in formulas:
         for line in formulas[label]:
@@ -36,9 +36,9 @@ def compile_(formula: Dict[str, str] = {'i_exec': 'i_exc * exp(-dt/tau_exec)'}) 
                 var, expression = line.split('=')
                 var = var.strip()
                 assert var not in expressions['assign'], 'One variable could have only one assignment'
-                assert re.match('^[0-9a-zA-Z_]$', var), 'variable name could have only [0-9a-zA-Z_]'
+                assert re.match('^[0-9a-zA-Z_]+$', var), 'variable name could have only [0-9a-zA-Z_]'
                 expressions['assign'][label][var] = expression
-                parameters['variables'].add(var)
+                parameters['variable'].add(var)
             else:
                 raise ValueError(line + ' does not contain assignments, you should eliminate it!')
 
