@@ -1,7 +1,8 @@
 
 import unittest
-from ctypes import c_int
+from ctypes import *
 
+import env
 import bsim.utils as utils
 from bsim.cudamemop import CUDAMemOp
 
@@ -12,18 +13,6 @@ class TestExpressionMethods(unittest.TestCase):
         self.assertEqual(utils.standardize('a += b+c_-aaa'), 'a = a + ( b + c_ - aaa )')
         self.assertEqual(utils.standardize('a_bsfdfd ++   \n'), 'a_bsfdfd = a_bsfdfd + 1')
         self.assertEqual(utils.standardize('a_bsfdfd --   \n'), 'a_bsfdfd = a_bsfdfd - 1')
-
-    def test_cudamemcpy(self):
-        cudamemop = CUDAMemOp(['int']).so()
-        data = (c_int * 1000)(*list(range(1000)))
-        cpu = (c_int * 1000)(*([0]*1000))
-        gpu = cudamemop.gpu_malloc_int(1000)
-        cudamemop.cpu2gpu_int(data, gpu, 1000)
-        cudamemop.gpu_cpu_int(gpu, cpu, 1000)
-
-        self.assertListEqual(data, cpu)
-
-
 
     #def test_model(self):
     #    self.assertEqual(LIF_curr_exp.expressions['computation'])
