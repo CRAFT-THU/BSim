@@ -1,0 +1,31 @@
+
+import inspect
+import unittest
+
+import env
+
+from bsim.connection import *
+
+
+class TestConnectionMethods(unittest.TestCase):
+    def test_connection(self):
+        print("\nTesting: %s\n" % inspect.currentframe().f_code.co_name)
+        c = Connection()
+        c.delay_start = [0, 0, 3, 0, 1, 0, 0, 0, 0, 2, 0, 0]
+        c.delay_num = [1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0]
+        c.rev_delay_start = [0, 0, 0, 1, 0, 0, 2, 0, 0, 0, 0, 3]
+        c.rev_delay_num = [0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1]
+        c.rev_map2sid = [0, 3, 1, 2]
+
+        gpu = c.to_gpu()
+        cpu = c.from_gpu(gpu, only_struct=False)
+        self.assertListEqual(c.delay_start, list(cpu.delay_start))
+        self.assertListEqual(c.delay_num, list(cpu.delay_num))
+        self.assertListEqual(c.rev_delay_start, list(cpu.rev_delay_start))
+        self.assertListEqual(c.rev_delay_num, list(cpu.rev_delay_num))
+        self.assertListEqual(c.rev_map2sid, list(cpu.rev_map2sid))
+
+
+if __name__ == '__main__':
+    unittest.main()
+

@@ -39,3 +39,14 @@ def standardize(expression):
 
     return standard
 
+
+def code_line(line, tab: int=1):
+    return '%s%s;\n' % (tab*'\t', line)
+
+def malloc(ret: str="", type_: str="", num='1', tab: int=1):
+    return code_line(
+        line='%s * %s = static_cast<%s*>(malloc(sizeof(%s)*%s))' %
+             (type_, ret, type_, type_, num),
+        tab = tab
+    )
+

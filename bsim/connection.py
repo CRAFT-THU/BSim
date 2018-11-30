@@ -1,7 +1,10 @@
-
+import os
 from ctypes import *
 
 import subprocess
+
+from bsim import utils
+from bsim.cudamemop import cudamemops, CUDAMemOp
 
 
 class CConnection(Structure):
@@ -23,6 +26,13 @@ class Connection(object):
         self.rev_delay_start = []
         self.rev_delay_num = []
         self.rev_map2sid = []
+        self.dir = os.path.dirname(__file__)
+        self._so = None
+
+    def so(self):
+        if not self._so:
+            self.compile_()
+        return self._so
 
     def to_c(self):
         assert len(self.delay_start) == len(self.delay_num) and \
@@ -30,7 +40,7 @@ class Connection(object):
                len(self.delay_start) == len(self.rev_delay_start)
         c = CConnection()
         c.n_length = len(self.delay_start)
-        c.s_length = len(self.delay_num)
+        c.s_length = len(self.rev_map2sid)
         c.delay_start = (c_int * len(self.delay_start))(*(self.delay_start))
         c.delay_num = (c_int * len(self.delay_num))(*(self.delay_num))
 
@@ -41,28 +51,55 @@ class Connection(object):
         return c
 
     def to_gpu(self):
+        c_data = self.to_c()
+        return self.so().to_gpu_connection(pointer(c_data))
 
-        if self.compile_():
-            connection_data_so = cdll.LoadLibrary('./c_so/connection.data.so')
-            c_data = self.to_c()
-            return connection_data_so.to_gpu_connection(c_data)
-        else:
-            raise EnvironmentError('Compile file connection.data.so failed')
+    def from_gpu(self, gpu: POINTER(CConnection), only_struct=True):
+        cpu = self.so().from_gpu_connection(gpu)
+        c = cast(cpu, POINTER(CConnection*1)).contents[0]
 
-        return None
+        if not only_struct:
+            c.delay_start = cast(
+                cudamemops.from_gpu_int(c.delay_start, c.n_length),
+                POINTER(c_int * c.n_length)
+            ).content
+            c.delay_num = cast(
+                cudamemops.from_gpu_int(c.delay_num, c.n_length),
+                POINTER(c_int * c.n_length)
+            ).content
+            c.rev_delay_start = cast(
+                cudamemops.from_gpu_int(c.rev_delay_start, c.n_length),
+                POINTER(c_int * c.n_length)
+            ).content
+            c.rev_delay_num = cast(
+                cudamemops.from_gpu_int(c.rev_delay_num, c.n_length),
+                POINTER(c_int * c.n_length)
+            ).content
+            c.rev_map2sid = cast(
+                cudamemops.from_gpu_int(c.rev_map2sid, c.n_length),
+                POINTER(c_int * c.n_length)
+            ).content
+
+        return c
 
     def compile_(self):
         self._compile_h()
         self._compile_data_cu()
 
-        return subprocess.call('nvcc -I/usr/local/cuda/include/ -shared'
-                               '--compiler-options "-Wall -Wfatal-errors -Ofast -fPIC" -c '
-                               './c_code/connection.data.cu -o ./c_so/connection.data.so',
-                               shell=True) == 0
+        if subprocess.call('/usr/local/cuda/bin/nvcc -I/usr/local/cuda/include/ -shared '
+                               '--compiler-options "-Wall -Wfatal-errors -Ofast -fPIC -shared" '
+                               '%s/c_code/connection.data.cu -o %s/c_so/connection.data.so' %
+                               (self.dir , self.dir),
+                               shell=True) == 0:
+            self._so = cdll.LoadLibrary('%s/c_so/connection.data.so' % self.dir)
+            self._so.to_gpu_connection.restype = POINTER(CConnection)
+            self._so.from_gpu_connection.restype = POINTER(CConnection)
+        else:
+            self._so = None
+            raise EnvironmentError('Compile file connection.data.so failed')
 
-    @staticmethod
-    def _compile_h():
-        h_file = open("./c_code/connection.h")
+    def _compile_h(self):
+        h_file = open("%s/c_code/connection.h" % self.dir, mode="w+")
 
         h_file.write("\n\n")
         h_file.write("#ifndef CONNECTION_H\n ")
@@ -82,39 +119,51 @@ class Connection(object):
         h_file.write("\n")
 
         h_file.write('extern "C" {\n')
-        h_file.write("\tCConnection * to_gpu_connection(CConnection *cpum);\n")
+        h_file.write("\tCConnection * to_gpu_connection(CConnection *cpu);\n")
+        h_file.write("\tCConnection * from_gpu_connection(CConnection *gpu);\n")
         h_file.write("}\n")
         h_file.write("\n")
 
+        h_file.write("#endif /* CONNECTION_H */\n")
+
         h_file.close()
 
-    @staticmethod
-    def _compile_data_cu():
-        c_file = open('./c_code/connection.data.cu')
+    def _compile_data_cu(self):
+        cu_file = open('%s/c_code/connection.data.cu' % self.dir, mode="w+")
 
-        c_file.write("\n\n")
-        c_file.write('#include <stdlib.h>\n')
-        c_file.write("\n")
-        c_file.write('#include "../gpu_utils/mem_op.h"\n')
-        c_file.write('#include "connection.h"\n')
-        c_file.write("\n\n")
+        cu_file.write("\n\n")
+        cu_file.write('#include <stdlib.h>\n')
+        cu_file.write("\n")
+        cu_file.write('#include "helper_cuda.h"\n')
+        cu_file.write('#include "connection.h"\n')
+        cu_file.write("\n\n")
 
-        c_file.write('extern "C" {\n')
-        c_file.write("\t%CConnection * to_gpu_connection(CConnection *cpu, int num)\n")
-        c_file.write("\t{\n")
-        c_file.write('\t\tCConnection * gpu = malloc(sizeof(CConnection);\n')
-        c_file.write('\t\tgpu->delay_start = copyToGPU<int>(cpu->delay_start, cpu->n_length);\n')
-        c_file.write('\t\tgpu->delay_num = copyToGPU<int>(cpu->delay_num, cpu->n_length);\n')
-        c_file.write('\t\tgpu->rev_delay_start = copyToGPU<int>(rev_cpu->delay_start, cpu->n_length);\n')
-        c_file.write('\t\tgpu->rev_delay_num = copyToGPU<int>(rev_cpu->delay_num, cpu->n_length);\n')
-        c_file.write('\t\tgpu->rev_map2sid = copyToGPU<int>(rev_cpu->delay_num, cpu->s_length);\n')
-        c_file.write('\t\tret = copyToGPU<CConnection>(gpu, 1);\n')
-        c_file.write('\n\t\treturn ret;\n')
-        c_file.write("\t}\n")
-        c_file.write("}\n")
-        c_file.write("\n")
+        cu_file.write("CConnection * to_gpu_connection(CConnection *cpu)\n")
+        cu_file.write("{\n")
+        cu_file.write('\tCConnection * gpu = (CConnection*)malloc(sizeof(CConnection));\n')
 
-        c_file.close()
+        cu_file.write(CUDAMemOp.to_gpu(ret='gpu->delay_start', cpu='cpu->delay_start', type_='int', num='cpu->n_length'))
+        cu_file.write(CUDAMemOp.to_gpu(ret='gpu->delay_num', cpu='cpu->delay_num', type_='int', num='cpu->n_length'))
+
+        cu_file.write(CUDAMemOp.to_gpu(ret='gpu->rev_delay_start', cpu='cpu->rev_delay_start', type_='int', num='cpu->n_length'))
+        cu_file.write(CUDAMemOp.to_gpu(ret='gpu->rev_delay_num', cpu='cpu->rev_delay_num', type_='int', num='cpu->n_length'))
+
+        cu_file.write(CUDAMemOp.to_gpu(ret='gpu->rev_map2sid', cpu='cpu->rev_map2sid', type_='int', num='cpu->s_length'))
+
+        cu_file.write(utils.code_line('CConnection * ret = NULL'))
+        cu_file.write(CUDAMemOp.to_gpu(ret='ret', cpu='gpu', type_='CConnection'))
+        cu_file.write('\n\treturn ret;\n')
+        cu_file.write("}\n")
+        cu_file.write("\n")
+
+        cu_file.write("CConnection * from_gpu_connection(CConnection *gpu)\n")
+        cu_file.write("{\n")
+        cu_file.write(CUDAMemOp.from_gpu(gpu='gpu', ret='ret', type_='CConnection'))
+        cu_file.write('\n\treturn ret;\n')
+        cu_file.write("}\n")
+        cu_file.write("\n")
+
+        cu_file.close()
         return
 
 
