@@ -3,8 +3,8 @@ from typing import List, Dict
 import importlib
 
 from bsim.connection import Connection
-from bsim.neuron import Population
-from bsim.synapse import Projection
+from bsim.population import Population
+from bsim.projection import Projection
 
 
 class Network(object):
@@ -125,7 +125,7 @@ class Network(object):
 
     def _compile_model(self):
         for neuron in self.populations:
-            neuron.compile()
+            neuron.compile_()
             self.neuron_models.append(neuron)
             self.neuron_data.append(
                 Population(model=neuron, num=0, name="%s_compact" % neuron.name)
@@ -133,7 +133,7 @@ class Network(object):
         self.neuron_nums = [0] * (len(self.neuron_models) + 1)
 
         for synapse in self.projections:
-            synapse.compile()
+            synapse.compile_()
             self.synapse_models.append(neuron)
             self.synapse_data.append(
                 Projection(model=synapse, num=0, name="%s_compact" % synapse.name)

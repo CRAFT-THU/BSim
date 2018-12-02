@@ -1,6 +1,4 @@
 from ctypes import *
-
-
 class CConnection(Structure):
 	_fields_ = [
 		("delay_start", POINTER(c_int * 12)),

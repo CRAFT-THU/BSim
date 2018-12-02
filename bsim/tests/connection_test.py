@@ -1,5 +1,4 @@
 
-import inspect
 import unittest
 
 import env
@@ -8,9 +7,8 @@ from bsim.connection import *
 
 
 class TestConnectionMethods(unittest.TestCase):
-    def test_connection(self):
-        print("\nTesting: %s\n" % inspect.currentframe().f_code.co_name)
-        c = Connection(debug=True)
+    def test_data(self):
+        c = Connection(debug=False)
         c.delay_start = [0, 0, 3, 0, 1, 0, 0, 0, 0, 2, 0, 0]
         c.delay_num = [1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0]
         c.rev_delay_start = [0, 0, 0, 1, 0, 0, 2, 0, 0, 0, 0, 3]

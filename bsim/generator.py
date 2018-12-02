@@ -1,42 +1,79 @@
+import subprocess
 
-class CGenerator(object):
+
+class BaseGenerator(object):
+    def __init__(self, filename: str= ''):
+        self.file = open(filename, "w+")
+
+    def line_no_end(self, line: str='', tab: int=1):
+        self.file.write('{}{}\n'.format(tab * '\t', line))
+
+    def blank_line(self, num: int=1):
+        self.file.write('\n'*num)
+
+    def close(self):
+        self.file.close()
+
+
+class PyGenerator(BaseGenerator):
+    def __init__(self, filename: str= ''):
+        self.file = open(filename, "w+")
+
+    def line(self, line: str='', tab: int=1):
+        self.line_no_end(line, tab=tab)
+
+    def import_(self, name: str='', package: str=''):
+        if not package == '':
+            self.file.write('from {} import {}\n'.format(package, name))
+        else:
+            self.file.write('import {}\n'.format(name))
+
+    def class_(self, name: str='', parent: str='', tab: int=0):
+        self.line('class {}({}):'.format(name, parent), tab=tab)
+
+
+class CGenerator(BaseGenerator):
     def __init__(self, filename: str= ''):
         self.file = open(filename, "w+")
 
     def line(self, line, tab: int=1):
-        self.file.write('%s%s;\n' % (tab*'\t', line))
+        self.line_no_end('{};'.format(line), tab=tab)
 
-    def line_no_end(self, line: str='', tab: int=1):
-        self.file.write('%s%s\n' % (tab*'\t', line))
+    def struct(self, name: str='', tab: int=0):
+        self.line_no_end('struct {} {{'.format(name), tab=tab)
 
-    def if_define(self, name: str=''):
-        self.line_no_end('#ifdef %' % name.replace('.', '_').upper())
-        self.line_no_end('#define %' % name.replace('.', '_').upper())
+    def if_define(self, name: str='', tab: int=0):
+        self.line_no_end('#ifndef {}'.format(name.replace('.', '_').upper()), tab=tab)
+        self.line_no_end('#define {}'.format(name.replace('.', '_').upper()), tab=tab)
 
-    def end_if_define(self, name: str=''):
-        self.line_no_end('#endif // %' % name.replace('.', '_').upper())
+    def end_if_define(self, name: str='', tab: int=0):
+        self.line_no_end('#endif // {}'.format(name.replace('.', '_').upper()), tab=tab)
 
     def include(self, filename: str='', tab: int=0):
-        self.line_no_end('#include "%s"\n' % filename, tab=tab)
+        self.line_no_end('#include "{}"'.format(filename), tab=tab)
 
     def include_std(self, filename: str='', tab: int=0):
-        self.line_no_end('#include <%s>\n' % filename, tab=tab)
+        self.line_no_end('#include <{}>'.format(filename), tab=tab)
 
-    def open_brace(self, tab: int=1):
-        self.line_no_end("{\n", tab=tab)
+    def open_brace(self, tab: int=0):
+        self.line_no_end("{", tab=tab)
 
-    def close_brace(self, tab: int=1):
-        self.line_no_end("}\n", tab=tab)
-
-    def blank_line(self):
-        self.line_no_end('\n')
+    def close_brace(self, tab: int=0):
+        self.line_no_end("}", tab=tab)
 
     def malloc(self, ret: str="", type_: str="", num='1', tab: int=1):
         self.line(
-            line='%s * %s = static_cast<%s*>(malloc(sizeof(%s)*%s))' %
-                 (type_, ret, type_, type_, num),
+            line='{} * {} = static_cast<{}*>(malloc(sizeof({})*{}))'
+                .format(type_, ret, type_, type_, num),
             tab=tab
         )
+
+    @staticmethod
+    def compile_(src: str='a.cpp', output: str='a.so'):
+        return subprocess.call(
+            '/usr/bin/g++ -Wall -Wno-switch -Wfatal-errors -Ofast -fPIC -shared '
+            '{} -o {}'.format(src, output),
+            shell=True) == 0
 
 
 class CUDAGenerator(CGenerator):
@@ -45,8 +82,8 @@ class CUDAGenerator(CGenerator):
 
     def malloc_gpu(self, ret: str="", type_: str="", num='1', tab: int=1):
         self.line(
-            line='checkCudaErrors(cudaMalloc((void**)&(%s), sizeof(%s)*%s))' %
-                 (ret, type_, num),
+            line='checkCudaErrors(cudaMalloc((void**)&({}), sizeof({})*{}))'
+                .format(ret, type_, num),
             tab=tab
         )
 
@@ -60,14 +97,24 @@ class CUDAGenerator(CGenerator):
 
     def cpu_to_gpu(self, cpu: str, gpu: str, type_:str= 'double', num='1', tab: int=1):
         self.line(
-            line='checkCudaErrors(cudaMemcpy(%s, %s, sizeof(%s)*%s, cudaMemcpyHostToDevice))' %
-                 (gpu, cpu, type_, num),
+            line='checkCudaErrors(cudaMemcpy({}, {}, sizeof({})*{}, cudaMemcpyHostToDevice))'
+                .format(gpu, cpu, type_, num),
             tab=tab
         )
 
     def gpu_to_cpu(self, cpu:str, gpu: str, type_:str= 'double', num='1', tab: int=1):
         self.line(
-            line='checkCudaErrors(cudaMemcpy(%s, %s, sizeof(%s)*%s, cudaMemcpyDeviceToHost))' %
-                 (cpu, gpu, type_, num),
+            line='checkCudaErrors(cudaMemcpy({}, {}, sizeof({})*{}, cudaMemcpyDeviceToHost))'
+                .format(cpu, gpu, type_, num),
             tab=tab
         )
+
+    @staticmethod
+    def compile_(src: str='a.cu', output: str='a.so'):
+        cmd = '{} {} {} -o {}'.format(
+            '/usr/local/cuda/bin/nvcc -I/usr/local/cuda/include/ -shared',
+            '--compiler-options "-Wall -Wno-switch -Wfatal-errors -Ofast -fPIC -shared"',
+            src, output
+        )
+        # print('{}\n'.format(cmd))
+        return subprocess.call(cmd, shell=True) == 0

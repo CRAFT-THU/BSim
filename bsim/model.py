@@ -1,55 +1,40 @@
 
+import os
 from abc import ABC, abstractmethod
 from typing import Dict, Iterable
 
+from bsim.data import Data
 
-class BaseModel(ABC):
-    def __init__(self):
-        self.name = ''
-        self.expressions = {}
-        self.parameters = {}
 
-    def compile_(self):
-        self._generate_h()
-        self._generate_c()
-        self._generate_cu()
-        self._generate_py()
-
-        return
+class Model(ABC):
+    def __init__(self, debug=False):
+        self.dir = os.path.dirname(__file__)
 
     @abstractmethod
-    def _generate_h(self):
-        """
-        Generate .h file for the model
-        """
+    def generate_h(self):
+        pass
 
     @abstractmethod
-    def _generate_py(self):
-        """
-        Generate .py file for the model
-        """
+    def generate_data_cu(self, debug=False):
+        pass
 
     @abstractmethod
-    def _generate_c(self):
-        """
-        Generate .cpp file for the model
-        """
+    def generate_compute_cu(self, debug=False):
+        pass
 
     @abstractmethod
-    def _generate_cu(self):
-        """
-        Generate .cu file for the model
-        """
+    def generate_py(self):
+        pass
 
 
-class ModelOfArray(object):
+class ModelOfArray(Data):
     """
     An array of Models. Base class of neuron or synapse classes, we assume that the neuron or synapse belong to
     same group have same constant parameters.
     TODO: deal with the neurons in same population but different constant parameters
     """
 
-    def __init__(self, model:BaseModel, num:int=1, name:str= '', **kwargs:Dict):
+    def __init__(self, model: Data, num: int=1, name: str= '', debug: bool=False, **kwargs: Dict):
         """
         Parameters
         ----------
@@ -61,20 +46,22 @@ class ModelOfArray(object):
         assert num >= 0 and isinstance(num, int), "%s, the number in %s is invalid" % (num, name)
 
         # name of this array
-        self.name = name # type: str
+        self.num = num  # type: int
+        self.name = name  # type: str
+        self.debug = debug  # type: bool
         # name of the model
         # self.type = model.name # type: str
         # description of the model
-        self.model = model # type: Union[NeuronModel, SynapseModel]
+        self.model = model  # type: Union[NeuronModel, SynapseModel]
         # computations of the model
         # self.expressions = model.expressions['assignment'] # type: Dict
         # parameters that should stored as a List
-        self.parameters = {} #  type: Dict[str:List]
+        self.parameters = {}  # type: Dict[str:List]
         # parameters that stored as number and shared across the array
-        self.shared = {} # type: typing.Dict[str:Union[int, float]] # type: typing.Dict[str:
+        self.shared = {}  # type: typing.Dict[str:Union[int, float]] # type: typing.Dict[str:
 
         if num > 0:
-            if set(kwargs) < model.parameters['origin']:
+            if set(kwargs) < model.parameters['original']:
                 raise ValueError('Projection %s Parameters not match, expect %s' % (name, model.parameters['origin']))
 
             for para in self.model.parameters['variable']:
@@ -121,3 +108,28 @@ class ModelOfArray(object):
             self.parameters[i].extend(model.parameters[i])
 
         return self
+
+    def to_c(self):
+        pass
+
+    def to_gpu(self):
+        pass
+
+    def from_gpu(self, gpu, only_struct=True):
+        pass
+
+    def compile_(self):
+        pass
+
+    def _generate_h(self):
+        self.model.generate_h()
+
+    def _generate_data_cu(self):
+        self.model.generate_data_cu()
+
+    def _generate_py(self):
+        self.model.generate_py
+
+
+
+

@@ -1,28 +1,14 @@
+
 import os
 from ctypes import *
-
-import subprocess
-
 import importlib
 
-from bsim import utils
-from bsim.cudamemop import cudamemops, CUDAMemOp
-
-
-#class CConnection(Structure):
-#    _fields_ = [
-#        ("delay_start", POINTER(c_int)),
-#        ("delay_num", POINTER(c_int)),
-#        ("rev_delay_start", POINTER(c_int)),
-#        ("rev_delay_num", POINTER(c_int)),
-#        ("rev_map2sid", POINTER(c_int)),
-#        ("n_length", c_int),
-#        ("s_length", c_int)
-#    ]
+from bsim.cudamemop import cudamemops
+from bsim.generator import CUDAGenerator, CGenerator, PyGenerator
 
 
 class Connection(object):
-    def __init__(self, debug = False):
+    def __init__(self, debug=False):
         self.delay_start = []
         self.delay_num = []
         self.rev_delay_start = []
@@ -32,7 +18,7 @@ class Connection(object):
         self.dir = os.path.dirname(__file__)
         self.debug = debug
         self._so = None
-        self.cconnection = None
+        self.c_connection = None
 
     def so(self):
         if not self._so:
@@ -46,10 +32,10 @@ class Connection(object):
 
         self._generate_py()
 
-        self.cconnection = importlib.import_module(
+        self.c_connection = importlib.import_module(
             'bsim.py_code.cconnection_%s_%s' % (len(self.delay_start), len(self.rev_map2sid))
             ).CConnection
-        c = self.cconnection()
+        c = self.c_connection()
         c.n_length = len(self.delay_start)
         c.s_length = len(self.rev_map2sid)
         c.delay_start = pointer((c_int * len(self.delay_start))(*(self.delay_start)))
@@ -77,7 +63,7 @@ class Connection(object):
         :return:
         """
         cpu = self.so().from_gpu_connection(gpu)
-        c = cast(cpu, POINTER(self.cconnection*1)).contents[0]
+        c = cast(cpu, POINTER(self.c_connection * 1)).contents[0]
 
         if self.debug:
             print("\nPython CPU Pointer: %s" % hex(cast(cpu, c_void_p).value))
@@ -96,123 +82,127 @@ class Connection(object):
         self._generate_h()
         self._generate_data_cu()
 
-        if subprocess.call('/usr/local/cuda/bin/nvcc -I/usr/local/cuda/include/ -shared '
-                               '--compiler-options "-Wall -Wfatal-errors -Ofast -fPIC -shared" '
-                               '%s/c_code/connection.data.cu -o %s/c_so/connection.data.so' %
-                               (self.dir , self.dir),
-                               shell=True) == 0:
+        if CUDAGenerator.compile_(
+            src='{}/c_code/connection.data.cu'.format(self.dir),
+            output='{}/c_so/connection.data.so'.format(self.dir)
+        ):
             self._so = cdll.LoadLibrary('%s/c_so/connection.data.so' % self.dir)
-            self._so.to_gpu_connection.restype = POINTER(self.cconnection)
-            self._so.from_gpu_connection.restype = POINTER(self.cconnection)
+            self._so.to_gpu_connection.restype = POINTER(self.c_connection)
+            self._so.from_gpu_connection.restype = POINTER(self.c_connection)
         else:
             self._so = None
             raise EnvironmentError('Compile file connection.data.so failed')
 
     def _generate_h(self):
-        h_file = open("%s/c_code/connection.h" % self.dir, mode="w+")
+        h_gen = CGenerator("%s/c_code/connection.h" % self.dir)
 
-        h_file.write("\n\n")
-        h_file.write("#ifndef CONNECTION_H\n ")
-        h_file.write("#define CONNECTION_H\n")
-        h_file.write("\n\n")
+        h_gen.blank_line(2)
+        h_gen.if_define('connection.h')
+        h_gen.blank_line(2)
 
-        h_file.write("struct CConnection {\n")
-        h_file.write("\tint *delay_start;\n")
-        h_file.write("\tint *delay_num;\n")
-        h_file.write("\tint *rev_delay_start;\n")
-        h_file.write("\tint *rev_delay_num;\n")
-        h_file.write("\tint *rev_map2sid;\n")
-        h_file.write("\tint n_length;\n")
-        h_file.write("\tint s_length;\n")
+        h_gen.struct("CConnection")
+        h_gen.line("int *delay_start")
+        h_gen.line("int *delay_num")
+        h_gen.line("int *rev_delay_start")
+        h_gen.line("int *rev_delay_num")
+        h_gen.line("int *rev_map2sid")
+        h_gen.line("int n_length")
+        h_gen.line("int s_length")
 
-        h_file.write("};\n")
-        h_file.write("\n")
+        h_gen.line("}")
+        h_gen.blank_line()
 
-        h_file.write('extern "C" {\n')
-        h_file.write("\tCConnection * to_gpu_connection(CConnection *cpu);\n")
-        h_file.write("\tCConnection * from_gpu_connection(CConnection *gpu);\n")
-        h_file.write("}\n")
-        h_file.write("\n")
+        h_gen.line_no_end('extern "C" {', 0)
+        h_gen.line("CConnection * to_gpu_connection(CConnection *cpu)")
+        h_gen.line("CConnection * from_gpu_connection(CConnection *gpu)")
+        h_gen.close_brace()
+        h_gen.blank_line()
 
-        h_file.write("#endif /* CONNECTION_H */\n")
+        h_gen.end_if_define('connection.h')
 
-        h_file.close()
+        h_gen.close()
 
     def _generate_data_cu(self):
-        cu_file = open('%s/c_code/connection.data.cu' % self.dir, mode="w+")
+        cu_gen = CUDAGenerator('{}/c_code/connection.data.cu'.format(self.dir))
 
-        cu_file.write("\n\n")
+        cu_gen.blank_line(2)
         if self.debug:
-            cu_file.write(utils.code_line_no_end(line='#include <stdio.h>', tab=0))
-        cu_file.write('#include <stdlib.h>\n')
-        cu_file.write("\n")
-        cu_file.write('#include "helper_cuda.h"\n')
-        cu_file.write('#include "connection.h"\n')
-        cu_file.write("\n\n")
+            cu_gen.include_std('stdio.h')
 
-        cu_file.write("CConnection * to_gpu_connection(CConnection *cpu)\n")
-        cu_file.write("{\n")
-        cu_file.write('\tCConnection * gpu = (CConnection*)malloc(sizeof(CConnection));\n')
+        cu_gen.include_std('stdlib.h')
+        cu_gen.blank_line()
+        cu_gen.include('helper_cuda.h')
+        cu_gen.include('connection.h')
+        cu_gen.blank_line(2)
 
-        cu_file.write(utils.code_line('gpu->n_length = cpu->n_length'))
-        cu_file.write(utils.code_line('gpu->s_length = cpu->s_length'))
+        cu_gen.line_no_end("CConnection * to_gpu_connection(CConnection *cpu)", 0)
+        cu_gen.open_brace()
+        cu_gen.line('CConnection * gpu = (CConnection*)malloc(sizeof(CConnection))')
+        cu_gen.line('gpu->n_length = cpu->n_length')
+        cu_gen.line('gpu->s_length = cpu->s_length')
 
-        cu_file.write(CUDAMemOp.to_gpu(ret='gpu->delay_start', cpu='cpu->delay_start', type_='int', num='cpu->n_length'))
-        cu_file.write(CUDAMemOp.to_gpu(ret='gpu->delay_num', cpu='cpu->delay_num', type_='int', num='cpu->n_length'))
+        cu_gen.to_gpu(ret='gpu->delay_start', cpu='cpu->delay_start', type_='int', num='cpu->n_length')
+        cu_gen.to_gpu(ret='gpu->delay_num', cpu='cpu->delay_num', type_='int', num='cpu->n_length')
+        cu_gen.to_gpu(ret='gpu->rev_delay_start', cpu='cpu->rev_delay_start', type_='int', num='cpu->n_length')
+        cu_gen.to_gpu(ret='gpu->rev_delay_num', cpu='cpu->rev_delay_num', type_='int', num='cpu->n_length')
+        cu_gen.to_gpu(ret='gpu->rev_map2sid', cpu='cpu->rev_map2sid', type_='int', num='cpu->s_length')
 
-        cu_file.write(CUDAMemOp.to_gpu(ret='gpu->rev_delay_start', cpu='cpu->rev_delay_start', type_='int', num='cpu->n_length'))
-        cu_file.write(CUDAMemOp.to_gpu(ret='gpu->rev_delay_num', cpu='cpu->rev_delay_num', type_='int', num='cpu->n_length'))
-
-        cu_file.write(CUDAMemOp.to_gpu(ret='gpu->rev_map2sid', cpu='cpu->rev_map2sid', type_='int', num='cpu->s_length'))
-
-        cu_file.write(utils.code_line('CConnection * ret = NULL'))
-        cu_file.write(CUDAMemOp.to_gpu(ret='ret', cpu='gpu', type_='CConnection'))
+        cu_gen.line('CConnection * ret = NULL')
+        cu_gen.to_gpu(ret='ret', cpu='gpu', type_='CConnection')
 
         if self.debug:
-            cu_file.write(utils.code_line(line=r'printf("GPU CConnection Pointer: %p\n", ret)'))
-            cu_file.write(utils.code_line(line=r'printf("GPU n_length: %d  s_length: %d\n", gpu->n_length, gpu->s_length)'))
+            cu_gen.line(line=r'printf("GPU CConnection Pointer: %p\n", ret)')
+            cu_gen.line(line=r'printf("GPU n_length: %d  s_length: %d\n", gpu->n_length, gpu->s_length)')
 
-        cu_file.write('\n\treturn ret;\n')
-        cu_file.write("}\n")
-        cu_file.write("\n")
+        cu_gen.line('return ret')
+        cu_gen.close_brace()
+        cu_gen.blank_line()
 
-        cu_file.write("CConnection * from_gpu_connection(CConnection *gpu)\n")
-        cu_file.write("{\n")
-        cu_file.write(CUDAMemOp.from_gpu(gpu='gpu', ret='ret', type_='CConnection'))
+        cu_gen.line_no_end("CConnection * from_gpu_connection(CConnection *gpu)", 0)
+        cu_gen.open_brace()
+        cu_gen.from_gpu(gpu='gpu', ret='ret', type_='CConnection')
 
         if self.debug:
-            cu_file.write(utils.code_line(line=r'printf("CPU CConnection Pointer: %p\n", ret)'))
-            cu_file.write(utils.code_line(line=r'printf("CPU n_length: %d s_length: %d\n", ret->n_length, ret->s_length)'))
+            cu_gen.line(line=r'printf("CPU CConnection Pointer: %p\n", ret)')
+            cu_gen.line(line=r'printf("CPU n_length: %d s_length: %d\n", ret->n_length, ret->s_length)')
 
-        cu_file.write('\n\treturn ret;\n')
-        cu_file.write("}\n")
-        cu_file.write("\n")
+        cu_gen.line('return ret')
+        cu_gen.close_brace()
+        cu_gen.blank_line()
 
-        cu_file.close()
+        cu_gen.close()
         return
 
     def _generate_py(self):
-        py_file = open('%s/py_code/cconnection_%s_%s.py' % (self.dir, len(self.delay_start), len(self.rev_map2sid)), mode="w+")
+        py_gen = PyGenerator('{}/py_code/cconnection_{}_{}.py'.format(
+            self.dir, len(self.delay_start), len(self.rev_map2sid)
+        ))
 
-        py_file.write("from ctypes import *\n\n\n")
-        py_file.write("class CConnection(Structure):\n")
-        py_file.write("\t_fields_ = [\n")
-        py_file.write('\t\t("delay_start", POINTER(c_int * %s)),\n' % len(self.delay_start))
-        py_file.write('\t\t("delay_num", POINTER(c_int * %s)),\n' % len(self.delay_num))
-        py_file.write('\t\t("rev_delay_start", POINTER(c_int * %s)),\n' % len(self.rev_delay_start))
-        py_file.write('\t\t("rev_delay_num", POINTER(c_int * %s)),\n' % len(self.rev_delay_num))
-        py_file.write('\t\t("rev_map2sid", POINTER(c_int * %s)),\n' % len(self.rev_map2sid))
-        py_file.write('\t\t("n_length", c_int),\n')
-        py_file.write('\t\t("s_length", c_int)\n')
-        py_file.write("\t]\n")
-        py_file.write('\n')
+        py_gen.import_("*", "ctypes")
+        py_gen.class_("CConnection", "Structure")
+        py_gen.line("_fields_ = [")
+        py_gen.line('("delay_start", POINTER(c_int * {})),'.format(len(self.delay_start)), 2)
+        py_gen.line('("delay_num", POINTER(c_int * {})),'.format(len(self.delay_num)), 2)
+        py_gen.line('("rev_delay_start", POINTER(c_int * {})),'.format(len(self.rev_delay_start)), 2)
+        py_gen.line('("rev_delay_num", POINTER(c_int * {})),'.format(len(self.rev_delay_num)), 2)
+        py_gen.line('("rev_map2sid", POINTER(c_int * {})),'.format(len(self.rev_map2sid)), 2)
+        py_gen.line('("n_length", c_int),', 2)
+        py_gen.line('("s_length", c_int)', 2)
+        py_gen.line("]")
+        py_gen.blank_line()
 
-        py_file.close()
+        py_gen.close()
         return
 
 
-
-
-
-
+# class CConnection(Structure):
+#    _fields_ = [
+#        ("delay_start", POINTER(c_int)),
+#        ("delay_num", POINTER(c_int)),
+#        ("rev_delay_start", POINTER(c_int)),
+#        ("rev_delay_num", POINTER(c_int)),
+#        ("rev_map2sid", POINTER(c_int)),
+#        ("n_length", c_int),
+#        ("s_length", c_int)
+#    ]
 

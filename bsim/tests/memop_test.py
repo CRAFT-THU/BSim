@@ -1,5 +1,4 @@
 
-import inspect
 import unittest
 from ctypes import *
 
@@ -8,8 +7,7 @@ from bsim.cudamemop import cudamemops
 
 
 class TestMemOpMethods(unittest.TestCase):
-    def test_cudamemop(self):
-        print("\nTesting: %s\n" % inspect.currentframe().f_code.co_name)
+    def test_malloc_and_data(self):
         data = (c_int * 1000)(*list(range(1000)))
         cpu = (c_int * 1000)(*([0]*1000))
         gpu = cudamemops.gpu_malloc_int(1000)
@@ -18,9 +16,9 @@ class TestMemOpMethods(unittest.TestCase):
         cudamemops.cpu2gpu_int(data, gpu, 1000)
         cudamemops.gpu2cpu_int(gpu, cpu, 1000)
 
-
         self.assertListEqual(list(data), list(cpu))
         self.assertListEqual(list(data), list(cpu1.contents))
+
 
 if __name__ == '__main__':
     unittest.main()

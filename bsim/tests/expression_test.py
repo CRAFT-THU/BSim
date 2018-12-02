@@ -1,16 +1,12 @@
 
-import inspect
 import unittest
-from ctypes import *
 
 import env
 import bsim.utils as utils
-from bsim.cudamemop import CUDAMemOp
 
 
 class TestExpressionMethods(unittest.TestCase):
     def test_standard(self):
-        print("\nTesting: %s\n" % inspect.currentframe().f_code.co_name)
         self.assertEqual(utils.standardize('a= b+c_ -aaa'), 'a = b + c_ - aaa')
         self.assertEqual(utils.standardize('a += b+c_-aaa'), 'a = a + ( b + c_ - aaa )')
         self.assertEqual(utils.standardize('a_bsfdfd ++   \n'), 'a_bsfdfd = a_bsfdfd + 1')

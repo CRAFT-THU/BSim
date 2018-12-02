@@ -1,9 +1,11 @@
 
-from bsim.model import BaseModel
+import os
+
+from bsim.model import Model
 from bsim.model_compiler import compile_
 
 
-class SynapseModel(BaseModel):
+class SynapseModel(Model):
     def __init__(self, computation: str='', pre: str='', post: str='', name: str=''):
         """
         Create SynapseModel: find out variables and constants for further optimization.
@@ -24,7 +26,9 @@ class SynapseModel(BaseModel):
         self.parameters['variable'].add('weight')
         self.parameters['constant'].add('delay')
 
-    def _generate_h(self):
+        self.dir = os.path.dirname(__file__)
+
+    def generate_h(self):
         h_file = open("./c_code/%s.h" % self.name)
 
         h_file.write("\n\n")
@@ -71,7 +75,7 @@ class SynapseModel(BaseModel):
         h_file.close()
         return
 
-    def _generate_py(self):
+    def generate_py(self):
         py_file = open('./c_code/%s.py' % self.name )
 
         py_file.write("from ctypes import *\n\n\n")
@@ -88,7 +92,7 @@ class SynapseModel(BaseModel):
         py_file.close()
         return
 
-    def _generate_c(self):
+    def generate_data_cu(self, debug=False):
         c_file = open('./c_code/%s.cpp' % self.name )
 
         c_file.write("\n\n")
@@ -117,7 +121,7 @@ class SynapseModel(BaseModel):
         c_file.close()
         return
 
-    def _generate_cu(self):
+    def generate_compute_cu(self, debug=False):
         cu_file = open('./c_code/%s.cu' % self.name)
 
         cu_file.write('extern "C" {\n')
