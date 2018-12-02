@@ -10,33 +10,33 @@ class BaseModel(ABC):
         self.parameters = {}
 
     def compile_(self):
-        self._compile_h()
-        self._compile_c()
-        self._compile_cu()
-        self._compile_py()
+        self._generate_h()
+        self._generate_c()
+        self._generate_cu()
+        self._generate_py()
 
         return
 
     @abstractmethod
-    def _compile_h(self):
+    def _generate_h(self):
         """
         Generate .h file for the model
         """
 
     @abstractmethod
-    def _compile_py(self):
+    def _generate_py(self):
         """
         Generate .py file for the model
         """
 
     @abstractmethod
-    def _compile_c(self):
+    def _generate_c(self):
         """
         Generate .cpp file for the model
         """
 
     @abstractmethod
-    def _compile_cu(self):
+    def _generate_cu(self):
         """
         Generate .cu file for the model
         """

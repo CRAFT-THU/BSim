@@ -31,7 +31,6 @@ int* to_gpu_int(int *cpu, int size)
 
 int* from_gpu_int(int *gpu, int size)
 {
-	int * cpu = NULL;
 	int * cpu = static_cast<int*>(malloc(sizeof(int)*size));
 	checkCudaErrors(cudaMemcpy(cpu, gpu, sizeof(int)*size, cudaMemcpyDeviceToHost));
 	return cpu;
@@ -64,7 +63,6 @@ float* to_gpu_float(float *cpu, int size)
 
 float* from_gpu_float(float *gpu, int size)
 {
-	float * cpu = NULL;
 	float * cpu = static_cast<float*>(malloc(sizeof(float)*size));
 	checkCudaErrors(cudaMemcpy(cpu, gpu, sizeof(float)*size, cudaMemcpyDeviceToHost));
 	return cpu;
@@ -97,7 +95,6 @@ double* to_gpu_double(double *cpu, int size)
 
 double* from_gpu_double(double *gpu, int size)
 {
-	double * cpu = NULL;
 	double * cpu = static_cast<double*>(malloc(sizeof(double)*size));
 	checkCudaErrors(cudaMemcpy(cpu, gpu, sizeof(double)*size, cudaMemcpyDeviceToHost));
 	return cpu;

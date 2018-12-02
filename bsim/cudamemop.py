@@ -20,8 +20,8 @@ class CUDAMemOp(object):
         return self._so
 
     def compile_(self):
-        self._compile_h()
-        self._compile_cu()
+        self._generate_h()
+        self._generate_cu()
 
         # TODO nvcc path
         if subprocess.call('/usr/local/cuda/bin/nvcc -I/usr/local/cuda/include/ -shared '
@@ -38,7 +38,7 @@ class CUDAMemOp(object):
             self._so = None
             raise EnvironmentError('Compile file connection.data.so failed')
 
-    def _compile_h(self):
+    def _generate_h(self):
         h_file = open("%s/c_code/cudamemop.h" % os.path.dirname(__file__), mode="w+")
 
         h_file.write("\n\n")
@@ -64,7 +64,7 @@ class CUDAMemOp(object):
         h_file.close()
         return
 
-    def _compile_cu(self):
+    def _generate_cu(self):
         cu_file = open('%s/c_code/cudamemop.cu' % os.path.dirname(__file__), mode="w+")
 
         cu_file.write("\n\n")
@@ -113,39 +113,39 @@ class CUDAMemOp(object):
         cu_file.close()
         return
 
-    @staticmethod
-    def malloc(ret: str="", type_: str="", num='1', tab: int=1):
-        return utils.code_line(
-                   line='checkCudaErrors(cudaMalloc((void**)&(%s), sizeof(%s)*%s))' %
-                        (ret, type_, num),
-                   tab = tab
-               )
+    #@staticmethod
+    #def malloc(ret: str="", type_: str="", num='1', tab: int=1):
+    #    return utils.code_line(
+    #               line='checkCudaErrors(cudaMalloc((void**)&(%s), sizeof(%s)*%s))' %
+    #                    (ret, type_, num),
+    #               tab = tab
+    #           )
 
-    @classmethod
-    def to_gpu(cls, ret: str, cpu: str, type_:str= 'double', num='1', tab: int=1):
-        return cls.malloc(ret=ret, type_=type_, num=num, tab=tab) +\
-               cls.cpu_to_gpu(gpu=ret, cpu=cpu, type_=type_, num=num, tab=tab)
+    #@classmethod
+    #def to_gpu(cls, ret: str, cpu: str, type_:str= 'double', num='1', tab: int=1):
+    #    return cls.malloc(ret=ret, type_=type_, num=num, tab=tab) +\
+    #           cls.cpu_to_gpu(gpu=ret, cpu=cpu, type_=type_, num=num, tab=tab)
 
-    @classmethod
-    def from_gpu(cls, ret: str, gpu: str, type_:str= 'double', num='1', tab: int=1):
-        return utils.malloc(ret=ret, type_=type_, num=num, tab=tab) + \
-               cls.gpu_to_cpu(gpu=gpu, cpu=ret, type_=type_, num=num, tab=tab)
+    #@classmethod
+    #def from_gpu(cls, ret: str, gpu: str, type_:str= 'double', num='1', tab: int=1):
+    #    return utils.malloc(ret=ret, type_=type_, num=num, tab=tab) + \
+    #           cls.gpu_to_cpu(gpu=gpu, cpu=ret, type_=type_, num=num, tab=tab)
 
-    @staticmethod
-    def cpu_to_gpu(cpu: str, gpu: str, type_:str= 'double', num='1', tab: int=1):
-        return utils.code_line(
-            line='checkCudaErrors(cudaMemcpy(%s, %s, sizeof(%s)*%s, cudaMemcpyHostToDevice))' %
-                 (gpu, cpu, type_, num),
-            tab=tab
-        )
+    #@staticmethod
+    #def cpu_to_gpu(cpu: str, gpu: str, type_:str= 'double', num='1', tab: int=1):
+    #    return utils.code_line(
+    #        line='checkCudaErrors(cudaMemcpy(%s, %s, sizeof(%s)*%s, cudaMemcpyHostToDevice))' %
+    #             (gpu, cpu, type_, num),
+    #        tab=tab
+    #    )
 
-    @staticmethod
-    def gpu_to_cpu(cpu:str, gpu: str, type_:str= 'double', num='1', tab: int=1):
-        return utils.code_line(
-            line='checkCudaErrors(cudaMemcpy(%s, %s, sizeof(%s)*%s, cudaMemcpyDeviceToHost))' %
-                 (cpu, gpu, type_, num),
-            tab=tab
-        )
+    #@staticmethod
+    #def gpu_to_cpu(cpu:str, gpu: str, type_:str= 'double', num='1', tab: int=1):
+    #    return utils.code_line(
+    #        line='checkCudaErrors(cudaMemcpy(%s, %s, sizeof(%s)*%s, cudaMemcpyDeviceToHost))' %
+    #             (cpu, gpu, type_, num),
+    #        tab=tab
+    #    )
 
 
 cudamemops = CUDAMemOp(['int', 'float', 'double']).so()

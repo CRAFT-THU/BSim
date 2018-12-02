@@ -18,7 +18,7 @@ class NeuronModel(BaseModel):
             'computation': computation,
         })
 
-    def _compile_h(self):
+    def _generate_h(self):
         h_file = open("./c_code/%s.h" % self.name)
 
         h_file.write("\n\n")
@@ -61,7 +61,7 @@ class NeuronModel(BaseModel):
         h_file.close()
         return
 
-    def _compile_py(self):
+    def _generate_py(self):
         py_file = open('./c_code/%s.py' % self.name )
 
         py_file.write("from ctypes import *\n\n\n")
@@ -79,7 +79,7 @@ class NeuronModel(BaseModel):
         py_file.close()
         return
 
-    def _compile_c(self):
+    def _generate_c(self):
         c_file = open('./c_code/%s.cpp' % self.name )
 
         c_file.write("\n\n")
@@ -110,7 +110,7 @@ class NeuronModel(BaseModel):
         c_file.close()
         return
 
-    def _compile_cu(self):
+    def _generate_cu(self):
         cu_file = open('./c_code/%s.cu' % self.name)
 
         cu_file.write("\n")
