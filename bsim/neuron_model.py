@@ -24,18 +24,15 @@ class NeuronModel(Model):
         })
 
         #TODO dynamic deal with reset and threshold
-        self.parameters['original'].add('v_reset')
-        self.parameters['constant'].add('v_reset')
-        self.parameters['original'].add('v_threshold')
-        self.parameters['constant'].add('v_threshold')
-        self.parameters['original'].remove('i_exec')
-        self.parameters['variable'].remove('i_exec')
-        self.parameters['original'].remove('i_inh')
-        self.parameters['variable'].remove('i_inh')
 
-        if self.refract:
-            self.parameters['original'].add('refract_time')
-            self.parameters['constant'].add('refract_time')
+        self.parameters['special'] = set(('refract_step', 'refract_time')) if self.refract else set()
+        self.parameters['outer'] = set(('i_exec', 'i_inh'))
+
+        self.parameters['original'] |= set(('v_reset', 'v_threshold'))
+        self.parameters['constant'] |= set(('v_reset', 'v_threshold'))
+        self.parameters['original'] -= self.parameters['special'] | self.parameters['outer']
+        self.parameters['variable'] -= self.parameters['special'] | self.parameters['outer']
+        self.parameters['constant'] -= self.parameters['special'] | self.parameters['outer']
 
         self.dir = os.path.dirname(__file__)
 
@@ -43,16 +40,22 @@ class NeuronModel(Model):
         h_gen = CGenerator("{}/c_code/{}.h".format(self.dir, self.name.lower()))
 
         h_gen.blank_line(2)
-        h_gen.include("blocksize.h")
         h_gen.if_define("{}_H ".format(self.name.upper()))
+        h_gen.blank_line(2)
+        h_gen.include("blocksize.h")
         h_gen.blank_line(2)
 
         h_gen.struct(self.name.capitalize(), 0)
-        if self.refract:
-            h_gen.line("int *p_refract_step")
+
+        for i in self.parameters['special']:
+            h_gen.line("int *p_%s" % i)
+
+        for i in self.parameters['constant']:
+            h_gen.line("float *p_%s" % i)
 
         for i in self.parameters['variable']:
             h_gen.line("float *p_%s" % i)
+
         h_gen.line("}", 0)
         h_gen.blank_line(1)
 
@@ -60,6 +63,8 @@ class NeuronModel(Model):
         h_gen.line("void update_{}({} *data, int num, int start_id, BlockSize *size)"
                    .format(self.name.lower(), self.name.capitalize()))
         h_gen.line("{} * to_gpu_{}({} *cpu, int num)"
+                   .format(self.name.capitalize(), self.name.lower(), self.name.capitalize()))
+        h_gen.line("{} * from_gpu_{}({} *gpu, int num)"
                    .format(self.name.capitalize(), self.name.lower(), self.name.capitalize()))
         h_gen.close_brace()
         h_gen.blank_line(1)
@@ -78,22 +83,21 @@ class NeuronModel(Model):
     def generate_py(self):
         py_gen = PyGenerator('{}/py_code/{}.py'.format(self.dir, self.name.lower()))
 
+        py_gen.blank_line()
         py_gen.import_("*", "ctypes")
+        py_gen.blank_line(2)
         py_gen.class_(self.name.capitalize(), "Structure")
         py_gen.line("_fields_ = [")
 
-        if self.refract:
-            py_gen.line('("p_refract_step", POINTER(c_int)),', 2)
+        for i in list(self.parameters['special']):
+            py_gen.line('("p_{}", POINTER(c_int)),'.format(i), 2)
 
-        t = list(self.parameters['variable'])
+        for i in list(self.parameters['constant']):
+            py_gen.line('("p_{}", POINTER(c_float)),'.format(i), 2)
 
-        if t[-1] == 'refract_step':
-            t = t[:-1]
+        for i in self.parameters['variable']:
+            py_gen.line('("p_{}", POINTER(c_float)),'.format(i), 2)
 
-        for i in t[:-1]:
-            if not i=='refract_step':
-                py_gen.line('("p_{}", POINTER(c_float)),'.format(i), 2)
-        py_gen.line('("p_{}", POINTER(c_float))'.format(t[-1]), 2)
         py_gen.line("]")
         py_gen.blank_line()
 
@@ -111,11 +115,15 @@ class NeuronModel(Model):
         cu_gen.blank_line(2)
 
         cu_gen.line_no_end("{} * to_gpu_{}({} *cpu, int num)"
-                   .format(self.name.capitalize(), self.name.lower(), self.name.capitalize()), 0)
+                           .format(self.name.capitalize(), self.name.lower(), self.name.capitalize()), 0)
         cu_gen.open_brace()
-        cu_gen.malloc(ret = 'gpu', type_=self.name.capitalize())
-        if self.refract:
-            cu_gen.to_gpu(ret='gpu->p_refract_step', cpu='cpu->p_refract_step', num='num', type_='int')
+        cu_gen.malloc(ret='gpu', type_=self.name.capitalize())
+
+        for i in self.parameters['special']:
+            cu_gen.to_gpu(ret='gpu->p_{}'.format(i), cpu='cpu->p_{}'.format(i), num='num', type_='int')
+
+        for i in self.parameters['constant']:
+            cu_gen.to_gpu(ret='gpu->p_{}'.format(i), cpu='cpu->p_{}'.format(i), num='num', type_='float')
 
         for i in self.parameters['variable']:
             cu_gen.to_gpu(ret='gpu->p_{}'.format(i), cpu='cpu->p_{}'.format(i), num='num', type_='float')
@@ -124,6 +132,15 @@ class NeuronModel(Model):
         cu_gen.to_gpu(ret='ret', cpu='gpu', num='1', type_=self.name.capitalize())
 
         cu_gen.line('return ret')
+        cu_gen.close_brace()
+        cu_gen.blank_line()
+
+        cu_gen.line_no_end("{} * from_gpu_{}({} *gpu, int num)"
+                           .format(self.name.capitalize(), self.name.lower(), self.name.capitalize()), 0)
+        cu_gen.open_brace()
+        cu_gen.from_gpu(ret='cpu', gpu='gpu', type_=self.name.capitalize())
+
+        cu_gen.line('return cpu')
         cu_gen.close_brace()
         cu_gen.blank_line()
 

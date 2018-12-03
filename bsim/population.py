@@ -1,16 +1,16 @@
-
-from bsim.model import ModelOfArray
+from bsim.neuron_model import NeuronModel
+from bsim.array import ModelOfArray
 
 
 class Population(ModelOfArray):
 
-    def __init__(self, model, num=2, name='', **kwargs):
-        super(Population, self).__init__(model=model, num=num, name=name, **kwargs)
+    def __init__(self, model: NeuronModel, num: int=2, name: str='', refract_step: int=0, **kwargs):
+        super(Population, self).__init__(model=model, num=num, name=name, refract_step=refract_step, **kwargs)
 
 
 class Neuron(Population):
 
-    def __init__(self, model, name='', **kwargs):
-        super(Neuron, self).__init__(model=model, num=1, name=name, **kwargs)
+    def __init__(self, model: NeuronModel, name: str='', refract_step: int=0, **kwargs):
+        super(Neuron, self).__init__(model=model, num=1, name=name, refract_step=refract_step, **kwargs)
 
 

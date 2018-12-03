@@ -178,7 +178,9 @@ class Connection(Data):
             self.dir, len(self.delay_start), len(self.rev_map2sid)
         ))
 
+        py_gen.blank_line()
         py_gen.import_("*", "ctypes")
+        py_gen.blank_line(2)
         py_gen.class_("CConnection", "Structure")
         py_gen.line("_fields_ = [")
         py_gen.line('("delay_start", POINTER(c_int * {})),'.format(len(self.delay_start)), 2)

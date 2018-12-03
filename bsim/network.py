@@ -248,7 +248,7 @@ class Network(object):
             c_model = importlib.import_module(model.name.capitalize(), model.name.lower())
             tmp_model = c_model()
             for name, _ in tmp_model._fields_:
-                origin_data = self.neuron_data[i].parameters[name]
+                origin_data = self.neuron_data[i].parameter[name]
                 setattr(tmp_model, i,
                         getattr(tmp_model, i)._type_*len(origin_data)(*origin_data)
                         )

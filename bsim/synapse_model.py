@@ -21,6 +21,15 @@ class SynapseModel(Model):
             'post': post
         })
 
+        self.parameters['outer'] = set('t')
+
+        self.parameters['special'] = set(('dst', 'last_update', 'delay')) \
+            if self.pre_learn or self.post_learn else set(('dst', 'delay'))
+
+        self.parameters['original'] -= self.parameters['special'] | self.parameters['outer']
+        self.parameters['variable'] -= self.parameters['special'] | self.parameters['outer']
+        self.parameters['constant'] -= self.parameters['special'] | self.parameters['outer']
+
         self.parameters['original'].add('weight')
         self.parameters['original'].add('delay')
         self.parameters['variable'].add('weight')
