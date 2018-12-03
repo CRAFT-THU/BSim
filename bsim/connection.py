@@ -4,10 +4,11 @@ from ctypes import *
 import importlib
 
 from bsim.cudamemop import cudamemops
+from bsim.data import Data
 from bsim.generator import CUDAGenerator, CGenerator, PyGenerator
 
 
-class Connection(object):
+class Connection(Data):
     def __init__(self, debug=False):
         self.delay_start = []
         self.delay_num = []
@@ -18,7 +19,6 @@ class Connection(object):
         self.dir = os.path.dirname(__file__)
         self.debug = debug
         self._so = None
-        self.c_connection = None
 
     def so(self):
         if not self._so:
@@ -32,10 +32,10 @@ class Connection(object):
 
         self._generate_py()
 
-        self.c_connection = importlib.import_module(
+        self.c_type = importlib.import_module(
             'bsim.py_code.cconnection_%s_%s' % (len(self.delay_start), len(self.rev_map2sid))
             ).CConnection
-        c = self.c_connection()
+        c = self.c_type()
         c.n_length = len(self.delay_start)
         c.s_length = len(self.rev_map2sid)
         c.delay_start = pointer((c_int * len(self.delay_start))(*(self.delay_start)))
@@ -63,7 +63,7 @@ class Connection(object):
         :return:
         """
         cpu = self.so().from_gpu_connection(gpu)
-        c = cast(cpu, POINTER(self.c_connection * 1)).contents[0]
+        c = cast(cpu, POINTER(self.c_type * 1)).contents[0]
 
         if self.debug:
             print("\nPython CPU Pointer: %s" % hex(cast(cpu, c_void_p).value))
@@ -83,12 +83,12 @@ class Connection(object):
         self._generate_data_cu()
 
         if CUDAGenerator.compile_(
-            src='{}/c_code/connection.data.cu'.format(self.dir),
-            output='{}/c_so/connection.data.so'.format(self.dir)
+                src='{}/c_code/connection.data.cu'.format(self.dir),
+                output='{}/c_so/connection.data.so'.format(self.dir)
         ):
-            self._so = cdll.LoadLibrary('%s/c_so/connection.data.so' % self.dir)
-            self._so.to_gpu_connection.restype = POINTER(self.c_connection)
-            self._so.from_gpu_connection.restype = POINTER(self.c_connection)
+            self._so = cdll.LoadLibrary('{}/c_so/connection.data.so'.format(self.dir))
+            self._so.to_gpu_connection.restype = POINTER(self.c_type)
+            self._so.from_gpu_connection.restype = POINTER(self.c_type)
         else:
             self._so = None
             raise EnvironmentError('Compile file connection.data.so failed')

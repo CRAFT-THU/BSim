@@ -8,6 +8,7 @@ class Data(ABC):
         self.dir = os.path.dirname(__file__)
         self.debug = debug
         self._so = None
+        self.c_type = None
 
     def so(self):
         if not self._so:

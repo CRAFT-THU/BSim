@@ -61,6 +61,9 @@ class CGenerator(BaseGenerator):
     def close_brace(self, tab: int=0):
         self.line_no_end("}", tab=tab)
 
+    def block(self, line: str=0):
+        self.line_no_end(line, tab=0)
+
     def malloc(self, ret: str="", type_: str="", num='1', tab: int=1):
         self.line(
             line='{} * {} = static_cast<{}*>(malloc(sizeof({})*{}))'

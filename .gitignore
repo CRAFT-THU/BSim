@@ -27,3 +27,4 @@ src/utils/TypeFunc.cu
 *.DS_Store
 bsim/c_code/*
 bsim/c_so/*
+bsim/py_code/*

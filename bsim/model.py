@@ -1,9 +1,11 @@
 
 import os
+from ctypes import *
 from abc import ABC, abstractmethod
 from typing import Dict, Iterable
 
 from bsim.data import Data
+from bsim.generator import CUDAGenerator
 
 
 class Model(ABC):
@@ -119,7 +121,22 @@ class ModelOfArray(Data):
         pass
 
     def compile_(self):
-        pass
+        self._generate_h()
+        self._generate_py()
+        self._generate_data_cu()
+        self.model.generate_compute_cu()
+
+        if CUDAGenerator.compile_(
+                src='{}/c_code/{}.data.cu {}/c_code/{}.compute.cu'
+                        .format(self.dir, self.model.name, self.model.name),
+                output='{}/c_so/{}.so'.format(self.dir, self.model.name)
+        ):
+            self._so = cdll.LoadLibrary('{}/c_so/{}.so'.format(self.dir, self.model.name))
+            getattr(self._so, "to_gpu_{}".format(self.model.name)).restype = POINTER(self.c_type)
+            getattr(self._so, "from_gpu_{}".format(self.model.name)).restype = POINTER(self.c_type)
+        else:
+            self._so = None
+            raise EnvironmentError('Compile file connection.data.so failed')
 
     def _generate_h(self):
         self.model.generate_h()
