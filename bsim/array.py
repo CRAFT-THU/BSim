@@ -50,7 +50,12 @@ class ModelOfArray(Data):
 
         if num > 0:
             if not set(kwargs) - model.parameters['special'] >= model.parameters['original']:
-                raise ValueError('%s Parameters not match, expect %s' % (name, model.parameters['original']))
+                raise ValueError('{} Parameters not match, expect {}, {} is missing'
+                                 .format(name, model.parameters['original'],
+                                         model.parameters['original'] -
+                                         (set(kwargs) - model.parameters['special'])
+                                         )
+                                 )
 
             for para in self.model.parameters['variable']:
                 value = kwargs[para]

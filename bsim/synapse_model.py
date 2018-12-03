@@ -31,9 +31,7 @@ class SynapseModel(Model):
         self.parameters['constant'] -= self.parameters['special'] | self.parameters['outer']
 
         self.parameters['original'].add('weight')
-        self.parameters['original'].add('delay')
         self.parameters['variable'].add('weight')
-        self.parameters['constant'].add('delay')
 
         self.dir = os.path.dirname(__file__)
 
