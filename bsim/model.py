@@ -12,7 +12,7 @@ from bsim.generator import CUDAGenerator
 
 
 class Model(ABC):
-    def __init__(self, debug=False):
+    def __init__(self):
         self.dir = os.path.dirname(__file__)
 
     @abstractmethod
@@ -48,6 +48,8 @@ class ModelOfArray(Data):
         name: identifier for the ModelArray
         kwargs: init parameters for the ModelArray
         """
+        super(ModelOfArray, self).__init__(debug)
+
         assert num >= 0 and isinstance(num, int), "%s, the number in %s is invalid" % (num, name)
 
         # name of this array
@@ -117,7 +119,7 @@ class ModelOfArray(Data):
     def to_c(self):
         self._generate_py()
         self.c_type = getattr(importlib.import_module(
-            'bsim.py_code.%s'.format(self.mode.name)
+            'bsim.py_code.{}'.format(self.model.name.lower())
         ), self.model.name.capitalize())
 
         c = self.c_type()
@@ -153,16 +155,19 @@ class ModelOfArray(Data):
         self.model.generate_compute_cu()
 
         if CUDAGenerator.compile_(
-                src='{}/c_code/{}.data.cu {}/c_code/{}.compute.cu'
-                        .format(self.dir, self.model.name, self.model.name),
-                output='{}/c_so/{}.so'.format(self.dir, self.model.name)
+                # TODO: compute.cu
+                src='{}/c_code/{}.data.cu'
+                        .format(self.dir, self.model.name.lower()),
+                # src='{}/c_code/{}.data.cu {}/c_code/{}.compute.cu'
+                #        .format(self.dir, self.model.name.lower(), self.dir, self.model.name.lower()),
+                output='{}/c_so/{}.so'.format(self.dir, self.model.name.lower())
         ):
-            self._so = cdll.LoadLibrary('{}/c_so/{}.so'.format(self.dir, self.model.name))
-            getattr(self._so, "to_gpu_{}".format(self.model.name)).restype = POINTER(self.c_type)
-            getattr(self._so, "from_gpu_{}".format(self.model.name)).restype = POINTER(self.c_type)
+            self._so = cdll.LoadLibrary('{}/c_so/{}.so'.format(self.dir, self.model.name.lower()))
+            getattr(self._so, "to_gpu_{}".format(self.model.name.lower())).restype = POINTER(self.c_type)
+            getattr(self._so, "from_gpu_{}".format(self.model.name.lower())).restype = POINTER(self.c_type)
         else:
             self._so = None
-            raise EnvironmentError('Compile file connection.data.so failed')
+            raise EnvironmentError('Compile file {}/c_so/{}.so failed'.format(self.dir, self.model.name.lower()))
 
     def _generate_h(self):
         self.model.generate_h()
@@ -171,7 +176,7 @@ class ModelOfArray(Data):
         self.model.generate_data_cu()
 
     def _generate_py(self):
-        self.model.generate_py
+        self.model.generate_py()
 
 
 

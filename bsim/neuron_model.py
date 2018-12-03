@@ -12,6 +12,8 @@ class NeuronModel(Model):
         Create NeuronModel: find out variables and constants for further optimization.
         This func may be modified.
         """
+        super(NeuronModel, self).__init__()
+
         self.name = name
         self.threshold = threshold
         self.reset = reset
@@ -26,6 +28,10 @@ class NeuronModel(Model):
         self.parameters['constant'].add('v_reset')
         self.parameters['original'].add('v_threshold')
         self.parameters['constant'].add('v_threshold')
+        self.parameters['original'].remove('i_exec')
+        self.parameters['variable'].remove('i_exec')
+        self.parameters['original'].remove('i_inh')
+        self.parameters['variable'].remove('i_inh')
 
         if self.refract:
             self.parameters['original'].add('refract_time')
@@ -34,41 +40,34 @@ class NeuronModel(Model):
         self.dir = os.path.dirname(__file__)
 
     def generate_h(self):
-        h_gen = CGenerator("{}/c_code/{}.h".format(self.dir, self.name))
+        h_gen = CGenerator("{}/c_code/{}.h".format(self.dir, self.name.lower()))
 
         h_gen.blank_line(2)
-        h_gen.if_define("{}_H\n ".format(self.name.upper()))
-        h_gen.blank_line(2)
-        h_gen.include("../utils/BlockSize.h")
+        h_gen.include("blocksize.h")
+        h_gen.if_define("{}_H ".format(self.name.upper()))
         h_gen.blank_line(2)
 
-        h_gen.struct(self.name.capitalize())
+        h_gen.struct(self.name.capitalize(), 0)
         if self.refract:
             h_gen.line("int *p_refract_step")
 
         for i in self.parameters['variable']:
             h_gen.line("float *p_%s" % i)
-        h_gen.line("}")
+        h_gen.line("}", 0)
         h_gen.blank_line(1)
 
-        h_gen.line_no_end('extern "C" {')
+        h_gen.line_no_end('extern "C" {', 0)
         h_gen.line("void update_{}({} *data, int num, int start_id, BlockSize *size)"
                    .format(self.name.lower(), self.name.capitalize()))
-        h_gen.close_brace()
-        h_gen.blank_line(1)
-
-        h_gen.line_no_end('extern "C" {')
         h_gen.line("{} * to_gpu_{}({} *cpu, int num)"
-                   .format(self.name.lower(), self.name.capitalize(), self.name.capitalize()))
+                   .format(self.name.capitalize(), self.name.lower(), self.name.capitalize()))
         h_gen.close_brace()
         h_gen.blank_line(1)
 
-        h_gen.line("__global void find_{}_gpu({} *data, int num, int start_id)"
-                   .format(self.name.lower(), self.name))
-        h_gen.blank_line(1)
-
-        h_gen.line("__global void update_{}_gpu({} *data, int num, int start_id)"
-                   .format(self.name.lower(), self.name))
+        h_gen.line("__global__ void find_{}_gpu({} *data, int num, int start_id)"
+                   .format(self.name.lower(), self.name.capitalize()), 0)
+        h_gen.line("__global__ void update_{}_gpu({} *data, int num, int start_id)"
+                   .format(self.name.lower(), self.name.capitalize()), 0)
         h_gen.blank_line(1)
 
         h_gen.end_if_define("{}_H".format(self.name.upper()))
@@ -77,17 +76,24 @@ class NeuronModel(Model):
         return
 
     def generate_py(self):
-        py_gen = PyGenerator('{}/c_code/{}.py'.format(self.dir, self.name))
+        py_gen = PyGenerator('{}/py_code/{}.py'.format(self.dir, self.name.lower()))
 
         py_gen.import_("*", "ctypes")
         py_gen.class_(self.name.capitalize(), "Structure")
         py_gen.line("_fields_ = [")
+
         if self.refract:
             py_gen.line('("p_refract_step", POINTER(c_int)),', 2)
 
-        for i in self.parameters['variable'][:-1]:
-            py_gen.line('("p_{}", POINTER(c_float)),'.format(i), 2)
-        py_gen.line('("p_{}", POINTER(c_float))'.format(self.parameters['variable'][-1]), 2)
+        t = list(self.parameters['variable'])
+
+        if t[-1] == 'refract_step':
+            t = t[:-1]
+
+        for i in t[:-1]:
+            if not i=='refract_step':
+                py_gen.line('("p_{}", POINTER(c_float)),'.format(i), 2)
+        py_gen.line('("p_{}", POINTER(c_float))'.format(t[-1]), 2)
         py_gen.line("]")
         py_gen.blank_line()
 
@@ -95,26 +101,27 @@ class NeuronModel(Model):
         return
 
     def generate_data_cu(self, debug=False):
-        cu_gen = CUDAGenerator('{}/c_code/{}.cu'.format(self.dir, self.name))
+        cu_gen = CUDAGenerator('{}/c_code/{}.data.cu'.format(self.dir, self.name.lower()))
 
         cu_gen.blank_line(2)
         cu_gen.include_std('stdlib.h')
         cu_gen.blank_line()
-        cu_gen.include("../gpu_utils/mem_op.h")
-        cu_gen.include("{}.h".format(self.name))
+        cu_gen.include("helper_cuda.h")
+        cu_gen.include("{}.h".format(self.name.lower()))
         cu_gen.blank_line(2)
 
-        cu_gen.line("{} * to_gpu_{}({} *cpu, int num)"
-                   .format(self.name.lower(), self.name.capitalize(), self.name.capitalize()), 0)
+        cu_gen.line_no_end("{} * to_gpu_{}({} *cpu, int num)"
+                   .format(self.name.capitalize(), self.name.lower(), self.name.capitalize()), 0)
         cu_gen.open_brace()
-        cu_gen.line('%s * gpu = malloc(sizeof(%s)', (self.name.capitalize(), self.name.capitalize()))
+        cu_gen.malloc(ret = 'gpu', type_=self.name.capitalize())
         if self.refract:
-            cu_gen.line('gpu->p_refract_step = copyToGPU<real>(cpu->p_refract_step, num)')
+            cu_gen.to_gpu(ret='gpu->p_refract_step', cpu='cpu->p_refract_step', num='num', type_='int')
 
         for i in self.parameters['variable']:
-            cu_gen.line('gpu->{} = copyToGPU<real>(cpu->{}, num)'.format(i, i))
+            cu_gen.to_gpu(ret='gpu->p_{}'.format(i), cpu='cpu->p_{}'.format(i), num='num', type_='float')
 
-        cu_gen.line('{} * ret = copyToGPU<{}>(gpu, 1)'.format(self.name.capitalize(), self.name.capitalize()))
+        cu_gen.line('{} * ret = NULL'.format(self.name.capitalize()))
+        cu_gen.to_gpu(ret='ret', cpu='gpu', num='1', type_=self.name.capitalize())
 
         cu_gen.line('return ret')
         cu_gen.close_brace()
@@ -124,10 +131,10 @@ class NeuronModel(Model):
         return
 
     def generate_compute_cu(self, debug=False):
-        cu_gen = CUDAGenerator('{}/c_code/{}.cu'.format(self.dir, self.name))
+        cu_gen = CUDAGenerator('{}/c_code/{}.compute.cu'.format(self.dir, self.name.lower()))
 
         cu_gen.blank_line()
-        cu_gen.include("../../gpu_utils/runtime.h")
+        cu_gen.include("runtime.h")
         cu_gen.include("{}.h".format(self.name))
         cu_gen.blank_line(2)
 
