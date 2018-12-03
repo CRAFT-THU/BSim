@@ -21,6 +21,16 @@ class NeuronModel(Model):
             'computation': computation,
         })
 
+        #TODO dynamic deal with reset and threshold
+        self.parameters['original'].add('v_reset')
+        self.parameters['constant'].add('v_reset')
+        self.parameters['original'].add('v_threshold')
+        self.parameters['constant'].add('v_threshold')
+
+        if self.refract:
+            self.parameters['original'].add('refract_time')
+            self.parameters['constant'].add('refract_time')
+
         self.dir = os.path.dirname(__file__)
 
     def generate_h(self):

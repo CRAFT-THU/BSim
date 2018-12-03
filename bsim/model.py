@@ -4,6 +4,9 @@ from ctypes import *
 from abc import ABC, abstractmethod
 from typing import Dict, Iterable
 
+import importlib
+
+from bsim.cudamemop import cudamemops
 from bsim.data import Data
 from bsim.generator import CUDAGenerator
 
@@ -112,17 +115,40 @@ class ModelOfArray(Data):
         return self
 
     def to_c(self):
-        pass
+        self._generate_py()
+        self.c_type = getattr(importlib.import_module(
+            'bsim.py_code.%s'.format(self.mode.name)
+        ), self.model.name.capitalize())
+
+        c = self.c_type()
+
+        for i in self.parameters:
+            t = getattr(c, i)._type_
+            setattr(c, i, pointer((t*self.num)(*(self.parameters[i]))))
+        return c
+
 
     def to_gpu(self):
-        pass
+        c_data = self.to_c()
+        gpu_data = getattr(self.so(), "to_gpu_{}".format(self.model.name))(pointer(c_data))
+
+        return gpu_data
+
 
     def from_gpu(self, gpu, only_struct=True):
-        pass
+        cpu = getattr(self.so(), "from_gpu_{}".format(self.model.name))(gpu)
+        c = cast(cpu, POINTER(self.c_type * 1)).contents[0]
+
+        if not only_struct:
+            for i in self.parameters:
+                t = getattr(c, i)._type_
+                data = cudamemops.from_gpu_int(getattr(c, i), self.num) if t is c_int else cudamemops.from_gpu_float(getattr(c, i), self.num)
+                setattr(c, i, data)
+
+        return c
 
     def compile_(self):
         self._generate_h()
-        self._generate_py()
         self._generate_data_cu()
         self.model.generate_compute_cu()
 

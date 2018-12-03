@@ -33,7 +33,7 @@ class Connection(Data):
         self._generate_py()
 
         self.c_type = importlib.import_module(
-            'bsim.py_code.cconnection_%s_%s' % (len(self.delay_start), len(self.rev_map2sid))
+            'bsim.py_code.cconnection_{}_{}'.format(len(self.delay_start), len(self.rev_map2sid))
             ).CConnection
         c = self.c_type()
         c.n_length = len(self.delay_start)

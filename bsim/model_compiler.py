@@ -39,6 +39,8 @@ def compile_(formula: Dict[str, str] = {'i_exec': 'i_exc * exp(-dt/tau_exec)'}) 
                 assert re.match('^[0-9a-zA-Z_]+$', var), 'variable name could have only [0-9a-zA-Z_]'
                 expressions['assign'][label][var] = expression
                 parameters['variable'].add(var)
+                parameters['original'] |= set(var.split())
+                parameters['original'] |= set(expression.split())
             else:
                 raise ValueError(line + ' does not contain assignments, you should eliminate it!')
 
