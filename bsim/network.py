@@ -33,11 +33,6 @@ class Network(object):
         self.synapse_data = []  # type: List[Projection]
         self.connection_data = []  # type: List[Connection]
 
-        # C data
-        self.neuron_data_c = []
-        self.synapse_data_c = []
-        self.connection_data_c = []
-
         # GPU data
         self.neuron_data_gpu = []
         self.synapse_data_gpu = []
@@ -47,9 +42,9 @@ class Network(object):
         self.population2id = {}  # type: Dict[Population, Int]
         self.synapse2id = {}  # type: Dict[Projection, Int]
         self.synapse2neuron_id = {}  # type: Dict[Projection, Int]
-        self.s_id2n_id = {}  # type: Dict[Projection, Int]
+        self.s_id2n_id = {}  # type: Dict[Int, Int]
         self.neuron2synapses = []  # type: List[List[List[Projection]]]
-        self.neuron2synapses_reverse = []  # type: List[List[List[Projection]]]
+        self.neuron2synapses_rev = []  # type: List[List[List[Projection]]]
 
     def connect(self,
                 pre_population: Population, pre_id: int,
@@ -77,7 +72,7 @@ class Network(object):
                 'projection': synapse
             }]
 
-        return 1
+        return 0
 
     def connect_alltoall(self,
                          pre_population: Population,
@@ -102,7 +97,7 @@ class Network(object):
                 'projection': projection
             }]
 
-        return 1
+        return 0
 
     def _add_population(self, population: Population, warn: bool = True):
         """
@@ -116,43 +111,41 @@ class Network(object):
                 print('Population %s is already in the network %s', population.name, self.name)
             return -1
 
-        if population.type in self.populations:
-            self.populations[population.type].append(population)
+        if population.model in self.populations:
+            self.populations[population.model].append(population)
         else:
-            self.populations[population.type] = [population]
+            self.populations[population.model] = [population]
 
         return 0
 
     def _compile_model(self):
         for neuron in self.populations:
-            neuron.compile_()
             self.neuron_models.append(neuron)
             self.neuron_data.append(
-                Population(model=neuron, num=0, name="%s_compact" % neuron.name)
+                Population(model=neuron, num=0, name="{}_compact".format(neuron.name))
             )
         self.neuron_nums = [0] * (len(self.neuron_models) + 1)
 
         for synapse in self.projections:
-            synapse.compile_()
-            self.synapse_models.append(neuron)
+            self.synapse_models.append(synapse)
             self.synapse_data.append(
-                Projection(model=synapse, num=0, name="%s_compact" % synapse.name)
+                Projection(model=synapse, num=0, name="{}_compact".format(synapse.name))
             )
         self.synapse_nums = [0] * (len(self.synapse_models) + 1)
 
     def _compile_neuron_data(self):
         for i in range(len(self.neuron_models)):
             data = self.neuron_data[i]
-            for population in self.populations[i]:
-                self.population2id[population] = self.neuron_num[i] + len(data)
+            for population in self.populations[self.neuron_models[i]]:
+                self.population2id[population] = self.neuron_nums[i] + len(data)
                 data.merge(population)
-            self.neuron_nums[i + 1] = len(data) + self.neuron_num[i]
+            self.neuron_nums[i + 1] = len(data) + self.neuron_nums[i]
 
         self.neuron_num = self.neuron_nums[len(self.neuron_models)]
         self.neuron2synapses = [[[] for _ in range(self.neuron_num)] for _ in range(len(self.synapse_models))]
-        self.neuron2synapses_reverse = [[[] for _ in range(self.neuron_num)] for _ in range(len(self.synapse_models))]
+        self.neuron2synapses_rev = [[[] for _ in range(self.neuron_num)] for _ in range(len(self.synapse_models))]
 
-        return 1
+        return 0
 
     def _compile_temp_connection(self):
         for model in self.projections:
@@ -165,118 +158,117 @@ class Network(object):
                     # Neuron to neuron connection
                     src_id += int(c['pre_neuron'])
                     dst_id += int(c['post_neuron'])
-                    syn = c['projection']
-                    self.max_delay = max(self.max_delay, c.parameters['constant']['delay'])
-                    self.min_delay = min(self.max_delay, c.parameters['constant']['delay'])
+                    syn = c['projection'][0]
+                    syn.special['dst'] = dst_id
+                    self.max_delay = max(self.max_delay, syn.special['delay'])
+                    self.min_delay = min(self.min_delay, syn.special['delay'])
                     self.neuron2synapses[self.synapse_models.index(model)][src_id].append(syn)
-                    self.neuron2synapses_reverse[self.synapse_models.index(model)][dst_id].append(syn)
+                    self.neuron2synapses_rev[self.synapse_models.index(model)][dst_id].append(syn)
                     self.synapse2neuron_id[syn] = dst_id
                 elif c['type'] == 'all2all':
                     # AlltoAll connection
                     for i in range(len(src)):
                         for j in range(len(dst)):
                             syn = c['projection'][i * len(dst) + j]
-                            self.max_delay = max(self.max_delay, c.parameters['delay'])
-                            self.min_delay = min(self.max_delay, c.parameters['delay'])
+                            syn.special['dst'] = dst_id + j
+                            self.max_delay = max(self.max_delay, syn.special['delay'])
+                            self.min_delay = min(self.min_delay, syn.special['delay'])
                             self.neuron2synapses[self.synapse_models.index(model)][src_id + i].append(syn)
-                            self.neuron2synapses_reverse[self.synapse_models.index(model)][dst_id + j].append(syn)
+                            self.neuron2synapses_rev[self.synapse_models.index(model)][dst_id + j].append(syn)
                             self.synapse2neuron_id[syn] = dst_id + j
                 else:
                     raise TypeError('Unsupported connection type')
-        return 1
+        return 0
 
     def _compile_synapse_data(self):
         for t in range(len(self.synapse_models)):
             for d in range(self.min_delay, self.max_delay + 1):
                 for i in range(len(self.neuron2synapses[t])):
-                    for j in range(len(self.neuron2synapses[i][t])):
-                        syn = self.neuron2synapses[i][t][j]
-                        if syn.parameters['delay'] == d:
-                            self.synapse2id[syn] = len(self.synapse_data[t])
+                    for syn in self.neuron2synapses[t][i]:
+                        #syn = self.neuron2synapses[t][i][j]
+                        if syn.special['delay'] == d:
+                            sid = len(self.synapse_data[t])
+                            self.synapse2id[syn] = sid
                             self.synapse_data[t].merge(syn)
-                            self.s_id2n_id.append[self.synapse2neuron_id[syn]]
+                            self.s_id2n_id[sid] = [self.synapse2neuron_id[syn]]
 
             self.synapse_nums[t + 1] = self.synapse_nums[t] + len(self.synapse_data[t])
         self.synapse_num = self.synapse_nums[len(self.synapse_models)]
 
-        return 1
+        return 0
 
     def _compile_connection(self):
         length = self.neuron_num * (self.max_delay - self.min_delay + 1)
         self.connection_data = [Connection() for _ in self.synapse_models]
-        for i in self.connection_data:
-            self.connection_data[i].delay_start = [0] * (length)
-            self.connection_data[i].delay_num = [0] * (length)
+        for c in self.connection_data:
+            c.delay_start = [0] * length
+            c.delay_num = [0] * length
 
         for t in range(len(self.synapse_models)):
             for d in range(self.min_delay, self.max_delay + 1):
                 for i in range(len(self.neuron2synapses[t])):
                     count = 0
-                    for j in range(len(self.neuron2synapses[i][t])):
-                        if self.neuron2synapses[i][t][j].parameters['delay'] == d:
+                    for syn in self.neuron2synapses[t][i]:
+                        if syn.special['delay'] == d:
                             if count == 0:
-                                self.connection_data[t].delay_start[i + d * self.neuron_num] = \
-                                    self.synapse2id[self.neuron2synapses[i][t][j]]
-                    self.connection_data[t].delay_num[i + d * self.neuron_num] = count
-        return 1
+                                self.connection_data[t].delay_start[i + (d-self.min_delay)* self.neuron_num] = \
+                                    self.synapse2id[syn]
+                            count += 1
+                    self.connection_data[t].delay_num[i + (d-self.min_delay) * self.neuron_num] = count
+        return 0
 
     def _compile_reverse_connection(self):
-        length = self.neuron_num * (self.max_delay - self.min_delay + 1)
-        self.connection_data = [Connection() for _ in self.synapse_models]
-        for i in self.connection_data:
-            self.connection_data[i].rev_delay_start = [0] * (length)
-            self.connection_data[i].rev_delay_num = [0] * (length)
-            self.connection_data[i].rev_map2sid = [0] * (self.synapse_num)
+        # Reversed connection have no delay
+        for i, c in enumerate(self.connection_data):
+            c.rev_delay_start = [0] * self.neuron_num
+            c.rev_delay_num = [0] * self.neuron_num
+            c.rev_map2sid = [0] * (self.synapse_nums[i+1] - self.synapse_nums[i])
 
         g_count = 0
         for t in range(len(self.synapse_models)):
-            for d in range(self.min_delay, self.max_delay + 1):
-                for i in range(len(self.neuron2synapses_rev[t])):
-                    count = 0
-                    for j in range(len(self.neuron2synapses_rev[i][t])):
-                        if self.neuron2synapses_rev[i][t][j].parameters['delay'] == d:
-                            if count == 0:
-                                self.connection_data[t].delay_start_rev[i + d * self.neuron_num] = g_count
-                                self.connection_data[t].rev_map2sid[g_count] = \
-                                    self.synapse2id[self.synapse2id[self.neuron2synapses[t][i][j]]]
-                    self.connection_data[t].delay_num[i + d * self.neuron_num] = count
-                    g_count += count
-        return 1
+            for i in range(len(self.neuron2synapses_rev[t])):
+                count = 0
+                for syn in self.neuron2synapses_rev[t][i]:
+                    if count == 0:
+                        self.connection_data[t].rev_delay_start[i] = g_count
+                    self.connection_data[t].rev_map2sid[g_count + count] = self.synapse2id[syn]
+                    count += 1
+                self.connection_data[t].rev_delay_num[i] = count
+                g_count += count
 
-    def _compile_c_types(self):
-        for i, model in enumerate(self.neuron_models):
-            c_model = importlib.import_module(model.name.capitalize(), model.name.lower())
-            tmp_model = c_model()
-            for name, _ in tmp_model._fields_:
-                origin_data = self.neuron_data[i].parameter[name]
-                setattr(tmp_model, i,
-                        getattr(tmp_model, i)._type_*len(origin_data)(*origin_data)
-                        )
-            self.neuron_data_c.append(tmp_model)
+        # length = self.neuron_num * (self.max_delay - self.min_delay + 1)
+        # self.connection_data = [Connection() for _ in self.synapse_models]
+        # for i in self.connection_data:
+        #     self.connection_data[i].rev_delay_start = [0] * (length)
+        #     self.connection_data[i].rev_delay_num = [0] * (length)
+        #     self.connection_data[i].rev_map2sid = [0] * (self.synapse_num)
 
-        for i, model in enumerate(self.synapse_models):
-            c_model = importlib.import_module(model.name.capitalize(), model.name.lower())
-            tmp_model = c_model()
-            for name, _ in tmp_model._fields_:
-                origin_data = self.synapse_data[i].parameters[name]
-                setattr(tmp_model, i,
-                        getattr(tmp_model, i)._type_*len(origin_data)(*origin_data)
-                        )
-            self.synapse_data_c.append(tmp_model)
+        # g_count = 0
+        # for t in range(len(self.synapse_models)):
+        #     for d in range(self.min_delay, self.max_delay + 1):
+        #         for i in range(len(self.neuron2synapses_rev[t])):
+        #             count = 0
+        #             for j in range(len(self.neuron2synapses_rev[i][t])):
+        #                 if self.neuron2synapses_rev[i][t][j].parameters['delay'] == d:
+        #                     if count == 0:
+        #                         self.connection_data[t].delay_start_rev[i + d * self.neuron_num] = g_count
+        #                         self.connection_data[t].rev_map2sid[g_count] = \
+        #                             self.synapse2id[self.synapse2id[self.neuron2synapses[t][i][j]]]
+        #             self.connection_data[t].rev_delay_num[i + d * self.neuron_num] = count
+        #             g_count += count
+        return 0
 
-        for connection in self.connection_data:
-            self.connection_data_c.append(connection.to_c())
+    def to_gpu(self):
+        for data in self.neuron_data:
+            self.neuron_data_gpu.append(data.to_gpu())
 
+        for data in self.synapse_data:
+            self.synapse_data_gpu.append(data.to_gpu())
 
-        return 1
+        for data in self.connection_data:
+            self.connection_data_gpu.append(data.to_gpu())
 
-    def _compile_to_gpu(self):
-
-        return 1
-
-    def _compile_so(self):
-
-        return 1
+        return 0
 
     def compile_(self):
         self._compile_model()
@@ -287,12 +279,7 @@ class Network(object):
         self._compile_connection()
         self._compile_reverse_connection()
 
-        # TODO generate C data structure
-        self._compile_c_types()
-        self._compile_to_gpu()
-        self._compile_so()
+        return 0
 
-        return 1
-
-    def run(self):
+    def run_gpu(self):
         return 0

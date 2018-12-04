@@ -1,7 +1,14 @@
 
 import re
 from ctypes import Structure
+from typing import Iterable
 
+
+def to_list(data):
+    if isinstance(data, Iterable):
+        return list(data)
+    else:
+        return [data]
 
 def standardize(expression):
     names = '[a-zA-Z0-9_]'

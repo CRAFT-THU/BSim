@@ -27,17 +27,16 @@ class Connection(Data):
 
     def to_c(self):
         assert len(self.delay_start) == len(self.delay_num) and \
-               len(self.rev_delay_start) == len(self.rev_delay_num) and \
-               len(self.delay_start) == len(self.rev_delay_start)
-
+               len(self.rev_delay_start) == len(self.rev_delay_num)
         self._generate_py()
 
         self.c_type = importlib.import_module(
             'bsim.py_code.cconnection_{}_{}'.format(len(self.delay_start), len(self.rev_map2sid))
             ).CConnection
         c = self.c_type()
-        c.n_length = len(self.delay_start)
-        c.s_length = len(self.rev_map2sid)
+        c.n_len = len(self.delay_start)
+        c.r_n_len = len(self.rev_delay_start)
+        c.s_len = len(self.rev_map2sid)
         c.delay_start = pointer((c_int * len(self.delay_start))(*(self.delay_start)))
         c.delay_num = pointer((c_int * len(self.delay_num))(*(self.delay_num)))
 
@@ -67,14 +66,19 @@ class Connection(Data):
 
         if self.debug:
             print("\nPython CPU Pointer: %s" % hex(cast(cpu, c_void_p).value))
-            print("Python CPU n_lenght: %s s_lenght: %s\n" % (int(c.n_length), int(c.s_length)))
+            print("Python CPU n_len: %s r_n_len: %s s_len: %s\n" % (int(c.n_len), int(c.r_n_len), int(c.s_len)))
 
         if not only_struct:
-            c.delay_start = cast(cudamemops.from_gpu_int(c.delay_start, c.n_length), POINTER(c_int*c.n_length))
-            c.delay_num = cast(cudamemops.from_gpu_int(c.delay_num, c.n_length), POINTER(c_int*c.n_length))
-            c.rev_delay_start = cast(cudamemops.from_gpu_int(c.rev_delay_start, c.n_length), POINTER(c_int*c.n_length))
-            c.rev_delay_num = cast(cudamemops.from_gpu_int(c.rev_delay_num, c.n_length), POINTER(c_int*c.n_length))
-            c.rev_map2sid = cast(cudamemops.from_gpu_int(c.rev_map2sid, c.s_length), POINTER(c_int*c.s_length))
+            c.delay_start = cast(cudamemops.from_gpu_int(c.delay_start, len(self.delay_start)),
+                                 POINTER(c_int*len(self.delay_start)))
+            c.delay_num = cast(cudamemops.from_gpu_int(c.delay_num, len(self.delay_num)),
+                               POINTER(c_int*len(self.delay_num)))
+            c.rev_delay_start = cast(cudamemops.from_gpu_int(c.rev_delay_start, len(self.rev_delay_start)),
+                                     POINTER(c_int*len(self.rev_delay_start)))
+            c.rev_delay_num = cast(cudamemops.from_gpu_int(c.rev_delay_num, len(self.rev_delay_num)),
+                                   POINTER(c_int*len(self.rev_delay_num)))
+            c.rev_map2sid = cast(cudamemops.from_gpu_int(c.rev_map2sid, len(self.rev_map2sid)),
+                                 POINTER(c_int*len(self.rev_map2sid)))
 
         return c
 
@@ -106,8 +110,9 @@ class Connection(Data):
         h_gen.line("int *rev_delay_start")
         h_gen.line("int *rev_delay_num")
         h_gen.line("int *rev_map2sid")
-        h_gen.line("int n_length")
-        h_gen.line("int s_length")
+        h_gen.line("int n_len")
+        h_gen.line("int r_n_len")
+        h_gen.line("int s_len")
 
         h_gen.line("}")
         h_gen.blank_line()
@@ -138,21 +143,22 @@ class Connection(Data):
         cu_gen.line_no_end("CConnection * to_gpu_connection(CConnection *cpu)", 0)
         cu_gen.open_brace()
         cu_gen.line('CConnection * gpu = (CConnection*)malloc(sizeof(CConnection))')
-        cu_gen.line('gpu->n_length = cpu->n_length')
-        cu_gen.line('gpu->s_length = cpu->s_length')
+        cu_gen.line('gpu->n_len = cpu->n_len')
+        cu_gen.line('gpu->r_n_len = cpu->r_n_len')
+        cu_gen.line('gpu->s_len = cpu->s_len')
 
-        cu_gen.to_gpu(ret='gpu->delay_start', cpu='cpu->delay_start', type_='int', num='cpu->n_length')
-        cu_gen.to_gpu(ret='gpu->delay_num', cpu='cpu->delay_num', type_='int', num='cpu->n_length')
-        cu_gen.to_gpu(ret='gpu->rev_delay_start', cpu='cpu->rev_delay_start', type_='int', num='cpu->n_length')
-        cu_gen.to_gpu(ret='gpu->rev_delay_num', cpu='cpu->rev_delay_num', type_='int', num='cpu->n_length')
-        cu_gen.to_gpu(ret='gpu->rev_map2sid', cpu='cpu->rev_map2sid', type_='int', num='cpu->s_length')
+        cu_gen.to_gpu(ret='gpu->delay_start', cpu='cpu->delay_start', type_='int', num='cpu->n_len')
+        cu_gen.to_gpu(ret='gpu->delay_num', cpu='cpu->delay_num', type_='int', num='cpu->n_len')
+        cu_gen.to_gpu(ret='gpu->rev_delay_start', cpu='cpu->rev_delay_start', type_='int', num='cpu->r_n_len')
+        cu_gen.to_gpu(ret='gpu->rev_delay_num', cpu='cpu->rev_delay_num', type_='int', num='cpu->r_n_len')
+        cu_gen.to_gpu(ret='gpu->rev_map2sid', cpu='cpu->rev_map2sid', type_='int', num='cpu->s_len')
 
         cu_gen.line('CConnection * ret = NULL')
         cu_gen.to_gpu(ret='ret', cpu='gpu', type_='CConnection')
 
         if self.debug:
             cu_gen.line(line=r'printf("GPU CConnection Pointer: %p\n", ret)')
-            cu_gen.line(line=r'printf("GPU n_length: %d  s_length: %d\n", gpu->n_length, gpu->s_length)')
+            cu_gen.line(line=r'printf("GPU n_len: %d r_n_len: %d s_len: %d\n", gpu->n_len, gpu->r_n_len, gpu->s_len)')
 
         cu_gen.line('return ret')
         cu_gen.close_brace()
@@ -164,7 +170,7 @@ class Connection(Data):
 
         if self.debug:
             cu_gen.line(line=r'printf("CPU CConnection Pointer: %p\n", ret)')
-            cu_gen.line(line=r'printf("CPU n_length: %d s_length: %d\n", ret->n_length, ret->s_length)')
+            cu_gen.line(line=r'printf("CPU n_len: %d r_n_len: %d s_len: %d\n", ret->n_len, ret->r_n_len, ret->s_len)')
 
         cu_gen.line('return ret')
         cu_gen.close_brace()
@@ -188,8 +194,9 @@ class Connection(Data):
         py_gen.line('("rev_delay_start", POINTER(c_int * {})),'.format(len(self.rev_delay_start)), 2)
         py_gen.line('("rev_delay_num", POINTER(c_int * {})),'.format(len(self.rev_delay_num)), 2)
         py_gen.line('("rev_map2sid", POINTER(c_int * {})),'.format(len(self.rev_map2sid)), 2)
-        py_gen.line('("n_length", c_int),', 2)
-        py_gen.line('("s_length", c_int)', 2)
+        py_gen.line('("n_len", c_int),', 2)
+        py_gen.line('("r_n_len", c_int),', 2)
+        py_gen.line('("s_len", c_int)', 2)
         py_gen.line("]")
         py_gen.blank_line()
 

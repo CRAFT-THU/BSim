@@ -10,8 +10,9 @@ struct CConnection {
 	int *rev_delay_start;
 	int *rev_delay_num;
 	int *rev_map2sid;
-	int n_length;
-	int s_length;
+	int n_len;
+	int r_n_len;
+	int s_len;
 	};
 
 extern "C" {

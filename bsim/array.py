@@ -9,6 +9,7 @@ from bsim.synapse_model import SynapseModel
 from bsim.cudamemop import cudamemops
 from bsim.data import Data
 from bsim.generator import CUDAGenerator
+from bsim.utils import to_list
 
 
 class ModelOfArray(Data):
@@ -75,7 +76,7 @@ class ModelOfArray(Data):
                         assert not isinstance(value, Iterable), \
                             'currently we assume that the neuron in a population has same parameters'
                         express.replace(i, str(value))
-                    self.shared[para] = express
+                    self.shared[para] = [express] * num
                 else:
                     value = kwargs[para]
                     # TODO: Currently, we assume that all neurons in the same population have same constant parameters
@@ -98,16 +99,19 @@ class ModelOfArray(Data):
         return self.num
 
     def __getitem__(self, index):
-        ret = self.__class__(model=self.model, num=0, name='%s_%s' % (self.name, index))
-        for i in self.parameter:
-            ret.parameter[i] = self.parameter[i][index]
+        ret = self.__class__(model=self.model, num=0, name='{}_{}'.format(self.name, index))
+
+        for i in self.special:
+            ret.special[i] = self.special[i][index]
 
         for i in self.shared:
             # TODO: support parameter shared
-            ret.shared[i] = self.parameter[i][index]
+            ret.shared[i] = self.shared[i][index]
 
-        for i in self.special:
-            ret.special[i] = self.parameter[i][index]
+        for i in self.parameter:
+            ret.parameter[i] = self.parameter[i][index]
+
+        ret.num = index.length if isinstance(index, slice) else 1
 
         return ret
 
@@ -115,19 +119,25 @@ class ModelOfArray(Data):
         assert isinstance(model,  ModelOfArray) and self.model == model.model, 'Only array of same models could be merged'
 
         if self.num == 0:
-            self.special = deepcopy(model.special)
-            self.shared = deepcopy(model.shared)
-            self.parameter = deepcopy(model.parameter)
+            for i in model.special:
+                self.special[i] = to_list(model.special[i])
+
+            for i in model.shared:
+                # TODO: support parameter shared
+                self.shared[i] = to_list(model.shared[i])
+
+            for i in model.parameter:
+                self.parameter[i] = to_list(model.parameter[i])
         else:
             for i in self.special:
-                self.special[i].extend(model.special[i])
+                self.special[i].extend(to_list(model.special[i]))
 
             for i in self.shared:
                 # TODO: support parameter shared
-                self.shared[i].extend(model.shared[i])
+                self.shared[i].extend(to_list(model.shared[i]))
 
             for i in self.parameter:
-                self.parameter[i].extend(model.parameter[i])
+                self.parameter[i].extend(to_list(model.parameter[i]))
         self.num += model.num
 
         return self
