@@ -315,7 +315,8 @@ class Network(object):
         h_gen.block('}')
         h_gen.blank_line()
 
-        h_gen.block('__device__ int commit2globalTable(int *shared_buf, volatile unsigned int size, int *global_buf, int * global_size, int offset);')
+        h_gen.block('__device__ int commit2globalTable(int *shared_buf, volatile unsigned int size, '
+                    'int *global_buf, int * global_size, int offset);')
 
         h_gen.end_if_define('runtime.h')
         h_gen.close()
