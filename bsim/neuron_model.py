@@ -26,7 +26,7 @@ class NeuronModel(Model):
         #TODO dynamic deal with reset and threshold
 
         self.parameters['special'] = set(('refract_step', 'refract_time')) if self.refract else set()
-        self.parameters['outer'] = set(('i_exec', 'i_inh'))
+        self.parameters['external'] = set(('i_exec', 'i_inh'))
 
         self.parameters['original'] |= set(('v_reset', 'v_threshold'))
         self.parameters['constant'] |= set(('v_reset', 'v_threshold'))

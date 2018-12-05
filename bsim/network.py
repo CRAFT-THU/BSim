@@ -1,8 +1,10 @@
+import math
+import os
+import importlib
 from typing import List, Dict
 
-import importlib
-
 from bsim.connection import Connection
+from bsim.generator import CGenerator
 from bsim.population import Population
 from bsim.projection import Projection
 
@@ -11,6 +13,7 @@ class Network(object):
     def __init__(self, dt: float = 0.0001, name: str = ''):
         self.dt = dt
         self.name = name
+        self.dir = os.path.dirname(__file__)
 
         # Original Data
         self.populations = {}  # type: Dict[NeuronModel, List[Population]]
@@ -28,7 +31,7 @@ class Network(object):
         self.neuron_models = []  # type: List[NeuronModel]
         self.neuron_nums = []  # type: List[Int]
         self.neuron_data = []  # type: List[Population]
-        self.synapse_models = []  # type: SynapseModel
+        self.synapse_models = []  # type: List[SynapseModel]
         self.synapse_nums = []  # type: List[Int]
         self.synapse_data = []  # type: List[Projection]
         self.connection_data = []  # type: List[Connection]
@@ -118,7 +121,7 @@ class Network(object):
 
         return 0
 
-    def _compile_model(self):
+    def _build_model(self):
         for neuron in self.populations:
             self.neuron_models.append(neuron)
             self.neuron_data.append(
@@ -133,7 +136,7 @@ class Network(object):
             )
         self.synapse_nums = [0] * (len(self.synapse_models) + 1)
 
-    def _compile_neuron_data(self):
+    def _build_neuron_data(self):
         for i in range(len(self.neuron_models)):
             data = self.neuron_data[i]
             for population in self.populations[self.neuron_models[i]]:
@@ -147,7 +150,7 @@ class Network(object):
 
         return 0
 
-    def _compile_temp_connection(self):
+    def _build_temp_connection(self):
         for model in self.projections:
             for c in self.projections[model]:
                 src = c['pre_population']
@@ -180,7 +183,7 @@ class Network(object):
                     raise TypeError('Unsupported connection type')
         return 0
 
-    def _compile_synapse_data(self):
+    def _build_synapse_data(self):
         for t in range(len(self.synapse_models)):
             for d in range(self.min_delay, self.max_delay + 1):
                 for i in range(len(self.neuron2synapses[t])):
@@ -197,7 +200,7 @@ class Network(object):
 
         return 0
 
-    def _compile_connection(self):
+    def _build_connection(self):
         length = self.neuron_num * (self.max_delay - self.min_delay + 1)
         self.connection_data = [Connection() for _ in self.synapse_models]
         for c in self.connection_data:
@@ -217,7 +220,7 @@ class Network(object):
                     self.connection_data[t].delay_num[i + (d-self.min_delay) * self.neuron_num] = count
         return 0
 
-    def _compile_reverse_connection(self):
+    def _build_reverse_connection(self):
         # Reversed connection have no delay
         for i, c in enumerate(self.connection_data):
             c.rev_delay_start = [0] * self.neuron_num
@@ -258,6 +261,78 @@ class Network(object):
         #             g_count += count
         return 0
 
+    def _generate_runtime(self):
+        h_gen = CGenerator('{}/c_code/runtime.h'.format(self.dir))
+        h_gen.if_define('runtime.h')
+        h_gen.blank_line(2)
+        h_gen.include("connection.h")
+        h_gen.blank_line(2)
+
+        h_gen.block('const int MAX_DELAY = {};'.format(self.max_delay))
+        h_gen.block('const int MIN_DELAY = {};'.format(self.min_delay))
+        # TODO gMax and gMin
+        h_gen.block('const float GMAX = {};'.format('1000'))
+        h_gen.block('const float GMIN = {};'.format('-1000'))
+
+        for i in len(self.neuron_models):
+            block_size = 32
+            h_gen.block("const int {}_BLOCKSIZE = {};".format(self.neuron_models[i].name.upper(), int(block_size)))
+            h_gen.block("const int {}_GRIDSIZE = {};".format(
+                self.neuron_models[i].name.upper(), math.ceil(self.neuron_nums[i+1]/block_size)))
+
+        for i in len(self.synapse_models):
+            block_size = 128
+            h_gen.block("const int {}_BLOCKSIZE = {};".format(self.synapse_models[i].name.upper(), int(block_size)))
+            h_gen.block("const int {}_GRIDSIZE = {};".format(
+                self.synapse_models[i].name.upper(), math.ceil(self.synapse_nums[i+1]/block_size)))
+        h_gen.blank_line()
+
+        h_gen.block('extern __device__ int * g_firedTable;')
+        h_gen.block('extern __device__ int * g_firedTableSizes;')
+
+
+        for model in self.neuron_models:
+            h_gen.block('extern __device__ int * g_active{}Table;'.format(model.name.capitalize()))
+            h_gen.block('extern __device__ int g_active{}TableSize;'.format(model.name.capitalize()))
+
+
+        for model in self.synapse_models:
+            h_gen.block('extern __device__ CConnection * g_connection{};'.format(model.name.capitalize()))
+
+        external = set()
+        for model in self.neuron_models:
+            external |= set(model.parameters['external'])
+        for model in self.synapse_models:
+            external |= set(model.parameters['external'])
+        external -= set('t')
+
+        for i in external:
+            h_gen.block('extern __device__ float * {};'.format(i))
+        h_gen.blank_line()
+
+        h_gen.block('extern "C" {')
+        h_gen.block('\t__global__ void init_runtime();')
+        h_gen.block('}')
+        h_gen.blank_line()
+
+        h_gen.block('__device__ int commit2globalTable(int *shared_buf, volatile unsigned int size, int *global_buf, int * global_size, int offset);')
+
+        h_gen.end_if_define('runtime.h')
+        h_gen.close()
+
+        cu_gen = CGenerator('{}/c_code/runtime.cu'.format(self.dir))
+        cu_gen.include("runtime.h")
+        cu_gen.blank_line(2)
+
+        cu_gen.block('__global__ void init_runtime(int num)')
+        cu_gen.block('{')
+        for model in self.neuron_models:
+            h_gen.block('\tg_active{}TableSize = 0;'.format(model.name.capitalize()))
+        cu_gen.block('}')
+
+        cu_gen.close()
+
+
     def to_gpu(self):
         for data in self.neuron_data:
             self.neuron_data_gpu.append(data.to_gpu())
@@ -271,15 +346,24 @@ class Network(object):
         return 0
 
     def compile_(self):
-        self._compile_model()
+        self._generate_runtime()
+        return
 
-        self._compile_neuron_data()
-        self._compile_temp_connection()
-        self._compile_synapse_data()
-        self._compile_connection()
-        self._compile_reverse_connection()
+    def build_(self):
+        self._build_model()
+        self._build_neuron_data()
+        self._build_temp_connection()
+        self._build_synapse_data()
+        self._build_connection()
+        self._build_reverse_connection()
+
+        self.compile_()
 
         return 0
 
-    def run_gpu(self):
+    def run_gpu(self, time):
+        cycle = int(time/self.dt)
+
+        #for i in range(cycle):
+
         return 0

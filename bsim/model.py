@@ -36,19 +36,13 @@ class Model(ABC):
         h_gen.blank_line(1)
 
         h_gen.line_no_end('extern "C" {', 0)
-        h_gen.line("void update_{}({} *data, int num, int start_id, BlockSize *size)"
+        h_gen.line("void update_{}({} *data, int num, int start_id, int, t)"
                    .format(self.name.lower(), self.name.capitalize()))
         h_gen.line("{} * to_gpu_{}({} *cpu, int num)"
                    .format(self.name.capitalize(), self.name.lower(), self.name.capitalize()))
         h_gen.line("{} * from_gpu_{}({} *gpu, int num)"
                    .format(self.name.capitalize(), self.name.lower(), self.name.capitalize()))
         h_gen.close_brace()
-        h_gen.blank_line(1)
-
-        h_gen.line("__global__ void find_{}_gpu({} *data, int num, int start_id)"
-                   .format(self.name.lower(), self.name.capitalize()), 0)
-        h_gen.line("__global__ void update_{}_gpu({} *data, int num, int start_id)"
-                   .format(self.name.lower(), self.name.capitalize()), 0)
         h_gen.blank_line(1)
 
         h_gen.end_if_define("{}_H".format(self.name.upper()))
