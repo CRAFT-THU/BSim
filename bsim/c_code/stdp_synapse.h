@@ -9,15 +9,15 @@
 
 struct Stdp_synapse {
 	int *p_last_update;
-	int *p_delay;
 	int *p_dst;
+	int *p_delay;
 	float *p_d_apost;
-	float *p_d_apre;
 	float *p_tau_pre;
+	float *p_d_apre;
 	float *p_tau_post;
 	float *p_apre;
-	float *p_weight;
 	float *p_apost;
+	float *p_weight;
 };
 
 extern "C" {

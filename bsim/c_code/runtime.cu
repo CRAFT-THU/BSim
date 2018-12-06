@@ -23,9 +23,9 @@ void init_runtime(CConnection ** connections)
 
 	checkCudaErrors(cudaMalloc((void**)&(p_float), sizeof(float)*8));
 	checkCudaErrors(cudaMemset(p_float, 0, sizeof(float)*8));
-	checkCudaErrors(cudaMemcpyToSymbol(i_inh, &p_float, sizeof(p_float)));
+	checkCudaErrors(cudaMemcpyToSymbol(g_i_exec, &p_float, sizeof(p_float)));
 	checkCudaErrors(cudaMalloc((void**)&(p_float), sizeof(float)*8));
 	checkCudaErrors(cudaMemset(p_float, 0, sizeof(float)*8));
-	checkCudaErrors(cudaMemcpyToSymbol(i_exec, &p_float, sizeof(p_float)));
+	checkCudaErrors(cudaMemcpyToSymbol(g_i_inh, &p_float, sizeof(p_float)));
 	checkCudaErrors(cudaMemcpyToSymbol(g_connection_stdp_synapse, &(connections[0]), sizeof(CConnection*)));
 }

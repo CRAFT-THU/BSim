@@ -282,14 +282,15 @@ class Network(object):
 
         for i in range(len(self.neuron_models)):
             block_size = 32
-            h_gen.block("const int {}_BLOCKSIZE = {};".format(self.neuron_models[i].name.upper(), int(block_size)))
-            h_gen.block("const int {}_GRIDSIZE = {};".format(
+            h_gen.block("const int {}_BLOCK_SIZE = {};".format(self.neuron_models[i].name.upper(), int(block_size)))
+            h_gen.block("const int {}_GRID_SIZE = {};".format(
                 self.neuron_models[i].name.upper(), math.ceil(self.neuron_nums[i+1]/block_size)))
 
         for i in range(len(self.synapse_models)):
             block_size = 128
-            h_gen.block("const int {}_BLOCKSIZE = {};".format(self.synapse_models[i].name.upper(), int(block_size)))
-            h_gen.block("const int {}_GRIDSIZE = {};".format(
+            h_gen.block("const int {}_BLOCK_SIZE = {};".format(
+                self.synapse_models[i].name.upper(), int(block_size)))
+            h_gen.block("const int {}_GRID_SIZE = {};".format(
                 self.synapse_models[i].name.upper(), math.ceil(self.synapse_nums[i+1]/block_size)))
         h_gen.blank_line()
 

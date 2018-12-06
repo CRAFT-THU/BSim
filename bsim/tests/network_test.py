@@ -15,7 +15,8 @@ class TestNetworkMethods(unittest.TestCase):
         super(TestNetworkMethods, self).__init__(*args, **kwargs)
 
         lif_curr_exp = NeuronModel(
-            computation='v = Cm * v + v_tmp + i_exec * C_exec + i_inh * C_inh;i_exec *= Cexec; i_inh *= Cinh',
+            computation='v = Cm * v + v_tmp + i_exec * C_exec + i_inh * C_inh;i_exec *= Cexec; '
+                        'i_inh *= Cinh; i_exec += g_i_exec; i_inh += g_i_inh',
             threshold='V > v_threshold',
             reset='v = v_reset',
             name='LIF_curr_exp'
@@ -28,14 +29,14 @@ class TestNetworkMethods(unittest.TestCase):
             name='stdp_synapse'
         )
 
-        p0 = Population(lif_curr_exp, num=2, name='P0', v=0.0, Cm=1.0, v_tmp=2.0,
-                        C_exec=2.0, C_inh=0.6, Cexec=0.5, Cinh=0.3, v_threshold=1.0, v_reset=0.0, refract_time=1)
-        p1 = Population(lif_curr_exp, num=3, name='P1', v=1.0, Cm=2.0, v_tmp=3.0,
-                        C_exec=3.0, C_inh=1.0, Cexec=1.6, Cinh=0.4, v_threshold=20.0, v_reset=-10.0, refract_time=2)
-        p2 = Population(lif_curr_exp, num=2, name='P2', v=0.0, Cm=3.0, v_tmp=4.0,
-                        C_exec=2.0, C_inh=0.5, Cexec=0.5, Cinh=0.3, v_threshold=20.0, v_reset=-30.0, refract_time=5)
-        p3 = Population(lif_curr_exp, num=1, name='P3', v=1.0, Cm=4.0, v_tmp=1.0,
-                        C_exec=1.0, C_inh=1.5, Cexec=1.6, Cinh=0.4, v_threshold=1.0, v_reset=-20.0, refract_time=3)
+        p0 = Population(lif_curr_exp, num=2, name='P0', v=0.0, Cm=1.0, v_tmp=2.0, C_exec=2.0, C_inh=0.6, Cexec=0.5,
+                        Cinh=0.3, v_threshold=1.0, v_reset=0.0, refract_time=1)
+        p1 = Population(lif_curr_exp, num=3, name='P1', v=1.0, Cm=2.0, v_tmp=3.0, C_exec=3.0, C_inh=1.0, Cexec=1.6,
+                        Cinh=0.4, v_threshold=20.0, v_reset=-10.0, refract_time=2)
+        p2 = Population(lif_curr_exp, num=2, name='P2', v=0.0, Cm=3.0, v_tmp=4.0, C_exec=2.0, C_inh=0.5, Cexec=0.5,
+                        Cinh=0.3, v_threshold=20.0, v_reset=-30.0, refract_time=5)
+        p3 = Population(lif_curr_exp, num=1, name='P3', v=1.0, Cm=4.0, v_tmp=1.0, C_exec=1.0, C_inh=1.5, Cexec=1.6,
+                        Cinh=0.4, v_threshold=1.0, v_reset=-20.0, refract_time=3)
 
         s01_00 = Projection(stdp_synapse, num=1, name='S0', last_update=0, apre=0.1, tau_pre=1.2,
                             apost=2.3, tau_post=3.4, d_apre=4.5, d_apost=5.6, weight=6.7, delay=0)

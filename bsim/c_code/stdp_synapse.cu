@@ -27,7 +27,7 @@ __global__ void update_stdp_synapse_gpu(Stdp_synapse *data, int num, int start_i
 	for (int delta_t=MIN_DELAY; delta_t<=MAX_DELAY; delta_t++) {
 		int block_idx = blockIdx.x;
 		int time_idx = (t + MAX_DELAY - delta_t) % ( MAX_DELAY + 1);
-		int firedSize = gFiredTableSizes[time_idx];
+		int firedSize = g_fired_tableSizes[time_idx];
 		int num_per_block = (firedSize - 1) / gridDim.x + 1;
 		int block_nums_minus_1 = (firedSize - 1) / num_per_block;
 		int fired_size_block = 0;
@@ -39,7 +39,7 @@ __global__ void update_stdp_synapse_gpu(Stdp_synapse *data, int num, int start_i
 		fired_size_block = 0;
 		}
 		for (int idx = 0; idx < fired_size_block; idx++) {
-			int nid = gFiredTable[time_idx * gFiredTableCap + (block_idx) * num_per_block + idx];
+			int nid = g_fired_table[time_idx * g_fired_tableCap + (block_idx) * num_per_block + idx];
 			int start_loc = connection->delayStart[delta_t + nid * MAX_DELAY];
 			int synapseNum = connection->delayNum[delta_t + nid * MAX_DELAY];
 			if (threadIdx.x == 0) {
@@ -70,7 +70,7 @@ __global__ void update_stdp_synapse_gpu(Stdp_synapse * data, int num, int start_
 {
 	int block_idx = blockIdx.x;
 	int time_idx = t%(MAX_DELAY+1);
-	int firedSize = gFiredTableSizes[time_idx];
+	int firedSize = g_fired_tableSizes[time_idx];
 	int num_per_block = (firedSize - 1) / gridDim.x + 1;
 	int block_nums_minus_1 = (firedSize - 1) / num_per_block;
 	int fired_size_block = 0;
@@ -83,7 +83,7 @@ __global__ void update_stdp_synapse_gpu(Stdp_synapse * data, int num, int start_
 	}
 
 	for (int idx = 0; idx < fired_size_block; idx++) {
-		int nid = gFiredTable[time_idx * gFiredTableCap + (block_idx) * num_per_block + idx];
+		int nid = g_fired_table[time_idx * g_fired_tableCap + (block_idx) * num_per_block + idx];
 		int start_loc = gConnectionStdp_synapse->rev_delayStart[nid];
 		int synapseNum = gConnectionStdp_synapse->rev_delayNum[nid];
 		for (int j=threadIdx.x; j < synapseNum; j += blockDim.x) {
