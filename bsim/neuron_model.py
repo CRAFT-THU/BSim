@@ -30,9 +30,9 @@ class NeuronModel(Model):
 
         self.parameters['original'] |= set(('v_reset', 'v_threshold'))
         self.parameters['constant'] |= set(('v_reset', 'v_threshold'))
-        self.parameters['original'] -= self.parameters['special'] | self.parameters['outer']
-        self.parameters['variable'] -= self.parameters['special'] | self.parameters['outer']
-        self.parameters['constant'] -= self.parameters['special'] | self.parameters['outer']
+        self.parameters['original'] -= self.parameters['special'] | self.parameters['external']
+        self.parameters['variable'] -= self.parameters['special'] | self.parameters['external']
+        self.parameters['constant'] -= self.parameters['special'] | self.parameters['external']
 
         self.dir = os.path.dirname(__file__)
 
@@ -45,13 +45,13 @@ class NeuronModel(Model):
         cu_gen.include("{}.h".format(self.name))
         cu_gen.blank_line(2)
 
-        cu_gen.block("void update_%s(%s *data, int num, int start_id, BlockSize *size)" %
+        cu_gen.block("void update_%s(%s *data, int num, int start_id, int t)" %
                       (self.name.lower(), self.name.capitalize()))
         cu_gen.block("{")
-        cu_gen.block("\tfind_{}_gpu<<<size=>gridSize, size->blockSize>>>(({}*)data, num, start_id);"
-                     .format(self.name.lower(), self.name.capitalize()))
-        cu_gen.block("\tupdate_{}_gpu<<<size=>gridSize, size->blockSize>>>(({}*)data, num, start_id);"
-                     .format(self.name.lower(), self.name.capitalize()))
+        cu_gen.block("\tfind_{}_gpu<<<{}_GRID_SIZE, {}_BLOCK_SIZE>>>(({}*)data, num, start_id);"
+                     .format(self.name.lower(), self.name.upper(), self.name.upper(), self.name.capitalize()))
+        cu_gen.block("\tupdate_{}_gpu<<<{}_GRID_SIZE, {}_BLOCK_SIZE>>>(({}*)data, num, start_id);"
+                     .format(self.name.lower(), self.name.upper(), self.name.upper(), self.name.capitalize()))
         cu_gen.block("}")
         cu_gen.blank_line()
 
@@ -156,7 +156,7 @@ class NeuronModel(Model):
         cu_gen.blank_line()
 
         cu_gen.block("\t\tif (fire_cnt >= MAXBLOCKSIZE) {")
-        cu_gen.block("\t\t\tcommit2globalTable(fire_table_t, MAXBLOCKSIZE, gFiredTable, &gFiredTableSizes[gCurrentIdx], gFiredTableCap*gCurrentIdx);")
+        cu_gen.block("\t\t\tcommit2globalTable(fire_table_t, MAXBLOCKSIZE, g_fired_table, &g_fired_tableSizes[gCurrentIdx], g_fired_tableCap*gCurrentIdx);")
         cu_gen.block("\t\t\tif (threadIdx.x == 0) {")
         cu_gen.block("\t\t\t\tfire_cnt = 0;")
         cu_gen.block("\t\t\t}")
@@ -173,7 +173,7 @@ class NeuronModel(Model):
         cu_gen.block("\t\t}")
         cu_gen.block("\t\t__syncthreads();")
         cu_gen.block("\t\tif (fire_cnt >= MAXBLOCKSIZE) {")
-        cu_gen.block("\t\t\tcommit2globalTable(fire_table_t, MAXBLOCKSIZE, gFiredTable, &gFiredTableSizes[gCurrentIdx], gFiredTableCap*gCurrentIdx);")
+        cu_gen.block("\t\t\tcommit2globalTable(fire_table_t, MAXBLOCKSIZE, g_fired_table, &g_fired_tableSizes[gCurrentIdx], g_fired_tableCap*gCurrentIdx);")
         cu_gen.block("\t\t\tif (threadIdx.x == 0) {")
         cu_gen.block("\t\t\t\tfire_cnt = 0;")
         cu_gen.block("\t\t\t}")
@@ -181,7 +181,7 @@ class NeuronModel(Model):
         cu_gen.block("\t\t__syncthreads();")
         cu_gen.block("\t\t")
         cu_gen.block("\t\tif (fire_cnt > 0) {")
-        cu_gen.block("\t\t\tcommit2globalTable(fire_table_t, fire_cnt, gFiredTable, &gFiredTableSizes[gCurrentIdx], gFiredTableCap*gCurrentIdx);")
+        cu_gen.block("\t\t\tcommit2globalTable(fire_table_t, fire_cnt, g_fired_table, &g_fired_tableSizes[gCurrentIdx], g_fired_tableCap*gCurrentIdx);")
         cu_gen.block("\t\t\tif (threadIdx.x == 0) {")
         cu_gen.block("\t\t\t\tfire_cnt = 0;")
         cu_gen.block("\t\t\t}")

@@ -1,10 +1,13 @@
 import math
 import os
+
 import importlib
+from ctypes import POINTER
+from ctypes import cdll
 from typing import List, Dict
 
 from bsim.connection import Connection
-from bsim.generator import CGenerator
+from bsim.generator import CGenerator, CUDAGenerator
 from bsim.population import Population
 from bsim.projection import Projection
 
@@ -14,6 +17,7 @@ class Network(object):
         self.dt = dt
         self.name = name
         self.dir = os.path.dirname(__file__)
+        self._so = None
 
         # Original Data
         self.populations = {}  # type: Dict[NeuronModel, List[Population]]
@@ -26,6 +30,9 @@ class Network(object):
         # Max and Min delay
         self.min_delay = 1e10  # type: Int
         self.max_delay = 0  # type: Int
+        self.g_max = 100
+        self.g_min = -100
+        self.max_block_size = 1024
 
         # Compiled Data
         self.neuron_models = []  # type: List[NeuronModel]
@@ -270,34 +277,37 @@ class Network(object):
 
         h_gen.block('const int MAX_DELAY = {};'.format(self.max_delay))
         h_gen.block('const int MIN_DELAY = {};'.format(self.min_delay))
-        # TODO gMax and gMin
-        h_gen.block('const float GMAX = {};'.format('1000'))
-        h_gen.block('const float GMIN = {};'.format('-1000'))
+        h_gen.block('const float G_MAX = {};'.format(self.g_max))
+        h_gen.block('const float G_MIN = {};'.format(self.g_min))
 
-        for i in len(self.neuron_models):
+        for i in range(len(self.neuron_models)):
             block_size = 32
             h_gen.block("const int {}_BLOCKSIZE = {};".format(self.neuron_models[i].name.upper(), int(block_size)))
             h_gen.block("const int {}_GRIDSIZE = {};".format(
                 self.neuron_models[i].name.upper(), math.ceil(self.neuron_nums[i+1]/block_size)))
 
-        for i in len(self.synapse_models):
+        for i in range(len(self.synapse_models)):
             block_size = 128
             h_gen.block("const int {}_BLOCKSIZE = {};".format(self.synapse_models[i].name.upper(), int(block_size)))
             h_gen.block("const int {}_GRIDSIZE = {};".format(
                 self.synapse_models[i].name.upper(), math.ceil(self.synapse_nums[i+1]/block_size)))
         h_gen.blank_line()
 
-        h_gen.block('extern __device__ int * g_firedTable;')
-        h_gen.block('extern __device__ int * g_firedTableSizes;')
+        h_gen.block("const int MAX_BLOCK_SIZE = {};".format(self.max_block_size))
+        h_gen.block("const int FIRED_TABLE_SIZE = {};".format(self.neuron_num))
+
+
+        h_gen.block('extern __device__ int * g_fired_table;')
+        h_gen.block('extern __device__ int * g_fired_table_sizes;')
 
 
         for model in self.neuron_models:
-            h_gen.block('extern __device__ int * g_active{}Table;'.format(model.name.capitalize()))
-            h_gen.block('extern __device__ int g_active{}TableSize;'.format(model.name.capitalize()))
+            h_gen.block('extern __device__ int * g_active_{}_table;'.format(model.name.lower()))
+            h_gen.block('extern __device__ int g_active_{}_table_size;'.format(model.name.lower()))
 
 
         for model in self.synapse_models:
-            h_gen.block('extern __device__ CConnection * g_connection{};'.format(model.name.capitalize()))
+            h_gen.block('extern __device__ CConnection * g_connection_{};'.format(model.name.lower()))
 
         external = set()
         for model in self.neuron_models:
@@ -311,7 +321,7 @@ class Network(object):
         h_gen.blank_line()
 
         h_gen.block('extern "C" {')
-        h_gen.block('\t__global__ void init_runtime();')
+        h_gen.block('\tvoid init_runtime(CConnection *connections);')
         h_gen.block('}')
         h_gen.blank_line()
 
@@ -321,14 +331,38 @@ class Network(object):
         h_gen.end_if_define('runtime.h')
         h_gen.close()
 
-        cu_gen = CGenerator('{}/c_code/runtime.cu'.format(self.dir))
+        cu_gen = CUDAGenerator('{}/c_code/runtime.cu'.format(self.dir))
+
+        cu_gen.include('helper_cuda.h')
         cu_gen.include("runtime.h")
         cu_gen.blank_line(2)
 
-        cu_gen.block('__global__ void init_runtime(int num)')
+        cu_gen.block('void init_runtime(CConnection ** connections)')
         cu_gen.block('{')
+        cu_gen.block('\tint zero = 0;')
+        cu_gen.block('\tint *p_int = NULL;')
+        cu_gen.block('\tfloat *p_float = NULL;')
+        cu_gen.blank_line()
+
+        cu_gen.malloc_symbol(symbol='g_fired_table', gpu='p_int', type_='int',
+                             num='{}'.format(self.neuron_num*(self.max_delay+1)))
+        cu_gen.malloc_symbol(symbol='g_fired_table_sizes', gpu='p_int', type_='int',
+                             num='{}'.format(self.max_delay+1))
+        cu_gen.blank_line()
+
         for model in self.neuron_models:
-            h_gen.block('\tg_active{}TableSize = 0;'.format(model.name.capitalize()))
+            cu_gen.malloc_symbol(symbol='g_active_{}_table'.format(model.name.lower()), gpu='p_int', type_='int',
+                                 num='{}'.format(self.neuron_num))
+            cu_gen.cu_line('cudaMemcpyToSymbol(g_active_{}_table_size, &zero, sizeof(int))'
+                         .format(model.name.lower()))
+        cu_gen.block('\n')
+
+        for i in external:
+            cu_gen.malloc_symbol(symbol='{}'.format(i), gpu='p_float', type_='float', num='{}'.format(self.neuron_num))
+
+        for i, model in enumerate(self.synapse_models):
+            cu_gen.cu_line('cudaMemcpyToSymbol(g_connection_{}, &(connections[{}]), sizeof(CConnection*))'
+                          .format(model.name.lower(), i))
         cu_gen.block('}')
 
         cu_gen.close()
@@ -348,9 +382,34 @@ class Network(object):
 
     def compile_(self):
         self._generate_runtime()
+
+        src = '{}/c_code/runtime.cu {}/c_code/runtime_.cu'.format(self.dir, self.dir)
+
+        for model in self.neuron_models:
+            src += ' {}/c_code/{}.compute.cu '.format(self.dir, model.name.lower())
+
+        for model in self.synapse_models:
+            src += ' {}/c_code/{}.compute.cu '.format(self.dir, model.name.lower())
+
+
+        if CUDAGenerator.compile_(
+            src = src,
+            output = 'runtime.so'
+        ):
+            self._so = cdll.LoadLibrary('{}/c_so/runtime.so'.format(self.dir))
+        else:
+            self._so = None
+            raise EnvironmentError('Compile file runtime.so failed')
+
         return
 
-    def build_(self):
+    def so(self):
+        if not self._so:
+            self.compile_()
+        return self._so
+
+
+    def build(self):
         self._build_model()
         self._build_neuron_data()
         self._build_temp_connection()
@@ -358,13 +417,29 @@ class Network(object):
         self._build_connection()
         self._build_reverse_connection()
 
-        self.compile_()
-
         return 0
 
     def run_gpu(self, time):
         cycle = int(time/self.dt)
 
-        #for i in range(cycle):
+        so = self.so()
+        c_connection = importlib.import_module(
+            'bsim.py_code.cconnection'.format(len(self.delay_start), len(self.rev_map2sid))
+        ).CConnection
+
+        so.init_runtime((POINTER(c_connection)*len(self.synapse_models))(*(self.connection_data_gpu)))
+
+        for t in range(cycle):
+            for i, model in enumerate(self.neuron_models):
+                getattr(so, 'updata_{}'.format(model.name.lower()))(self.neuron_data_gpu[i],
+                                                                    self.neuron_nums[i+1] -self.neuron_nums[i],
+                                                                    self.neuron_nums[i],
+                                                                    t)
+
+            for model in self.synapse_models:
+                getattr(so, 'updata_{}'.format(model.name.lower()))(self.synapse_data_gpu[i],
+                                                                    self.synapse_nums[i+1] -self.synapse_nums[i],
+                                                                    self.synapse_nums[i],
+                                                                    t)
 
         return 0

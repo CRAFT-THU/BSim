@@ -68,7 +68,7 @@ class TestNetworkMethods(unittest.TestCase):
         self.net.connect_alltoall(p1, p3, s12)
         self.net.connect_alltoall(p2, p3, s23)
 
-        self.net.compile_()
+        self.net.build()
         self.net.to_gpu()
 
 
@@ -77,13 +77,18 @@ class TestNetworkMethods(unittest.TestCase):
         cpu = self.net.connection_data[0].from_gpu(self.net.connection_data_gpu[0], only_struct=False)
         self.assertListEqual([0, 3, 0, 0, 0, 0, 0, 0,
                               0, 0, 6, 7, 8, 0, 0, 0,
-                              9, 11, 0, 0, 0, 13, 14, 0], list(cpu.delay_start.contents))
+                              9, 11, 0, 0, 0, 13, 14, 0],
+                             list(cast(cpu.delay_start, POINTER(c_int*cpu.n_len)).contents))
         self.assertListEqual([3, 3, 0, 0, 0, 0, 0, 0,
                               0, 0, 1, 1, 1, 0, 0, 0,
-                              2, 2, 0, 0, 0, 1, 1, 0], list(cpu.delay_num.contents))
-        self.assertListEqual([0, 0, 0, 2, 4, 6, 8, 10], list(cpu.rev_delay_start.contents))
-        self.assertListEqual([0, 0, 2, 2, 2, 2, 2, 5], list(cpu.rev_delay_num.contents))
-        self.assertListEqual([0, 3, 1, 4, 2, 5, 9, 11, 10, 12, 6, 7, 8, 13, 14], list(cpu.rev_map2sid.contents))
+                              2, 2, 0, 0, 0, 1, 1, 0],
+                             list(cast(cpu.delay_num, POINTER(c_int*cpu.n_len)).contents))
+        self.assertListEqual([0, 0, 0, 2, 4, 6, 8, 10],
+                             list(cast(cpu.rev_delay_start, POINTER(c_int*cpu.r_n_len)).contents))
+        self.assertListEqual([0, 0, 2, 2, 2, 2, 2, 5],
+                             list(cast(cpu.rev_delay_num, POINTER(c_int*cpu.r_n_len)).contents))
+        self.assertListEqual([0, 3, 1, 4, 2, 5, 9, 11, 10, 12, 6, 7, 8, 13, 14],
+                             list(cast(cpu.rev_map2sid, POINTER(c_int*cpu.s_len)).contents))
 
     def test_neuron_data(self):
         self.assertEqual(1, len(self.net.neuron_data))
@@ -144,6 +149,8 @@ class TestNetworkMethods(unittest.TestCase):
                               7, 7, 7, 5, 6, 5,
                               6, 7, 7], list(cast(cpu.p_dst, POINTER(c_int*15)).contents))
 
+    def test_compute(self):
+        self.net.run_gpu(0.001)
 
 if __name__ == '__main__':
     unittest.main()

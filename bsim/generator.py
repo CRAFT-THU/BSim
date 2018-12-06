@@ -83,10 +83,25 @@ class CUDAGenerator(CGenerator):
     def __init__(self, filename: str= ''):
         self.file = open(filename, "w+")
 
+    def cu_line(self, line: str='', tab: int=1):
+        self.line(line='checkCudaErrors({})'.format(line), tab=tab)
+
     def malloc_gpu(self, ret: str="", type_: str="", num='1', tab: int=1):
-        self.line(
-            line='checkCudaErrors(cudaMalloc((void**)&({}), sizeof({})*{}))'
+        self.cu_line(
+            line='cudaMalloc((void**)&({}), sizeof({})*{})'
                 .format(ret, type_, num),
+            tab=tab
+        )
+        self.cu_line(
+            line='cudaMemset({}, 0, sizeof({})*{})'
+                .format(ret, type_, num),
+            tab=tab
+        )
+
+    def malloc_symbol(self, symbol:str, gpu: str, type_: str="int", num='1', tab: int=1):
+        self.malloc_gpu(ret=gpu, type_=type_, num=num, tab=tab)
+        self.cu_line(
+            line='cudaMemcpyToSymbol({}, &{}, sizeof({}))'.format(symbol, gpu, gpu),
             tab=tab
         )
 
@@ -99,15 +114,15 @@ class CUDAGenerator(CGenerator):
         self.gpu_to_cpu(gpu=gpu, cpu=ret, type_=type_, num=num, tab=tab)
 
     def cpu_to_gpu(self, cpu: str, gpu: str, type_:str= 'double', num='1', tab: int=1):
-        self.line(
-            line='checkCudaErrors(cudaMemcpy({}, {}, sizeof({})*{}, cudaMemcpyHostToDevice))'
+        self.cu_line(
+            line='cudaMemcpy({}, {}, sizeof({})*{}, cudaMemcpyHostToDevice)'
                 .format(gpu, cpu, type_, num),
             tab=tab
         )
 
     def gpu_to_cpu(self, cpu:str, gpu: str, type_:str= 'double', num='1', tab: int=1):
-        self.line(
-            line='checkCudaErrors(cudaMemcpy({}, {}, sizeof({})*{}, cudaMemcpyDeviceToHost))'
+        self.cu_line(
+            line='cudaMemcpy({}, {}, sizeof({})*{}, cudaMemcpyDeviceToHost)'
                 .format(cpu, gpu, type_, num),
             tab=tab
         )

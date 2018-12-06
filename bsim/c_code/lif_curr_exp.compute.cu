@@ -3,10 +3,10 @@
 #include "LIF_curr_exp.h"
 
 
-void update_lif_curr_exp(Lif_curr_exp *data, int num, int start_id, BlockSize *size)
+void update_lif_curr_exp(Lif_curr_exp *data, int num, int start_id, int t)
 {
-	find_lif_curr_exp_gpu<<<size=>gridSize, size->blockSize>>>((Lif_curr_exp*)data, num, start_id);
-	update_lif_curr_exp_gpu<<<size=>gridSize, size->blockSize>>>((Lif_curr_exp*)data, num, start_id);
+	find_lif_curr_exp_gpu<<<LIF_CURR_EXP_GRID_SIZE, LIF_CURR_EXP_BLOCK_SIZE>>>((Lif_curr_exp*)data, num, start_id);
+	update_lif_curr_exp_gpu<<<LIF_CURR_EXP_GRID_SIZE, LIF_CURR_EXP_BLOCK_SIZE>>>((Lif_curr_exp*)data, num, start_id);
 }
 
 __global void find_lif_curr_exp_gpu(LIF_curr_exp *data, int num, int start_id)

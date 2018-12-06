@@ -36,7 +36,7 @@ class Model(ABC):
         h_gen.blank_line(1)
 
         h_gen.line_no_end('extern "C" {', 0)
-        h_gen.line("void update_{}({} *data, int num, int start_id, int, t)"
+        h_gen.line("void update_{}({} *data, int num, int start_id, int t)"
                    .format(self.name.lower(), self.name.capitalize()))
         h_gen.line("{} * to_gpu_{}({} *cpu, int num)"
                    .format(self.name.capitalize(), self.name.lower(), self.name.capitalize()))

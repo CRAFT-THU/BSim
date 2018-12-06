@@ -27,9 +27,9 @@ class SynapseModel(Model):
         self.parameters['special'] = set(('dst', 'last_update', 'delay')) \
             if self.pre_learn or self.post_learn else set(('dst', 'delay'))
 
-        self.parameters['original'] -= self.parameters['special'] | self.parameters['outer']
-        self.parameters['variable'] -= self.parameters['special'] | self.parameters['outer']
-        self.parameters['constant'] -= self.parameters['special'] | self.parameters['outer']
+        self.parameters['original'] -= self.parameters['special'] | self.parameters['external']
+        self.parameters['variable'] -= self.parameters['special'] | self.parameters['external']
+        self.parameters['constant'] -= self.parameters['special'] | self.parameters['external']
 
         self.parameters['original'].add('weight')
         self.parameters['variable'].add('weight')
@@ -81,7 +81,7 @@ class SynapseModel(Model):
         cu_gen.block("\tfor (int delta_t={}; delta_t<={}; delta_t++) {{".format("MIN_DELAY", "MAX_DELAY"))
         cu_gen.block("\t\tint block_idx = blockIdx.x;")
         cu_gen.block("\t\tint time_idx = (t + {} - delta_t) % ( {} + 1);".format("MAX_DELAY", "MAX_DELAY"))
-        cu_gen.block("\t\tint firedSize = gFiredTableSizes[time_idx];")
+        cu_gen.block("\t\tint firedSize = g_fired_tableSizes[time_idx];")
         cu_gen.block("\t\tint num_per_block = (firedSize - 1) / gridDim.x + 1;")
         cu_gen.block("\t\tint block_nums_minus_1 = (firedSize - 1) / num_per_block;")
         cu_gen.block("\t\tint fired_size_block = 0;")
@@ -93,7 +93,7 @@ class SynapseModel(Model):
         cu_gen.block("\t\tfired_size_block = 0;")
         cu_gen.block("\t\t}")
         cu_gen.block("\t\tfor (int idx = 0; idx < fired_size_block; idx++) {")
-        cu_gen.block("\t\t\tint nid = gFiredTable[time_idx * gFiredTableCap + (block_idx) * num_per_block + idx];")
+        cu_gen.block("\t\t\tint nid = g_fired_table[time_idx * g_fired_tableCap + (block_idx) * num_per_block + idx];")
         cu_gen.block("\t\t\tint start_loc = connection->delayStart[delta_t + nid * MAX_DELAY];")
         cu_gen.block("\t\t\tint synapseNum = connection->delayNum[delta_t + nid * MAX_DELAY];")
         cu_gen.block("\t\t\tif (threadIdx.x == 0) {")
@@ -132,7 +132,7 @@ class SynapseModel(Model):
             cu_gen.block("{")
             cu_gen.block("\tint block_idx = blockIdx.x;")
             cu_gen.block("\tint time_idx = t%(MAX_DELAY+1);")
-            cu_gen.block("\tint firedSize = gFiredTableSizes[time_idx];")
+            cu_gen.block("\tint firedSize = g_fired_tableSizes[time_idx];")
             cu_gen.block("\tint num_per_block = (firedSize - 1) / gridDim.x + 1;")
             cu_gen.block("\tint block_nums_minus_1 = (firedSize - 1) / num_per_block;")
             cu_gen.block("\tint fired_size_block = 0;")
@@ -145,7 +145,7 @@ class SynapseModel(Model):
             cu_gen.block("\t}")
             cu_gen.blank_line()
             cu_gen.block("\tfor (int idx = 0; idx < fired_size_block; idx++) {")
-            cu_gen.block("\t\tint nid = gFiredTable[time_idx * gFiredTableCap + (block_idx) * num_per_block + idx];")
+            cu_gen.block("\t\tint nid = g_fired_table[time_idx * g_fired_tableCap + (block_idx) * num_per_block + idx];")
             cu_gen.block("\t\tint start_loc = gConnection{}->rev_delayStart[nid];".format(self.name.capitalize()))
             cu_gen.block("\t\tint synapseNum = gConnection{}->rev_delayNum[nid];".format(self.name.capitalize()))
             cu_gen.block("\t\tfor (int j=threadIdx.x; j < synapseNum; j += blockDim.x) {")
@@ -167,7 +167,7 @@ class SynapseModel(Model):
             # cu_gen.block("\tfor (int delta_t={}; delta_t<={}; delta_t++) {{".format("MIN_DELAY", "MAX_DELAY"))
             # cu_gen.block("\t\tint block_idx = blockIdx.x;")
             # cu_gen.block("\t\tint time_idx = (gCurrentIdx + {} - delta_t) % ({} + 1);".format("MAX_DELAY", "MAX_DELAY"))
-            # cu_gen.block("\t\tint firedSize = gFiredTableSizes[time_idx];")
+            # cu_gen.block("\t\tint firedSize = g_fired_tableSizes[time_idx];")
             # cu_gen.block("\t\tint num_per_block = (firedSize - 1) / gridDim.x + 1;")
             # cu_gen.block("\t\tint block_nums_minus_1 = (firedSize - 1) / num_per_block;")
             # cu_gen.block("")
@@ -181,7 +181,7 @@ class SynapseModel(Model):
             # cu_gen.block("\t\t}")
             # cu_gen.blank_line()
             # cu_gen.block("\t\tfor (int idx = 0; idx < fired_size_block; idx++) {")
-            # cu_gen.block("\t\t\tint nid = gFiredTable[time_idx * gFiredTableCap + (block_idx) * num_per_block + idx];")
+            # cu_gen.block("\t\t\tint nid = g_fired_table[time_idx * g_fired_tableCap + (block_idx) * num_per_block + idx];")
             # cu_gen.block("\t\t\tint start_loc = connection->rev_delayStart[delta_t + nid * MAX_DELAY];")
             # cu_gen.block("\t\t\tint synapseNum = connection->rev_delayNum[delta_t + nid * MAX_DELAY];")
             # cu_gen.block("\t\t\tif (threadIdx.x == 0) {")

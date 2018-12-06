@@ -31,18 +31,18 @@ class Connection(Data):
         self._generate_py()
 
         self.c_type = importlib.import_module(
-            'bsim.py_code.cconnection_{}_{}'.format(len(self.delay_start), len(self.rev_map2sid))
+            'bsim.py_code.cconnection'.format(len(self.delay_start), len(self.rev_map2sid))
             ).CConnection
         c = self.c_type()
         c.n_len = len(self.delay_start)
         c.r_n_len = len(self.rev_delay_start)
         c.s_len = len(self.rev_map2sid)
-        c.delay_start = pointer((c_int * len(self.delay_start))(*(self.delay_start)))
-        c.delay_num = pointer((c_int * len(self.delay_num))(*(self.delay_num)))
+        c.delay_start = (c_int * len(self.delay_start))(*(self.delay_start))
+        c.delay_num = (c_int * len(self.delay_num))(*(self.delay_num))
 
-        c.rev_delay_start = pointer((c_int * len(self.rev_delay_start))(*(self.rev_delay_start)))
-        c.rev_delay_num = pointer((c_int * len(self.rev_delay_num))(*(self.rev_delay_num)))
-        c.rev_map2sid = pointer((c_int * len(self.rev_map2sid))(*(self.rev_map2sid)))
+        c.rev_delay_start = (c_int * len(self.rev_delay_start))(*(self.rev_delay_start))
+        c.rev_delay_num = (c_int * len(self.rev_delay_num))(*(self.rev_delay_num))
+        c.rev_map2sid = (c_int * len(self.rev_map2sid))(*(self.rev_map2sid))
 
         return c
 
@@ -69,16 +69,11 @@ class Connection(Data):
             print("Python CPU n_len: %s r_n_len: %s s_len: %s\n" % (int(c.n_len), int(c.r_n_len), int(c.s_len)))
 
         if not only_struct:
-            c.delay_start = cast(cudamemops.from_gpu_int(c.delay_start, len(self.delay_start)),
-                                 POINTER(c_int*len(self.delay_start)))
-            c.delay_num = cast(cudamemops.from_gpu_int(c.delay_num, len(self.delay_num)),
-                               POINTER(c_int*len(self.delay_num)))
-            c.rev_delay_start = cast(cudamemops.from_gpu_int(c.rev_delay_start, len(self.rev_delay_start)),
-                                     POINTER(c_int*len(self.rev_delay_start)))
-            c.rev_delay_num = cast(cudamemops.from_gpu_int(c.rev_delay_num, len(self.rev_delay_num)),
-                                   POINTER(c_int*len(self.rev_delay_num)))
-            c.rev_map2sid = cast(cudamemops.from_gpu_int(c.rev_map2sid, len(self.rev_map2sid)),
-                                 POINTER(c_int*len(self.rev_map2sid)))
+            c.delay_start = cudamemops.from_gpu_int(c.delay_start, len(self.delay_start))
+            c.delay_num = cudamemops.from_gpu_int(c.delay_num, len(self.delay_num))
+            c.rev_delay_start = cudamemops.from_gpu_int(c.rev_delay_start, len(self.rev_delay_start))
+            c.rev_delay_num = cudamemops.from_gpu_int(c.rev_delay_num, len(self.rev_delay_num))
+            c.rev_map2sid = cudamemops.from_gpu_int(c.rev_map2sid, len(self.rev_map2sid))
 
         return c
 
@@ -180,20 +175,18 @@ class Connection(Data):
         return
 
     def _generate_py(self):
-        py_gen = PyGenerator('{}/py_code/cconnection_{}_{}.py'.format(
-            self.dir, len(self.delay_start), len(self.rev_map2sid)
-        ))
+        py_gen = PyGenerator('{}/py_code/cconnection.py'.format(self.dir))
 
         py_gen.blank_line()
         py_gen.import_("*", "ctypes")
         py_gen.blank_line(2)
         py_gen.class_("CConnection", "Structure")
         py_gen.line("_fields_ = [")
-        py_gen.line('("delay_start", POINTER(c_int * {})),'.format(len(self.delay_start)), 2)
-        py_gen.line('("delay_num", POINTER(c_int * {})),'.format(len(self.delay_num)), 2)
-        py_gen.line('("rev_delay_start", POINTER(c_int * {})),'.format(len(self.rev_delay_start)), 2)
-        py_gen.line('("rev_delay_num", POINTER(c_int * {})),'.format(len(self.rev_delay_num)), 2)
-        py_gen.line('("rev_map2sid", POINTER(c_int * {})),'.format(len(self.rev_map2sid)), 2)
+        py_gen.line('("delay_start", POINTER(c_int)),', 2)
+        py_gen.line('("delay_num", POINTER(c_int)),', 2)
+        py_gen.line('("rev_delay_start", POINTER(c_int)),', 2)
+        py_gen.line('("rev_delay_num", POINTER(c_int)),', 2)
+        py_gen.line('("rev_map2sid", POINTER(c_int)),', 2)
         py_gen.line('("n_len", c_int),', 2)
         py_gen.line('("r_n_len", c_int),', 2)
         py_gen.line('("s_len", c_int)', 2)

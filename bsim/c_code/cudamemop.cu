@@ -8,6 +8,7 @@ int* gpu_malloc_int(int size)
 {
 	int * gpu = NULL;
 	checkCudaErrors(cudaMalloc((void**)&(gpu), sizeof(int)*size));
+	checkCudaErrors(cudaMemset(gpu, 0, sizeof(int)*size));
 	return gpu;
 }
 
@@ -25,6 +26,7 @@ int* to_gpu_int(int *cpu, int size)
 {
 	int * gpu = NULL;
 	checkCudaErrors(cudaMalloc((void**)&(gpu), sizeof(int)*size));
+	checkCudaErrors(cudaMemset(gpu, 0, sizeof(int)*size));
 	checkCudaErrors(cudaMemcpy(gpu, cpu, sizeof(int)*size, cudaMemcpyHostToDevice));
 	return gpu;
 }
@@ -40,6 +42,7 @@ float* gpu_malloc_float(int size)
 {
 	float * gpu = NULL;
 	checkCudaErrors(cudaMalloc((void**)&(gpu), sizeof(float)*size));
+	checkCudaErrors(cudaMemset(gpu, 0, sizeof(float)*size));
 	return gpu;
 }
 
@@ -57,6 +60,7 @@ float* to_gpu_float(float *cpu, int size)
 {
 	float * gpu = NULL;
 	checkCudaErrors(cudaMalloc((void**)&(gpu), sizeof(float)*size));
+	checkCudaErrors(cudaMemset(gpu, 0, sizeof(float)*size));
 	checkCudaErrors(cudaMemcpy(gpu, cpu, sizeof(float)*size, cudaMemcpyHostToDevice));
 	return gpu;
 }
@@ -72,6 +76,7 @@ double* gpu_malloc_double(int size)
 {
 	double * gpu = NULL;
 	checkCudaErrors(cudaMalloc((void**)&(gpu), sizeof(double)*size));
+	checkCudaErrors(cudaMemset(gpu, 0, sizeof(double)*size));
 	return gpu;
 }
 
@@ -89,6 +94,7 @@ double* to_gpu_double(double *cpu, int size)
 {
 	double * gpu = NULL;
 	checkCudaErrors(cudaMalloc((void**)&(gpu), sizeof(double)*size));
+	checkCudaErrors(cudaMemset(gpu, 0, sizeof(double)*size));
 	checkCudaErrors(cudaMemcpy(gpu, cpu, sizeof(double)*size, cudaMemcpyHostToDevice));
 	return gpu;
 }
