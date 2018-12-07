@@ -269,7 +269,7 @@ class Network(object):
         return 0
 
     def _generate_runtime(self):
-        h_gen = CGenerator('{}/c_code/runtime.h'.format(self.dir))
+        h_gen = CGenerator('{}/code_gen/runtime.h'.format(self.dir))
         h_gen.if_define('runtime.h')
         h_gen.blank_line(2)
         h_gen.include("connection.h")
@@ -332,10 +332,33 @@ class Network(object):
         h_gen.end_if_define('runtime.h')
         h_gen.close()
 
-        cu_gen = CUDAGenerator('{}/c_code/runtime.cu'.format(self.dir))
+        cu_gen = CUDAGenerator('{}/code_gen/runtime.cu'.format(self.dir))
 
-        cu_gen.include('helper_cuda.h')
+        cu_gen.include('../c_code/helper_cuda.h')
         cu_gen.include("runtime.h")
+        cu_gen.blank_line(2)
+
+        cu_gen.block('__device__ int * g_fired_table;')
+        cu_gen.block('__device__ int * g_fired_table_sizes;')
+
+
+        for model in self.neuron_models:
+            cu_gen.block('__device__ int * g_active_{}_table;'.format(model.name.lower()))
+            cu_gen.block('__device__ int g_active_{}_table_size;'.format(model.name.lower()))
+
+
+        for model in self.synapse_models:
+            cu_gen.block('__device__ CConnection * g_connection_{};'.format(model.name.lower()))
+
+        external = set()
+        for model in self.neuron_models:
+            external |= set(model.parameters['external'])
+        for model in self.synapse_models:
+            external |= set(model.parameters['external'])
+        external -= set('t')
+
+        for i in external:
+            cu_gen.block('__device__ float * {};'.format(i))
         cu_gen.blank_line(2)
 
         cu_gen.block('void init_runtime(CConnection ** connections)')
@@ -384,20 +407,20 @@ class Network(object):
     def compile_(self):
         self._generate_runtime()
 
-        src = '{}/c_code/runtime.cu {}/c_code/runtime_.cu'.format(self.dir, self.dir)
+        src = '{}/c_code/runtime.cu {}/code_gen/runtime.cu'.format(self.dir, self.dir)
 
         for model in self.neuron_models:
-            src += ' {}/c_code/{}.compute.cu '.format(self.dir, model.name.lower())
+            src += ' {}/code_gen/{}.compute.cu '.format(self.dir, model.name.lower())
 
         for model in self.synapse_models:
-            src += ' {}/c_code/{}.compute.cu '.format(self.dir, model.name.lower())
+            src += ' {}/code_gen/{}.compute.cu '.format(self.dir, model.name.lower())
 
 
         if CUDAGenerator.compile_(
             src = src,
-            output = 'runtime.so'
+            output = '{}/so_gen/runtime.so'
         ):
-            self._so = cdll.LoadLibrary('{}/c_so/runtime.so'.format(self.dir))
+            self._so = cdll.LoadLibrary('{}/so_gen/runtime.so'.format(self.dir))
         else:
             self._so = None
             raise EnvironmentError('Compile file runtime.so failed')
@@ -425,7 +448,7 @@ class Network(object):
 
         so = self.so()
         c_connection = importlib.import_module(
-            'bsim.py_code.cconnection'.format(len(self.delay_start), len(self.rev_map2sid))
+            'bsim.code_gen.cconnection'.format(len(self.delay_start), len(self.rev_map2sid))
         ).CConnection
 
         so.init_runtime((POINTER(c_connection)*len(self.synapse_models))(*(self.connection_data_gpu)))

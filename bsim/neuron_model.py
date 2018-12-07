@@ -38,7 +38,7 @@ class NeuronModel(Model):
 
 
     def generate_compute_cu(self, debug=False):
-        cu_gen = CUDAGenerator('{}/c_code/{}.compute.cu'.format(self.dir, self.name.lower()))
+        cu_gen = CUDAGenerator('{}/code_gen/{}.compute.cu'.format(self.dir, self.name.lower()))
 
         cu_gen.blank_line()
         cu_gen.include("runtime.h")

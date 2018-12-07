@@ -25,4 +25,6 @@ src/utils/TypeFunc.cu
 *.pyc
 *.idea
 *.DS_Store
-bsim/c_so/*
+*.so
+bsim/so_gen/*
+bsim/*_gen/*

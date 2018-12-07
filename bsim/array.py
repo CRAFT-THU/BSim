@@ -145,7 +145,7 @@ class ModelOfArray(Data):
     def to_c(self):
         self._generate_py()
         self.c_type = getattr(importlib.import_module(
-            'bsim.py_code.{}'.format(self.model.name.lower())
+            'bsim.code_gen.{}'.format(self.model.name.lower())
         ), self.model.name.capitalize())
 
         c = self.c_type()
@@ -194,18 +194,18 @@ class ModelOfArray(Data):
 
         if CUDAGenerator.compile_(
                 # TODO: compute.cu
-                src='{}/c_code/{}.data.cu'
+                src='{}/code_gen/{}.data.cu'
                         .format(self.dir, self.model.name.lower()),
-                # src='{}/c_code/{}.data.cu {}/c_code/{}.compute.cu'
+                # src='{}/code_gen/{}.data.cu {}/code_gen/{}.compute.cu'
                 #        .format(self.dir, self.model.name.lower(), self.dir, self.model.name.lower()),
-                output='{}/c_so/{}.so'.format(self.dir, self.model.name.lower())
+                output='{}/so_gen/{}.so'.format(self.dir, self.model.name.lower())
         ):
-            self._so = cdll.LoadLibrary('{}/c_so/{}.so'.format(self.dir, self.model.name.lower()))
+            self._so = cdll.LoadLibrary('{}/so_gen/{}.so'.format(self.dir, self.model.name.lower()))
             getattr(self._so, "to_gpu_{}".format(self.model.name.lower())).restype = POINTER(self.c_type)
             getattr(self._so, "from_gpu_{}".format(self.model.name.lower())).restype = POINTER(self.c_type)
         else:
             self._so = None
-            raise EnvironmentError('Compile file {}/c_so/{}.so failed'.format(self.dir, self.model.name.lower()))
+            raise EnvironmentError('Compile file {}/so_gen/{}.so failed'.format(self.dir, self.model.name.lower()))
 
     def _generate_h(self):
         self.model.generate_h()

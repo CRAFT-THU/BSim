@@ -31,7 +31,7 @@ class Connection(Data):
         self._generate_py()
 
         self.c_type = importlib.import_module(
-            'bsim.py_code.cconnection'.format(len(self.delay_start), len(self.rev_map2sid))
+            'bsim.code_gen.cconnection'.format(len(self.delay_start), len(self.rev_map2sid))
             ).CConnection
         c = self.c_type()
         c.n_len = len(self.delay_start)
@@ -82,10 +82,10 @@ class Connection(Data):
         self._generate_data_cu()
 
         if CUDAGenerator.compile_(
-                src='{}/c_code/connection.data.cu'.format(self.dir),
-                output='{}/c_so/connection.data.so'.format(self.dir)
+                src='{}/code_gen/connection.data.cu'.format(self.dir),
+                output='{}/so_gen/connection.data.so'.format(self.dir)
         ):
-            self._so = cdll.LoadLibrary('{}/c_so/connection.data.so'.format(self.dir))
+            self._so = cdll.LoadLibrary('{}/so_gen/connection.data.so'.format(self.dir))
             self._so.to_gpu_connection.restype = POINTER(self.c_type)
             self._so.from_gpu_connection.restype = POINTER(self.c_type)
         else:
@@ -93,7 +93,7 @@ class Connection(Data):
             raise EnvironmentError('Compile file connection.data.so failed')
 
     def _generate_h(self):
-        h_gen = CGenerator("%s/c_code/connection.h" % self.dir)
+        h_gen = CGenerator("%s/code_gen/connection.h" % self.dir)
 
         h_gen.blank_line(2)
         h_gen.if_define('connection.h')
@@ -123,7 +123,7 @@ class Connection(Data):
         h_gen.close()
 
     def _generate_data_cu(self):
-        cu_gen = CUDAGenerator('{}/c_code/connection.data.cu'.format(self.dir))
+        cu_gen = CUDAGenerator('{}/code_gen/connection.data.cu'.format(self.dir))
 
         cu_gen.blank_line(2)
         if self.debug:
@@ -131,7 +131,7 @@ class Connection(Data):
 
         cu_gen.include_std('stdlib.h')
         cu_gen.blank_line()
-        cu_gen.include('helper_cuda.h')
+        cu_gen.include('../c_code/helper_cuda.h')
         cu_gen.include('connection.h')
         cu_gen.blank_line(2)
 
@@ -175,7 +175,7 @@ class Connection(Data):
         return
 
     def _generate_py(self):
-        py_gen = PyGenerator('{}/py_code/cconnection.py'.format(self.dir))
+        py_gen = PyGenerator('{}/code_gen/cconnection.py'.format(self.dir))
 
         py_gen.blank_line()
         py_gen.import_("*", "ctypes")

@@ -13,12 +13,10 @@ class Model(ABC):
         pass
 
     def generate_h(self):
-        h_gen = CGenerator("{}/c_code/{}.h".format(self.dir, self.name.lower()))
+        h_gen = CGenerator("{}/code_gen/{}.h".format(self.dir, self.name.lower()))
 
         h_gen.blank_line(2)
         h_gen.if_define("{}_H ".format(self.name.upper()))
-        h_gen.blank_line(2)
-        h_gen.include("blocksize.h")
         h_gen.blank_line(2)
 
         h_gen.struct(self.name.capitalize(), 0)
@@ -51,7 +49,7 @@ class Model(ABC):
         return
 
     def generate_py(self):
-        py_gen = PyGenerator('{}/py_code/{}.py'.format(self.dir, self.name.lower()))
+        py_gen = PyGenerator('{}/code_gen/{}.py'.format(self.dir, self.name.lower()))
 
         py_gen.blank_line()
         py_gen.import_("*", "ctypes")
@@ -75,12 +73,12 @@ class Model(ABC):
         return
 
     def generate_data_cu(self, debug=False):
-        cu_gen = CUDAGenerator('{}/c_code/{}.data.cu'.format(self.dir, self.name.lower()))
+        cu_gen = CUDAGenerator('{}/code_gen/{}.data.cu'.format(self.dir, self.name.lower()))
 
         cu_gen.blank_line(2)
         cu_gen.include_std('stdlib.h')
         cu_gen.blank_line()
-        cu_gen.include("helper_cuda.h")
+        cu_gen.include("../c_code/helper_cuda.h")
         cu_gen.include("{}.h".format(self.name.lower()))
         cu_gen.blank_line(2)
 

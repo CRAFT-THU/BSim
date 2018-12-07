@@ -130,7 +130,7 @@ class CUDAGenerator(CGenerator):
     @staticmethod
     def compile_(src: str='a.cu', output: str='a.so'):
         cmd = '{} {} {} -o {}'.format(
-            '/usr/local/cuda/bin/nvcc -I/usr/local/cuda/include/ -shared',
+            '/usr/local/cuda/bin/nvcc -I/usr/local/cuda/include/ -shared -rdc=true',
             '--compiler-options "-Wall -Wno-switch -Wfatal-errors -Ofast -fPIC -shared"',
             src, output
         )
