@@ -2,10 +2,10 @@ import math
 import os
 
 import importlib
-from ctypes import POINTER
-from ctypes import cdll
+from ctypes import *
 from typing import List, Dict
 
+from bsim.cudamemop import cudamemops
 from bsim.connection import Connection
 from bsim.generator import CGenerator, CUDAGenerator
 from bsim.population import Population
@@ -322,7 +322,7 @@ class Network(object):
         h_gen.blank_line()
 
         h_gen.block('extern "C" {')
-        h_gen.block('\tvoid init_runtime(CConnection *connections);')
+        h_gen.block('\tvoid **init_runtime(CConnection **connections);')
         h_gen.block('}')
         h_gen.blank_line()
 
@@ -333,6 +333,8 @@ class Network(object):
         h_gen.close()
 
         cu_gen = CUDAGenerator('{}/code_gen/runtime.cu'.format(self.dir))
+
+        cu_gen.include_std("stdio.h")
 
         cu_gen.include('../c_code/helper_cuda.h')
         cu_gen.include("runtime.h")
@@ -361,17 +363,23 @@ class Network(object):
             cu_gen.block('__device__ float * {};'.format(i))
         cu_gen.blank_line(2)
 
-        cu_gen.block('void init_runtime(CConnection ** connections)')
+        cu_gen.block('void **init_runtime(CConnection ** connections)')
         cu_gen.block('{')
         cu_gen.block('\tint zero = 0;')
         cu_gen.block('\tint *p_int = NULL;')
         cu_gen.block('\tfloat *p_float = NULL;')
         cu_gen.blank_line()
 
+        cu_gen.block('\tvoid **ret = static_cast<void**>(malloc(sizeof(void*) * {}));'.format(2))
+        cu_gen.blank_line()
+
         cu_gen.malloc_symbol(symbol='g_fired_table', gpu='p_int', type_='int',
                              num='{}'.format(self.neuron_num*(self.max_delay+1)))
+        cu_gen.block('\tret[0] = static_cast<void*>(p_int);')
         cu_gen.malloc_symbol(symbol='g_fired_table_sizes', gpu='p_int', type_='int',
                              num='{}'.format(self.max_delay+1))
+        cu_gen.block('\tret[1] = static_cast<void*>(p_int);')
+        cu_gen.block('\tprintf("\\n%p, %p, %p\\n", ret, ret[0], ret[1]);')
         cu_gen.blank_line()
 
         for model in self.neuron_models:
@@ -387,6 +395,8 @@ class Network(object):
         for i, model in enumerate(self.synapse_models):
             cu_gen.cu_line('cudaMemcpyToSymbol(g_connection_{}, &(connections[{}]), sizeof(CConnection*))'
                           .format(model.name.lower(), i))
+
+        cu_gen.block('\treturn ret;')
         cu_gen.block('}')
 
         cu_gen.close()
@@ -418,7 +428,7 @@ class Network(object):
 
         if CUDAGenerator.compile_(
             src = src,
-            output = '{}/so_gen/runtime.so'
+            output = '{}/so_gen/runtime.so'.format(self.dir)
         ):
             self._so = cdll.LoadLibrary('{}/so_gen/runtime.so'.format(self.dir))
         else:
@@ -443,27 +453,40 @@ class Network(object):
 
         return 0
 
-    def run_gpu(self, time):
+    def run_gpu(self, time, log=True):
         cycle = int(time/self.dt)
 
         so = self.so()
-        c_connection = importlib.import_module(
-            'bsim.code_gen.cconnection'.format(len(self.delay_start), len(self.rev_map2sid))
-        ).CConnection
+        c_connection = importlib.import_module('bsim.code_gen.cconnection' ).CConnection
 
-        so.init_runtime((POINTER(c_connection)*len(self.synapse_models))(*(self.connection_data_gpu)))
+        so.init_runtime.restype = POINTER(c_void_p)
+        log_info = so.init_runtime((POINTER(c_connection)*len(self.synapse_models))(*(self.connection_data_gpu)))
+
+        if log:
+            fired_neuron = cast(log_info[0], POINTER(c_int*(self.neuron_num*(self.max_delay+1))))
+            fired_size = cast(log_info[1], POINTER(c_int*(self.max_delay + 1)))
+            size = (c_int*(self.max_delay + 1))(0)
+            nid = (c_int * (self.neuron_num * (self.max_delay + 1)))(0)
+
+            cudamemops.gpu2cpu_int(cast(fired_neuron, POINTER(c_int)), nid, self.neuron_num * (self.max_delay+1))
+            cudamemops.gpu2cpu_int(cast(fired_size, POINTER(c_int)), size, 3)
 
         for t in range(cycle):
             for i, model in enumerate(self.neuron_models):
-                getattr(so, 'updata_{}'.format(model.name.lower()))(self.neuron_data_gpu[i],
+                getattr(so, 'update_{}'.format(model.name.lower()))(self.neuron_data_gpu[i],
                                                                     self.neuron_nums[i+1] -self.neuron_nums[i],
                                                                     self.neuron_nums[i],
                                                                     t)
 
             for model in self.synapse_models:
-                getattr(so, 'updata_{}'.format(model.name.lower()))(self.synapse_data_gpu[i],
+                getattr(so, 'update_{}'.format(model.name.lower()))(self.synapse_data_gpu[i],
                                                                     self.synapse_nums[i+1] -self.synapse_nums[i],
                                                                     self.synapse_nums[i],
                                                                     t)
+            if log:
+                offset = t % (self.max_delay + 1)
+                cudamemops.gpu2cpu_int(cast(fired_neuron, POINTER(c_int)), nid, self.neuron_num)
+                cudamemops.gpu2cpu_int(cast(fired_size, POINTER(c_int)), size, 1)
+
 
         return 0
