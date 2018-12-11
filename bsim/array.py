@@ -4,6 +4,7 @@ from ctypes import *
 from typing import Dict, Iterable, Union
 from copy import deepcopy
 
+from bsim import pkg_dir
 from bsim.neuron_model import NeuronModel
 from bsim.synapse_model import SynapseModel
 from bsim.cudamemop import cudamemops
@@ -29,7 +30,7 @@ class ModelOfArray(Data):
         name: identifier for the ModelArray
         kwargs: init parameters for the ModelArray
         """
-        super(ModelOfArray, self).__init__(debug)
+        super(ModelOfArray, self).__init__()
 
         assert num >= 0 and isinstance(num, int), "%s, the number in %s is invalid" % (num, name)
 
@@ -195,17 +196,17 @@ class ModelOfArray(Data):
         if CUDAGenerator.compile_(
                 # TODO: compute.cu
                 src='{}/code_gen/{}.data.cu'
-                        .format(self.dir, self.model.name.lower()),
+                        .format(pkg_dir, self.model.name.lower()),
                 # src='{}/code_gen/{}.data.cu {}/code_gen/{}.compute.cu'
-                #        .format(self.dir, self.model.name.lower(), self.dir, self.model.name.lower()),
-                output='{}/so_gen/{}.so'.format(self.dir, self.model.name.lower())
+                #        .format(pkg_dir, self.model.name.lower(), pkg_dir, self.model.name.lower()),
+                output='{}/so_gen/{}.so'.format(pkg_dir, self.model.name.lower())
         ):
-            self._so = cdll.LoadLibrary('{}/so_gen/{}.so'.format(self.dir, self.model.name.lower()))
+            self._so = cdll.LoadLibrary('{}/so_gen/{}.so'.format(pkg_dir, self.model.name.lower()))
             getattr(self._so, "to_gpu_{}".format(self.model.name.lower())).restype = POINTER(self.c_type)
             getattr(self._so, "from_gpu_{}".format(self.model.name.lower())).restype = POINTER(self.c_type)
         else:
             self._so = None
-            raise EnvironmentError('Compile file {}/so_gen/{}.so failed'.format(self.dir, self.model.name.lower()))
+            raise EnvironmentError('Compile file {}/so_gen/{}.so failed'.format(pkg_dir, self.model.name.lower()))
 
     def _generate_h(self):
         self.model.generate_h()

@@ -4,16 +4,8 @@ from abc import ABC, abstractmethod
 
 
 class Data(ABC):
-    def __init__(self, debug=False):
-        self.dir = os.path.dirname(__file__)
-        self.debug = debug
+    def __init__(self):
         self._so = None
-        self.c_type = None
-
-    def so(self):
-        if not self._so:
-            self.compile_()
-        return self._so
 
     @abstractmethod
     def to_c(self):
@@ -31,15 +23,8 @@ class Data(ABC):
     def compile_(self):
         pass
 
-    @abstractmethod
-    def _generate_h(self):
-        pass
-
-    @abstractmethod
-    def _generate_data_cu(self):
-        pass
-
-    @abstractmethod
-    def _generate_py(self):
-        pass
+    def so(self):
+        if not self._so:
+            self.compile_()
+        return self._so
 

@@ -1,6 +1,7 @@
 
 import os
 
+from bsim import pkg_dir
 from bsim.model import Model
 from bsim.model_compiler import compile_
 from bsim.generator import CGenerator, CUDAGenerator, PyGenerator
@@ -34,11 +35,8 @@ class NeuronModel(Model):
         self.parameters['variable'] -= self.parameters['special'] | self.parameters['external']
         self.parameters['constant'] -= self.parameters['special'] | self.parameters['external']
 
-        self.dir = os.path.dirname(__file__)
-
-
     def generate_compute_cu(self, debug=False):
-        cu_gen = CUDAGenerator('{}/code_gen/{}.compute.cu'.format(self.dir, self.name.lower()))
+        cu_gen = CUDAGenerator('{}/code_gen/{}.compute.cu'.format(pkg_dir, self.name.lower()))
 
         cu_gen.blank_line()
         cu_gen.include("runtime.h")
@@ -211,6 +209,6 @@ class NeuronModel(Model):
         cu_gen.block("}")
         cu_gen.blank_line()
 
-
         cu_gen.close()
+
         return

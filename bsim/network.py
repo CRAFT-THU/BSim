@@ -5,6 +5,7 @@ import importlib
 from ctypes import *
 from typing import List, Dict
 
+from bsim import pkg_dir
 from bsim.cudamemop import cudamemops
 from bsim.connection import Connection
 from bsim.generator import CGenerator, CUDAGenerator
@@ -16,7 +17,6 @@ class Network(object):
     def __init__(self, dt: float = 0.0001, name: str = ''):
         self.dt = dt
         self.name = name
-        self.dir = os.path.dirname(__file__)
         self._so = None
 
         # Original Data
@@ -269,7 +269,7 @@ class Network(object):
         return 0
 
     def _generate_runtime(self):
-        h_gen = CGenerator('{}/code_gen/runtime.h'.format(self.dir))
+        h_gen = CGenerator('{}/code_gen/runtime.h'.format(pkg_dir))
         h_gen.if_define('runtime.h')
         h_gen.blank_line(2)
         h_gen.include("connection.h")
@@ -332,7 +332,7 @@ class Network(object):
         h_gen.end_if_define('runtime.h')
         h_gen.close()
 
-        cu_gen = CUDAGenerator('{}/code_gen/runtime.cu'.format(self.dir))
+        cu_gen = CUDAGenerator('{}/code_gen/runtime.cu'.format(pkg_dir))
 
         cu_gen.include_std("stdio.h")
 
@@ -417,20 +417,20 @@ class Network(object):
     def compile_(self):
         self._generate_runtime()
 
-        src = '{}/c_code/runtime.cu {}/code_gen/runtime.cu'.format(self.dir, self.dir)
+        src = '{}/c_code/runtime.cu {}/code_gen/runtime.cu'.format(pkg_dir, pkg_dir)
 
         for model in self.neuron_models:
-            src += ' {}/code_gen/{}.compute.cu '.format(self.dir, model.name.lower())
+            src += ' {}/code_gen/{}.compute.cu '.format(pkg_dir, model.name.lower())
 
         for model in self.synapse_models:
-            src += ' {}/code_gen/{}.compute.cu '.format(self.dir, model.name.lower())
+            src += ' {}/code_gen/{}.compute.cu '.format(pkg_dir, model.name.lower())
 
 
         if CUDAGenerator.compile_(
             src = src,
-            output = '{}/so_gen/runtime.so'.format(self.dir)
+            output = '{}/so_gen/runtime.so'.format(pkg_dir)
         ):
-            self._so = cdll.LoadLibrary('{}/so_gen/runtime.so'.format(self.dir))
+            self._so = cdll.LoadLibrary('{}/so_gen/runtime.so'.format(pkg_dir))
         else:
             self._so = None
             raise EnvironmentError('Compile file runtime.so failed')
@@ -465,6 +465,8 @@ class Network(object):
         if log:
             fired_neuron = cast(log_info[0], POINTER(c_int*(self.neuron_num*(self.max_delay+1))))
             fired_size = cast(log_info[1], POINTER(c_int*(self.max_delay + 1)))
+            neuron_data = self.neuron_data[0].from_gpu(self.neuron_data_gpu[0], self.neuron_nums[1], only_struct=True)
+            v = (c_float*self.neuron_num)(0)
             size = (c_int*(self.max_delay + 1))(0)
             nid = (c_int * (self.neuron_num * (self.max_delay + 1)))(0)
 
@@ -485,6 +487,7 @@ class Network(object):
                                                                     t)
             if log:
                 offset = t % (self.max_delay + 1)
+                cudamemops.gpu2cpu_float(neuron_data.p_v, v, self.neuron_num)
                 cudamemops.gpu2cpu_int(cast(fired_neuron, POINTER(c_int)), nid, self.neuron_num)
                 cudamemops.gpu2cpu_int(cast(fired_size, POINTER(c_int)), size, 1)
 

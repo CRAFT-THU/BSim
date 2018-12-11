@@ -3,12 +3,16 @@ import os
 from ctypes import *
 import importlib
 
+from bsim import pkg_dir
 from bsim.cudamemop import cudamemops
 from bsim.data import Data
 from bsim.generator import CUDAGenerator, CGenerator, PyGenerator
 
 
 class Connection(Data):
+    _cls_so = None
+    _cls_ctype = None
+
     def __init__(self, debug=False):
         self.delay_start = []
         self.delay_num = []
@@ -16,84 +20,90 @@ class Connection(Data):
         self.rev_delay_num = []
         self.rev_map2sid = []
 
-        self.dir = os.path.dirname(__file__)
-        self.debug = debug
+        self.c = None
+        self.gpu = None
         self._so = None
-
-    def so(self):
-        if not self._so:
-            self.compile_()
-        return self._so
+        self.debug = debug
 
     def to_c(self):
         assert len(self.delay_start) == len(self.delay_num) and \
                len(self.rev_delay_start) == len(self.rev_delay_num)
-        self._generate_py()
 
-        self.c_type = importlib.import_module(
-            'bsim.code_gen.cconnection'.format(len(self.delay_start), len(self.rev_map2sid))
+        if not self._cls_ctype:
+            self._generate_py()
+            self._cls_ctype = importlib.import_module(
+                'bsim.code_gen.cconnection'.format(len(self.delay_start), len(self.rev_map2sid))
             ).CConnection
-        c = self.c_type()
-        c.n_len = len(self.delay_start)
-        c.r_n_len = len(self.rev_delay_start)
-        c.s_len = len(self.rev_map2sid)
-        c.delay_start = (c_int * len(self.delay_start))(*(self.delay_start))
-        c.delay_num = (c_int * len(self.delay_num))(*(self.delay_num))
 
-        c.rev_delay_start = (c_int * len(self.rev_delay_start))(*(self.rev_delay_start))
-        c.rev_delay_num = (c_int * len(self.rev_delay_num))(*(self.rev_delay_num))
-        c.rev_map2sid = (c_int * len(self.rev_map2sid))(*(self.rev_map2sid))
+        if not self.c:
+            self.c = self._cls_ctype()
+            self.c.n_len = len(self.delay_start)
+            self.c.r_n_len = len(self.rev_delay_start)
+            self.c.s_len = len(self.rev_map2sid)
+            self.c.delay_start = (c_int * len(self.delay_start))(*(self.delay_start))
+            self.c.delay_num = (c_int * len(self.delay_num))(*(self.delay_num))
 
-        return c
+            self.c.rev_delay_start = (c_int * len(self.rev_delay_start))(*(self.rev_delay_start))
+            self.c.rev_delay_num = (c_int * len(self.rev_delay_num))(*(self.rev_delay_num))
+            self.c.rev_map2sid = (c_int * len(self.rev_map2sid))(*(self.rev_map2sid))
+
+        return self.c
 
     def to_gpu(self):
-        c_data = self.to_c()
-        gpu_data = self.so().to_gpu_connection(pointer(c_data))
+        if not self.c:
+            self.c = self.to_c()
+        self.gpu = self.so().to_gpu_connection(pointer(self.c))
 
         if self.debug:
-            print("\nPython GPU Pointer: %s" % hex(cast(gpu_data, c_void_p).value))
+            print("\nPython GPU Pointer: %s" % hex(cast(self.gpu, c_void_p).value))
 
-        return gpu_data
+        return self.gpu
 
-    def from_gpu(self, gpu, only_struct=True):
+    def from_gpu(self, gpu=None, only_struct=True):
         """
         :param gpu:  must be of type POINTER(self.cconnection)
         :param only_struct:
         :return:
         """
+        if gpu is None:
+            gpu = self.gpu
+
         cpu = self.so().from_gpu_connection(gpu)
-        c = cast(cpu, POINTER(self.c_type * 1)).contents[0]
+        c = cast(cpu, POINTER(self._cls_ctype * 1)).contents[0]
 
         if self.debug:
             print("\nPython CPU Pointer: %s" % hex(cast(cpu, c_void_p).value))
             print("Python CPU n_len: %s r_n_len: %s s_len: %s\n" % (int(c.n_len), int(c.r_n_len), int(c.s_len)))
 
         if not only_struct:
-            c.delay_start = cudamemops.from_gpu_int(c.delay_start, len(self.delay_start))
-            c.delay_num = cudamemops.from_gpu_int(c.delay_num, len(self.delay_num))
-            c.rev_delay_start = cudamemops.from_gpu_int(c.rev_delay_start, len(self.rev_delay_start))
-            c.rev_delay_num = cudamemops.from_gpu_int(c.rev_delay_num, len(self.rev_delay_num))
-            c.rev_map2sid = cudamemops.from_gpu_int(c.rev_map2sid, len(self.rev_map2sid))
+            c.delay_start = cudamemops.from_gpu_int(c.delay_start, c.n_len)
+            c.delay_num = cudamemops.from_gpu_int(c.delay_num, c.n_len)
+            c.rev_delay_start = cudamemops.from_gpu_int(c.rev_delay_start, c.r_n_len)
+            c.rev_delay_num = cudamemops.from_gpu_int(c.rev_delay_num, c.r_n_len)
+            c.rev_map2sid = cudamemops.from_gpu_int(c.rev_map2sid, c.s_len)
 
         return c
 
     def compile_(self):
-        self._generate_h()
-        self._generate_data_cu()
+        if self._cls_so is None:
+            self._generate_h()
+            self._generate_data_cu()
 
-        if CUDAGenerator.compile_(
-                src='{}/code_gen/connection.data.cu'.format(self.dir),
-                output='{}/so_gen/connection.data.so'.format(self.dir)
-        ):
-            self._so = cdll.LoadLibrary('{}/so_gen/connection.data.so'.format(self.dir))
-            self._so.to_gpu_connection.restype = POINTER(self.c_type)
-            self._so.from_gpu_connection.restype = POINTER(self.c_type)
-        else:
-            self._so = None
-            raise EnvironmentError('Compile file connection.data.so failed')
+            if CUDAGenerator.compile_(
+                    src='{}/code_gen/connection.data.cu'.format(pkg_dir),
+                    output='{}/so_gen/connection.data.so'.format(pkg_dir)
+            ):
+                self._cls_so = cdll.LoadLibrary('{}/so_gen/connection.data.so'.format(pkg_dir))
+                self._cls_so.to_gpu_connection.restype = POINTER(self._cls_ctype)
+                self._cls_so.from_gpu_connection.restype = POINTER(self._cls_ctype)
+            else:
+                self._cls_so = None
+                raise EnvironmentError('Compile file connection.data.so failed')
+
+        self._so = self._cls_so
 
     def _generate_h(self):
-        h_gen = CGenerator("%s/code_gen/connection.h" % self.dir)
+        h_gen = CGenerator("%s/code_gen/connection.h" % pkg_dir)
 
         h_gen.blank_line(2)
         h_gen.if_define('connection.h')
@@ -123,7 +133,7 @@ class Connection(Data):
         h_gen.close()
 
     def _generate_data_cu(self):
-        cu_gen = CUDAGenerator('{}/code_gen/connection.data.cu'.format(self.dir))
+        cu_gen = CUDAGenerator('{}/code_gen/connection.data.cu'.format(pkg_dir))
 
         cu_gen.blank_line(2)
         if self.debug:
@@ -175,7 +185,7 @@ class Connection(Data):
         return
 
     def _generate_py(self):
-        py_gen = PyGenerator('{}/code_gen/cconnection.py'.format(self.dir))
+        py_gen = PyGenerator('{}/code_gen/cconnection.py'.format(pkg_dir))
 
         py_gen.blank_line()
         py_gen.import_("*", "ctypes")

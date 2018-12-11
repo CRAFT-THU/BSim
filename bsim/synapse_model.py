@@ -1,6 +1,7 @@
 
 import os
 
+from bsim import pkg_dir
 from bsim.generator import CUDAGenerator
 from bsim.model import Model
 from bsim.model_compiler import compile_
@@ -34,10 +35,8 @@ class SynapseModel(Model):
         self.parameters['original'].add('weight')
         self.parameters['variable'].add('weight')
 
-        self.dir = os.path.dirname(__file__)
-
     def generate_compute_cu(self, debug=False):
-        cu_gen = CUDAGenerator('{}/code_gen/{}.compute.cu'.format(self.dir, self.name))
+        cu_gen = CUDAGenerator('{}/code_gen/{}.compute.cu'.format(pkg_dir, self.name))
 
         cu_gen.include("runtime.h")
         cu_gen.include("{}.h".format(self.name.lower()))

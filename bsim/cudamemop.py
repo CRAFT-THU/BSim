@@ -4,6 +4,7 @@ import ctypes
 from ctypes import *
 from typing import List
 
+from bsim import pkg_dir
 from bsim.generator import CGenerator, CUDAGenerator
 
 
@@ -11,7 +12,6 @@ class CUDAMemOp(object):
     def __init__(self, types: List):
         self.types = types
         self._so = None
-        self.dir = os.path.dirname(__file__)
 
     def so(self):
         if not self._so:
@@ -25,9 +25,9 @@ class CUDAMemOp(object):
 
         # TODO nvcc path
         if CUDAGenerator.compile_(
-                src='{}/code_gen/cudamemop.cu'.format(self.dir),
-                output='{}/so_gen/cudamemop.so'.format(self.dir)):
-            self._so = cdll.LoadLibrary('{}/so_gen/cudamemop.so'.format(self.dir))
+                src='{}/code_gen/cudamemop.cu'.format(pkg_dir),
+                output='{}/so_gen/cudamemop.so'.format(pkg_dir)):
+            self._so = cdll.LoadLibrary('{}/so_gen/cudamemop.so'.format(pkg_dir))
             for i in self.types:
                 getattr(self._so, 'gpu_malloc_{}'.format(i)).restype = POINTER(getattr(ctypes, 'c_%s' % i))
                 getattr(self._so, 'to_gpu_{}'.format(i)).restype = POINTER(getattr(ctypes, 'c_%s' % i))
@@ -37,7 +37,7 @@ class CUDAMemOp(object):
             raise EnvironmentError('Compile file connection.data.so failed')
 
     def _generate_h(self):
-        h_gen = CGenerator("{}/code_gen/cudamemop.h".format(self.dir))
+        h_gen = CGenerator("{}/code_gen/cudamemop.h".format(pkg_dir))
 
         h_gen.blank_line(2)
         h_gen.if_define("cudamemop.h")
@@ -57,7 +57,7 @@ class CUDAMemOp(object):
         return
 
     def _generate_cu(self):
-        cu_gen = CUDAGenerator('{}/code_gen/cudamemop.cu'.format(self.dir))
+        cu_gen = CUDAGenerator('{}/code_gen/cudamemop.cu'.format(pkg_dir))
 
         cu_gen.blank_line(2)
         cu_gen.include("../c_code/helper_cuda.h")
