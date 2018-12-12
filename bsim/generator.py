@@ -93,8 +93,9 @@ class CUDAGenerator(CGenerator):
             tab=tab
         )
         self.cu_line(
-            line='cudaMemset({}, 10, sizeof({})*{})'
-                .format(ret, type_, num),
+            # TODO: memset to 0
+            line='cudaMemset({}, 0, sizeof({})*{})'.format(ret, type_, num),
+            # line='cudaMemset({}, 10, sizeof({})*{}/2)'.format(ret, type_, num),
             tab=tab
         )
 
