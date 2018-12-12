@@ -102,7 +102,7 @@ class NeuronModel(Model):
         cu_gen.block("\t\t__syncthreads();")
         cu_gen.blank_line()
         cu_gen.block("\t\tif (active_cnt > 0) {")
-        cu_gen.block("\t\t\tcommit2globalTable(active_table_t, MAX_BLOCK_SIZE, g_active_{}_table, "
+        cu_gen.block("\t\t\tcommit2globalTable(active_table_t, active_cnt, g_active_{}_table, "
                      "&g_active_{}_table_size, 0);".format(self.name.lower(), self.name.lower()))
         cu_gen.block("\t\t\tif (threadIdx.x == 0) {")
         cu_gen.block("\t\t\t\tactive_cnt = 0;")

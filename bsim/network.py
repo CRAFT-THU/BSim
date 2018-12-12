@@ -379,7 +379,7 @@ class Network(object):
         cu_gen.malloc_symbol(symbol='g_fired_table', gpu='p_int', type_='int',
                              num='{}'.format(self.neuron_num*(self.max_delay+1)))
         cu_gen.block('\tret[1] = static_cast<void*>(p_int);')
-        cu_gen.block('\tprintf("\\n%p, %p, %p\\n", ret, ret[0], ret[1]);')
+        # cu_gen.block('\tprintf("\\n%p, %p, %p\\n", ret, ret[0], ret[1]);')
         cu_gen.blank_line()
 
         for model in self.neuron_models:
@@ -459,13 +459,13 @@ class Network(object):
         so.init_runtime.restype = POINTER(c_void_p)
         log_info = so.init_runtime((POINTER(c_connection)*len(self.synapse_models))(*(self.connection_data_gpu)))
 
-        fired_size = c_int(0)
-        fired_neuron = (c_int * self.neuron_num)(0)
-
-        v = (c_float*self.neuron_num)(0)
-        neuron_data = self.neuron_data[0].from_gpu(self.neuron_data_gpu[0], self.neuron_nums[1], only_struct=True)
 
         if log:
+            fired_size = c_int(0)
+            fired_neuron = (c_int * self.neuron_num)(0)
+
+            v = (c_float*self.neuron_num)(0)
+            neuron_data = self.neuron_data[0].from_gpu(self.neuron_data_gpu[0], self.neuron_nums[1], only_struct=True)
 
             cudamemops.gpu2cpu_int(cast(log_info[0] + sizeof(c_int), POINTER(c_int)), pointer(fired_size), 1)
             cudamemops.gpu2cpu_int(cast(log_info[1] + 4 * sizeof(c_int), POINTER(c_int)),
@@ -479,22 +479,10 @@ class Network(object):
 
         for t in range(cycle):
 
-            offset = t % (self.max_delay + 1)
-            cudamemops.gpu2cpu_int(cast(log_info[0] + sizeof(c_int) * offset, POINTER(c_int)), pointer(fired_size), 1)
-            cudamemops.gpu2cpu_int(cast(log_info[1] + self.neuron_num * offset * sizeof(c_int), POINTER(c_int)),
-                                   fired_neuron, fired_size.value)
-            cudamemops.gpu2cpu_float(neuron_data.p_v, v, self.neuron_num)
-
             for i, model in enumerate(self.neuron_models):
                 getattr(so, 'update_{}'.format(model.name.lower()))(self.neuron_data_gpu[i],
                                                                     self.neuron_nums[i+1] - self.neuron_nums[i],
                                                                     self.neuron_nums[i], t)
-
-            offset = t % (self.max_delay + 1)
-            cudamemops.gpu2cpu_int(cast(log_info[0] + sizeof(c_int) * offset, POINTER(c_int)), pointer(fired_size), 1)
-            cudamemops.gpu2cpu_int(cast(log_info[1] + self.neuron_num * offset * sizeof(c_int), POINTER(c_int)),
-                                   fired_neuron, fired_size.value)
-            cudamemops.gpu2cpu_float(neuron_data.p_v, v, self.neuron_num)
 
             for i, model in enumerate(self.synapse_models):
                 getattr(so, 'update_{}'.format(model.name.lower()))(self.synapse_data_gpu[i],
@@ -508,10 +496,5 @@ class Network(object):
                                         fired_neuron, fired_size.value)
                  cudamemops.gpu2cpu_float(neuron_data.p_v, v, self.neuron_num)
 
-            offset = t % (self.max_delay + 1)
-            cudamemops.gpu2cpu_int(cast(log_info[0] + sizeof(c_int) * offset, POINTER(c_int)), pointer(fired_size), 1)
-            cudamemops.gpu2cpu_int(cast(log_info[1] + self.neuron_num * offset * sizeof(c_int), POINTER(c_int)),
-                                   fired_neuron, fired_size.value)
-            cudamemops.gpu2cpu_float(neuron_data.p_v, v, self.neuron_num)
 
         return 0

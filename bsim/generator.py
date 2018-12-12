@@ -131,9 +131,10 @@ class CUDAGenerator(CGenerator):
     @staticmethod
     def compile_(src: str='a.cu', output: str='a.so'):
         cmd = '{} {} {} -o {}'.format(
-            '/usr/local/cuda/bin/nvcc -I/usr/local/cuda/include/ -shared -rdc=true',
-            '--compiler-options "-Wall -Wno-switch -Wfatal-errors -Ofast -fPIC -shared"',
+            '/usr/local/cuda/bin/nvcc -G -g -I/usr/local/cuda/include/ -shared -rdc=true',
+            '--compiler-options "-g -Wall -Wno-switch -Wfatal-errors -Ofast -fPIC -shared"',
             src, output
         )
         # print('{}\n'.format(cmd))
         return subprocess.call(cmd, shell=True) == 0
+
