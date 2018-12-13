@@ -343,7 +343,6 @@ class Network(object):
         cu_gen.block('__device__ int * g_fired_table;')
         cu_gen.block('__device__ int * g_fired_table_sizes;')
 
-
         for model in self.neuron_models:
             cu_gen.block('__device__ int * g_active_{}_table;'.format(model.name.lower()))
             cu_gen.block('__device__ int g_active_{}_table_size;'.format(model.name.lower()))
@@ -450,7 +449,7 @@ class Network(object):
 
         return 0
 
-    def run_gpu(self, time, log=True):
+    def run_gpu(self, time, log=['fire']):
         cycle = int(time/self.dt)
 
         so = self.so()
@@ -459,23 +458,14 @@ class Network(object):
         so.init_runtime.restype = POINTER(c_void_p)
         log_info = so.init_runtime((POINTER(c_connection)*len(self.synapse_models))(*(self.connection_data_gpu)))
 
-
-        if log:
+        if isinstance(log, List) and len(log) > 0:
             fired_size = c_int(0)
             fired_neuron = (c_int * self.neuron_num)(0)
 
-            v = (c_float*self.neuron_num)(0)
-            neuron_data = self.neuron_data[0].from_gpu(self.neuron_data_gpu[0], self.neuron_nums[1], only_struct=True)
+            # v = (c_float*self.neuron_num)(0)
+            # neuron_data = self.neuron_data[0].from_gpu(self.neuron_data_gpu[0], self.neuron_nums[1], only_struct=True)
 
-            cudamemops.gpu2cpu_int(cast(log_info[0] + sizeof(c_int), POINTER(c_int)), pointer(fired_size), 1)
-            cudamemops.gpu2cpu_int(cast(log_info[1] + 4 * sizeof(c_int), POINTER(c_int)),
-                                   fired_neuron, fired_size.value)
-            cudamemops.gpu2cpu_float(neuron_data.p_v, v, self.neuron_num)
-
-            cudamemops.gpu2cpu_int(cast(log_info[0] + sizeof(c_int) * 0, POINTER(c_int)), pointer(fired_size), 1)
-            cudamemops.gpu2cpu_int(cast(log_info[1] + self.neuron_num * 0 * sizeof(c_int), POINTER(c_int)),
-                                   fired_neuron, fired_size.value)
-            cudamemops.gpu2cpu_float(neuron_data.p_v, v, self.neuron_num)
+            fire_log = open("fire.log", "wb+")
 
         for t in range(cycle):
 
@@ -489,12 +479,16 @@ class Network(object):
                                                                     self.synapse_nums[i+1] - self.synapse_nums[i],
                                                                     self.synapse_nums[i], t)
 
-            if log:
+            if isinstance(log, List) and len(log) > 0:
                  offset = t % (self.max_delay + 1)
                  cudamemops.gpu2cpu_int(cast(log_info[0] + sizeof(c_int) * offset, POINTER(c_int)), pointer(fired_size), 1)
                  cudamemops.gpu2cpu_int(cast(log_info[1] + self.neuron_num * offset * sizeof(c_int), POINTER(c_int)),
                                         fired_neuron, fired_size.value)
-                 cudamemops.gpu2cpu_float(neuron_data.p_v, v, self.neuron_num)
+                 fire_log.write(bytes(fired_size.value))
+                 fire_log.write(bytes(fired_neuron))
+                 # cudamemops.gpu2cpu_float(neuron_data.p_v, v, self.neuron_num)
 
+        if log:
+            fire_log.close()
 
         return 0
