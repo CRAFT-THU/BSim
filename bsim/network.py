@@ -465,7 +465,8 @@ class Network(object):
             # v = (c_float*self.neuron_num)(0)
             # neuron_data = self.neuron_data[0].from_gpu(self.neuron_data_gpu[0], self.neuron_nums[1], only_struct=True)
 
-            fire_log = open("fire.log", "wb+")
+            fire_bin_log = open("fire.bin.log", "wb+")
+            #fire_txt_log = open("fire.txt.log", "w+")
 
         for t in range(cycle):
 
@@ -483,12 +484,16 @@ class Network(object):
                  offset = t % (self.max_delay + 1)
                  cudamemops.gpu2cpu_int(cast(log_info[0] + sizeof(c_int) * offset, POINTER(c_int)), pointer(fired_size), 1)
                  cudamemops.gpu2cpu_int(cast(log_info[1] + self.neuron_num * offset * sizeof(c_int), POINTER(c_int)),
-                                        fired_neuron, fired_size.value)
-                 fire_log.write(bytes(fired_size.value))
-                 fire_log.write(bytes(fired_neuron))
+                                        fired_neuron, fired_size)
+                 fire_bin_log.write(bytes(fired_size))
+                 fire_bin_log.write(bytes(fired_neuron)[0:fired_size.value*sizeof(c_int)])
+                 # fire_txt_log.write(' '.join(map(str, list(fired_neuron)[0:fired_size.value])))
+                 # fire_txt_log.write('\n')
+
                  # cudamemops.gpu2cpu_float(neuron_data.p_v, v, self.neuron_num)
 
         if log:
-            fire_log.close()
+            fire_bin_log.close()
+            # fire_txt_log.close()
 
         return 0
