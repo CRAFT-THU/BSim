@@ -51,11 +51,9 @@ int main(int argc, char **argv)
 	c.connect(pn2, pn3, weight1, delay, NULL, N*N);
 	c.connect(pn3, pn4, weight0, delay, NULL, N*N);
 	c.connect(pn4, pn5, weight1, delay, NULL, N*N);
-	STSim st(&c, 1.0e-3);
 	SGSim sg(&c, 1.0e-3);
 	//sg.compare_run(0.1);
 	sg.run(0.1);
-	st.run(0.1);
 
 	if (!load) {
 		printf("SAVE DATA...\n");
