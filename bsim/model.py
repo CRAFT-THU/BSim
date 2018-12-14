@@ -1,7 +1,6 @@
-import os
 from abc import ABC, abstractmethod
 
-from bsim import pkg_dir
+from bsim.env import pkg_dir
 from bsim.generator import CGenerator, PyGenerator, CUDAGenerator
 
 

@@ -1,12 +1,7 @@
 
 import unittest
 import numpy as np
-from ctypes import *
 
-import env
-
-from bsim.population import *
-from bsim.projection import *
 from bsim.network import *
 
 
@@ -59,19 +54,18 @@ class TestNetworkMethods(unittest.TestCase):
 
         self.net = Network(dt=0.0001)
 
-        self.net.connect(p0, 0, p1, 0, s01_00)
-        self.net.connect(p0, 0, p1, 1, s01_01)
-        self.net.connect(p0, 0, p1, 2, s01_02)
-        self.net.connect(p0, 1, p1, 0, s01_10)
-        self.net.connect(p0, 1, p1, 1, s01_11)
-        self.net.connect(p0, 1, p1, 2, s01_12)
-        self.net.connect_alltoall(p0, p2, s02)
-        self.net.connect_alltoall(p1, p3, s12)
-        self.net.connect_alltoall(p2, p3, s23)
+        self.net.one_to_one(p0, 0, p1, 0, s01_00)
+        self.net.one_to_one(p0, 0, p1, 1, s01_01)
+        self.net.one_to_one(p0, 0, p1, 2, s01_02)
+        self.net.one_to_one(p0, 1, p1, 0, s01_10)
+        self.net.one_to_one(p0, 1, p1, 1, s01_11)
+        self.net.one_to_one(p0, 1, p1, 2, s01_12)
+        self.net.all_to_all(p0, p2, s02)
+        self.net.all_to_all(p1, p3, s12)
+        self.net.all_to_all(p2, p3, s23)
 
         self.net.build()
         self.net.to_gpu()
-
 
     def test_connection(self):
         self.assertEqual(1, len(self.net.connection_data))
@@ -150,8 +144,6 @@ class TestNetworkMethods(unittest.TestCase):
                               7, 7, 7, 5, 6, 5,
                               6, 7, 7], list(cast(cpu.p_dst, POINTER(c_int*15)).contents))
 
-    def test_compute(self):
-        self.net.run_gpu(0.001)
 
 if __name__ == '__main__':
     unittest.main()

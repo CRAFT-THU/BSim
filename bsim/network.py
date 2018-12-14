@@ -1,11 +1,11 @@
 import math
-import os
-
 import importlib
 from ctypes import *
-from typing import List, Dict
+from typing import List, Dict, Sequence
 
-from bsim import pkg_dir
+import bsim
+from bsim.neuron_model import NeuronModel
+from bsim.synapse_model import SynapseModel
 from bsim.cudamemop import cudamemops
 from bsim.connection import Connection
 from bsim.generator import CGenerator, CUDAGenerator
@@ -25,21 +25,21 @@ class Network(object):
 
         # Statics Data
         # Total neuron or synapse numbers
-        self.neuron_num = 0  # type: Int
-        self.synapse_num = 0  # type: Int
+        self.neuron_num = 0  # type: int
+        self.synapse_num = 0  # type: int
         # Max and Min delay
-        self.min_delay = 1e10  # type: Int
-        self.max_delay = 0  # type: Int
+        self.min_delay = 1e10  # type: int
+        self.max_delay = 0  # type: int
         self.g_max = 100
         self.g_min = -100
         self.max_block_size = 1024
 
         # Compiled Data
         self.neuron_models = []  # type: List[NeuronModel]
-        self.neuron_nums = []  # type: List[Int]
+        self.neuron_nums = []  # type: List[int]
         self.neuron_data = []  # type: List[Population]
         self.synapse_models = []  # type: List[SynapseModel]
-        self.synapse_nums = []  # type: List[Int]
+        self.synapse_nums = []  # type: List[int]
         self.synapse_data = []  # type: List[Projection]
         self.connection_data = []  # type: List[Connection]
 
@@ -49,17 +49,29 @@ class Network(object):
         self.connection_data_gpu = []
 
         # Temp Data
-        self.population2id = {}  # type: Dict[Population, Int]
-        self.synapse2id = {}  # type: Dict[Projection, Int]
-        self.synapse2neuron_id = {}  # type: Dict[Projection, Int]
-        self.s_id2n_id = {}  # type: Dict[Int, Int]
+        self.population2id = {}  # type: Dict[Population, int]
+        self.synapse2id = {}  # type: Dict[Projection, int]
+        self.synapse2neuron_id = {}  # type: Dict[Projection, int]
+        self.s_id2n_id = {}  # type: Dict[int, int]
         self.neuron2synapses = []  # type: List[List[List[Projection]]]
         self.neuron2synapses_rev = []  # type: List[List[List[Projection]]]
 
-    def connect(self,
-                pre_population: Population, pre_id: int,
-                post_population: Population, post_id: int,
-                synapse: Projection):
+    def population(self, model: NeuronModel, **kwargs):
+        kwargs['dt'] = self.dt
+        p = Population(model=model, **kwargs)
+        self._add_population(p, warn=True)
+
+        return p
+
+    def projection(self, model: NeuronModel, **kwargs):
+        kwargs['dt'] = self.dt
+        s = Projection(model=model, **kwargs)
+        return s
+
+    def one_to_one(self,
+                   pre_population: Population, pre_id: int,
+                   post_population: Population, post_id: int,
+                   synapse: Projection):
         self._add_population(pre_population, warn=False)
         self._add_population(post_population, warn=False)
 
@@ -84,10 +96,10 @@ class Network(object):
 
         return 0
 
-    def connect_alltoall(self,
-                         pre_population: Population,
-                         post_population: Population,
-                         projection: Projection):
+    def all_to_all(self,
+                   pre_population: Population,
+                   post_population: Population,
+                   projection: Projection):
 
         self._add_population(pre_population, warn=False)
         self._add_population(post_population, warn=False)
@@ -192,15 +204,14 @@ class Network(object):
 
     def _build_synapse_data(self):
         for t in range(len(self.synapse_models)):
-            for d in range(self.min_delay, self.max_delay + 1):
+            for d in range(int(self.min_delay), int(self.max_delay + 1)):
                 for i in range(len(self.neuron2synapses[t])):
                     for syn in self.neuron2synapses[t][i]:
-                        #syn = self.neuron2synapses[t][i][j]
                         if syn.special['delay'] == d:
                             sid = len(self.synapse_data[t])
                             self.synapse2id[syn] = sid
                             self.synapse_data[t].merge(syn)
-                            self.s_id2n_id[sid] = [self.synapse2neuron_id[syn]]
+                            self.s_id2n_id[sid] = self.synapse2neuron_id[syn]
 
             self.synapse_nums[t + 1] = self.synapse_nums[t] + len(self.synapse_data[t])
         self.synapse_num = self.synapse_nums[len(self.synapse_models)]
@@ -221,7 +232,7 @@ class Network(object):
                     for syn in self.neuron2synapses[t][i]:
                         if syn.special['delay'] == d:
                             if count == 0:
-                                self.connection_data[t].delay_start[i + (d-self.min_delay)* self.neuron_num] = \
+                                self.connection_data[t].delay_start[i+(d-self.min_delay)*self.neuron_num] = \
                                     self.synapse2id[syn]
                             count += 1
                     self.connection_data[t].delay_num[i + (d-self.min_delay) * self.neuron_num] = count
@@ -297,15 +308,12 @@ class Network(object):
         h_gen.block("const int MAX_BLOCK_SIZE = {};".format(self.max_block_size))
         h_gen.block("const int FIRED_TABLE_SIZE = {};".format(self.neuron_num))
 
-
         h_gen.block('extern __device__ int * g_fired_table;')
         h_gen.block('extern __device__ int * g_fired_table_sizes;')
-
 
         for model in self.neuron_models:
             h_gen.block('extern __device__ int * g_active_{}_table;'.format(model.name.lower()))
             h_gen.block('extern __device__ int g_active_{}_table_size;'.format(model.name.lower()))
-
 
         for model in self.synapse_models:
             h_gen.block('extern __device__ CConnection * g_connection_{};'.format(model.name.lower()))
@@ -346,7 +354,6 @@ class Network(object):
         for model in self.neuron_models:
             cu_gen.block('__device__ int * g_active_{}_table;'.format(model.name.lower()))
             cu_gen.block('__device__ int g_active_{}_table_size;'.format(model.name.lower()))
-
 
         for model in self.synapse_models:
             cu_gen.block('__device__ CConnection * g_connection_{};'.format(model.name.lower()))
@@ -393,7 +400,7 @@ class Network(object):
 
         for i, model in enumerate(self.synapse_models):
             cu_gen.cu_line('cudaMemcpyToSymbol(g_connection_{}, &(connections[{}]), sizeof(CConnection*))'
-                          .format(model.name.lower(), i))
+                           .format(model.name.lower(), i))
 
         cu_gen.block('\treturn ret;')
         cu_gen.block('}')
@@ -424,8 +431,8 @@ class Network(object):
             src += ' {}/code_gen/{}.compute.cu '.format(pkg_dir, model.name.lower())
 
         if CUDAGenerator.compile_(
-            src = src,
-            output = '{}/so_gen/runtime.so'.format(pkg_dir)
+                src=src,
+                output='{}/so_gen/runtime.so'.format(pkg_dir)
         ):
             self._so = cdll.LoadLibrary('{}/so_gen/runtime.so'.format(pkg_dir))
         else:
@@ -449,24 +456,22 @@ class Network(object):
 
         return 0
 
-    def run_gpu(self, time, log=['fire']):
+    def run_gpu(self, time, log: Sequence[str] = None):
         cycle = int(time/self.dt)
 
         so = self.so()
-        c_connection = importlib.import_module('bsim.code_gen.cconnection' ).CConnection
+        c_connection = importlib.import_module('bsim.code_gen.cconnection').CConnection
 
         so.init_runtime.restype = POINTER(c_void_p)
-        log_info = so.init_runtime((POINTER(c_connection)*len(self.synapse_models))(*(self.connection_data_gpu)))
+        log_info = so.init_runtime((POINTER(c_connection)*len(self.synapse_models))(*self.connection_data_gpu))
 
-        if isinstance(log, List) and len(log) > 0:
-            fired_size = c_int(0)
-            fired_neuron = (c_int * self.neuron_num)(0)
+        fired_size = c_int(0)
+        fired_neuron = (c_int * self.neuron_num)(0)
+        fire_bin_log = open("fire.bin.log", "wb+")
 
-            # v = (c_float*self.neuron_num)(0)
-            # neuron_data = self.neuron_data[0].from_gpu(self.neuron_data_gpu[0], self.neuron_nums[1], only_struct=True)
-
-            fire_bin_log = open("fire.bin.log", "wb+")
-            #fire_txt_log = open("fire.txt.log", "w+")
+        # fire_txt_log = open("fire.txt.log", "w+")
+        # v = (c_float*self.neuron_num)(0)
+        # neuron_data = self.neuron_data[0].from_gpu(self.neuron_data_gpu[0], self.neuron_nums[1], only_struct=True)
 
         for t in range(cycle):
 
@@ -480,17 +485,18 @@ class Network(object):
                                                                     self.synapse_nums[i+1] - self.synapse_nums[i],
                                                                     self.synapse_nums[i], t)
 
-            if isinstance(log, List) and len(log) > 0:
-                 offset = t % (self.max_delay + 1)
-                 cudamemops.gpu2cpu_int(cast(log_info[0] + sizeof(c_int) * offset, POINTER(c_int)), pointer(fired_size), 1)
-                 cudamemops.gpu2cpu_int(cast(log_info[1] + self.neuron_num * offset * sizeof(c_int), POINTER(c_int)),
-                                        fired_neuron, fired_size)
-                 fire_bin_log.write(bytes(fired_size))
-                 fire_bin_log.write(bytes(fired_neuron)[0:fired_size.value*sizeof(c_int)])
-                 # fire_txt_log.write(' '.join(map(str, list(fired_neuron)[0:fired_size.value])))
-                 # fire_txt_log.write('\n')
+            if isinstance(log, Sequence) and len(log) > 0:
+                offset = t % (self.max_delay + 1)
+                cudamemops.gpu2cpu_int(cast(log_info[0] + sizeof(c_int) * offset,
+                                            POINTER(c_int)), pointer(fired_size), 1)
+                cudamemops.gpu2cpu_int(cast(log_info[1] + self.neuron_num * offset * sizeof(c_int),
+                                            POINTER(c_int)), fired_neuron, fired_size)
+                fire_bin_log.write(bytes(fired_size))
+                fire_bin_log.write(bytes(fired_neuron)[0:fired_size.value*sizeof(c_int)])
+                # fire_txt_log.write(' '.join(map(str, list(fired_neuron)[0:fired_size.value])))
+                # fire_txt_log.write('\n')
 
-                 # cudamemops.gpu2cpu_float(neuron_data.p_v, v, self.neuron_num)
+                # cudamemops.gpu2cpu_float(neuron_data.p_v, v, self.neuron_num)
 
         if log:
             fire_bin_log.close()

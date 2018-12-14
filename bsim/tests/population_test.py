@@ -2,8 +2,6 @@ import unittest
 import numpy as np
 from ctypes import *
 
-import env
-
 from bsim.population import *
 
 

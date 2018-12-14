@@ -3,8 +3,6 @@ import unittest
 import numpy as np
 from ctypes import *
 
-import env
-
 from bsim.projection import *
 
 
@@ -46,7 +44,6 @@ class TestProjectionMethods(unittest.TestCase):
         self.assertListEqual([3] * 10 + [4] * 5, list(cast(cpu.p_delay, POINTER(c_int*15)).contents))
         self.assertListEqual([1] * 10 + [0] * 5, list(cast(cpu.p_last_update, POINTER(c_int*15)).contents))
         self.assertListEqual([0] * 10 + [0] * 5, list(cast(cpu.p_dst, POINTER(c_int*15)).contents))
-
 
 
 if __name__ == '__main__':

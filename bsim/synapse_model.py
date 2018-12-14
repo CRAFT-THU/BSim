@@ -1,7 +1,5 @@
 
-import os
-
-from bsim import pkg_dir
+from bsim.env import pkg_dir
 from bsim.generator import CUDAGenerator
 from bsim.model import Model
 from bsim.model_compiler import compile_

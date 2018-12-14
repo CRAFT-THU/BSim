@@ -1,14 +1,13 @@
 
-import os
-
-from bsim import pkg_dir
+from bsim.env import pkg_dir
 from bsim.model import Model
 from bsim.model_compiler import compile_
-from bsim.generator import CGenerator, CUDAGenerator, PyGenerator
+from bsim.generator import CUDAGenerator
 
 
 class NeuronModel(Model):
-    def __init__(self, computation: str='', threshold: str='v > vt', reset: str='v = vr', refract: bool=True, name: str=''):
+    def __init__(self, computation: str = '', threshold: str = 'v > vt', reset: str = 'v = vr',
+                 refract: bool = True, name: str = ''):
         """
         Create NeuronModel: find out variables and constants for further optimization.
         This func may be modified.

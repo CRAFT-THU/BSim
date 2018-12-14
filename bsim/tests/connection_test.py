@@ -1,8 +1,6 @@
 
 import unittest
 
-import env
-
 from bsim.connection import *
 
 

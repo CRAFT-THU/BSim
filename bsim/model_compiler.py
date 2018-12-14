@@ -32,6 +32,9 @@ def compile_(formula: Dict[str, str] = {'i_exec': 'i_exc * exp(-dt/tau_exec)'}) 
         for line in formulas[label]:
             line = standardize(line)
 
+            if line == '':
+                break
+
             if line.count('=') == 1:
                 var, expression = line.split('=')
                 var = var.strip()
