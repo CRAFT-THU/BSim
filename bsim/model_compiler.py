@@ -11,6 +11,22 @@ Operators = set(['+', '-', '*', '/', 'exp', 'log', '(', ')'])
 def constant_folding_propagation(expressions, parameters):
     # TODO: constant folding and propagation
 
+    expressions['fold']['computation']['C'] = 'exp ( - dt / tau )'
+    expressions['fold']['computation']['Cexec'] = 'exp ( - dt /  tau_e )'
+    expressions['fold']['computation']['Cinh'] = 'exp ( - dt /  tau_i )'
+    expressions['fold']['computation']['v_tmp'] = \
+        '(1 - ( exp ( - dt / tau ) ) ) * ( i_offset * ( tau / c )  + v_rest ) '
+    expressions['fold']['computation']['v_tmp'] = \
+        '(1 - ( exp ( - dt / tau ) ) ) * ( i_offset * ( tau / c )  + v_rest ) '
+    expressions['fold']['computation']['v_tmp'] =  \
+        '(1 - ( exp ( - dt / tau ) ) ) * ( i_offset * ( tau / c )  + v_rest ) '
+    expressions['fold']['computation']['C_exec'] = \
+        '( ( exp ( - dt / tau_e ) )  - ( exp ( - dt / tau ) ) ) * ( ( tau / c ) * ( tau_e / ( tau_e - tau ) ) )'
+    expressions['fold']['computation']['C_inh'] = \
+        '( ( exp ( - dt / tau_i ) )  - ( exp ( - dt / tau ) ) ) * ( ( tau / c ) * ( tau_i / ( tau_i - tau ) ) )'
+
+    parameters['shared'] = set(('v_tmp', 'C_exec', 'C_inh', 'Cexec', 'Cinh', 'C'))
+
     return expressions, parameters
 
 
@@ -38,6 +54,7 @@ def compile_(formula: Dict[str, str] = {'i_exec': 'i_exc * exp(-dt/tau_exec)'}) 
             if line.count('=') == 1:
                 var, expression = line.split('=')
                 var = var.strip()
+                expression = expression.strip()
                 assert var not in expressions['assign'], 'One variable could have only one assignment'
                 assert re.match('^[0-9a-zA-Z_]+$', var), 'variable name could have only [0-9a-zA-Z_]'
                 expressions['assign'][label][var] = expression
