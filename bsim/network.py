@@ -1,5 +1,6 @@
 import math
 import importlib
+import time
 from ctypes import *
 from typing import List, Dict, Sequence
 
@@ -28,7 +29,7 @@ class Network(object):
         self.neuron_num = 0  # type: int
         self.synapse_num = 0  # type: int
         # Max and Min delay
-        self.min_delay = 1e10  # type: int
+        self.min_delay = 20000000  # type: int
         self.max_delay = 0  # type: int
         self.g_max = 100
         self.g_min = -100
@@ -456,11 +457,11 @@ class Network(object):
 
         return 0
 
-    def run(self, time, log: Sequence[str] = None):
-        self.run_gpu(time=time, log=log)
+    def run(self, sim_time, log: Sequence[str] = ['fire']):
+        self.run_gpu(sim_time=sim_time, log=log)
 
-    def run_gpu(self, time, log: Sequence[str] = None):
-        cycle = int(time/self.dt)
+    def run_gpu(self, sim_time, log: Sequence[str] = ['fire']):
+        cycle = int(sim_time / self.dt)
 
         so = self.so()
         c_connection = importlib.import_module('bsim.code_gen.cconnection').CConnection
@@ -471,12 +472,13 @@ class Network(object):
         fired_size = c_int(0)
         fired_neuron = (c_int * self.neuron_num)(0)
         fire_bin_log = open("fire.bin.log", "wb+")
+        # fire_txt_log = open("fire.txt.log", "w+")
         v_txt_log = open("v.txt.log", "w+")
 
-        # fire_txt_log = open("fire.txt.log", "w+")
         v = (c_float*self.neuron_num)(0)
         neuron_data = self.neuron_data[0].from_gpu(self.neuron_data_gpu[0], self.neuron_nums[1], only_struct=True)
 
+        start_time = time.perf_counter()
         for t in range(cycle):
 
             for i, model in enumerate(self.neuron_models):
@@ -500,11 +502,14 @@ class Network(object):
                 # fire_txt_log.write(' '.join(map(str, list(fired_neuron)[0:fired_size.value])))
                 # fire_txt_log.write('\n')
                 cudamemops.gpu2cpu_float(neuron_data.p_v, v, self.neuron_num)
-                fire_txt_log.write(' '.join(map(str, list(v))))
-                fire_txt_log.write('\n')
+                v_txt_log.write(' '.join(map(str, list(v))))
+                v_txt_log.write('\n')
 
-        if log:
-            fire_bin_log.close()
-            # fire_txt_log.close()
+        end_time = time.perf_counter()
+        print('\nSimulates {}s costs {}s.\n'.format(self.dt * cycle, end_time - start_time))
+
+        fire_bin_log.close()
+        #fire_txt_log.close()
+        v_txt_log.close()
 
         return 0

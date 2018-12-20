@@ -3,7 +3,7 @@ import unittest
 from bsim import *
 
 
-class TestSmallNet(unittest.TestCase):
+class TestLIF(unittest.TestCase):
     def test_run(self):
 
         lif = Neuron(
@@ -25,22 +25,22 @@ class TestSmallNet(unittest.TestCase):
         N = 500
 
         net = Net(dt=0.0001)
-        p0 = net.population(lif, num=10, name='P0', v=0.0, v_rest=0.0, v_reset=0.0,
+        p0 = net.population(lif, num=N, name='P0', v=0.0, v_rest=0.0, v_reset=0.0,
                             c=0.1, tau=50e-3, tau_i=1.0, tau_e=1.0, v_threshold=15e-3,
                             i_offset=1.0, refract_time=0.001, dt=0.001)
-        p1 = net.population(lif, num=10, name='P1', v=0.0, v_rest=0.0, v_reset=0.0,
+        p1 = net.population(lif, num=N, name='P1', v=0.0, v_rest=0.0, v_reset=0.0,
                             c=0.1, tau=50e-3, tau_i=1.0, tau_e=1.0, v_threshold=15e-3,
                             i_offset=0.0, refract_time=0.001, dt=0.001)
-        p2 = net.population(lif, num=10, name='P2', v=0.0, v_rest=0.0, v_reset=0.0,
+        p2 = net.population(lif, num=N, name='P2', v=0.0, v_rest=0.0, v_reset=0.0,
                             c=0.1, tau=50e-3, tau_i=1.0, tau_e=1.0, v_threshold=15e-3,
                             i_offset=0.0, refract_time=0.001, dt=0.001)
-        p3 = net.population(lif, num=10, name='P3', v=0.0, v_rest=0.0, v_reset=0.0,
+        p3 = net.population(lif, num=N, name='P3', v=0.0, v_rest=0.0, v_reset=0.0,
                             c=0.1, tau=50e-3, tau_i=1.0, tau_e=1.0, v_threshold=15e-3,
                             i_offset=0.0, refract_time=0.001, dt=0.001)
-        p4 = net.population(lif, num=10, name='P4', v=0.0, v_rest=0.0, v_reset=0.0,
+        p4 = net.population(lif, num=N, name='P4', v=0.0, v_rest=0.0, v_reset=0.0,
                             c=0.1, tau=50e-3, tau_i=1.0, tau_e=1.0, v_threshold=15e-3,
                             i_offset=0.0, refract_time=0.001, dt=0.001)
-        p5 = net.population(lif, num=10, name='P5', v=0.0, v_rest=0.0, v_reset=0.0,
+        p5 = net.population(lif, num=N, name='P5', v=0.0, v_rest=0.0, v_reset=0.0,
                             c=0.1, tau=50e-3, tau_i=1.0, tau_e=1.0, v_threshold=15e-3,
                             i_offset=0.0, refract_time=0.001, dt=0.001)
 
