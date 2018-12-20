@@ -471,8 +471,8 @@ class Network(object):
 
         fired_size = c_int(0)
         fired_neuron = (c_int * self.neuron_num)(0)
-        fire_bin_log = open("fire.bin.log", "wb+")
-        # fire_txt_log = open("fire.txt.log", "w+")
+        # fire_bin_log = open("fire.bin.log", "wb+")
+        fire_txt_log = open("fire.txt.log", "w+")
         v_txt_log = open("v.txt.log", "w+")
 
         v = (c_float*self.neuron_num)(0)
@@ -497,10 +497,10 @@ class Network(object):
                                             POINTER(c_int)), pointer(fired_size), 1)
                 cudamemops.gpu2cpu_int(cast(log_info[1] + self.neuron_num * offset * sizeof(c_int),
                                             POINTER(c_int)), fired_neuron, fired_size)
-                fire_bin_log.write(bytes(fired_size))
-                fire_bin_log.write(bytes(fired_neuron)[0:fired_size.value*sizeof(c_int)])
-                # fire_txt_log.write(' '.join(map(str, list(fired_neuron)[0:fired_size.value])))
-                # fire_txt_log.write('\n')
+                # fire_bin_log.write(bytes(fired_size))
+                # fire_bin_log.write(bytes(fired_neuron)[0:fired_size.value*sizeof(c_int)])
+                fire_txt_log.write(' '.join(map(str, list(fired_neuron)[0:fired_size.value])))
+                fire_txt_log.write('\n')
                 cudamemops.gpu2cpu_float(neuron_data.p_v, v, self.neuron_num)
                 v_txt_log.write(' '.join(map(str, list(v))))
                 v_txt_log.write('\n')
@@ -508,8 +508,8 @@ class Network(object):
         end_time = time.perf_counter()
         print('\nSimulates {}s costs {}s.\n'.format(self.dt * cycle, end_time - start_time))
 
-        fire_bin_log.close()
-        #fire_txt_log.close()
+        # fire_bin_log.close()
+        fire_txt_log.close()
         v_txt_log.close()
 
         return 0
