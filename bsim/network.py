@@ -3,7 +3,7 @@ import importlib
 from ctypes import *
 from typing import List, Dict, Sequence
 
-import bsim
+from bsim.env import pkg_dir
 from bsim.neuron_model import NeuronModel
 from bsim.synapse_model import SynapseModel
 from bsim.cudamemop import cudamemops
@@ -63,7 +63,7 @@ class Network(object):
 
         return p
 
-    def projection(self, model: NeuronModel, **kwargs):
+    def projection(self, model: SynapseModel, **kwargs):
         kwargs['dt'] = self.dt
         s = Projection(model=model, **kwargs)
         return s
