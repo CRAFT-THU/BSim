@@ -6,11 +6,15 @@ from bsim.model_compiler import compile_
 
 
 class SynapseModel(Model):
-    def __init__(self, computation: str='', pre: str='', post: str='', name: str=''):
+    def __init__(self, computation: str = '', pre: str = '', post: str = '', name: str = '',
+                 compile_config: str = '', debug: bool = False):
         """
         Create SynapseModel: find out variables and constants for further optimization.
         This func may be modified.
         """
+
+        super(SynapseModel, self).__init__(compile_config=compile_config, debug=debug)
+
         self.name = name
         self.pre_learn = not (pre == '')
         self.post_learn = not (post == '')
@@ -19,7 +23,7 @@ class SynapseModel(Model):
             'computation': computation,
             'pre': pre,
             'post': post
-        })
+        }, config=self.compile_config)
 
         self.parameters['external'] = set(('t', 'i_exec', 'i_inh'))
 

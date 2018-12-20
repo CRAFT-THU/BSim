@@ -3,7 +3,7 @@ import importlib
 from ctypes import *
 from typing import List, Dict, Sequence
 
-import bsim
+from bsim.env import pkg_dir
 from bsim.neuron_model import NeuronModel
 from bsim.synapse_model import SynapseModel
 from bsim.cudamemop import cudamemops
@@ -455,6 +455,9 @@ class Network(object):
         self._build_reverse_connection()
 
         return 0
+
+    def run(self, time, log: Sequence[str] = None):
+        self.run_gpu(time=time, log=log)
 
     def run_gpu(self, time, log: Sequence[str] = None):
         cycle = int(time/self.dt)

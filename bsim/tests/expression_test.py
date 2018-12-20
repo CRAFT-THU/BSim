@@ -15,17 +15,25 @@ class TestExpressionMethods(unittest.TestCase):
 
     def test_model(self):
         lif = NeuronModel(
-            computation='v = C * v + v_tmp + i_exec * C_exec + i_inh * C_inh;i_exec *= Cexec; '
-                        'i_inh *= Cinh',
+            computation='v = exp(-dt/tau) * v + (1-exp(-dt/tau)) * (i_offset * (tau/c) + v_rest) + '
+                        'i_exec * (exp(-dt/tau_e) - exp(-dt/tau)) * ((tau/c) * (tau_e/(tau_e-tau))) + '
+                        'i_inh * (exp(-dt/tau_i) - exp(-dt/tau)) * ((tau/c) * (tau_i/(tau_i-tau))); '
+                        'i_exec *= exp(-dt/tau_e); '
+                        'i_inh *= exp(-dt/tau_i)',
             threshold='V > v_threshold',
             reset='v = v_reset',
-            name='lif_curr_exp'
+            name='lif_curr_exp',
+            compile_config='constant_folding'
         )
 
         self.assertSetEqual(lif.parameters['variable'], set(('v', 'i_exec', 'i_inh')))
-        self.assertSetEqual(lif.parameters['shared'], set(('v_tmp', 'C_exec', 'C', 'C_inh', 'Cexec', 'Cinh')))
+        self.assertSetEqual(lif.parameters['constant'], set(('v_tmp', 'C_exec', 'C', 'C_inh',
+                                                           'Cexec', 'Cinh', 'v_reset', 'v_threshold')))
         self.assertSetEqual(lif.parameters['special'], set(('refract_step', 'refract_time')))
         self.assertSetEqual(lif.parameters['external'], set(('g_i_exec', 'g_i_inh')))
+        self.assertSetEqual(lif.parameters['original'], set(('v', 'v_rest', 'v_reset', 'c', 'tau',
+                                                             'tau_i', 'tau_e', 'v_threshold',
+                                                             'i_offset', 'i_exec', 'i_inh', 'dt')))
 
         self.assertEqual(lif.expressions['assign']['computation']['v'],
                          'C * v + v_tmp + i_exec * C_exec + i_inh * C_inh')
@@ -33,23 +41,19 @@ class TestExpressionMethods(unittest.TestCase):
                          'i_exec * Cexec')
         self.assertEqual(lif.expressions['assign']['computation']['i_inh'],
                          'i_inh * Cinh')
-        self.assertEqual(lif.expressions['assign']['current']['i_exec'],
-                         'i_exec + g_i_exec')
-        self.assertEqual(lif.expressions['assign']['current']['i_inh'],
-                         'i_inh + g_i_inh')
-        self.assertEqual(lif.expressions['fold']['computation']['C'], 'exp ( - dt / tau )')
-        self.assertEqual(lif.expressions['fold']['computation']['Cexec'], 'exp ( - dt /  tau_e )')
-        self.assertEqual(lif.expressions['fold']['computation']['Cinh'], 'exp ( - dt /  tau_i )')
-        self.assertEqual(lif.expressions['fold']['computation']['v_tmp'],
+        # self.assertEqual(lif.expressions['assign']['external']['i_exec'],
+        #                  'i_exec + g_i_exec')
+        # self.assertEqual(lif.expressions['assign']['external']['i_inh'],
+        #                  'i_inh + g_i_inh')
+        self.assertEqual(lif.expressions['fold']['C'], 'exp ( - dt / tau )')
+        self.assertEqual(lif.expressions['fold']['Cexec'], 'exp ( - dt /  tau_e )')
+        self.assertEqual(lif.expressions['fold']['Cinh'], 'exp ( - dt /  tau_i )')
+        self.assertEqual(lif.expressions['fold']['v_tmp'],
                          '(1 - ( exp ( - dt / tau ) ) ) * ( i_offset * ( tau / c )  + v_rest ) ')
-        self.assertEqual(lif.expressions['fold']['computation']['v_tmp'],
-                         '(1 - ( exp ( - dt / tau ) ) ) * ( i_offset * ( tau / c )  + v_rest ) ')
-        self.assertEqual(lif.expressions['fold']['computation']['v_tmp'],
-                         '(1 - ( exp ( - dt / tau ) ) ) * ( i_offset * ( tau / c )  + v_rest ) ')
-        self.assertEqual(lif.expressions['fold']['computation']['C_exec'],
+        self.assertEqual(lif.expressions['fold']['C_exec'],
                          '( ( exp ( - dt / tau_e ) )  - ( exp ( - dt / tau ) ) ) '
                          '* ( ( tau / c ) * ( tau_e / ( tau_e - tau ) ) )')
-        self.assertEqual(lif.expressions['fold']['computation']['C_inh'],
+        self.assertEqual(lif.expressions['fold']['C_inh'],
                          '( ( exp ( - dt / tau_i ) )  - ( exp ( - dt / tau ) ) ) '
                          '* ( ( tau / c ) * ( tau_i / ( tau_i - tau ) ) )')
 

@@ -7,12 +7,12 @@ from bsim.generator import CUDAGenerator
 
 class NeuronModel(Model):
     def __init__(self, computation: str = '', threshold: str = 'v > vt', reset: str = 'v = vr',
-                 refract: bool = True, name: str = ''):
+                 refract: bool = True, name: str = '', compile_config: str = '', debug: bool = False):
         """
         Create NeuronModel: find out variables and constants for further optimization.
         This func may be modified.
         """
-        super(NeuronModel, self).__init__()
+        super(NeuronModel, self).__init__(compile_config=compile_config, debug=debug)
 
         self.name = name
         self.threshold = threshold
@@ -21,7 +21,7 @@ class NeuronModel(Model):
 
         self.expressions, self.parameters = compile_({
             'computation': computation,
-        })
+        }, config=self.compile_config)
 
         #TODO dynamic deal with reset and threshold
 
@@ -34,7 +34,7 @@ class NeuronModel(Model):
         self.parameters['variable'] -= self.parameters['special'] | self.parameters['external']
         self.parameters['constant'] -= self.parameters['special'] | self.parameters['external']
 
-    def generate_compute_cu(self, debug=False):
+    def generate_compute_cu(self):
         cu_gen = CUDAGenerator('{}/code_gen/{}.compute.cu'.format(pkg_dir, self.name.lower()))
 
         cu_gen.blank_line()
