@@ -456,6 +456,9 @@ class Network(object):
 
         return 0
 
+    def run(self, time, log: Sequence[str] = None):
+        self.run_gpu(time=time, log=log)
+
     def run_gpu(self, time, log: Sequence[str] = None):
         cycle = int(time/self.dt)
 

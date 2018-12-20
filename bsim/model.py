@@ -5,11 +5,12 @@ from bsim.generator import CGenerator, PyGenerator, CUDAGenerator
 
 
 class Model(ABC):
-    def __init__(self):
-        pass
+    def __init__(self, compile_config='', debug=False):
+        self.debug = debug
+        self.compile_config = compile_config
 
     @abstractmethod
-    def generate_compute_cu(self, debug=False):
+    def generate_compute_cu(self):
         pass
 
     def generate_h(self):

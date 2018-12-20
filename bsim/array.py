@@ -2,6 +2,7 @@
 import importlib
 from ctypes import *
 from typing import Dict, Iterable, Union
+from math import *
 from copy import deepcopy
 
 from bsim import pkg_dir
@@ -20,7 +21,7 @@ class ModelOfArray(Data):
     TODO: deal with the neurons in same population but different constant parameters
     """
 
-    def __init__(self, model: Union[NeuronModel, SynapseModel], num: int=1, name: str= '',
+    def __init__(self, model: Union[NeuronModel, SynapseModel], num: int = 1, name: str = '',
                  debug: bool=False, **kwargs: Dict):
         """
         Parameters
@@ -45,7 +46,7 @@ class ModelOfArray(Data):
         # computations of the model
         # self.expressions = model.expressions['assignment'] # type: Dict
         # parameters that should stored as a List
-        self.parameter = {}  # type: Dict[str:List]
+        self.variable = {}  # type: Dict[str:List]
         # parameters that stored as number and shared across the array
         self.shared = {}  # type: typing.Dict[str:Union[int, float]]
         self.special = {}
@@ -64,36 +65,38 @@ class ModelOfArray(Data):
                 if isinstance(value, Iterable):
                     assert len(list(value)) == self.num, \
                         'input parameters should have the same length as the population size'
-                    self.parameter[para] = list(value)
+                    self.variable[para] = list(value)
                 else:
-                    self.parameter[para] = [value] * self.num
+                    self.variable[para] = [value] * self.num
 
             for para in self.model.parameters['constant']:
-                if para in model.expressions['fold']:
+                if para in self.model.expressions['fold']:
                     express = self.model.expressions['fold'][para]
                     # TODO: Currently, we assume that all neurons in the same population have same constant parameters
-                    for i in (self.model.parameters['origin'] - self.model.parameters['variable']):
+                    for i in (self.model.parameters['original'] - self.model.parameters['variable']):
                         value = kwargs[i]
                         assert not isinstance(value, Iterable), \
                             'currently we assume that the neuron in a population has same parameters'
-                        express.replace(i, str(value))
-                    self.shared[para] = [express] * num
+                        express = express.replace(' {} '.format(i), ' {} '.format(value))
+                    self.shared[para] = [eval(express)] * num
                 else:
                     value = kwargs[para]
                     # TODO: Currently, we assume that all neurons in the same population have same constant parameters
                     assert not isinstance(value, Iterable), \
                         'currently we assume that the neuron in a population has same parameters'
-                    # TODO: support parameter shared
+                    # TODO: support variable shared
                     self.shared[para] = [value] * num
 
             for para in self.model.parameters['special']:
-                value = kwargs[para]
+                # TODO: warning about default dt
+                value = kwargs[para] if para.find('time') < 0 and para.strip() != 'delay' \
+                    else int(kwargs[para]/kwargs.get('dt', 0.001))
                 if isinstance(value, Iterable):
                     assert len(list(value)) == self.num, \
                         'input parameters should have the same length as the population size'
                     self.special[para] = list(value)
                 else:
-                    # TODO: support parameter shared
+                    # TODO: support variable shared
                     self.special[para] = [value] * num
 
     def __len__(self):
@@ -106,11 +109,11 @@ class ModelOfArray(Data):
             ret.special[i] = self.special[i][index]
 
         for i in self.shared:
-            # TODO: support parameter shared
+            # TODO: support variable shared
             ret.shared[i] = self.shared[i][index]
 
-        for i in self.parameter:
-            ret.parameter[i] = self.parameter[i][index]
+        for i in self.variable:
+            ret.variable[i] = self.variable[i][index]
 
         ret.num = index.length if isinstance(index, slice) else 1
 
@@ -124,21 +127,21 @@ class ModelOfArray(Data):
                 self.special[i] = to_list(model.special[i])
 
             for i in model.shared:
-                # TODO: support parameter shared
+                # TODO: support variable shared
                 self.shared[i] = to_list(model.shared[i])
 
-            for i in model.parameter:
-                self.parameter[i] = to_list(model.parameter[i])
+            for i in model.variable:
+                self.variable[i] = to_list(model.variable[i])
         else:
             for i in self.special:
                 self.special[i].extend(to_list(model.special[i]))
 
             for i in self.shared:
-                # TODO: support parameter shared
+                # TODO: support variable shared
                 self.shared[i].extend(to_list(model.shared[i]))
 
-            for i in self.parameter:
-                self.parameter[i].extend(to_list(model.parameter[i]))
+            for i in self.variable:
+                self.variable[i].extend(to_list(model.variable[i]))
         self.num += model.num
 
         return self
@@ -151,11 +154,11 @@ class ModelOfArray(Data):
 
         c = self.c_type()
 
-        for i in self.parameter:
-            setattr(c, "p_{}".format(i), cast(pointer((c_float*self.num)(*(self.parameter[i]))), POINTER(c_float)))
+        for i in self.variable:
+            setattr(c, "p_{}".format(i), cast(pointer((c_float*self.num)(*(self.variable[i]))), POINTER(c_float)))
 
         for i in self.shared:
-            # TODO: support parameter shared
+            # TODO: support variable shared
             setattr(c, "p_{}".format(i), cast(pointer((c_float*self.num)(*(self.shared[i]))), POINTER(c_float)))
 
         for i in self.special:
@@ -178,7 +181,7 @@ class ModelOfArray(Data):
                 data = cudamemops.from_gpu_int(getattr(c, 'p_{}'.format(i)), num)
                 setattr(c, 'p_{}'.format(i), data)
 
-            for i in self.parameter:
+            for i in self.variable:
                 data = cudamemops.from_gpu_float(getattr(c, "p_{}".format(i)), num)
                 setattr(c, "p_{}".format(i), data)
 
