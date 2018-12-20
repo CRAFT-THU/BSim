@@ -44,11 +44,11 @@ class TestSmallNet(unittest.TestCase):
                             c=0.1, tau=50e-3, tau_i=1.0, tau_e=1.0, v_threshold=15e-3,
                             i_offset=0.0, refract_time=0.001, dt=0.001)
 
-        s01 = net.projection(static, num=N*N, name='S01', weight=6.7, delay=0.001)
-        s12 = net.projection(static, num=N*N, name='S12', weight=7.3, delay=0.001)
-        s23 = net.projection(static, num=N*N, name='S23', weight=7.4, delay=0.001)
-        s34 = net.projection(static, num=N*N, name='S34', weight=7.5, delay=0.001)
-        s45 = net.projection(static, num=N*N, name='S45', weight=7.5, delay=0.001)
+        s01 = net.projection(static, num=N*N, name='S01', weight=0.002, delay=0.001)
+        s12 = net.projection(static, num=N*N, name='S12', weight=0.002, delay=0.001)
+        s23 = net.projection(static, num=N*N, name='S23', weight=0.002, delay=0.001)
+        s34 = net.projection(static, num=N*N, name='S34', weight=0.002, delay=0.001)
+        s45 = net.projection(static, num=N*N, name='S45', weight=0.002, delay=0.001)
 
         net.all_to_all(p0, p1, s01)
         net.all_to_all(p1, p2, s12)
