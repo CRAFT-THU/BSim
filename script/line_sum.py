@@ -24,7 +24,6 @@ def line_sum(file1=""):
 
 def main(argv):
     file1 = ''
-    file2 = ''
 
     usuage_msg = sys.argv[0] + ' -f <file>'
 
