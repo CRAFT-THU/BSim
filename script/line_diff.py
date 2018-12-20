@@ -27,8 +27,8 @@ def line_diff(file1="", file2=""):
         outfile.write('Line ' + str(linenum) + ' \t')
         diff0 = set0 - set1
         diff1 = set1 - set0
-        outfile.write('+++\t' + diff1)
-        outfile.write('---\t' + diff0)
+        outfile.write('+++\t' + str(diff1))
+        outfile.write('---\t' + str(diff0))
         outfile.write('\n')
 
         if (len(diff0) > 0 or len(diff1) > 0):
@@ -63,7 +63,7 @@ def main(argv):
         elif opt in ("-2", "--file2"):
             file2 = arg
     
-    column_sub(file1, file2);
+    line_diff(file1, file2);
 
 
 if __name__ == "__main__":

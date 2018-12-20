@@ -53,7 +53,7 @@ int main(int argc, char **argv)
 	c.connect(pn0, pn1, weight0, delay, NULL, N*N);
 	c.connect(pn1, pn2, weight1, delay, NULL, N*N);
 	//c.connect(pn2, pn3, weight1, delay, NULL, N*N);
-	SGSim sg(&c, 1.0e-3);
+	SGSim sg(&c, 1.0e-4);
 	//sg.compare_run(0.1);
 	sg.run(0.1);
 
