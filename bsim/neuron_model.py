@@ -133,7 +133,7 @@ class NeuronModel(Model):
         cu_gen.block("\t\tint nid = g_active_{}_table[idx];".format(self.name.lower()))
         cu_gen.block("\t\tint gnid = start_id + nid; ")
         cu_gen.blank_line()
-        cu_gen.block("\t\tdata->p_v[nid] = data->p_Cm[nid] * data->p_v[nid] + data->p_v_tmp[nid] + "
+        cu_gen.block("\t\tdata->p_v[nid] = data->p_C[nid] * data->p_v[nid] + data->p_v_tmp[nid] + "
                      "data->p_i_exec[nid] * data->p_C_exec[nid] + data->p_i_inh[nid] * data->p_C_inh[nid];")
         cu_gen.block("\t\tdata->p_i_exec[nid] *= data->p_Cexec[nid];")
         cu_gen.block("\t\tdata->p_i_inh[nid] *= data->p_Cinh[nid];")
