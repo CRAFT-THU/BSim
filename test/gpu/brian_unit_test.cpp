@@ -15,12 +15,12 @@ int main(int argc, char **argv)
 		load = true;
 	}
 
-	const int N = 500;
+	const int N = 10;
 	Network c;
 	//createPopulation(int id, int N, LIFENeuron(ID id, real v_init, real v_rest, real v_reset, real cm, real tau_m, real tau_refrac, real tau_syn_E, real tau_syn_I, real v_thresh, real i_offset)), ID(0, 0), real tau_syn_E, real tau_syn_I);
 	Population<LIF_brian> *pn0 = c.createPopulation(N, LIF_brian(LIFENeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-3, 0.0, 1.0, 1.0, 15.0e-3, 100.0e-1), 1.0, 1.0));
 	Population<LIF_brian> *pn1 = c.createPopulation(N, LIF_brian(LIFENeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-3, 0.0, 1.0, 1.0, 15.0e-3, 0.0e-3), 1.0, 1.0));
-	//Population<LIF_brian> *pn2 = c.createPopulation(N, LIF_brian(LIFENeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-3, 0.0, 1.0, 1.0, 15.0e-3, 0.0e-3), 1.0, 1.0));
+	Population<LIF_brian> *pn2 = c.createPopulation(N, LIF_brian(LIFENeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-3, 0.0, 1.0, 1.0, 15.0e-3, 0.0e-3), 1.0, 1.0));
 	//Population<LIF_brian> *pn3 = c.createPopulation(N, LIF_brian(LIFENeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-3, 0.0, 1.0, 1.0, 15.0e-3, 0.0e-3), 1.0, 1.0));
 
 	real * weight0 = NULL;
@@ -51,12 +51,10 @@ int main(int argc, char **argv)
 
 	//Network.connect(population1, population2, weight_array, delay_array, Exec or Inhi array, num)
 	c.connect(pn0, pn1, weight0, delay, NULL, N*N);
-	//c.connect(pn1, pn2, weight1, delay, NULL, N*N);
+	c.connect(pn1, pn2, weight1, delay, NULL, N*N);
 	//c.connect(pn2, pn3, weight1, delay, NULL, N*N);
-	STSim st(&c, 1.0e-3);
 	SGSim sg(&c, 1.0e-3);
 	//sg.compare_run(0.1);
-	st.run(0.1);
 	sg.run(0.1);
 
 	if (!load) {
