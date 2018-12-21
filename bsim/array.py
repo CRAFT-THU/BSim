@@ -6,6 +6,7 @@ from math import *
 from copy import deepcopy
 
 from bsim import pkg_dir
+from bsim.env import c_real, real
 from bsim.neuron_model import NeuronModel
 from bsim.synapse_model import SynapseModel
 from bsim.cudamemop import cudamemops
@@ -160,10 +161,10 @@ class ModelOfArray(Data):
 
         for i in self.shared:
             # TODO: support variable shared
-            setattr(c, "p_{}".format(i), cast(pointer((c_float*self.num)(*(self.shared[i]))), POINTER(c_float)))
+            setattr(c, "p_{}".format(i), cast(pointer((c_real*self.num)(*(self.shared[i]))), POINTER(c_real)))
 
         for i in self.variable:
-            setattr(c, "p_{}".format(i), cast(pointer((c_float*self.num)(*(self.variable[i]))), POINTER(c_float)))
+            setattr(c, "p_{}".format(i), cast(pointer((c_real*self.num)(*(self.variable[i]))), POINTER(c_real)))
 
         return c
 
@@ -184,11 +185,13 @@ class ModelOfArray(Data):
                     setattr(c, 'p_{}'.format(i), data)
 
             for i in self.variable:
-                data = cudamemops.from_gpu_float(getattr(c, "p_{}".format(i)), num)
+                data = getattr(cudamemops, 'from_gpu_{}'.format(real))(getattr(c, "p_{}".format(i)), num)
+                # data = cudamemops.from_gpu_float(getattr(c, "p_{}".format(i)), num)
                 setattr(c, "p_{}".format(i), data)
 
             for i in self.shared:
-                data = cudamemops.from_gpu_float(getattr(c, "p_{}".format(i)), num)
+                data = getattr(cudamemops, 'from_gpu_{}'.format(real))(getattr(c, "p_{}".format(i)), num)
+                # data = cudamemops.from_gpu_float(getattr(c, "p_{}".format(i)), num)
                 setattr(c, "p_{}".format(i), data)
 
         return c

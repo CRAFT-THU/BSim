@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from bsim.env import pkg_dir
+from bsim.env import pkg_dir, real
 from bsim.generator import CGenerator, PyGenerator, CUDAGenerator
 
 
@@ -27,10 +27,10 @@ class Model(ABC):
                 h_gen.line("int *p_%s" % i)
 
         for i in self.parameters['constant']:
-            h_gen.line("float *p_%s" % i)
+            h_gen.line("{} *p_{}".format(real, i))
 
         for i in self.parameters['variable']:
-            h_gen.line("float *p_%s" % i)
+            h_gen.line("{} *p_{}".format(real, i))
 
         h_gen.line("}", 0)
         h_gen.blank_line(1)
@@ -64,10 +64,10 @@ class Model(ABC):
                 py_gen.line('("p_{}", POINTER(c_int)),'.format(i), 2)
 
         for i in list(self.parameters['constant']):
-            py_gen.line('("p_{}", POINTER(c_float)),'.format(i), 2)
+            py_gen.line('("p_{}", POINTER(c_{})),'.format(i, real), 2)
 
         for i in self.parameters['variable']:
-            py_gen.line('("p_{}", POINTER(c_float)),'.format(i), 2)
+            py_gen.line('("p_{}", POINTER(c_{})),'.format(i, real), 2)
 
         py_gen.line("]")
         py_gen.blank_line()
@@ -95,10 +95,10 @@ class Model(ABC):
                 cu_gen.to_gpu(ret='gpu->p_{}'.format(i), cpu='cpu->p_{}'.format(i), num='num', type_='int')
 
         for i in self.parameters['constant']:
-            cu_gen.to_gpu(ret='gpu->p_{}'.format(i), cpu='cpu->p_{}'.format(i), num='num', type_='float')
+            cu_gen.to_gpu(ret='gpu->p_{}'.format(i), cpu='cpu->p_{}'.format(i), num='num', type_=real)
 
         for i in self.parameters['variable']:
-            cu_gen.to_gpu(ret='gpu->p_{}'.format(i), cpu='cpu->p_{}'.format(i), num='num', type_='float')
+            cu_gen.to_gpu(ret='gpu->p_{}'.format(i), cpu='cpu->p_{}'.format(i), num='num', type_=real)
 
         cu_gen.line('{} * ret = NULL'.format(self.name.capitalize()))
         cu_gen.to_gpu(ret='ret', cpu='gpu', num='1', type_=self.name.capitalize())

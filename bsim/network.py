@@ -4,7 +4,7 @@ import time
 from ctypes import *
 from typing import List, Dict, Sequence
 
-from bsim.env import pkg_dir
+from bsim.env import pkg_dir, real, c_real
 from bsim.neuron_model import NeuronModel
 from bsim.synapse_model import SynapseModel
 from bsim.cudamemop import cudamemops
@@ -295,8 +295,8 @@ class Network(object):
 
         h_gen.block('const int MAX_DELAY = {};'.format(self.max_delay))
         h_gen.block('const int MIN_DELAY = {};'.format(self.min_delay))
-        h_gen.block('const float G_MAX = {};'.format(self.g_max))
-        h_gen.block('const float G_MIN = {};'.format(self.g_min))
+        h_gen.block('const {} G_MAX = {};'.format(real, self.g_max))
+        h_gen.block('const {} G_MIN = {};'.format(real, self.g_min))
 
         for i in range(len(self.neuron_models)):
             block_size = 32
@@ -333,7 +333,7 @@ class Network(object):
         external -= set('t')
 
         for i in external:
-            h_gen.block('extern __device__ float * {};'.format(i))
+            h_gen.block('extern __device__ {} * {};'.format(real, i))
         h_gen.blank_line()
 
         h_gen.block('extern "C" {')
@@ -373,14 +373,14 @@ class Network(object):
         external -= set('t')
 
         for i in external:
-            cu_gen.block('__device__ float * {};'.format(i))
+            cu_gen.block('__device__ {} * {};'.format(real, i))
         cu_gen.blank_line(2)
 
         cu_gen.block('void **init_runtime(CConnection ** connections)')
         cu_gen.block('{')
         cu_gen.block('\tint zero = 0;')
         cu_gen.block('\tint *p_int = NULL;')
-        cu_gen.block('\tfloat *p_float = NULL;')
+        cu_gen.block('\t{} *p_real = NULL;'.format(real))
         cu_gen.blank_line()
 
         cu_gen.block('\tvoid **ret = static_cast<void**>(malloc(sizeof(void*) * {}));'.format(2))
@@ -403,7 +403,8 @@ class Network(object):
         cu_gen.block('\n')
 
         for i in external:
-            cu_gen.malloc_symbol(symbol='{}'.format(i), gpu='p_float', type_='float', num='{}'.format(self.neuron_num))
+            cu_gen.malloc_symbol(symbol='{}'.format(i), gpu='p_{}'.format(real), type_=real,
+                                 num='{}'.format(self.neuron_num))
 
         for i, model in enumerate(self.synapse_models):
             cu_gen.cu_line('cudaMemcpyToSymbol(g_connection_{}, &(connections[{}]), sizeof(CConnection*))'
@@ -481,7 +482,7 @@ class Network(object):
         fire_txt_log = open("fire.txt.log", "w+")
         v_txt_log = open("v.txt.log", "w+")
 
-        v = (c_float*self.neuron_num)(0)
+        v = (c_real*self.neuron_num)(0)
         neuron_data = self.neuron_data[0].from_gpu(self.neuron_data_gpu[0], self.neuron_nums[1], only_struct=True)
 
         start_time = time.perf_counter()
@@ -508,7 +509,7 @@ class Network(object):
                 # fire_bin_log.write(bytes(fired_neuron)[0:fired_size.value*sizeof(c_int)])
                 fire_txt_log.write(' '.join(map(str, list(fired_neuron)[0:fired_size.value])))
                 fire_txt_log.write('\n')
-                cudamemops.gpu2cpu_float(neuron_data.p_v, v, self.neuron_num)
+                getattr(cudamemops, 'gpu2cpu_{}'.format(real))(neuron_data.p_v, v, self.neuron_num)
                 v_txt_log.write(' '.join(map(str, list(v))))
                 v_txt_log.write('\n')
 

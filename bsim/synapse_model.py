@@ -1,5 +1,5 @@
 
-from bsim.env import pkg_dir
+from bsim.env import pkg_dir, real
 from bsim.generator import CUDAGenerator
 from bsim.model import Model
 from bsim.model_compiler import compile_
@@ -50,7 +50,7 @@ class SynapseModel(Model):
         #            .format(self.name.lower(), self.name.capitalize()), 0)
         # cu_gen.blank_line(1)
 
-        cu_gen.block("__device__ float _clip(float a, float min, float max)")
+        cu_gen.block("__device__ {} _clip({} a, {} min, {} max)".format(real, real, real, real))
         cu_gen.block("{")
         cu_gen.block("\tif (a < min) {")
         cu_gen.block("\t\treturn min;")
@@ -89,7 +89,7 @@ class SynapseModel(Model):
         # cu_gen.block("\t\t\t}")
         cu_gen.block("\t\t\tfor (int j=threadIdx.x; j < synapse_num; j += blockDim.x) {")
         cu_gen.block("\t\t\t\tint sid = j+start_loc;")
-        cu_gen.block("\t\t\t\tfloat weight = data->p_weight[sid];")
+        cu_gen.block("\t\t\t\t{} weight = data->p_weight[sid];".format(real))
         cu_gen.block("\t\t\t\tif (weight >= 0) {")
         cu_gen.block("\t\t\t\t\tatomicAdd(&(g_i_exec[data->p_dst[sid]]), weight);")
         cu_gen.block("\t\t\t\t} else {")
