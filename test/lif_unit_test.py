@@ -39,8 +39,8 @@ class TestLIFUnit(unittest.TestCase):
                             c=0.1, tau=50e-3, tau_i=1.0, tau_e=1.0, v_threshold=15e-3,
                             i_offset=0.0, refract_time=0.0000)
 
-        s01 = net.projection(static, num=self.n*self.n, name='S01', weight=1e-5, delay=0.0000)
-        s12 = net.projection(static, num=self.n*self.n, name='S12', weight=2e-5, delay=0.0000)
+        s01 = net.projection(static, num=self.n*self.n, name='S01', weight=1e-5, delay=1.0000)
+        s12 = net.projection(static, num=self.n*self.n, name='S12', weight=2e-5, delay=1.0000)
 
         net.all_to_all(p0, p1, s01)
         net.all_to_all(p1, p2, s12)
