@@ -136,9 +136,6 @@ class TestNetworkMethods(unittest.TestCase):
         np.testing.assert_array_almost_equal(list(start+6.6),
                                              list(cast(cpu.p_weight, POINTER(c_float*15)).contents))
 
-        self.assertListEqual([0, 0, 0, 0, 0, 0,
-                              1, 1, 1, 2, 2, 2,
-                              2 ,2, 2], list(cast(cpu.p_delay, POINTER(c_int*15)).contents))
         self.assertListEqual([0]*15, list(cast(cpu.p_last_update, POINTER(c_int*15)).contents))
         self.assertListEqual([2, 3, 4, 2, 3, 4,
                               7, 7, 7, 5, 6, 5,

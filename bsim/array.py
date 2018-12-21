@@ -154,15 +154,16 @@ class ModelOfArray(Data):
 
         c = self.c_type()
 
-        for i in self.variable:
-            setattr(c, "p_{}".format(i), cast(pointer((c_float*self.num)(*(self.variable[i]))), POINTER(c_float)))
+        for i in self.special:
+            if i != 'delay':
+                setattr(c, 'p_{}'.format(i), cast(pointer((c_int*self.num)(*(self.special[i]))), POINTER(c_int)))
 
         for i in self.shared:
             # TODO: support variable shared
             setattr(c, "p_{}".format(i), cast(pointer((c_float*self.num)(*(self.shared[i]))), POINTER(c_float)))
 
-        for i in self.special:
-            setattr(c, 'p_{}'.format(i), cast(pointer((c_int*self.num)(*(self.special[i]))), POINTER(c_int)))
+        for i in self.variable:
+            setattr(c, "p_{}".format(i), cast(pointer((c_float*self.num)(*(self.variable[i]))), POINTER(c_float)))
 
         return c
 
@@ -172,14 +173,15 @@ class ModelOfArray(Data):
 
         return gpu_data
 
-    def from_gpu(self, gpu, num: int=0, only_struct=True):
+    def from_gpu(self, gpu, num: int = 0, only_struct: bool = True):
         cpu = getattr(self.so(), "from_gpu_{}".format(self.model.name.lower()))(gpu, num)
         c = cast(cpu, POINTER(self.c_type * 1)).contents[0]
 
         if not only_struct:
             for i in self.special:
-                data = cudamemops.from_gpu_int(getattr(c, 'p_{}'.format(i)), num)
-                setattr(c, 'p_{}'.format(i), data)
+                if i != 'delay':
+                    data = cudamemops.from_gpu_int(getattr(c, 'p_{}'.format(i)), num)
+                    setattr(c, 'p_{}'.format(i), data)
 
             for i in self.variable:
                 data = cudamemops.from_gpu_float(getattr(c, "p_{}".format(i)), num)

@@ -41,7 +41,6 @@ class TestProjectionMethods(unittest.TestCase):
         np.testing.assert_array_almost_equal([0.1] * 10 + [0.2] * 5,
                                              list(cast(cpu.p_weight, POINTER(c_float*15)).contents))
 
-        self.assertListEqual([3] * 10 + [4] * 5, list(cast(cpu.p_delay, POINTER(c_int*15)).contents))
         self.assertListEqual([1] * 10 + [0] * 5, list(cast(cpu.p_last_update, POINTER(c_int*15)).contents))
         self.assertListEqual([0] * 10 + [0] * 5, list(cast(cpu.p_dst, POINTER(c_int*15)).contents))
 

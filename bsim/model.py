@@ -23,7 +23,8 @@ class Model(ABC):
         h_gen.struct(self.name.capitalize(), 0)
 
         for i in self.parameters['special']:
-            h_gen.line("int *p_%s" % i)
+            if i != 'delay':
+                h_gen.line("int *p_%s" % i)
 
         for i in self.parameters['constant']:
             h_gen.line("float *p_%s" % i)
@@ -59,7 +60,8 @@ class Model(ABC):
         py_gen.line("_fields_ = [")
 
         for i in list(self.parameters['special']):
-            py_gen.line('("p_{}", POINTER(c_int)),'.format(i), 2)
+            if i != 'delay':
+                py_gen.line('("p_{}", POINTER(c_int)),'.format(i), 2)
 
         for i in list(self.parameters['constant']):
             py_gen.line('("p_{}", POINTER(c_float)),'.format(i), 2)
@@ -89,7 +91,8 @@ class Model(ABC):
         cu_gen.malloc(ret='gpu', type_=self.name.capitalize())
 
         for i in self.parameters['special']:
-            cu_gen.to_gpu(ret='gpu->p_{}'.format(i), cpu='cpu->p_{}'.format(i), num='num', type_='int')
+            if i != 'delay':
+                cu_gen.to_gpu(ret='gpu->p_{}'.format(i), cpu='cpu->p_{}'.format(i), num='num', type_='int')
 
         for i in self.parameters['constant']:
             cu_gen.to_gpu(ret='gpu->p_{}'.format(i), cpu='cpu->p_{}'.format(i), num='num', type_='float')
