@@ -61,7 +61,7 @@ class ModelOfArray(Data):
                                  )
 
             for para in self.model.parameters['variable']:
-                value = kwargs[para]
+                value = float(kwargs[para])
                 if isinstance(value, Iterable):
                     assert len(list(value)) == self.num, \
                         'input parameters should have the same length as the population size'
@@ -74,13 +74,13 @@ class ModelOfArray(Data):
                     express = self.model.expressions['fold'][para]
                     # TODO: Currently, we assume that all neurons in the same population have same constant parameters
                     for i in (self.model.parameters['original'] - self.model.parameters['variable']):
-                        value = kwargs[i]
+                        value = float(kwargs[i])
                         assert not isinstance(value, Iterable), \
                             'currently we assume that the neuron in a population has same parameters'
                         express = express.replace(' {} '.format(i), ' {} '.format(value))
-                    self.shared[para] = [eval(express)] * num
+                    self.shared[para] = [float(eval(express))] * num
                 else:
-                    value = kwargs[para]
+                    value = float(kwargs[para])
                     # TODO: Currently, we assume that all neurons in the same population have same constant parameters
                     assert not isinstance(value, Iterable), \
                         'currently we assume that the neuron in a population has same parameters'
@@ -89,7 +89,7 @@ class ModelOfArray(Data):
 
             for para in self.model.parameters['special']:
                 # TODO: warning about default dt
-                value = kwargs[para] if para.find('time') < 0 and para.strip() != 'delay' \
+                value = float(kwargs[para]) if para.find('time') < 0 and para.strip() != 'delay' \
                     else int(kwargs[para]/kwargs.get('dt', 0.001))
                 if isinstance(value, Iterable):
                     assert len(list(value)) == self.num, \
