@@ -2,6 +2,7 @@ import unittest
 import numpy as np
 from ctypes import *
 
+from bsim.env import c_real
 from bsim.population import *
 
 
@@ -50,23 +51,23 @@ class TestPopulationMethods(unittest.TestCase):
         gpu = p.to_gpu()
         cpu = p.from_gpu(gpu, 15, only_struct=False)
         np.testing.assert_array_almost_equal([0.0] * 10 + [1.0] * 5,
-                                             list(cast(cpu.p_v, POINTER(c_float*15)).contents))
+                                             list(cast(cpu.p_v, POINTER(c_real*15)).contents))
         np.testing.assert_array_almost_equal([1.0] * 10 + [2.0] * 5,
-                                             list(cast(cpu.p_C, POINTER(c_float*15)).contents))
+                                             list(cast(cpu.p_C, POINTER(c_real*15)).contents))
         np.testing.assert_array_almost_equal([2.0] * 10 + [3.0] * 5,
-                                             list(cast(cpu.p_v_tmp, POINTER(c_float*15)).contents))
+                                             list(cast(cpu.p_v_tmp, POINTER(c_real*15)).contents))
         np.testing.assert_array_almost_equal([0.8] * 10 + [0.7] * 5,
-                                             list(cast(cpu.p_C_exec, POINTER(c_float*15)).contents))
+                                             list(cast(cpu.p_C_exec, POINTER(c_real*15)).contents))
         np.testing.assert_array_almost_equal([0.6] * 10 + [0.5] * 5,
-                                             list(cast(cpu.p_C_inh, POINTER(c_float*15)).contents))
+                                             list(cast(cpu.p_C_inh, POINTER(c_real*15)).contents))
         np.testing.assert_array_almost_equal([0.5] * 10 + [0.6] * 5,
-                                             list(cast(cpu.p_Cexec, POINTER(c_float*15)).contents))
+                                             list(cast(cpu.p_Cexec, POINTER(c_real*15)).contents))
         np.testing.assert_array_almost_equal([0.3] * 10 + [0.4] * 5,
-                                             list(cast(cpu.p_Cinh, POINTER(c_float*15)).contents))
+                                             list(cast(cpu.p_Cinh, POINTER(c_real*15)).contents))
         np.testing.assert_array_almost_equal([20.0] * 10 + [25.0] * 5,
-                                             list(cast(cpu.p_v_threshold, POINTER(c_float*15)).contents))
+                                             list(cast(cpu.p_v_threshold, POINTER(c_real*15)).contents))
         np.testing.assert_array_almost_equal([0.0] * 10 + [-10.0] * 5,
-                                             list(cast(cpu.p_v_reset, POINTER(c_float*15)).contents))
+                                             list(cast(cpu.p_v_reset, POINTER(c_real*15)).contents))
 
         self.assertListEqual([1] * 10 + [2] * 5, list(cast(cpu.p_refract_time, POINTER(c_int*15)).contents))
         self.assertListEqual([0] * 10 + [0] * 5, list(cast(cpu.p_refract_step, POINTER(c_int*15)).contents))
