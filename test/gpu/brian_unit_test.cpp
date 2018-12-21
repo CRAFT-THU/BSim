@@ -42,10 +42,10 @@ int main(int argc, char **argv)
 		//	weight0[i] = 1e-6*((i+1));
 		//	weight1[i] = 1e-6*((N*N-i));
 		//}
-		weight0 = getRandomArray((real)1e-5, N*N);
+		weight0 = getConstArray((real)1e-5, N*N);
 		//weight0 = getConstArray((real)10000e-5, N*N);
-		weight1 = getRandomArray((real)2e-5, N*N);
-		delay = getConstArray((real)1e-3, N*N);
+		weight1 = getConstArray((real)2e-5, N*N);
+		delay = getConstArray((real)1e-4, N*N);
 		printf("GENERATE DATA FINISHED\n");
 	}
 
