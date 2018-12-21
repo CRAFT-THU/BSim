@@ -23,6 +23,7 @@ src/utils/TypeFunc.cu
 *.test
 *.data
 *.pyc
+*.bak
 *.idea
 *.DS_Store
 *.so

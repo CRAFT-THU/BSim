@@ -380,7 +380,7 @@ class Network(object):
         cu_gen.block('{')
         cu_gen.block('\tint zero = 0;')
         cu_gen.block('\tint *p_int = NULL;')
-        cu_gen.block('\t{} *p_real = NULL;'.format(real))
+        cu_gen.block('\t{} *p_{} = NULL;'.format(real, real))
         cu_gen.blank_line()
 
         cu_gen.block('\tvoid **ret = static_cast<void**>(malloc(sizeof(void*) * {}));'.format(2))
