@@ -89,7 +89,7 @@ class ModelOfArray(Data):
 
             for para in self.model.parameters['special']:
                 # TODO: warning about default dt
-                value = float(kwargs[para]) if para.find('time') < 0 and para.strip() != 'delay' \
+                value = int(kwargs[para]) if para.find('time') < 0 and para.strip() != 'delay' \
                     else int(kwargs[para]/kwargs.get('dt', 0.001))
                 if isinstance(value, Iterable):
                     assert len(list(value)) == self.num, \
