@@ -233,10 +233,16 @@ class Network(object):
                     for syn in self.neuron2synapses[t][i]:
                         if syn.special['delay'] == d:
                             if count == 0:
-                                self.connection_data[t].delay_start[i+(d-self.min_delay)*self.neuron_num] = \
-                                    self.synapse2id[syn]
+                                self.connection_data[t].delay_start[
+                                    (d-self.min_delay) + i * (self.max_delay - self.min_delay + 1)
+                                    ] = self.synapse2id[syn]
+                                # self.connection_data[t].delay_start[i+(d-self.min_delay)*self.neuron_num] = \
+                                #     self.synapse2id[syn]
                             count += 1
-                    self.connection_data[t].delay_num[i + (d-self.min_delay) * self.neuron_num] = count
+                    self.connection_data[t].delay_num[
+                        (d-self.min_delay) + i * (self.max_delay - self.min_delay + 1)
+                        ] = count
+                    # self.connection_data[t].delay_num[i + (d-self.min_delay) * self.neuron_num] = count
         return 0
 
     def _build_reverse_connection(self):
