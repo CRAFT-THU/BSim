@@ -80,9 +80,9 @@ class SynapseModel(Model):
         cu_gen.block("\t\t}")
         cu_gen.block("\t\tfor (int idx = 0; idx < fired_size_block; idx++) {")
         cu_gen.block("\t\t\tint nid = g_fired_table[delay_idx * FIRED_TABLE_SIZE + (block_idx) * num_per_block + idx];")
-        cu_gen.block("\t\t\tint start_loc = g_connection_{}->delay_start[delta_t + nid * (MAX_DELAY - MIN_DELAY + 1)];"
+        cu_gen.block("\t\t\tint start_loc = g_connection_{}->delay_start[delta_t - MIN_DELAY + nid * (MAX_DELAY - MIN_DELAY + 1)];"
                      .format(self.name.lower()))
-        cu_gen.block("\t\t\tint synapse_num = g_connection_{}->delay_num[delta_t + nid * (MAX_DELAY - MIN_DELAY + 1)];"
+        cu_gen.block("\t\t\tint synapse_num = g_connection_{}->delay_num[delta_t - MIN_DELAY + nid * (MAX_DELAY - MIN_DELAY + 1)];"
                      .format(self.name.lower()))
         # cu_gen.block("\t\t\tif (threadIdx.x == 0) {")
         # cu_gen.block("\t\t\t\tgLayerInput[nid]++;")

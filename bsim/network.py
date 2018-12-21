@@ -486,7 +486,7 @@ class Network(object):
 
         start_time = time.perf_counter()
         for t in range(cycle):
-            print(t)
+            # print(t)
 
             for i, model in enumerate(self.neuron_models):
                 getattr(so, 'update_{}'.format(model.name.lower()))(self.neuron_data_gpu[i],
