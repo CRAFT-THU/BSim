@@ -3,6 +3,7 @@ import numpy as np
 from ctypes import *
 
 from bsim import *
+from bsim.env import c_real
 
 
 class TestLIFUnit(unittest.TestCase):
@@ -60,35 +61,35 @@ class TestLIFUnit(unittest.TestCase):
                                                only_struct=False)
 
         np.testing.assert_array_almost_equal([0.0] * 30,
-                                             list(cast(cpu.p_v, POINTER(c_float*n)).contents))
+                                             list(cast(cpu.p_v, POINTER(c_real*n)).contents))
         np.testing.assert_array_almost_equal([0.0] * 30,
-                                             list(cast(cpu.p_i_exec, POINTER(c_float*n)).contents))
+                                             list(cast(cpu.p_i_exec, POINTER(c_real*n)).contents))
         np.testing.assert_array_almost_equal([0.0] * 30,
-                                             list(cast(cpu.p_i_inh, POINTER(c_float*n)).contents))
+                                             list(cast(cpu.p_i_inh, POINTER(c_real*n)).contents))
 
         np.testing.assert_array_almost_equal([0.0149999997] * 30,
-                                             list(cast(cpu.p_v_threshold, POINTER(c_float*n)).contents))
+                                             list(cast(cpu.p_v_threshold, POINTER(c_real*n)).contents))
         np.testing.assert_array_almost_equal([0.0] * 30,
-                                             list(cast(cpu.p_v_reset, POINTER(c_float*n)).contents))
+                                             list(cast(cpu.p_v_reset, POINTER(c_real*n)).contents))
 
         self.assertListEqual([0] * 30, list(cast(cpu.p_refract_time, POINTER(c_int*n)).contents))
         self.assertListEqual([0] * 30, list(cast(cpu.p_refract_step, POINTER(c_int*n)).contents))
 
         np.testing.assert_array_almost_equal([0.999899983] * 30,
-                                             list(cast(cpu.p_Cexec, POINTER(c_float*n)).contents))
+                                             list(cast(cpu.p_Cexec, POINTER(c_real*n)).contents))
         np.testing.assert_array_almost_equal([0.999899983] * 30,
-                                             list(cast(cpu.p_Cinh, POINTER(c_float*n)).contents))
+                                             list(cast(cpu.p_Cinh, POINTER(c_real*n)).contents))
 
         np.testing.assert_array_almost_equal([0.000998942531] * 30,
-                                             list(cast(cpu.p_C_exec, POINTER(c_float*n)).contents))
+                                             list(cast(cpu.p_C_exec, POINTER(c_real*n)).contents))
         np.testing.assert_array_almost_equal([0.000998942531] * 30,
-                                             list(cast(cpu.p_C_inh, POINTER(c_float*n)).contents))
+                                             list(cast(cpu.p_C_inh, POINTER(c_real*n)).contents))
 
         np.testing.assert_array_almost_equal([0.00999003649] * 10 + [0.0] * 20,
-                                             list(cast(cpu.p_v_tmp, POINTER(c_float*n)).contents))
+                                             list(cast(cpu.p_v_tmp, POINTER(c_real*n)).contents))
 
         np.testing.assert_array_almost_equal([0.998001993] * 30,
-                                             list(cast(cpu.p_C, POINTER(c_float*n)).contents))
+                                             list(cast(cpu.p_C, POINTER(c_real*n)).contents))
 
     def test_synapse_data(self):
         self.assertEqual(1, len(self.net.synapse_data))
@@ -99,7 +100,7 @@ class TestLIFUnit(unittest.TestCase):
                                                 only_struct=False)
 
         np.testing.assert_array_almost_equal([9.99999975e-06] * 100 + [1.99999995e-05] * 100,
-                                             list(cast(cpu.p_weight, POINTER(c_float*n)).contents))
+                                             list(cast(cpu.p_weight, POINTER(c_real*n)).contents))
 
         self.assertListEqual([i for i in range(10, 20)] * 10 + [i for i in range(20, 30)] * 10,
                              list(cast(cpu.p_dst, POINTER(c_int*n)).contents))

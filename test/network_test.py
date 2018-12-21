@@ -92,23 +92,23 @@ class TestNetworkMethods(unittest.TestCase):
                                                only_struct=False)
 
         np.testing.assert_array_almost_equal([0.0] * 2 + [1.0] * 3 + [0.0] * 2 + [1.0] * 1,
-                                             list(cast(cpu.p_v, POINTER(c_float*8)).contents))
+                                             list(cast(cpu.p_v, POINTER(c_real*8)).contents))
         np.testing.assert_array_almost_equal([1.0] * 2 + [2.0] * 3 + [3.0] * 2 + [4.0] * 1,
-                                             list(cast(cpu.p_C, POINTER(c_float*8)).contents))
+                                             list(cast(cpu.p_C, POINTER(c_real*8)).contents))
         np.testing.assert_array_almost_equal([2.0] * 2 + [3.0] * 3 + [4.0] * 2 + [1.0] * 1,
-                                             list(cast(cpu.p_v_tmp, POINTER(c_float*8)).contents))
+                                             list(cast(cpu.p_v_tmp, POINTER(c_real*8)).contents))
         np.testing.assert_array_almost_equal([2.0] * 2 + [3.0] * 3 + [2.0] * 2 + [1.0] * 1,
-                                             list(cast(cpu.p_C_exec, POINTER(c_float*8)).contents))
+                                             list(cast(cpu.p_C_exec, POINTER(c_real*8)).contents))
         np.testing.assert_array_almost_equal([0.6] * 2 + [1.0] * 3 + [0.5] * 2 + [1.5] * 1,
-                                             list(cast(cpu.p_C_inh, POINTER(c_float*8)).contents))
+                                             list(cast(cpu.p_C_inh, POINTER(c_real*8)).contents))
         np.testing.assert_array_almost_equal([0.5] * 2 + [1.6] * 3 + [0.5] * 2 + [1.6] * 1,
-                                             list(cast(cpu.p_Cexec, POINTER(c_float*8)).contents))
+                                             list(cast(cpu.p_Cexec, POINTER(c_real*8)).contents))
         np.testing.assert_array_almost_equal([0.3] * 2 + [0.4] * 3 + [0.3] * 2 + [0.4] * 1,
-                                             list(cast(cpu.p_Cinh, POINTER(c_float*8)).contents))
+                                             list(cast(cpu.p_Cinh, POINTER(c_real*8)).contents))
         np.testing.assert_array_almost_equal([1.0] * 2 + [20.0] * 3 + [20.0] * 2 + [1.0] * 1,
-                                             list(cast(cpu.p_v_threshold, POINTER(c_float*8)).contents))
+                                             list(cast(cpu.p_v_threshold, POINTER(c_real*8)).contents))
         np.testing.assert_array_almost_equal([0.0] * 2 + [-10.0] * 3 + [-30.0] * 2 + [-20.0] * 1,
-                                             list(cast(cpu.p_v_reset, POINTER(c_float*8)).contents))
+                                             list(cast(cpu.p_v_reset, POINTER(c_real*8)).contents))
 
         self.assertListEqual([1] * 2 + [2] * 3 + [5] * 2 + [3] * 1, list(cast(cpu.p_refract_time, POINTER(c_int*8)).contents))
         self.assertListEqual([0] * 2 + [0] * 3 + [0] * 2 + [0] * 1, list(cast(cpu.p_refract_step, POINTER(c_int*8)).contents))
@@ -122,19 +122,19 @@ class TestNetworkMethods(unittest.TestCase):
         start = np.array([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 0.8,
                           0.8, 0.7, 0.7, 0.7, 0.7, 0.9, 0.9])
         np.testing.assert_array_almost_equal(list(start),
-                                             list(cast(cpu.p_apre, POINTER(c_float*15)).contents))
+                                             list(cast(cpu.p_apre, POINTER(c_real*15)).contents))
         np.testing.assert_array_almost_equal(list(start+1.1),
-                                             list(cast(cpu.p_tau_pre, POINTER(c_float*15)).contents))
+                                             list(cast(cpu.p_tau_pre, POINTER(c_real*15)).contents))
         np.testing.assert_array_almost_equal(list(start+2.2),
-                                             list(cast(cpu.p_apost, POINTER(c_float*15)).contents))
+                                             list(cast(cpu.p_apost, POINTER(c_real*15)).contents))
         np.testing.assert_array_almost_equal(list(start+3.3),
-                                             list(cast(cpu.p_tau_post, POINTER(c_float*15)).contents))
+                                             list(cast(cpu.p_tau_post, POINTER(c_real*15)).contents))
         np.testing.assert_array_almost_equal(list(start+4.4),
-                                             list(cast(cpu.p_d_apre, POINTER(c_float*15)).contents))
+                                             list(cast(cpu.p_d_apre, POINTER(c_real*15)).contents))
         np.testing.assert_array_almost_equal(list(start+5.5),
-                                             list(cast(cpu.p_d_apost, POINTER(c_float*15)).contents))
+                                             list(cast(cpu.p_d_apost, POINTER(c_real*15)).contents))
         np.testing.assert_array_almost_equal(list(start+6.6),
-                                             list(cast(cpu.p_weight, POINTER(c_float*15)).contents))
+                                             list(cast(cpu.p_weight, POINTER(c_real*15)).contents))
 
         self.assertListEqual([0]*15, list(cast(cpu.p_last_update, POINTER(c_int*15)).contents))
         self.assertListEqual([2, 3, 4, 2, 3, 4,

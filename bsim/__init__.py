@@ -3,6 +3,8 @@ import os
 import sys
 
 from bsim.env import pkg_dir
+from bsim.env import real
+from bsim.env import c_real
 import bsim.neuron_model
 import bsim.synapse_model
 import bsim.network
@@ -20,4 +22,4 @@ if not os.path.exists(os.path.join(pkg_dir, 'so_gen')):
     os.mkdir(os.path.join(pkg_dir, 'so_gen'))
 
 
-__all__ = ['Neuron', 'Synapse', 'Net']
+__all__ = ['Neuron', 'Synapse', 'Net', 'pkg_dir', 'c_real', 'real']
