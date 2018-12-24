@@ -27,13 +27,15 @@ int main(int argc, char **argv)
 
 	real * weight0 = NULL;
 	real * weight1 = NULL;
-	real * delay = NULL;
+	real * delay1 = NULL;
+	real * delay2 = NULL;
 
 	if (load) { 
 		printf("LOAD DATA...\n");
 		weight0 = loadArray("weight0.csv", N*N);
 		weight1 = loadArray("weight1.csv", N*N);
-		delay = loadArray("delay.csv", N*N);
+		delay1 = loadArray("delay1.csv", N*N);
+		delay2 = loadArray("delay2.csv", N*N);
 		printf("LOAD DATA FINISHED\n");
 	} else {
 		printf("GENERATE DATA...\n");
@@ -65,7 +67,8 @@ int main(int argc, char **argv)
 		printf("SAVE DATA...\n");
 		saveArray("weight0.csv", weight0, N*N);
 		saveArray("weight1.csv", weight1, N*N);
-		saveArray("delay.csv", delay, N*N);
+		saveArray("delay1.csv", delay1, N*N);
+		saveArray("delay2.csv", delay2, N*N);
 		printf("SAVE DATA FINISHED\n");
 	}
 	
