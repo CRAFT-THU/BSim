@@ -38,19 +38,26 @@ int main(int argc, char **argv)
 	} else {
 		printf("GENERATE DATA...\n");
 		//real * array = getConstArray(weight_value, num);
-		weight0 = getConstArray((real)20e-4, N*N);
-		weight1 = getConstArray((real)20e-4, N*N);
+		weight0 = (real*)malloc(sizeof(real) * N * N);
+		weight1 = (real*)malloc(sizeof(real) * N * N);
+
+		for (int i=0; i<N*N; i++) {
+		    weight0[i] = 0.002 + double(i)/double(N) * 0.02;
+		    weight1[i] = 0.022 - double(i)/double(N) * 0.02;
+		}
+
 		//weight2 = getRandomArray((real)20e-3, N*N);
-		delay = getConstArray((real)1e-4, N*N);
+		delay1 = getConstArray((real)1e-4, N*N);
+		delay2 = getConstArray((real)2e-4, N*N);
 		printf("GENERATE DATA FINISHED\n");
 	}
 
 	//Network.connect(population1, population2, weight_array, delay_array, Exec or Inhi array, num)
-	c.connect(pn0, pn1, weight0, delay, NULL, N*N);
-	c.connect(pn1, pn2, weight1, delay, NULL, N*N);
-	c.connect(pn2, pn3, weight1, delay, NULL, N*N);
-	c.connect(pn3, pn4, weight0, delay, NULL, N*N);
-	c.connect(pn4, pn5, weight1, delay, NULL, N*N);
+	c.connect(pn0, pn1, weight0, delay2, NULL, N*N);
+	c.connect(pn1, pn2, weight0, delay2, NULL, N*N);
+	c.connect(pn2, pn3, weight0, delay1, NULL, N*N);
+	c.connect(pn3, pn4, weight1, delay1, NULL, N*N);
+	c.connect(pn4, pn5, weight1, delay1, NULL, N*N);
 	SGSim sg(&c, 1.0e-4);
 	sg.run(0.1);
 
