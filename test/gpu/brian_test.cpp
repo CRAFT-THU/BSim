@@ -44,8 +44,8 @@ int main(int argc, char **argv)
 		weight1 = (real*)malloc(sizeof(real) * N * N);
 
 		for (int i=0; i<N*N; i++) {
-		    weight0[i] = 0.002 + double(i)/double(N) * 0.02;
-		    weight1[i] = 0.022 - double(i)/double(N) * 0.02;
+		    weight0[i] = 0.002 + (double)(i)/(double)(N*N) * 0.02;
+		    weight1[i] = 0.022 - (double)(i)/(double)(N*N) * 0.02;
 		}
 
 		//weight2 = getRandomArray((real)20e-3, N*N);
@@ -55,8 +55,8 @@ int main(int argc, char **argv)
 	}
 
 	//Network.connect(population1, population2, weight_array, delay_array, Exec or Inhi array, num)
-	c.connect(pn0, pn1, weight0, delay2, NULL, N*N);
-	c.connect(pn1, pn2, weight0, delay2, NULL, N*N);
+	c.connect(pn0, pn1, weight0, delay1, NULL, N*N);
+	c.connect(pn1, pn2, weight0, delay1, NULL, N*N);
 	c.connect(pn2, pn3, weight0, delay1, NULL, N*N);
 	c.connect(pn3, pn4, weight1, delay1, NULL, N*N);
 	c.connect(pn4, pn5, weight1, delay1, NULL, N*N);
