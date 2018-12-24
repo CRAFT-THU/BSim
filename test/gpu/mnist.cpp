@@ -144,7 +144,12 @@ int main(int argc, char **argv)
 		}
 
 		//cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, 1024, 1, 10, 1, fc2_weight_data, 10, real_rate, 1, 0, res, 1);
+		#ifndef USE_DOUBLE
 		cblas_sgemv(CblasRowMajor, CblasTrans, 1024, 10, 1, fc2_weight_data, 10, real_rate, 1, 1, res, 1);
+		#else
+		cblas_dgemv(CblasRowMajor, CblasTrans, 1024, 10, 1, fc2_weight_data, 10, real_rate, 1, 1, res, 1);
+		#endif
+
 
 		if (dataset.test_labels[batch] == getMaxLoc(res, 10)) {
 			matched_batches++;
