@@ -44,13 +44,13 @@ class TestLIF(unittest.TestCase):
                             c=0.1, tau=50e-3, tau_i=1.0, tau_e=1.0, v_threshold=15e-3,
                             i_offset=0.0, refract_time=0.00)
 
-        weight0 = [0.002 + i/N * 0.02 for i in range(N*N)]
-        weight1 = [0.022 - i/N * 0.02 for i in range(N*N)]
+        weight0 = [0.002 + float(i)/float(N*N) * 0.02 for i in range(N*N)]
+        weight1 = [0.022 - float(i)/float(N*N) * 0.02 for i in range(N*N)]
 
         s01 = net.projection(static, num=N*N, name='S01', weight=weight0,
-                             delay=0.0002)
+                             delay=0.0001)
         s12 = net.projection(static, num=N*N, name='S12', weight=weight0,
-                             delay=0.0002)
+                             delay=0.0001)
         s23 = net.projection(static, num=N*N, name='S23', weight=weight0,
                              delay=0.0001)
         s34 = net.projection(static, num=N*N, name='S34', weight=weight1,

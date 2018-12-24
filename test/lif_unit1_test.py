@@ -6,9 +6,9 @@ from bsim import *
 from bsim.env import c_real
 
 
-class TestLIFUnit(unittest.TestCase):
+class TestLIFUnit1(unittest.TestCase):
     def __init__(self, *args, **kwargs):
-        super(TestLIFUnit, self).__init__(*args, **kwargs)
+        super(TestLIFUnit1, self).__init__(*args, **kwargs)
 
         self.n = 10
 

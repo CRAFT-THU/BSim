@@ -69,7 +69,7 @@ class NeuronModel(Model):
         cu_gen.block("\t\t} else {")
         cu_gen.block("\t\t\tg_i_exec[start_id + idx] = 0;")
         cu_gen.block("\t\t\tg_i_inh[start_id + idx] = 0;")
-        cu_gen.block("\t\t\tdata->p_refract_time[idx] = data->p_refract_time[idx] - 1;")
+        cu_gen.block("\t\t\tdata->p_refract_step[idx] = data->p_refract_step[idx] - 1;")
         cu_gen.block("\t\t}")
         cu_gen.block("\t\t__syncthreads();")
         cu_gen.blank_line()
