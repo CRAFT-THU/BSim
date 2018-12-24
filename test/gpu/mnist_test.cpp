@@ -185,7 +185,11 @@ int main(int argc, char **argv)
 		}
 
 		//cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, 1024, 1, 10, 1, fc2_weight_data, 10, real_rate, 1, 0, res, 1);
+#ifdef USE_DOUBLE
+		cblas_dgemv(CblasRowMajor, CblasTrans, 1024, 10, 1, fc2_weight_data, 10, real_rate, 1, 1, res, 1);
+#else
 		cblas_sgemv(CblasRowMajor, CblasTrans, 1024, 10, 1, fc2_weight_data, 10, real_rate, 1, 1, res, 1);
+#endif
 
 		for (int i=0; i< 10; i++) {
 			printf("%f ", res[i]);
