@@ -23,3 +23,10 @@ src/utils/TypeFunc.cu
 *.test
 *.data
 *.pyc
+*.bak
+*.idea
+*.DS_Store
+*.so
+bsim/code_gen/*
+bsim/so_gen/*
+bsim/*_gen/*

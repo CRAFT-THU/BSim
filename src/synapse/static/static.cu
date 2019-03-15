@@ -5,7 +5,7 @@
 
 __global__ void update_dense_static_hit(GStaticSynapses *d_synapses, int num, int start_id)
 {
-#define FAST_TEST 3
+#define FAST_TEST 2
 #if  FAST_TEST == 1
 	__shared__ int fire_neuron_id[MAXBLOCKSIZE];
 

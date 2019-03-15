@@ -61,7 +61,7 @@ elseif (CMAKE_BUILD_TYPE_UPPER STREQUAL "DEBUG")
 		SET(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -std=c++11 -O0 -Wall -g -ggdb -fPIC -D LOG_DATA")
 	ENDIF ( "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang" )
 	#SET(CUDA_NVCC_FLAGS_DEBUG "-std=c++11;-g;-G;-lineinfo;-Xcompiler;-D LOG_DATA;-arch=sm_60")
-	SET(CUDA_NVCC_FLAGS_DEBUG "-std=c++11;-g;-G;-lineinfo;-D LOG_DATA;-arch=sm_60;-lcufft")
+	SET(CUDA_NVCC_FLAGS_DEBUG "-std=c++11;-g;-G;-D LOG_DATA;-arch=sm_60;-lcufft")
 endif (CMAKE_BUILD_TYPE_UPPER STREQUAL "RELEASE")
 
 #SET(CUDA_NVCC_FLAGS_DEBUG "-arch=sm_60 -std=c++11 -g -G -lineinfo -Xcompiler -Wall -D LOG_DATA")

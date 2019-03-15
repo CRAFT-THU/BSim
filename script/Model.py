@@ -106,7 +106,7 @@ class Model:
 
 
     def load_type(self, content, type_name, name):
-        load_types = {'parameter':self.load_para, 'func':self.load_func}
+        load_types = {'variable':self.load_para, 'func':self.load_func}
         if type_name in load_types:
             load_types[type_name](content, name) 
         else:
