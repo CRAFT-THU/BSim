@@ -71,14 +71,23 @@ class TestNetworkMethods(unittest.TestCase):
     def test_connection(self):
         self.assertEqual(1, len(self.net.connection_data))
         cpu = self.net.connection_data[0].from_gpu(self.net.connection_data_gpu[0], only_struct=False)
-        self.assertListEqual([0, 3, 0, 0, 0, 0, 0, 0,
-                              0, 0, 6, 7, 8, 0, 0, 0,
-                              9, 11, 0, 0, 0, 13, 14, 0],
-                             list(cast(cpu.delay_start, POINTER(c_int*cpu.n_len)).contents))
-        self.assertListEqual([3, 3, 0, 0, 0, 0, 0, 0,
-                              0, 0, 1, 1, 1, 0, 0, 0,
-                              2, 2, 0, 0, 0, 1, 1, 0],
-                             list(cast(cpu.delay_num, POINTER(c_int*cpu.n_len)).contents))
+
+        std = [0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 6, 7, 8, 0, 0, 0, 9, 11, 0, 0, 0, 13, 14, 0]
+        std1 = []
+        for i in range(round(len(std)/3)):
+            std1.append(std[i])
+            std1.append(std[i+round(len(std)/3)])
+            std1.append(std[i+round(2*len(std)/3)])
+
+        self.assertListEqual(std1, list(cast(cpu.delay_start, POINTER(c_int*cpu.n_len)).contents))
+
+        std = [3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 2, 2, 0, 0, 0, 1, 1, 0]
+        std1 = []
+        for i in range(round(len(std)/3)):
+            std1.append(std[i])
+            std1.append(std[i+round(len(std)/3)])
+            std1.append(std[i+round(2*len(std)/3)])
+        self.assertListEqual(std1, list(cast(cpu.delay_num, POINTER(c_int*cpu.n_len)).contents))
         self.assertListEqual([0, 0, 0, 2, 4, 6, 8, 10],
                              list(cast(cpu.rev_delay_start, POINTER(c_int*cpu.r_n_len)).contents))
         self.assertListEqual([0, 0, 2, 2, 2, 2, 2, 5],
