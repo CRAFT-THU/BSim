@@ -47,5 +47,7 @@ class TestProjectionMethods(unittest.TestCase):
 
 
 if __name__ == '__main__':
+    print('Testing {}: '.format(__file__[:-3]))
     unittest.main()
+    print('\n')
 
