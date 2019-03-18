@@ -25,13 +25,13 @@ class TestNetworkMethods(unittest.TestCase):
         )
 
         p0 = Population(lif_curr_exp, num=2, name='P0', v=0.0, C=1.0, v_tmp=2.0, C_exec=2.0, C_inh=0.6, Cexec=0.5,
-                        Cinh=0.3, v_threshold=1.0, v_reset=0.0, refract_time=0.001)
+                        Cinh=0.3, v_threshold=1.0, v_reset=0.0, refract_time=0.0001)
         p1 = Population(lif_curr_exp, num=3, name='P1', v=1.0, C=2.0, v_tmp=3.0, C_exec=3.0, C_inh=1.0, Cexec=1.6,
-                        Cinh=0.4, v_threshold=20.0, v_reset=-10.0, refract_time=0.002)
+                        Cinh=0.4, v_threshold=20.0, v_reset=-10.0, refract_time=0.0002)
         p2 = Population(lif_curr_exp, num=2, name='P2', v=0.0, C=3.0, v_tmp=4.0, C_exec=2.0, C_inh=0.5, Cexec=0.5,
-                        Cinh=0.3, v_threshold=20.0, v_reset=-30.0, refract_time=0.005)
+                        Cinh=0.3, v_threshold=20.0, v_reset=-30.0, refract_time=0.0005)
         p3 = Population(lif_curr_exp, num=1, name='P3', v=1.0, C=4.0, v_tmp=1.0, C_exec=1.0, C_inh=1.5, Cexec=1.6,
-                        Cinh=0.4, v_threshold=1.0, v_reset=-20.0, refract_time=0.003)
+                        Cinh=0.4, v_threshold=1.0, v_reset=-20.0, refract_time=0.0003)
 
         s01_00 = Projection(stdp_synapse, num=1, name='S0', last_update=0, apre=0.1, tau_pre=1.2,
                             apost=2.3, tau_post=3.4, d_apre=4.5, d_apost=5.6, weight=6.7, delay=0)
@@ -46,11 +46,11 @@ class TestNetworkMethods(unittest.TestCase):
         s01_12 = Projection(stdp_synapse, num=1, name='S0', last_update=0, apre=0.6, tau_pre=1.7,
                             apost=2.8, tau_post=3.9, d_apre=5.0, d_apost=6.1, weight=7.2, delay=0)
         s02 = Projection(stdp_synapse, num=4, name='S1', last_update=0, apre=0.7, tau_pre=1.8,
-                        apost=2.9, tau_post=4.0, d_apre=5.1, d_apost=6.2, weight=7.3, delay=0.002)
+                        apost=2.9, tau_post=4.0, d_apre=5.1, d_apost=6.2, weight=7.3, delay=0.0002)
         s12 = Projection(stdp_synapse, num=3, name='S2', last_update=0, apre=0.8, tau_pre=1.9,
-                        apost=3.0, tau_post=4.1, d_apre=5.2, d_apost=6.3, weight=7.4, delay=0.001)
+                        apost=3.0, tau_post=4.1, d_apre=5.2, d_apost=6.3, weight=7.4, delay=0.0001)
         s23 = Projection(stdp_synapse, num=2, name='S3', last_update=0, apre=0.9, tau_pre=2.0,
-                        apost=3.1, tau_post=4.2, d_apre=5.3, d_apost=6.4, weight=7.5, delay=0.002)
+                        apost=3.1, tau_post=4.2, d_apre=5.3, d_apost=6.4, weight=7.5, delay=0.0002)
 
         self.net = Network(dt=0.0001)
 
@@ -60,6 +60,7 @@ class TestNetworkMethods(unittest.TestCase):
         self.net.one_to_one(p0, 1, p1, 0, s01_10)
         self.net.one_to_one(p0, 1, p1, 1, s01_11)
         self.net.one_to_one(p0, 1, p1, 2, s01_12)
+        # self.net.all_to_all(p0, p1, s01)
         self.net.all_to_all(p0, p2, s02)
         self.net.all_to_all(p1, p3, s12)
         self.net.all_to_all(p2, p3, s23)

@@ -17,9 +17,9 @@ class TestProjectionMethods(unittest.TestCase):
         )
 
         p1 = Projection(stdp_synapse, num=10, name='S1', last_update=1, apre=1.0, tau_pre=2.0,
-                        apost=0.8, tau_post=0.6, d_apre=0.5, d_apost=0.3, weight=0.1, delay=0.003)
+                        apost=0.8, tau_post=0.6, d_apre=0.5, d_apost=0.3, weight=0.1, delay=0.0003)
         p2 = Projection(stdp_synapse, num=5, name='S1', last_update=0, apre=2.0, tau_pre=3.0,
-                        apost=0.7, tau_post=0.5, d_apre=0.6, d_apost=0.4, weight=0.2, delay=0.004)
+                        apost=0.7, tau_post=0.5, d_apre=0.6, d_apost=0.4, weight=0.2, delay=0.0004)
 
         p = Projection(model=p1.model, num=0, name="%s_compact" % p1.model.name, debug=False)
         p.merge(p1)
