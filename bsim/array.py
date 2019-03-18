@@ -98,13 +98,13 @@ class ModelOfArray(Data):
                         'input parameters should have the same length as the population size'
 
                     if para.find('time') >= 0 or para.strip() == 'delay':
-                        value = [int(i/kwargs.get('dt', 0.0001)) for i in kwargs[para]]
+                        value = [round(i/kwargs.get('dt', 0.0001)) for i in kwargs[para]]
 
                     self.special[para] = list(value)
                 else:
                     # TODO: support variable shared
-                    value = int(value) if para.find('time') < 0 and para.strip() != 'delay' \
-                         else int(value/kwargs.get('dt', 0.0001))
+                    value = round(value) if para.find('time') < 0 and para.strip() != 'delay' \
+                         else round(value/kwargs.get('dt', 0.0001))
                     self.special[para] = [int(value)] * num
 
     def __len__(self):

@@ -39,10 +39,10 @@ class TestPopulationMethods(unittest.TestCase):
 
         p1 = Population(lif_curr_exp, num=10, name='P1', v=0.0, C=1.0, v_tmp=2.0,
                         C_exec=0.8, C_inh=0.6, Cexec=0.5, Cinh=0.3, v_threshold=20.0,
-                        v_reset=0.0, refract_time=0.001)
+                        v_reset=0.0, refract_time=0.001, dt=0.001)
         p2 = Population(lif_curr_exp, num=5, name='P1', v=1.0, C=2.0, v_tmp=3.0,
                         C_exec=0.7, C_inh=0.5, Cexec=0.6, Cinh=0.4, v_threshold=25.0,
-                        v_reset=-10.0, refract_time=0.002)
+                        v_reset=-10.0, refract_time=0.002, dt=0.001)
 
         p = Population(model=p1.model, num=0, name="%s_compact" % p1.model.name, debug=False)
         p.merge(p1)
@@ -74,5 +74,7 @@ class TestPopulationMethods(unittest.TestCase):
 
 
 if __name__ == '__main__':
+    print('Testing {}: '.format(__file__[:-3]))
     unittest.main()
+    print('\n')
 
