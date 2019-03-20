@@ -162,6 +162,8 @@ int SingleGPUSimulator::run(real time, FireInfo &log)
 		}
 #endif
 
+		update_time<<<1, 1>>>(time);
+
 		for (int i=0; i<nTypeNum; i++) {
 			cudaUpdateType[pCpuNet->nTypes[i]](c_pGpuNet->pNeurons[i], c_pGpuNet->neuronNums[i+1]-c_pGpuNet->neuronNums[i], c_pGpuNet->neuronNums[i],time, &updateSize[c_pGpuNet->nTypes[i]]);
 		}

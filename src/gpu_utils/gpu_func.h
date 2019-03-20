@@ -16,8 +16,8 @@
 // int cudaUpdateMax(void *data, int num, int start_id, int t, BlockSize *pSize);
 // int cudaUpdateStatic(void *data, int num, int start_id, int t, BlockSize *pSize);
 
-int addCrossNeurons(int *ids, int num);
-int cudaDeliverNeurons(int *idx2index, int *crossnode_index2idx, int *global_cross_data, int *fired_n_num, int node_num, int neuron_num);
+int addCrossNeurons(int *ids, int num, int time);
+int cudaDeliverNeurons(int *idx2index, int *crossnode_index2idx, int *global_cross_data, int *fired_n_num, int node_num, int neuron_num, int time);
 
 BlockSize * getBlockSize(int nSize, int sSize);
 

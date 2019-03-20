@@ -13,7 +13,7 @@ __device__ void reset_tj_neuron(GTJNeurons *d_neurons, int *shared_buf, volatile
 	}
 }
 
-__global__ void update_tj_neuron(GTJNeurons *d_neurons, int num, int start_id)
+__global__ void update_tj_neuron(GTJNeurons *d_neurons, int num, int start_id, int time)
 {
 	__shared__ int fire_table_t[MAXBLOCKSIZE];
 	__shared__ volatile int fire_cnt;
@@ -24,6 +24,7 @@ __global__ void update_tj_neuron(GTJNeurons *d_neurons, int num, int start_id)
 	__syncthreads();
 
 	int tid = blockIdx.x * blockDim.x + threadIdx.x;
+	int currentIdx = time % (MAX_DELAY+1);
 	for (int idx = tid; idx < num; idx +=blockDim.x*gridDim.x) {
 		bool fired = false;
 		int test_loc = 0;
@@ -50,7 +51,7 @@ __global__ void update_tj_neuron(GTJNeurons *d_neurons, int num, int start_id)
 				}
 				__syncthreads();
 				if (fire_cnt >= MAXBLOCKSIZE) {
-					commit2globalTable(fire_table_t, MAXBLOCKSIZE, gFiredTable, &gFiredTableSizes[gCurrentIdx], gFiredTableCap*gCurrentIdx);
+					commit2globalTable(fire_table_t, MAXBLOCKSIZE, gFiredTable, &gFiredTableSizes[currentIdx], gFiredTableCap*currentIdx);
 					reset_tj_neuron(d_neurons, fire_table_t, MAXBLOCKSIZE, start_id);
 					if (threadIdx.x == 0) {
 						fire_cnt = 0;
@@ -61,7 +62,7 @@ __global__ void update_tj_neuron(GTJNeurons *d_neurons, int num, int start_id)
 			__syncthreads();
 
 			if (fire_cnt > 0) {
-				commit2globalTable(fire_table_t, fire_cnt, gFiredTable, &gFiredTableSizes[gCurrentIdx], gFiredTableCap*gCurrentIdx);
+				commit2globalTable(fire_table_t, fire_cnt, gFiredTable, &gFiredTableSizes[currentIdx], gFiredTableCap*currentIdx);
 				reset_tj_neuron(d_neurons, fire_table_t, fire_cnt, start_id);
 				if (threadIdx.x == 0) {
 					fire_cnt = 0;

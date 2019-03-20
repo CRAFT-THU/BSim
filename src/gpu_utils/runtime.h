@@ -21,7 +21,7 @@ __global__ void init_buffers(/*int *c_gTimeTable,*/ real *c_gNeuronInput, int *c
 
 __device__ int commit2globalTable(int *shared_buf, volatile unsigned int size, int *global_buf, int * global_size, int offset);
 
-// __global__ void update_time();
+__global__ void update_time(int time);
 // __global__ void init_time(int gCurrentCycle);
 
 __global__ void curand_setup_kernel(curandState *state, int num);
@@ -32,9 +32,9 @@ __global__ void init_buffers(/*int *c_gTimeTable,*/ real *c_gNeuronInput, real *
 
 __global__ void reset_active_synapse();
 
-__global__ void add_cross_neuron(int *ids, int num);
+__global__ void add_cross_neuron(int *ids, int num, int time);
 
-__global__ void deliver_neurons(int *idx2index, int *crossnode_index2idx, int *global_cross_data, int *fired_n_num, int node_num);
+__global__ void deliver_neurons(int *idx2index, int *crossnode_index2idx, int *global_cross_data, int *fired_n_num, int node_num, int time);
 
 
 #endif /* GPU_KERNEL_H */

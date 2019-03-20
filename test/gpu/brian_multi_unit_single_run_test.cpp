@@ -59,7 +59,7 @@ int main(int argc, char **argv)
 	SGSim sg(&c, 1.0e-3);
 	sg.run(0.1);
 	MGSim mg(&c, 1.0e-3);
-	mg.single_run(0.1);
+	mg.run(0.1);
 
 	if (!load) {
 		printf("SAVE DATA...\n");

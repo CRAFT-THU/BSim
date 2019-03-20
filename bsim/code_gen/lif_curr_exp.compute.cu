@@ -71,8 +71,10 @@ __global__ void update_lif_curr_exp_gpu(Lif_curr_exp *data, int num, int start_i
 	int delay_idx = t % (MAX_DELAY+1);
 	__shared__ int fire_table_t[MAX_BLOCK_SIZE];
 	__shared__ volatile int fire_cnt;
-	if (threadIdx.x == 0 && blockIdx.x == 0) {
+	if (threadIdx.x == 0) {
 		fire_cnt = 0;
+	}
+	if (threadIdx.x == 0 && blockIdx.x == 0) {
 		g_fired_table_sizes[delay_idx] = 0;
 	}
 	__syncthreads();

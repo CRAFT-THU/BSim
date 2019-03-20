@@ -5,8 +5,9 @@
 #include "fft.h"
 
 
-__global__ void update_fft_neuron(GFFTNeurons *d_neurons, int num, int start_id)
+__global__ void update_fft_neuron(GFFTNeurons *d_neurons, int num, int start_id, int time)
 {
+	int currentIdx = time % (MAX_DELAY+1);
 	__shared__ int fire_table_t[MAXBLOCKSIZE];
 	__shared__ volatile unsigned int fire_cnt;
 
@@ -52,7 +53,7 @@ __global__ void update_fft_neuron(GFFTNeurons *d_neurons, int num, int start_id)
 		
 		__syncthreads();
 		if (fire_cnt >= MAXBLOCKSIZE) {
-			commit2globalTable(fire_table_t, MAXBLOCKSIZE, gFiredTable, &(gFiredTableSizes[gCurrentIdx]), gFiredTableCap*gCurrentIdx);
+			commit2globalTable(fire_table_t, MAXBLOCKSIZE, gFiredTable, &(gFiredTableSizes[currentIdx]), gFiredTableCap*currentIdx);
 			if (threadIdx.x == 0) {
 				fire_cnt = 0;
 			}
@@ -69,7 +70,7 @@ __global__ void update_fft_neuron(GFFTNeurons *d_neurons, int num, int start_id)
 		}
 		__syncthreads();
 		if (fire_cnt >= MAXBLOCKSIZE) {
-			commit2globalTable(fire_table_t, MAXBLOCKSIZE, gFiredTable, &(gFiredTableSizes[gCurrentIdx]), gFiredTableCap*gCurrentIdx);
+			commit2globalTable(fire_table_t, MAXBLOCKSIZE, gFiredTable, &(gFiredTableSizes[currentIdx]), gFiredTableCap*currentIdx);
 			if (threadIdx.x == 0) {
 				fire_cnt = 0;
 			}
@@ -83,14 +84,14 @@ __global__ void update_fft_neuron(GFFTNeurons *d_neurons, int num, int start_id)
 	__syncthreads();
 
 	if (fire_cnt > 0) {
-		commit2globalTable(fire_table_t, fire_cnt, gFiredTable, &(gFiredTableSizes[gCurrentIdx]), gFiredTableCap*gCurrentIdx);
+		commit2globalTable(fire_table_t, fire_cnt, gFiredTable, &(gFiredTableSizes[currentIdx]), gFiredTableCap*currentIdx);
 		if (threadIdx.x == 0) {
 			fire_cnt = 0;
 		}
 	}
 }
 
-int cudaUpdateFFT(void *data, int num, int start_id, BlockSize *pSize)
+int cudaUpdateFFT(void *data, int num, int start_id, int time, BlockSize *pSize)
 {
 	GFFTNeurons * p = (GFFTNeurons*)data;
 	GFFTNeurons tmp;
@@ -100,7 +101,7 @@ int cudaUpdateFFT(void *data, int num, int start_id, BlockSize *pSize)
 	cufftPlan1d(&plan, num/2, CUFFT_C2C, 1);
 	cufftExecC2C(plan, tmp.p_input, tmp.p_res, CUFFT_FORWARD);
 
-	update_fft_neuron<<<pSize->gridSize, pSize->blockSize>>>((GFFTNeurons*)data, num, start_id);
+	update_fft_neuron<<<pSize->gridSize, pSize->blockSize>>>((GFFTNeurons*)data, num, start_id, time);
 
 	return 0;
 }

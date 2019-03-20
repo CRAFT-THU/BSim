@@ -5,7 +5,7 @@
 #include "static.h"
 
 
-__global__ void update_dense_static_hit(GStaticSynapses *d_synapses, int num, int start_id)
+__global__ void update_dense_static_hit(GStaticSynapses *d_synapses, int num, int start_id, int time)
 {
 #define FAST_TEST 2
 #if  FAST_TEST == 1
@@ -14,7 +14,7 @@ __global__ void update_dense_static_hit(GStaticSynapses *d_synapses, int num, in
 	int tid = blockIdx.x * blockDim.x + threadIdx.x;
 	for (int delta_t = 0; delta_t<MAX_DELAY; delta_t++) {
 		int block_idx = blockIdx.x;
-		int time_idx = (gCurrentIdx+MAX_DELAY-delta_t)%(MAX_DELAY+1);
+		int time_idx = (time+MAX_DELAY-delta_t)%(MAX_DELAY+1);
 		int firedSize = gFiredTableSizes[time_idx];
 		int block_nums_minus_1 = (firedSize - 1 + blockDim.x) / blockDim.x - 1;
 		int grid_nums = (firedSize - 1 + blockDim.x*gridDim.x)/(blockDim.x * gridDim.x);
@@ -62,7 +62,7 @@ __global__ void update_dense_static_hit(GStaticSynapses *d_synapses, int num, in
 	//int tid = blockIdx.x * blockDim.x + threadIdx.x;
 	for (int delta_t = 0; delta_t<MAX_DELAY; delta_t++) {
 		int block_idx = blockIdx.x;
-		int time_idx = (gCurrentIdx+MAX_DELAY-delta_t)%(MAX_DELAY+1);
+		int time_idx = (time + MAX_DELAY-delta_t)%(MAX_DELAY+1);
 		int firedSize = gFiredTableSizes[time_idx];
 		int num_per_block = (firedSize - 1)/gridDim.x + 1;
 		int block_nums_minus_1 = (firedSize - 1) / num_per_block;
@@ -99,7 +99,7 @@ __global__ void update_dense_static_hit(GStaticSynapses *d_synapses, int num, in
 #else
 	int tid = blockIdx.x * blockDim.x + threadIdx.x;
 	for (int delta_t = 0; delta_t<MAX_DELAY; delta_t++) {
-		int time_idx = (gCurrentIdx+MAX_DELAY-delta_t)%(MAX_DELAY+1);
+		int time_idx = (time+MAX_DELAY-delta_t)%(MAX_DELAY+1);
 		int firedSize = gFiredTableSizes[time_idx];
 		for (int idx = tid; idx < firedSize; idx += blockDim.x*gridDim.x) {
 			int nid = gFiredTable[time_idx*gFiredTableCap + idx];
@@ -121,11 +121,11 @@ __global__ void update_dense_static_hit(GStaticSynapses *d_synapses, int num, in
 #endif
 }
 
-int cudaUpdateStatic(void *data, int num, int start_id, int t, BlockSize *pSize)
+int cudaUpdateStatic(void *data, int num, int start_id, int time, BlockSize *pSize)
 {
 	//update_static_hit<<<pSize->gridSize, pSize->blockSize>>>((GStaticSynapses*)data, num, start_id);
 	//reset_active_synapse<<<1, 1>>>();
-	update_dense_static_hit<<<pSize->gridSize, pSize->blockSize>>>((GStaticSynapses*)data, num, start_id, t);
+	update_dense_static_hit<<<pSize->gridSize, pSize->blockSize>>>((GStaticSynapses*)data, num, start_id, time);
 
 	return 0;
 }

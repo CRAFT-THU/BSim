@@ -4,8 +4,10 @@
 // #include "GDecideNeurons.h"
 #include "decide.h"
 
-__global__ void update_decide_neuron(GDecideNeurons *d_neurons, int num, int start_id, int t)
+__global__ void update_decide_neuron(GDecideNeurons *d_neurons, int num, int start_id, int time)
 {
+
+	int currentIdx = time % (MAX_DELAY+1);
 	__shared__ int fire_table_t[MAXBLOCKSIZE];
 	__shared__ volatile unsigned int fire_cnt;
 
@@ -37,7 +39,7 @@ __global__ void update_decide_neuron(GDecideNeurons *d_neurons, int num, int sta
 
 		d_neurons->p_tmp_rate[idx] += gNeuronInput[gnid] + gNeuronInput_I[gnid];
 
-		if (gCurrentCycle % PERIOD == 0) {
+		if (time % PERIOD == 0) {
 			d_neurons->p_fire_rate[idx] = 0.5 *d_neurons->p_fire_rate[idx] + d_neurons->p_tmp_rate[idx] * 0.05;
 			d_neurons->p_tmp_rate[idx] = 0;
 			d_neurons->p_fire_count[idx] = 0;
@@ -54,7 +56,7 @@ __global__ void update_decide_neuron(GDecideNeurons *d_neurons, int num, int sta
 			}
 			__syncthreads();
 			if (fire_cnt >= MAXBLOCKSIZE) {
-				commit2globalTable(fire_table_t, MAXBLOCKSIZE, gFiredTable, &(gFiredTableSizes[gCurrentIdx]), gFiredTableCap*gCurrentIdx);
+				commit2globalTable(fire_table_t, MAXBLOCKSIZE, gFiredTable, &(gFiredTableSizes[currentIdx]), gFiredTableCap*currentIdx);
 				if (threadIdx.x == 0) {
 					fire_cnt = 0;
 				}
@@ -68,16 +70,16 @@ __global__ void update_decide_neuron(GDecideNeurons *d_neurons, int num, int sta
 	__syncthreads();
 
 	if (fire_cnt > 0) {
-		commit2globalTable(fire_table_t, fire_cnt, gFiredTable, &(gFiredTableSizes[gCurrentIdx]), gFiredTableCap*gCurrentIdx);
+		commit2globalTable(fire_table_t, fire_cnt, gFiredTable, &(gFiredTableSizes[currentIdx]), gFiredTableCap*currentIdx);
 		if (threadIdx.x == 0) {
 			fire_cnt = 0;
 		}
 	}
 }
 
-int cudaUpdateDecide(void *data, int num, int start_id, int t, BlockSize *pSize)
+int cudaUpdateDecide(void *data, int num, int start_id, int time, BlockSize *pSize)
 {
-	update_decide_neuron<<<pSize->gridSize, pSize->blockSize>>>((GDecideNeurons*)data, num, start_id);
+	update_decide_neuron<<<pSize->gridSize, pSize->blockSize>>>((GDecideNeurons*)data, num, start_id, time);
 
 	return 0;
 }

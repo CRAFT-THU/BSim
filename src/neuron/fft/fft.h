@@ -7,6 +7,6 @@
 #include "GFFTNeurons.h"
 
 
-__global__ void update_fft_neuron(GFFTNeurons *d_neurons, int num, int start_id);
+__global__ void update_fft_neuron(GFFTNeurons *d_neurons, int num, int start_id, int time);
 
 #endif  // FFT_H

@@ -28,15 +28,14 @@
 __constant__ int MAX_DELAY;
 __constant__ int gTimeTableCap;
 __constant__ int gFiredTableCap;
-__constant__ int gSynapsesTableCap;
+// __constant__ int gSynapsesTableCap;
 __constant__ real DT;
 
 // Variable
 // __device__ int gCurrentIdx;
 // __device__ int gCurrentCycle;
-__device__ int gFiredTableSize;
-__device__ int gActiveTableSize;
-__device__ int gSynapsesActiveTableSize;
+// __device__ int gFiredTableSize;
+// __device__ int gSynapsesActiveTableSize;
 
 // Arrays
 //__device__ int *gTimeTable;
@@ -49,6 +48,7 @@ __device__ real *gNeuronInput_I;
 __device__ int *gFiredTable;
 __device__ int *gFiredTableSizes;
 __device__ int *gActiveTable;
+__device__ int gActiveTableSize;
 
 // Synapse Tables
 //__device__ int *gSynapsesActiveTable;
@@ -78,18 +78,18 @@ __device__ int commit2globalTable(int *shared_buf, volatile unsigned int size, i
 	return 0;
 }
 
-// __global__ void update_time()
-// {
-// 	if ((threadIdx.x == 0) && (blockIdx.x == 0)) {
-// 		//gTimeTable[gCurrentIdx] = simTime;
-// 		gCurrentCycle = gCurrentCycle + 1;
-// 		gCurrentIdx = (gCurrentIdx +1)%(MAX_DELAY + 1);
-// 		gActiveTableSize = 0;
-// 		gFiredTableSizes[gCurrentIdx] = 0;
-// 		gSynapsesActiveTableSize = 0;
-// 	}
-// 	__syncthreads();
-// }
+__global__ void update_time(int time)
+{
+	if ((threadIdx.x == 0) && (blockIdx.x == 0)) {
+		// gCurrentCycle = gCurrentCycle + 1;
+		// gCurrentIdx = (gCurrentIdx +1)%(MAX_DELAY + 1);
+		int currentIdx = time % (MAX_DELAY + 1);
+		gActiveTableSize = 0;
+		gFiredTableSizes[currentIdx] = 0;
+		// gSynapsesActiveTableSize = 0;
+	}
+	__syncthreads();
+}
 // 
 // __global__ void init_time(int gCurrentCycle)
 // {
@@ -104,14 +104,14 @@ __device__ int commit2globalTable(int *shared_buf, volatile unsigned int size, i
 // 	__syncthreads();
 // }
 
-__global__ void reset_active_synapse()
-{
-	if ((threadIdx.x == 0) && (blockIdx.x == 0)) {
-		gSynapsesActiveTableSize = 0;
-	}
-	__syncthreads();
-
-}
+// __global__ void reset_active_synapse()
+// {
+// 	if ((threadIdx.x == 0) && (blockIdx.x == 0)) {
+// 		gSynapsesActiveTableSize = 0;
+// 	}
+// 	__syncthreads();
+// 
+// }
 
 
 __global__ void curand_setup_kernel(curandState *state, int num)
@@ -125,20 +125,21 @@ __global__ void curand_setup_kernel(curandState *state, int num)
 
 
 
-__global__ void add_cross_neuron(int *ids, int num)
+__global__ void add_cross_neuron(int *ids, int num, int time)
 {
 	int tid = blockIdx.x * blockDim.x + threadIdx.x;
+	int delayIdx = time % (MAX_DELAY+1);
 	if (tid < num) {
-		gFiredTable[gFiredTableCap*gCurrentIdx + gFiredTableSizes[gCurrentIdx] + tid] = ids[tid];
+		gFiredTable[gFiredTableCap*delayIdx + gFiredTableSizes[delayIdx] + tid] = ids[tid];
 	}
 	__syncthreads();
 
 	if (tid == 0) {
-		gFiredTableSizes[gCurrentIdx] += num;
+		gFiredTableSizes[delayIdx] += num;
 	}
 }
 
-__global__ void deliver_neurons(int *idx2index, int *crossnode_index2idx, int *global_cross_data, int *fired_n_num, int node_num)
+__global__ void deliver_neurons(int *idx2index, int *crossnode_index2idx, int *global_cross_data, int *fired_n_num, int node_num, int time)
 {
 	__shared__ int cross_neuron_id[MAXBLOCKSIZE];
 	__shared__ volatile int cross_cnt;
@@ -149,11 +150,11 @@ __global__ void deliver_neurons(int *idx2index, int *crossnode_index2idx, int *g
 	__syncthreads();
 
 	int tid = blockIdx.x * blockDim.x + threadIdx.x;
-
-	int fired_size = gFiredTableSizes[gCurrentIdx];
+	int delayIdx = time % (MAX_DELAY+1);
+	int fired_size = gFiredTableSizes[delayIdx];
 	for (int node = 0; node < node_num; node++) {
 		for (int idx = tid; idx < fired_size; idx += blockDim.x * gridDim.x) {
-			int nid = gFiredTable[gFiredTableCap*gCurrentIdx + idx];
+			int nid = gFiredTable[gFiredTableCap*delayIdx + idx];
 			int tmp = idx2index[nid];
 			if (tmp >= 0) {
 				int map_nid = crossnode_index2idx[tmp*node_num + node];
@@ -188,11 +189,11 @@ __global__ void init_connection(N2SConnection *pConnection)
 __global__ void init_buffers(/*int *c_gTimeTable,*/ real *c_gNeuronInput, real *c_gNeuronInput_I, int *c_gFiredTable, int *c_gFiredTableSizes, int *c_gActiveTable, int *c_gSynapsesActiveTable, int *c_gSynapsesLogTable) 
 {
 	if ((threadIdx.x == 0) && (blockIdx.x == 0)) {
-		gCurrentIdx = 0;
-		gCurrentCycle = 0;
-		gFiredTableSize = 0;
+		// gCurrentIdx = 0;
+		// gCurrentCycle = 0;
+		// gFiredTableSize = 0;
 		gActiveTableSize = 0;
-		gSynapsesActiveTableSize = 0;
+		// gSynapsesActiveTableSize = 0;
 
 		//gTimeTable = c_gTimeTable;
 		gNeuronInput = c_gNeuronInput;

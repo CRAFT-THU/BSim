@@ -22,9 +22,9 @@
 using std::cout;
 using std::endl;
 
-pthread_barrier_t cycle_barrier;
+pthread_barrier_t gpuCycleBarrier;
 
-CrossNodeDataGPU * global_cross_data_gpu;
+CrossNodeDataGPU * gCrossDataGPU;
 
 MultiGPUSimulator::MultiGPUSimulator(Network *network, real dt) : SimulatorBase(network, dt)
 {
@@ -34,7 +34,7 @@ MultiGPUSimulator::~MultiGPUSimulator()
 {
 }
 
-void *run_thread(void *para);
+void *run_thread_gpu(void *para);
 
 int MultiGPUSimulator::run(real time, FireInfo &log)
 {
@@ -58,13 +58,13 @@ int MultiGPUSimulator::run(real time, FireInfo &log)
 	}
 	checkCudaErrors(cudaSetDevice(0));
 
-	pthread_barrier_init(&cycle_barrier, NULL, device_count);
+	pthread_barrier_init(&gpuCycleBarrier, NULL, device_count);
 
 	MultiNetwork multiNet(network, device_count);
 	DistriNetwork *node_nets = multiNet.buildNetworks();
 	assert(node_nets != NULL);
-	global_cross_data_gpu = multiNet.arrangeCrossNodeDataGPU(device_count);
-	assert(global_cross_data_gpu != NULL);
+	gCrossDataGPU = multiNet.arrangeCrossNodeDataGPU(device_count);
+	assert(gCrossDataGPU != NULL);
 
 	pthread_t *thread_ids = (pthread_t *)malloc(sizeof(pthread_t) * device_count);
 	assert(thread_ids != NULL);
@@ -77,7 +77,7 @@ int MultiGPUSimulator::run(real time, FireInfo &log)
 		node_nets[i]._dt = dt;
 
 
-		int ret = pthread_create(&(thread_ids[i]), NULL, &run_thread, (void*)&(node_nets[i]));
+		int ret = pthread_create(&(thread_ids[i]), NULL, &run_thread_gpu, (void*)&(node_nets[i]));
 		assert(ret == 0);
 	}
 
@@ -85,12 +85,12 @@ int MultiGPUSimulator::run(real time, FireInfo &log)
 		pthread_join(thread_ids[i], NULL);
 	}
 
-	pthread_barrier_destroy(&cycle_barrier);
+	pthread_barrier_destroy(&gpuCycleBarrier);
 
 	return 0;
 }
 
-void * run_thread(void *para) {
+void * run_thread_gpu(void *para) {
 	DistriNetwork *network = (DistriNetwork*)para;
 
 	char log_filename[512];
@@ -162,13 +162,15 @@ void * run_thread(void *para) {
 	//double barrier1_time = 0, gpu_cpy_time = 0, peer_cpy_time = 0, barrier2_time=0, copy_time = 0;
 	gettimeofday(&ts, NULL);
 	for (int time=0; time<network->_sim_cycle; time++) {
+		update_time<<<1, 1>>>(time);
+
 		for (int i=0; i<nTypeNum; i++) {
 			assert(c_pGpuNet->neuronNums[i+1]-c_pGpuNet->neuronNums[i] > 0);
 			cudaUpdateType[pCpuNet->nTypes[i]](c_pGpuNet->pNeurons[i], c_pGpuNet->neuronNums[i+1]-c_pGpuNet->neuronNums[i], c_pGpuNet->neuronNums[i], time, &updateSize[c_pGpuNet->nTypes[i]]);
 		}
 
 		//gettimeofday(&t0, NULL);
-		pthread_barrier_wait(&cycle_barrier);
+		pthread_barrier_wait(&gpuCycleBarrier);
 		//gettimeofday(&t1, NULL);
 		//barrier1_time += (t1.tv_sec - t0.tv_sec) + (t1.tv_usec - t0.tv_usec)/1000000.0;
 		cudaMemset(c_g_fired_n_num, 0, sizeof(int)*network->_node_num);
@@ -182,15 +184,15 @@ void * run_thread(void *para) {
 		//		copyFromGPU<int>(global_cross_data[offset]._fired_n_idxs, c_g_global_cross_data + allNeuronNum * i, global_cross_data[offset]._fired_n_num);
 		//	}
 		//}
-		cudaDeliverNeurons(c_g_idx2index, c_g_cross_index2idx, c_g_global_cross_data, c_g_fired_n_num, network->_node_num, allNeuronNum);
-		checkCudaErrors(cudaMemcpy(global_cross_data_gpu->_fired_num + network->_node_idx * network->_node_num, c_g_fired_n_num, sizeof(int)*network->_node_num, cudaMemcpyDeviceToHost));
+		cudaDeliverNeurons(c_g_idx2index, c_g_cross_index2idx, c_g_global_cross_data, c_g_fired_n_num, network->_node_num, allNeuronNum, time);
+		checkCudaErrors(cudaMemcpy(gCrossDataGPU->_fired_num + network->_node_idx * network->_node_num, c_g_fired_n_num, sizeof(int)*network->_node_num, cudaMemcpyDeviceToHost));
 		//gettimeofday(&t3, NULL);
 
 		for (int i=0; i< network->_node_num; i++) {
 			int idx2i = network->_node_idx * network->_node_num + i;
-			assert(global_cross_data_gpu->_fired_num[idx2i] <= global_cross_data_gpu->_max_num[idx2i]);
-			if (global_cross_data_gpu->_fired_num[idx2i] > 0) {
-				checkCudaErrors(cudaMemcpyPeer(global_cross_data_gpu->_fired_arrays[idx2i], i, c_g_global_cross_data + allNeuronNum * i, network->_node_idx, global_cross_data_gpu->_fired_num[idx2i] * sizeof(int)));
+			assert(gCrossDataGPU->_fired_num[idx2i] <= gCrossDataGPU->_max_num[idx2i]);
+			if (gCrossDataGPU->_fired_num[idx2i] > 0) {
+				checkCudaErrors(cudaMemcpyPeer(gCrossDataGPU->_fired_arrays[idx2i], i, c_g_global_cross_data + allNeuronNum * i, network->_node_idx, gCrossDataGPU->_fired_num[idx2i] * sizeof(int)));
 			}
 		}
 		//gettimeofday(&t7, NULL);
@@ -219,7 +221,7 @@ void * run_thread(void *para) {
 		//cudaDeviceSynchronize();
 
 		//gettimeofday(&t4, NULL);
-		pthread_barrier_wait(&cycle_barrier);
+		pthread_barrier_wait(&gpuCycleBarrier);
 		//gettimeofday(&t5, NULL);
 		//barrier2_time += (t5.tv_sec - t4.tv_sec) + (t5.tv_usec - t4.tv_usec)/1000000.0;
 
@@ -235,8 +237,8 @@ void * run_thread(void *para) {
 		//}
 		for (int i=0; i< network->_node_num; i++) {
 			int i2idx = network->_node_idx + network->_node_num * i;
-			if (global_cross_data_gpu->_fired_num[i2idx] > 0) {
-				addCrossNeurons(global_cross_data_gpu->_fired_arrays[i2idx], global_cross_data_gpu->_fired_num[i2idx]);
+			if (gCrossDataGPU->_fired_num[i2idx] > 0) {
+				addCrossNeurons(gCrossDataGPU->_fired_arrays[i2idx], gCrossDataGPU->_fired_num[i2idx], time);
 			}
 		}
 		
@@ -255,9 +257,9 @@ void * run_thread(void *para) {
 		fprintf(v_file, "\n");
 #endif
 
-		//pthread_barrier_wait(&cycle_barrier);
+		//pthread_barrier_wait(&gpuCycleBarrier);
 	}
-	pthread_barrier_wait(&cycle_barrier);
+	pthread_barrier_wait(&gpuCycleBarrier);
 	gettimeofday(&te, NULL);
 	long seconds = te.tv_sec - ts.tv_sec;
 	long hours = seconds/3600;

@@ -2,11 +2,12 @@
 #include "../../gpu_utils/runtime.h"
 
 // #include "GConstantNeurons.h"
-#include "constant.h"
+#include "constants.h"
 
 
-__global__ void update_constant_neuron(GConstantNeurons *d_neurons, int num, int start_id)
+__global__ void update_constant_neuron(GConstantNeurons *d_neurons, int num, int start_id, int time)
 {
+	int currentIdx = time % (MAX_DELAY+1);
 	__shared__ int fire_table_t[MAXBLOCKSIZE];
 	__shared__ volatile unsigned int fire_cnt;
 
@@ -20,7 +21,7 @@ __global__ void update_constant_neuron(GConstantNeurons *d_neurons, int num, int
 		bool fired = false;
 		int test_loc = 0;
 
-		fired = (gCurrentCycle < d_neurons->p_end_cycle[idx]) && (((gCurrentCycle - d_neurons->p_start_cycle[idx]) * d_neurons->p_fire_rate[idx]) > (d_neurons->p_fire_count[idx]));
+		fired = (time < d_neurons->p_end_cycle[idx]) && (((time - d_neurons->p_start_cycle[idx]) * d_neurons->p_fire_rate[idx]) > (d_neurons->p_fire_count[idx]));
 		gFireCount[start_id + idx] += fired;
 
 		for (int i=0; i<2; i++) {
@@ -34,7 +35,7 @@ __global__ void update_constant_neuron(GConstantNeurons *d_neurons, int num, int
 			}
 			__syncthreads();
 			if (fire_cnt >= MAXBLOCKSIZE) {
-				commit2globalTable(fire_table_t, MAXBLOCKSIZE, gFiredTable, &(gFiredTableSizes[gCurrentIdx]), gFiredTableCap*gCurrentIdx);
+				commit2globalTable(fire_table_t, MAXBLOCKSIZE, gFiredTable, &(gFiredTableSizes[currentIdx]), gFiredTableCap*currentIdx);
 				if (threadIdx.x == 0) {
 					fire_cnt = 0;
 				}
@@ -45,7 +46,7 @@ __global__ void update_constant_neuron(GConstantNeurons *d_neurons, int num, int
 	__syncthreads();
 
 	if (fire_cnt > 0) {
-		commit2globalTable(fire_table_t, fire_cnt, gFiredTable, &(gFiredTableSizes[gCurrentIdx]), gFiredTableCap*gCurrentIdx);
+		commit2globalTable(fire_table_t, fire_cnt, gFiredTable, &(gFiredTableSizes[currentIdx]), gFiredTableCap*currentIdx);
 		if (threadIdx.x == 0) {
 			fire_cnt = 0;
 		}

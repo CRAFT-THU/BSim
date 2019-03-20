@@ -15,8 +15,9 @@ __device__ void reset_poisson_neuron(GPoissonNeurons *d_neurons, int *shared_buf
 	}
 }
 
-__global__ void update_poisson_neuron(GPoissonNeurons *d_neurons, int num, int start_id)
+__global__ void update_poisson_neuron(GPoissonNeurons *d_neurons, int num, int start_id, int time)
 {
+	int currentIdx = time % (MAX_DELAY+1);
 	__shared__ int fire_table_t[MAXBLOCKSIZE];
 	__shared__ volatile unsigned int fire_cnt;
 
@@ -30,7 +31,7 @@ __global__ void update_poisson_neuron(GPoissonNeurons *d_neurons, int num, int s
 		bool fired = false;
 		int test_loc = 0;
 
-		fired = (gCurrentCycle == d_neurons->p_fire_cycle[idx]) && (gCurrentCycle <= d_neurons->p_end_cycle[idx]);
+		fired = (time == d_neurons->p_fire_cycle[idx]) && (time <= d_neurons->p_end_cycle[idx]);
 		gFireCount[start_id + idx] += fired;
 
 		for (int i=0; i<2; i++) {
@@ -43,7 +44,7 @@ __global__ void update_poisson_neuron(GPoissonNeurons *d_neurons, int num, int s
 			}
 			__syncthreads();
 			if (fire_cnt >= MAXBLOCKSIZE) {
-				commit2globalTable(fire_table_t, MAXBLOCKSIZE, gFiredTable, &(gFiredTableSizes[gCurrentIdx]), gFiredTableCap*gCurrentIdx);
+				commit2globalTable(fire_table_t, MAXBLOCKSIZE, gFiredTable, &(gFiredTableSizes[currentIdx]), gFiredTableCap*currentIdx);
 				reset_poisson_neuron(d_neurons, fire_table_t, MAXBLOCKSIZE, start_id);
 				if (threadIdx.x == 0) {
 					fire_cnt = 0;
@@ -55,7 +56,7 @@ __global__ void update_poisson_neuron(GPoissonNeurons *d_neurons, int num, int s
 	__syncthreads();
 
 	if (fire_cnt > 0) {
-		commit2globalTable(fire_table_t, fire_cnt, gFiredTable, &(gFiredTableSizes[gCurrentIdx]), gFiredTableCap*gCurrentIdx);
+		commit2globalTable(fire_table_t, fire_cnt, gFiredTable, &(gFiredTableSizes[currentIdx]), gFiredTableCap*currentIdx);
 		reset_poisson_neuron(d_neurons, fire_table_t, fire_cnt, start_id);
 		if (threadIdx.x == 0) {
 			fire_cnt = 0;
@@ -63,9 +64,9 @@ __global__ void update_poisson_neuron(GPoissonNeurons *d_neurons, int num, int s
 	}
 }
 
-int cudaUpdatePoisson(void *data, int num, int start_id, int t, BlockSize *pSize)
+int cudaUpdatePoisson(void *data, int num, int start_id, int time, BlockSize *pSize)
 {
-	update_poisson_neuron<<<pSize->gridSize, pSize->blockSize>>>((GPoissonNeurons*)data, num, start_id, t);
+	update_poisson_neuron<<<pSize->gridSize, pSize->blockSize>>>((GPoissonNeurons*)data, num, start_id, time);
 
 	return 0;
 }

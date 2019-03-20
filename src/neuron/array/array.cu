@@ -5,8 +5,9 @@
 #include "array.h"
 
 
-__global__ void update_array_neuron(GArrayNeurons *d_neurons, int num, int start_id)
+__global__ void update_array_neuron(GArrayNeurons *d_neurons, int num, int start_id, int time)
 {
+	int currentIdx = time % (MAX_DELAY+1);
 	__shared__ int fire_table_t[MAXBLOCKSIZE];
 	__shared__ volatile unsigned int fire_cnt;
 
@@ -20,7 +21,7 @@ __global__ void update_array_neuron(GArrayNeurons *d_neurons, int num, int start
 		bool fired = false;
 		int test_loc = 0;
 
-		fired = (d_neurons->p_start[idx] < d_neurons->p_end[idx]) &&  (gCurrentCycle >= d_neurons->p_fire_time[d_neurons->p_start[idx]]);
+		fired = (d_neurons->p_start[idx] < d_neurons->p_end[idx]) &&  (time >= d_neurons->p_fire_time[d_neurons->p_start[idx]]);
 		gFireCount[start_id + idx] += fired;
 
 		for (int i=0; i<2; i++) {
@@ -34,7 +35,7 @@ __global__ void update_array_neuron(GArrayNeurons *d_neurons, int num, int start
 			}
 			__syncthreads();
 			if (fire_cnt >= MAXBLOCKSIZE) {
-				commit2globalTable(fire_table_t, MAXBLOCKSIZE, gFiredTable, &(gFiredTableSizes[gCurrentIdx]), gFiredTableCap*gCurrentIdx);
+				commit2globalTable(fire_table_t, MAXBLOCKSIZE, gFiredTable, &(gFiredTableSizes[currentIdx]), gFiredTableCap*currentIdx);
 				//advance_array_neuron(d_neurons, fire_table_t, MAXBLOCKSIZE, start_id);
 				if (threadIdx.x == 0) {
 					fire_cnt = 0;
@@ -46,7 +47,7 @@ __global__ void update_array_neuron(GArrayNeurons *d_neurons, int num, int start
 	__syncthreads();
 
 	if (fire_cnt > 0) {
-		commit2globalTable(fire_table_t, fire_cnt, gFiredTable, &(gFiredTableSizes[gCurrentIdx]), gFiredTableCap*gCurrentIdx);
+		commit2globalTable(fire_table_t, fire_cnt, gFiredTable, &(gFiredTableSizes[currentIdx]), gFiredTableCap*currentIdx);
 		//advance_array_neuron(d_neurons, fire_table_t, fire_cnt, start_id);
 		if (threadIdx.x == 0) {
 			fire_cnt = 0;
@@ -54,9 +55,9 @@ __global__ void update_array_neuron(GArrayNeurons *d_neurons, int num, int start
 	}
 }
 
-int cudaUpdateArray(void *data, int num, int start_id, int t, BlockSize *pSize)
+int cudaUpdateArray(void *data, int num, int start_id, int time, BlockSize *pSize)
 {
-	update_array_neuron<<<pSize->gridSize, pSize->blockSize>>>((GArrayNeurons*)data, num, start_id, t);
+	update_array_neuron<<<pSize->gridSize, pSize->blockSize>>>((GArrayNeurons*)data, num, start_id, time);
 
 	return 0;
 }

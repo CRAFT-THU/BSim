@@ -6,27 +6,28 @@
 #include "../utils/utils.h"
 #include "../neuron/lif/lif.h"
 #include "../neuron/array/array.h"
-#include "../neuron/constant/constant.h"
+#include "../neuron/constant/constants.h"
 #include "../neuron/decide/decide.h"
 #include "../neuron/fft/fft.h"
 #include "../neuron/max/max.h"
 #include "../neuron/mem/mem.h"
 #include "../neuron/poisson/poisson.h"
 #include "../neuron/tj/tj.h"
+#include "../synapse/static/static.h"
 #include "runtime.h"
 #include "gpu_func.h"
 
 
-int addCrossNeurons(int *ids, int num)
+int addCrossNeurons(int *ids, int num, int time)
 {
-	add_cross_neuron<<<(num+MAXBLOCKSIZE-1)/MAXBLOCKSIZE, MAXBLOCKSIZE>>>(ids, num);
+	add_cross_neuron<<<(num+MAXBLOCKSIZE-1)/MAXBLOCKSIZE, MAXBLOCKSIZE>>>(ids, num, time);
 	return 0;
 }
 
 
-int cudaDeliverNeurons(int *idx2index, int *crossnode_index2idx, int *global_cross_data, int *fired_n_num, int node_num, int neuron_num)
+int cudaDeliverNeurons(int *idx2index, int *crossnode_index2idx, int *global_cross_data, int *fired_n_num, int node_num, int neuron_num, int time)
 {
-	deliver_neurons<<<(neuron_num + MAXBLOCKSIZE-1)/MAXBLOCKSIZE, MAXBLOCKSIZE>>>(idx2index, crossnode_index2idx, global_cross_data, fired_n_num, node_num);
+	deliver_neurons<<<(neuron_num + MAXBLOCKSIZE-1)/MAXBLOCKSIZE, MAXBLOCKSIZE>>>(idx2index, crossnode_index2idx, global_cross_data, fired_n_num, node_num, time);
 
 	return 0;
 }
