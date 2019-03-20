@@ -21,8 +21,8 @@ __global__ void init_buffers(/*int *c_gTimeTable,*/ real *c_gNeuronInput, int *c
 
 __device__ int commit2globalTable(int *shared_buf, volatile unsigned int size, int *global_buf, int * global_size, int offset);
 
-__global__ void update_time();
-__global__ void init_time(int gCurrentCycle);
+// __global__ void update_time();
+// __global__ void init_time(int gCurrentCycle);
 
 __global__ void curand_setup_kernel(curandState *state, int num);
 

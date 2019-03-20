@@ -1,7 +1,7 @@
 
 #include "../third_party/cuda/helper_cuda.h"
 #include "mem_op.h"
-#include "gpu_macros.h"
+// #include "gpu_macros.h"
 #include "runtime.h"
 
 #include "GBuffers.h"

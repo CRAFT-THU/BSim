@@ -164,7 +164,7 @@ void * run_thread(void *para) {
 	for (int time=0; time<network->_sim_cycle; time++) {
 		for (int i=0; i<nTypeNum; i++) {
 			assert(c_pGpuNet->neuronNums[i+1]-c_pGpuNet->neuronNums[i] > 0);
-			cudaUpdateType[pCpuNet->nTypes[i]](c_pGpuNet->pNeurons[i], c_pGpuNet->neuronNums[i+1]-c_pGpuNet->neuronNums[i], c_pGpuNet->neuronNums[i], &updateSize[c_pGpuNet->nTypes[i]]);
+			cudaUpdateType[pCpuNet->nTypes[i]](c_pGpuNet->pNeurons[i], c_pGpuNet->neuronNums[i+1]-c_pGpuNet->neuronNums[i], c_pGpuNet->neuronNums[i], time, &updateSize[c_pGpuNet->nTypes[i]]);
 		}
 
 		//gettimeofday(&t0, NULL);
@@ -214,7 +214,7 @@ void * run_thread(void *para) {
 
 		for (int i=0; i<sTypeNum; i++) {
 			assert(c_pGpuNet->synapseNums[i+1]-c_pGpuNet->synapseNums[i] > 0);
-			cudaUpdateType[pCpuNet->sTypes[i]](c_pGpuNet->pSynapses[i], c_pGpuNet->synapseNums[i+1]-c_pGpuNet->synapseNums[i], c_pGpuNet->synapseNums[i], &updateSize[pCpuNet->sTypes[i]]);
+			cudaUpdateType[pCpuNet->sTypes[i]](c_pGpuNet->pSynapses[i], c_pGpuNet->synapseNums[i+1]-c_pGpuNet->synapseNums[i], c_pGpuNet->synapseNums[i], time, &updateSize[pCpuNet->sTypes[i]]);
 		}
 		//cudaDeviceSynchronize();
 
@@ -256,7 +256,6 @@ void * run_thread(void *para) {
 #endif
 
 		//pthread_barrier_wait(&cycle_barrier);
-		update_time<<<1, 1>>>();
 	}
 	pthread_barrier_wait(&cycle_barrier);
 	gettimeofday(&te, NULL);

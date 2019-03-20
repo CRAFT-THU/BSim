@@ -1,7 +1,9 @@
 
 #include "../../gpu_utils/runtime_info.h"
 
-#include "GStatic.h"
+// #include "GStaticSynapses.h"
+#include "static.h"
+
 
 __global__ void update_dense_static_hit(GStaticSynapses *d_synapses, int num, int start_id)
 {
@@ -118,3 +120,13 @@ __global__ void update_dense_static_hit(GStaticSynapses *d_synapses, int num, in
 	}
 #endif
 }
+
+int cudaUpdateStatic(void *data, int num, int start_id, int t, BlockSize *pSize)
+{
+	//update_static_hit<<<pSize->gridSize, pSize->blockSize>>>((GStaticSynapses*)data, num, start_id);
+	//reset_active_synapse<<<1, 1>>>();
+	update_dense_static_hit<<<pSize->gridSize, pSize->blockSize>>>((GStaticSynapses*)data, num, start_id, t);
+
+	return 0;
+}
+

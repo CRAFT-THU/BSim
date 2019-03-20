@@ -1,7 +1,8 @@
 
 #include "../../gpu_utils/runtime.h"
 
-#include "GMax.h"
+#include "max.h"
+
 
 __global__ void update_max_neuron(GMaxNeurons *d_neurons, int num, int start_id)
 {
@@ -66,3 +67,11 @@ __global__ void update_max_neuron(GMaxNeurons *d_neurons, int num, int start_id)
 	}
 
 }
+
+int cudaUpdateMax(void *data, int num, int start_id, int t, BlockSize *pSize)
+{
+	update_max_neuron<<<pSize->gridSize, pSize->blockSize>>>((GMaxNeurons*)data, num, start_id, t);
+
+	return 0;
+}
+

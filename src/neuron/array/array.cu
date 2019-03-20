@@ -1,7 +1,8 @@
 
 #include "../../gpu_utils/runtime.h"
 
-#include "GArray.h"
+// #include "GArrayNeurons.h"
+#include "array.h"
 
 
 __global__ void update_array_neuron(GArrayNeurons *d_neurons, int num, int start_id)
@@ -51,5 +52,12 @@ __global__ void update_array_neuron(GArrayNeurons *d_neurons, int num, int start
 			fire_cnt = 0;
 		}
 	}
+}
+
+int cudaUpdateArray(void *data, int num, int start_id, int t, BlockSize *pSize)
+{
+	update_array_neuron<<<pSize->gridSize, pSize->blockSize>>>((GArrayNeurons*)data, num, start_id, t);
+
+	return 0;
 }
 

@@ -3,7 +3,8 @@
 
 #include "../../gpu_utils/runtime.h"
 
-#include "GLIF.h"
+// #include "GLIFENeurons.h"
+#include "lif.h"
 
 
 __global__ void find_life_neuron(GLIFENeurons *d_neurons, int num, int start_id)
@@ -314,3 +315,11 @@ __global__ void update_dense_life_neuron(GLIFENeurons *d_neurons, int num, int s
 	__syncthreads();
 }
 
+int cudaUpdateLIFE(void *data, int num, int start_id, int t, BlockSize *pSize)
+{
+	find_life_neuron<<<pSize->gridSize, pSize->blockSize>>>((GLIFENeurons*)data, num, start_id);
+	update_life_neuron<<<pSize->gridSize, pSize->blockSize>>>((GLIFENeurons*)data, num, start_id, t);
+	//update_dense_life_neuron<<<pSize->gridSize, pSize->blockSize>>>((GLIFENeurons*)data, num, start_id);
+
+	return 0;
+}

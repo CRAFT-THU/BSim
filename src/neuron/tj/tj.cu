@@ -1,7 +1,8 @@
 
 #include "../../gpu_utils/runtime.h"
 
-#include "GTJ.h"
+#include "tj.h"
+
 
 __device__ void reset_tj_neuron(GTJNeurons *d_neurons, int *shared_buf, volatile int size, int start_id) 
 {
@@ -73,5 +74,12 @@ __global__ void update_tj_neuron(GTJNeurons *d_neurons, int num, int start_id)
 		gNeuronInput_I[start_id + idx] = 0;
 	}
 	__syncthreads();
+}
+
+int cudaUpdateTJ(void *data, int num, int start_id, int t, BlockSize *pSize)
+{
+	update_tj_neuron<<<pSize->gridSize, pSize->blockSize>>>((GTJNeurons*)data, num, start_id, t);
+
+	return 0;
 }
 

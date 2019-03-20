@@ -16,7 +16,7 @@
 	void mpiSend##name(void *data, int rank, int offset, int size); \
 	void mpiRecv##name(void **data, int rank, int size); \
 	int cudaAlloc##name(void *pCpu, void *pGpu, int num); \
-	int cudaUpdate##name(void *data, int num, int start_id, BlockSize *pSize); \
+	int cudaUpdate##name(void *data, int num, int start_id, int t, BlockSize *pSize); \
 	int cudaFree##name(void *pGpu); 
 
 #define SYNAPSE_GPU_FUNC_DEFINE(name) \
@@ -28,7 +28,7 @@
 	void mpiSend##name(void *data, int rank, int offset, int size); \
 	void mpiRecv##name(void **data, int rank, int size); \
 	int cudaAlloc##name(void *pCpu, void *pGpu, int num); \
-	int cudaUpdate##name(void *data, int num, int start_id, BlockSize *pSize); \
+	int cudaUpdate##name(void *data, int num, int start_id, int t, BlockSize *pSize); \
 	int cudaFree##name(void *pGpu);
 
 #define NEURON_GPU_FUNC_BASIC(name) \

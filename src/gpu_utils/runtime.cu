@@ -3,7 +3,7 @@
 
 #include "../third_party/cuda/helper_cuda.h"
 #include "mem_op.h"
-#include "gpu_macros.h"
+// #include "gpu_macros.h"
 #include "runtime.h"
 
 #define MAXBLOCKSIZE 1024
@@ -32,8 +32,8 @@ __constant__ int gSynapsesTableCap;
 __constant__ real DT;
 
 // Variable
-__device__ int gCurrentIdx;
-__device__ int gCurrentCycle;
+// __device__ int gCurrentIdx;
+// __device__ int gCurrentCycle;
 __device__ int gFiredTableSize;
 __device__ int gActiveTableSize;
 __device__ int gSynapsesActiveTableSize;
@@ -78,31 +78,31 @@ __device__ int commit2globalTable(int *shared_buf, volatile unsigned int size, i
 	return 0;
 }
 
-__global__ void update_time()
-{
-	if ((threadIdx.x == 0) && (blockIdx.x == 0)) {
-		//gTimeTable[gCurrentIdx] = simTime;
-		gCurrentCycle = gCurrentCycle + 1;
-		gCurrentIdx = (gCurrentIdx +1)%(MAX_DELAY + 1);
-		gActiveTableSize = 0;
-		gFiredTableSizes[gCurrentIdx] = 0;
-		gSynapsesActiveTableSize = 0;
-	}
-	__syncthreads();
-}
-
-__global__ void init_time(int gCurrentCycle)
-{
-	if ((threadIdx.x == 0) && (blockIdx.x == 0)) {
-		//gTimeTable[gCurrentIdx] = simTime;
-		gCurrentCycle = gCurrentCycle;
-		gCurrentIdx = (gCurrentCycle)%(MAX_DELAY + 1);
-		gActiveTableSize = 0;
-		gFiredTableSizes[gCurrentIdx] = 0;
-		gSynapsesActiveTableSize = 0;
-	}
-	__syncthreads();
-}
+// __global__ void update_time()
+// {
+// 	if ((threadIdx.x == 0) && (blockIdx.x == 0)) {
+// 		//gTimeTable[gCurrentIdx] = simTime;
+// 		gCurrentCycle = gCurrentCycle + 1;
+// 		gCurrentIdx = (gCurrentIdx +1)%(MAX_DELAY + 1);
+// 		gActiveTableSize = 0;
+// 		gFiredTableSizes[gCurrentIdx] = 0;
+// 		gSynapsesActiveTableSize = 0;
+// 	}
+// 	__syncthreads();
+// }
+// 
+// __global__ void init_time(int gCurrentCycle)
+// {
+// 	if ((threadIdx.x == 0) && (blockIdx.x == 0)) {
+// 		//gTimeTable[gCurrentIdx] = simTime;
+// 		gCurrentCycle = gCurrentCycle;
+// 		gCurrentIdx = (gCurrentCycle)%(MAX_DELAY + 1);
+// 		gActiveTableSize = 0;
+// 		gFiredTableSizes[gCurrentIdx] = 0;
+// 		gSynapsesActiveTableSize = 0;
+// 	}
+// 	__syncthreads();
+// }
 
 __global__ void reset_active_synapse()
 {

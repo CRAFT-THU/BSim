@@ -163,13 +163,13 @@ int SingleGPUSimulator::run(real time, FireInfo &log)
 #endif
 
 		for (int i=0; i<nTypeNum; i++) {
-			cudaUpdateType[pCpuNet->nTypes[i]](c_pGpuNet->pNeurons[i], c_pGpuNet->neuronNums[i+1]-c_pGpuNet->neuronNums[i], c_pGpuNet->neuronNums[i], &updateSize[c_pGpuNet->nTypes[i]]);
+			cudaUpdateType[pCpuNet->nTypes[i]](c_pGpuNet->pNeurons[i], c_pGpuNet->neuronNums[i+1]-c_pGpuNet->neuronNums[i], c_pGpuNet->neuronNums[i],time, &updateSize[c_pGpuNet->nTypes[i]]);
 		}
 
 		//update_pre_synapse<<<preSize.gridSize, preSize.blockSize>>>(c_pGpuNet->pN2SConnection);
 
 		for (int i=0; i<sTypeNum; i++) {
-			cudaUpdateType[pCpuNet->sTypes[i]](c_pGpuNet->pSynapses[i], c_pGpuNet->synapseNums[i+1]-c_pGpuNet->synapseNums[i], c_pGpuNet->synapseNums[i], &updateSize[pCpuNet->sTypes[i]]);
+			cudaUpdateType[pCpuNet->sTypes[i]](c_pGpuNet->pSynapses[i], c_pGpuNet->synapseNums[i+1]-c_pGpuNet->synapseNums[i], c_pGpuNet->synapseNums[i], time, &updateSize[pCpuNet->sTypes[i]]);
 		}
 
 
@@ -240,8 +240,6 @@ int SingleGPUSimulator::run(real time, FireInfo &log)
 		//	fprintf(logFile, "\n");
 		//}
 #endif
-
-		update_time<<<1, 1>>>();
 	}
 	cudaDeviceSynchronize();
 

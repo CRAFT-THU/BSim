@@ -1,7 +1,9 @@
 
 #include "../../gpu_utils/runtime.h"
 
-#include "GConstantNeurons.h"
+// #include "GConstantNeurons.h"
+#include "constant.h"
+
 
 __global__ void update_constant_neuron(GConstantNeurons *d_neurons, int num, int start_id)
 {
@@ -49,3 +51,11 @@ __global__ void update_constant_neuron(GConstantNeurons *d_neurons, int num, int
 		}
 	}
 }
+
+int cudaUpdateConstant(void *data, int num, int start_id, int t, BlockSize *pSize)
+{
+	update_constant_neuron<<<pSize->gridSize, pSize->blockSize>>>((GConstantNeurons*)data, num, start_id, t);
+
+	return 0;
+}
+

@@ -1,7 +1,7 @@
 
 #include "../../gpu_utils/runtime.h"
 
-#include "GPoisson.h"
+#include "poisson.h"
 
 __device__ void reset_poisson_neuron(GPoissonNeurons *d_neurons, int *shared_buf, volatile int size, int start_id) 
 {
@@ -62,3 +62,11 @@ __global__ void update_poisson_neuron(GPoissonNeurons *d_neurons, int num, int s
 		}
 	}
 }
+
+int cudaUpdatePoisson(void *data, int num, int start_id, int t, BlockSize *pSize)
+{
+	update_poisson_neuron<<<pSize->gridSize, pSize->blockSize>>>((GPoissonNeurons*)data, num, start_id, t);
+
+	return 0;
+}
+
