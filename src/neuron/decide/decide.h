@@ -1,7 +1,10 @@
 
-#include "../../utils/BlockSize.h"
+#ifndef DECIDE_H
+#define DECIDE_H
 
 #include "GDecideNeurons.h"
 
 
-__global__ void update_decide_neuron(GDecideNeurons *d_neurons, int num, int start_id, int t)
+__global__ void update_decide_neuron(GDecideNeurons *d_neurons, int num, int start_id, int t);
+
+#endif // DECIDE_H
