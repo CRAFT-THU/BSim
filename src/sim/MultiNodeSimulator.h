@@ -1,22 +1,23 @@
 /* This header file is writen by qp09
  * usually just for fun
- * 二 二月 28 2017
+ * Sun December 13 2015
  */
-#ifndef MULTINODESIMULATOR_H
-#define MULTINODESIMULATOR_H
+#ifndef MULTIGPUSIMULATOR_H
+#define MULTIGPUSIMULATOR_H
 
-#include "SimulatorBase.h"
+#include "../base/SimulatorBase.h"
 
-class MultiGPUSimulator : public SimulatorBase {
+class MultiNodeSimulator : public SimulatorBase {
 public:
-	MultiGPUSimulator(Network *network, real dt);
-	~MultiGPUSimulator();
-	virtual int run(real time, FireInfo *log=NULL);
+	MultiNodeSimulator(Network *network, real dt);
+	~MultiNodeSimulator();
+	using SimulatorBase::run;
+	virtual int run(real time, FireInfo &log);
 	int init(int argc, char**argv);
 protected:
 	int rank;
 	int rankSize;
 };
 
-#endif /* MULTINODESIMULATOR_H */
+#endif /* MULTIGPUSIMULATOR_H */
 

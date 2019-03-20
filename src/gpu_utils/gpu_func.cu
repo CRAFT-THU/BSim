@@ -20,55 +20,55 @@
 #include "gpu_func.h"
 
 
-int cudaUpdateConstant(void *data, int num, int start_id, BlockSize *pSize)
+int cudaUpdateConstant(void *data, int num, int start_id, int t, BlockSize *pSize)
 {
-	update_constant_neuron<<<pSize->gridSize, pSize->blockSize>>>((GConstantNeurons*)data, num, start_id);
+	update_constant_neuron<<<pSize->gridSize, pSize->blockSize>>>((GConstantNeurons*)data, num, start_id, t);
 
 	return 0;
 }
 
-int cudaUpdatePoisson(void *data, int num, int start_id, BlockSize *pSize)
+int cudaUpdatePoisson(void *data, int num, int start_id, int t, BlockSize *pSize)
 {
-	update_poisson_neuron<<<pSize->gridSize, pSize->blockSize>>>((GPoissonNeurons*)data, num, start_id);
+	update_poisson_neuron<<<pSize->gridSize, pSize->blockSize>>>((GPoissonNeurons*)data, num, start_id, t);
 
 	return 0;
 }
 
-int cudaUpdateArray(void *data, int num, int start_id, BlockSize *pSize)
+int cudaUpdateArray(void *data, int num, int start_id, int t, BlockSize *pSize)
 {
-	update_array_neuron<<<pSize->gridSize, pSize->blockSize>>>((GArrayNeurons*)data, num, start_id);
+	update_array_neuron<<<pSize->gridSize, pSize->blockSize>>>((GArrayNeurons*)data, num, start_id, t);
 
 	return 0;
 }
 
-int cudaUpdateLIFE(void *data, int num, int start_id, BlockSize *pSize)
+int cudaUpdateLIFE(void *data, int num, int start_id, int t, BlockSize *pSize)
 {
 	find_life_neuron<<<pSize->gridSize, pSize->blockSize>>>((GLIFENeurons*)data, num, start_id);
-	update_life_neuron<<<pSize->gridSize, pSize->blockSize>>>((GLIFENeurons*)data, num, start_id);
+	update_life_neuron<<<pSize->gridSize, pSize->blockSize>>>((GLIFENeurons*)data, num, start_id, t);
 	//update_dense_life_neuron<<<pSize->gridSize, pSize->blockSize>>>((GLIFENeurons*)data, num, start_id);
 
 	return 0;
 }
 
-int cudaUpdateTJ(void *data, int num, int start_id, BlockSize *pSize)
+int cudaUpdateTJ(void *data, int num, int start_id, int t, BlockSize *pSize)
 {
-	update_tj_neuron<<<pSize->gridSize, pSize->blockSize>>>((GTJNeurons*)data, num, start_id);
+	update_tj_neuron<<<pSize->gridSize, pSize->blockSize>>>((GTJNeurons*)data, num, start_id, t);
 
 	return 0;
 }
 
-int cudaUpdateMax(void *data, int num, int start_id, BlockSize *pSize)
+int cudaUpdateMax(void *data, int num, int start_id, int t, BlockSize *pSize)
 {
-	update_max_neuron<<<pSize->gridSize, pSize->blockSize>>>((GMaxNeurons*)data, num, start_id);
+	update_max_neuron<<<pSize->gridSize, pSize->blockSize>>>((GMaxNeurons*)data, num, start_id, t);
 
 	return 0;
 }
 
-int cudaUpdateStatic(void *data, int num, int start_id, BlockSize *pSize)
+int cudaUpdateStatic(void *data, int num, int start_id, int t, BlockSize *pSize)
 {
 	//update_static_hit<<<pSize->gridSize, pSize->blockSize>>>((GStaticSynapses*)data, num, start_id);
 	//reset_active_synapse<<<1, 1>>>();
-	update_dense_static_hit<<<pSize->gridSize, pSize->blockSize>>>((GStaticSynapses*)data, num, start_id);
+	update_dense_static_hit<<<pSize->gridSize, pSize->blockSize>>>((GStaticSynapses*)data, num, start_id, t);
 
 	return 0;
 }

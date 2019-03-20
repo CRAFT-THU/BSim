@@ -3,7 +3,7 @@
 
 #include "GDecideNeurons.h"
 
-__global__ void update_decide_neuron(GDecideNeurons *d_neurons, int num, int start_id)
+__global__ void update_decide_neuron(GDecideNeurons *d_neurons, int num, int start_id, int t)
 {
 	__shared__ int fire_table_t[MAXBLOCKSIZE];
 	__shared__ volatile unsigned int fire_cnt;
@@ -74,7 +74,7 @@ __global__ void update_decide_neuron(GDecideNeurons *d_neurons, int num, int sta
 	}
 }
 
-int cudaUpdateDecide(void *data, int num, int start_id, BlockSize *pSize)
+int cudaUpdateDecide(void *data, int num, int start_id, int t, BlockSize *pSize)
 {
 	update_decide_neuron<<<pSize->gridSize, pSize->blockSize>>>((GDecideNeurons*)data, num, start_id);
 

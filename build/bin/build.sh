@@ -4,6 +4,8 @@ MODE=$(echo $1 | tr [A-Z] [a-z])
 
 PREC=$(echo $2 | tr [A-Z] [a-z])
 
+THREAD_NUM=$3 
+
 USE_DOUBLE="ON"
 USE_LOG="OFF"
 C_MODE="Release"
@@ -23,8 +25,10 @@ if [ "$PREC" = "float" ]; then
 	USE_DOUBLE="OFF"
 fi
 
-THREAD_NUM=`getconf _NPROCESSORS_ONLN`
-((THREAD_NUM=THREAD_NUM/2))
+TOTAL_THREAD_NUM=`getconf _NPROCESSORS_ONLN`
+if [ x"$THREAD_NUM" = x ]; then
+	((THREAD_NUM=THREAD_NUM/2))
+fi
 
 set -x
 if [ "$MODE" = "clean" ]; then
