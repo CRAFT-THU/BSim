@@ -16,7 +16,8 @@ extern int (*addTypeConnection[TYPESIZE])(void *, int *);
 
 extern int (*cudaAllocType[TYPESIZE])(void *, void *, int);
 extern int (*cudaFreeType[TYPESIZE])(void *);
-extern int (*cudaUpdateType[TYPESIZE])(void *, int, int, int, BlockSize*);
+extern void (*cudaFindType[TYPESIZE])(void *, int, int);
+extern void (*cudaUpdateType[TYPESIZE])(void *, real *, real *, int *, int, int, int);
 extern void (*mpiSendType[TYPESIZE])(void *data, int rank, int offset, int size);
 extern void (*mpiRecvType[TYPESIZE])(void **data, int rank, int size);
 

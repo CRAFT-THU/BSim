@@ -19,8 +19,8 @@ typedef int ID;
 
 const real ZERO = 1e-10;
 
-const int MAXBLOCKSIZE = 1024;
-const int WARPSIZE = 32;
+const int MAX_BLOCK_SIZE = 1024;
+const int WARP_SIZE = 32;
 
 const int DECAY_MULTIPLE_TAU = 5;
 
