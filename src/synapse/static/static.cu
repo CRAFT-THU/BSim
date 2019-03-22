@@ -5,7 +5,7 @@
 #include "static.h"
 
 
-__global__ void update_dense_static_hit(GStaticSynapses *d_synapses, int num, int start_id, int time)
+__global__ void update_dense_static_hit(GStaticSynapses *d_synapses, real *currentE, real *currentI, int *fireTable, int num, int start_id, int time)
 {
 #define FAST_TEST 2
 #if  FAST_TEST == 1
@@ -15,13 +15,13 @@ __global__ void update_dense_static_hit(GStaticSynapses *d_synapses, int num, in
 	for (int delta_t = 0; delta_t<MAX_DELAY; delta_t++) {
 		int block_idx = blockIdx.x;
 		int time_idx = (time+MAX_DELAY-delta_t)%(MAX_DELAY+1);
-		int firedSize = gFiredTableSizes[time_idx];
+		int firedSize = fireTableSizes[time_idx];
 		int block_nums_minus_1 = (firedSize - 1 + blockDim.x) / blockDim.x - 1;
 		int grid_nums = (firedSize - 1 + blockDim.x*gridDim.x)/(blockDim.x * gridDim.x);
 		int oid = tid;
 		for (int idx = 0; idx < grid_nums; idx++) {
 			if (oid < firedSize) {
-				fire_neuron_id[threadIdx.x] = gFiredTable[time_idx*gFiredTableCap + oid];
+				fire_neuron_id[threadIdx.x] = fireTable[time_idx*fireTableCap + oid];
 			} else {
 				fire_neuron_id[threadIdx.x] = -1;
 			}
@@ -47,9 +47,9 @@ __global__ void update_dense_static_hit(GStaticSynapses *d_synapses, int num, in
 					int sid = j+start_loc;
 					real weight = d_synapses->p_weight[sid];
 					if (weight >= 0) {
-						atomicAdd(&(gNeuronInput[d_synapses->p_dst[sid]]), weight);
+						atomicAdd(&(currentE[d_synapses->p_dst[sid]]), weight);
 					} else {
-						atomicAdd(&(gNeuronInput_I[d_synapses->p_dst[sid]]), weight);
+						atomicAdd(&(currentI[d_synapses->p_dst[sid]]), weight);
 					}
 				}
 			}
@@ -63,7 +63,7 @@ __global__ void update_dense_static_hit(GStaticSynapses *d_synapses, int num, in
 	for (int delta_t = 0; delta_t<MAX_DELAY; delta_t++) {
 		int block_idx = blockIdx.x;
 		int time_idx = (time + MAX_DELAY-delta_t)%(MAX_DELAY+1);
-		int firedSize = gFiredTableSizes[time_idx];
+		int firedSize = fireTableSizes[time_idx];
 		int num_per_block = (firedSize - 1)/gridDim.x + 1;
 		int block_nums_minus_1 = (firedSize - 1) / num_per_block;
 
@@ -77,7 +77,7 @@ __global__ void update_dense_static_hit(GStaticSynapses *d_synapses, int num, in
 		}
 
 		for (int idx = 0; idx < fired_size_block; idx++) {
-			int nid = gFiredTable[time_idx*gFiredTableCap + (block_idx)*num_per_block + idx];
+			int nid = fireTable[time_idx*fireTableCap + (block_idx)*num_per_block + idx];
 			int start_loc = gConnection->delayStart[delta_t + nid * MAX_DELAY];
 			int synapseNum = gConnection->delayNum[delta_t + nid * MAX_DELAY];
 			if (threadIdx.x == 0) {
@@ -88,9 +88,9 @@ __global__ void update_dense_static_hit(GStaticSynapses *d_synapses, int num, in
 				int sid = j+start_loc;
 				real weight = d_synapses->p_weight[sid];
 				if (weight >= 0) {
-					atomicAdd(&(gNeuronInput[d_synapses->p_dst[sid]]), weight);
+					atomicAdd(&(currentE[d_synapses->p_dst[sid]]), weight);
 				} else {
-					atomicAdd(&(gNeuronInput_I[d_synapses->p_dst[sid]]), weight);
+					atomicAdd(&(currentI[d_synapses->p_dst[sid]]), weight);
 				}
 			}
 		}
@@ -100,9 +100,9 @@ __global__ void update_dense_static_hit(GStaticSynapses *d_synapses, int num, in
 	int tid = blockIdx.x * blockDim.x + threadIdx.x;
 	for (int delta_t = 0; delta_t<MAX_DELAY; delta_t++) {
 		int time_idx = (time+MAX_DELAY-delta_t)%(MAX_DELAY+1);
-		int firedSize = gFiredTableSizes[time_idx];
+		int firedSize = fireTableSizes[time_idx];
 		for (int idx = tid; idx < firedSize; idx += blockDim.x*gridDim.x) {
-			int nid = gFiredTable[time_idx*gFiredTableCap + idx];
+			int nid = fireTable[time_idx*fireTableCap + idx];
 			int start_loc = gConnection->delayStart[delta_t + nid * MAX_DELAY];
 			int synapseNum = gConnection->delayNum[delta_t + nid * MAX_DELAY];
 			gLayerInput[nid]++;
@@ -111,9 +111,9 @@ __global__ void update_dense_static_hit(GStaticSynapses *d_synapses, int num, in
 				int sid = i+start_loc;
 				real weight = d_synapses->p_weight[sid];
 				if (weight >= 0) {
-					atomicAdd(&(gNeuronInput[d_synapses->p_dst[sid]]), weight);
+					atomicAdd(&(currentE[d_synapses->p_dst[sid]]), weight);
 				} else {
-					atomicAdd(&(gNeuronInput_I[d_synapses->p_dst[sid]]), weight);
+					atomicAdd(&(currentI[d_synapses->p_dst[sid]]), weight);
 				}
 			}
 		}
@@ -121,11 +121,11 @@ __global__ void update_dense_static_hit(GStaticSynapses *d_synapses, int num, in
 #endif
 }
 
-int cudaUpdateStatic(void *data, int num, int start_id, int time, BlockSize *pSize)
+int cudaUpdateStatic(void *data, real *currentE, real *currentI, int *fireTable, int num, int start_id, int time, BlockSize *pSize)
 {
 	//update_static_hit<<<pSize->gridSize, pSize->blockSize>>>((GStaticSynapses*)data, num, start_id);
 	//reset_active_synapse<<<1, 1>>>();
-	update_dense_static_hit<<<pSize->gridSize, pSize->blockSize>>>((GStaticSynapses*)data, num, start_id, time);
+	update_dense_static_hit<<<pSize->gridSize, pSize->blockSize>>>((GStaticSynapses*)data, currentE, currentI, num, start_id, time);
 
 	return 0;
 }

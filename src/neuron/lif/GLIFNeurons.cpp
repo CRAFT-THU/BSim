@@ -3,13 +3,13 @@
 #include "mpi.h"
 #include "../../utils/macros.h"
 #include "../../utils/TagPool.h"
-#include "GLIFENeurons.h"
+#include "GLIFNeurons.h"
 
-NEURON_GPU_FUNC_BASIC(LIFE)
+NEURON_GPU_FUNC_BASIC(LIF)
 
 int allocLIFE(void *pCpu, int N)
 {
-	GLIFENeurons *p = (GLIFENeurons*)pCpu;
+	GLIFNeurons *p = (GLIFNeurons*)pCpu;
 	p->p_vm = (real*)malloc(N*sizeof(real));
 	p->p_CI = (real*)malloc(N*sizeof(real));
 	p->p_CE = (real*)malloc(N*sizeof(real));
@@ -31,7 +31,7 @@ int allocLIFE(void *pCpu, int N)
 
 int freeLIFE(void *pCpu)
 {
-	GLIFENeurons *pCpuNeurons = (GLIFENeurons*)pCpu;
+	GLIFNeurons *pCpuNeurons = (GLIFNeurons*)pCpu;
 	free(pCpuNeurons->p_vm);
 	free(pCpuNeurons->p_CI);
 	free(pCpuNeurons->p_CE);

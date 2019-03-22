@@ -4,7 +4,7 @@
 #include "../../base/type.h"
 #include "../../utils/macros.h"
 
-struct GLIFENeurons {
+struct GLIFNeurons {
 	real *p_vm;
 	real *p_CI;
 	real *p_CE;
@@ -23,8 +23,8 @@ struct GLIFENeurons {
 	//int *p_end;
 };
 
-int cudaFetchLIFE(void *pGpu, void *pCpu, int num);
+int cudaFetchLIF(void *pGpu, void *pCpu, int num);
 
-NEURON_GPU_FUNC_DEFINE(LIFE)
+NEURON_GPU_FUNC_DEFINE(LIF)
 
 #endif /* GLIFENEURONS_H */

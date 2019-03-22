@@ -2,12 +2,12 @@
 #include "math.h"
 
 #include "../../third_party/json/json.h"
-#include "LIFENeuron.h"
-#include "GLIFENeurons.h"
+#include "LIFNeuron.h"
+#include "GLIFNeurons.h"
 
-const Type LIFENeuron::type = LIFE;
+const Type LIFNeuron::type = LIF;
 
-LIFENeuron::LIFENeuron(real v_init, real v_rest, real v_reset, real cm, real tau_m, real tau_refrac, real tau_syn_E, real tau_syn_I, real v_thresh, real i_offset)
+LIFNeuron::LIFNeuron(real v_init, real v_rest, real v_reset, real cm, real tau_m, real tau_refrac, real tau_syn_E, real tau_syn_I, real v_thresh, real i_offset)
 	: NeuronBase(), _v_thresh(v_thresh), _v_reset(v_reset), _v_init(v_init), _v_rest(v_rest), _cm(cm), _tau_m(tau_m), _tau_refrac(tau_refrac), _tau_syn_E(tau_syn_E), _tau_syn_I(tau_syn_I), _i_offset(i_offset)
 {
 	this->_i_syn_E = 0.0;
@@ -15,7 +15,7 @@ LIFENeuron::LIFENeuron(real v_init, real v_rest, real v_reset, real cm, real tau
 	this->monitored = false;
 }
 
-LIFENeuron::LIFENeuron(const LIFENeuron &neuron) : NeuronBase()
+LIFNeuron::LIFNeuron(const LIFNeuron &neuron) : NeuronBase()
 {
 	this->_vm = neuron._vm;
 	this->_CI = neuron._CI;
@@ -45,11 +45,11 @@ LIFENeuron::LIFENeuron(const LIFENeuron &neuron) : NeuronBase()
 	this->_i_syn_I = 0.0;
 }
 
-LIFENeuron::~LIFENeuron()
+LIFNeuron::~LIFNeuron()
 {
 }
 
-int LIFENeuron::recv(real I)
+int LIFNeuron::recv(real I)
 {
 	if ( I >= 0 ) {
 		_i_syn_E += I;
@@ -60,12 +60,12 @@ int LIFENeuron::recv(real I)
 	return 0;
 }
 
-Type LIFENeuron::getType()
+Type LIFNeuron::getType()
 {
 	return type;
 }
 
-int LIFENeuron::reset(SimInfo &info)
+int LIFNeuron::reset(SimInfo &info)
 {
 	real dt = info.dt;
 
@@ -111,7 +111,7 @@ int LIFENeuron::reset(SimInfo &info)
 	return 0;
 }
 
-int LIFENeuron::update(SimInfo &info)
+int LIFNeuron::update(SimInfo &info)
 {
 	fired = false;
 
@@ -159,16 +159,16 @@ int LIFENeuron::update(SimInfo &info)
 
 }
 
-void LIFENeuron::monitor(SimInfo &info)
+void LIFNeuron::monitor(SimInfo &info)
 {
 }
 
-size_t LIFENeuron::getSize()
+size_t LIFNeuron::getSize()
 {
-	return sizeof(GLIFENeurons);
+	return sizeof(GLIFNeurons);
 }
 
-int LIFENeuron::getData(void *data)
+int LIFNeuron::getData(void *data)
 {
 	Json::Value *p = (Json::Value *)data;
 	(*p)["id"] = getID();
@@ -189,9 +189,9 @@ int LIFENeuron::getData(void *data)
 	return 0;
 }
 
-int LIFENeuron::hardCopy(void * data, int idx, int base)
+int LIFNeuron::hardCopy(void * data, int idx, int base)
 {
-	GLIFENeurons *p = (GLIFENeurons *) data;
+	GLIFNeurons *p = (GLIFNeurons *) data;
 	setID(idx+base);
 	p->p_vm[idx] = _vm;
 	p->p_CI[idx] = _CI;

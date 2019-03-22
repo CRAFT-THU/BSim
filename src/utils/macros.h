@@ -13,10 +13,10 @@
 	size_t get##name##Size(); \
 	int alloc##name(void *pCpu, int N); \
 	int free##name(void *pCpu); \
-	void mpiSend##name(void *data, int rank, int offset, int size); \
-	void mpiRecv##name(void **data, int rank, int size); \
+	int mpiSend##name(void *data, int rank, int offset, int size); \
+	int mpiRecv##name(void **data, int rank, int size); \
 	int cudaAlloc##name(void *pCpu, void *pGpu, int num); \
-	int cudaUpdate##name(void *data, int num, int start_id, int t, BlockSize *pSize); \
+	void cudaUpdate##name(void *data, real *currentE, real *currentI, int *fireTable, int num, int start_id, int t, BlockSize *pSize); \
 	int cudaFree##name(void *pGpu); 
 
 #define SYNAPSE_GPU_FUNC_DEFINE(name) \
@@ -25,10 +25,10 @@
 	int alloc##name(void *pSynapses, int S); \
 	int free##name(void *pSynapses); \
 	int add##name##Connection(void *pCpu, int *pSynapsesDst); \
-	void mpiSend##name(void *data, int rank, int offset, int size); \
-	void mpiRecv##name(void **data, int rank, int size); \
+	int mpiSend##name(void *data, int rank, int offset, int size); \
+	int mpiRecv##name(void **data, int rank, int size); \
 	int cudaAlloc##name(void *pCpu, void *pGpu, int num); \
-	int cudaUpdate##name(void *data, int num, int start_id, int t, BlockSize *pSize); \
+	void cudaUpdate##name(void *data, real *currentE, real *currentI, int *fireTable, int num, int start_id, int t, BlockSize *pSize); \
 	int cudaFree##name(void *pGpu);
 
 #define NEURON_GPU_FUNC_BASIC(name) \

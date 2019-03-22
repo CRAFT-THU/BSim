@@ -7,7 +7,7 @@
 #include "lif.h"
 
 
-__global__ void findLIF(GLIFENeurons *data, int num, int offset)
+__global__ void find_lif_neuron(GLIFENeurons *data, int num, int offset)
 {
 	__shared__ int active_table_t[MAX_BLOCK_SIZE];
 	__shared__ volatile int active_cnt;
@@ -70,7 +70,7 @@ __global__ void findLIF(GLIFENeurons *data, int num, int offset)
 	}
 }
 
-__global__ void updateLIF(GLIFENeurons *data, int num, int offset, int time)
+__global__ void update_lif_neuron(GLIFENeurons *data, real *currentE, real *currentI, int *fireTable, int num, int offset, int time)
 {
 	int currentIdx = time % (MAX_DELAY+1);
 	__shared__ int fire_table_t[MAX_BLOCK_SIZE];
@@ -124,7 +124,7 @@ __global__ void updateLIF(GLIFENeurons *data, int num, int offset, int time)
 
 		__syncthreads();
 		if (fire_cnt >= MAX_BLOCK_SIZE) {
-			commit2globalTable(fire_table_t, MAX_BLOCK_SIZE, gFiredTable, &gFiredTableSizes[currentIdx], gFiredTableCap*currentIdx);
+			commit2globalTable(fire_table_t, MAX_BLOCK_SIZE, fireTable, &fireTableSizes[currentIdx], fireTableCap*currentIdx);
 			if (threadIdx.x == 0) {
 				fire_cnt = 0;
 			}
@@ -141,7 +141,7 @@ __global__ void updateLIF(GLIFENeurons *data, int num, int offset, int time)
 		}
 		__syncthreads();
 		if (fire_cnt >= MAX_BLOCK_SIZE) {
-			commit2globalTable(fire_table_t, MAX_BLOCK_SIZE, gFiredTable, &gFiredTableSizes[currentIdx], gFiredTableCap*currentIdx);
+			commit2globalTable(fire_table_t, MAX_BLOCK_SIZE, fireTable, &fireTableSizes[currentIdx], fireTableCap*currentIdx);
 			if (threadIdx.x == 0) {
 				fire_cnt = 0;
 			}
@@ -149,7 +149,7 @@ __global__ void updateLIF(GLIFENeurons *data, int num, int offset, int time)
 		__syncthreads();
 
 		if (fire_cnt > 0) {
-			commit2globalTable(fire_table_t, fire_cnt, gFiredTable, &gFiredTableSizes[currentIdx], gFiredTableCap*currentIdx);
+			commit2globalTable(fire_table_t, fire_cnt, fireTable, &fireTableSizes[currentIdx], fireTableCap*currentIdx);
 			if (threadIdx.x == 0) {
 				fire_cnt = 0;
 			}
@@ -217,7 +217,7 @@ __global__ void update_all_life_neuron(GLIFENeurons *data, int num, int offset, 
 
 			__syncthreads();
 			if (fire_cnt >= MAX_BLOCK_SIZE) {
-				commit2globalTable(fire_table_t, MAX_BLOCK_SIZE, gFiredTable, &gFiredTableSizes[currentIdx], gFiredTableCap*currentIdx);
+				commit2globalTable(fire_table_t, MAX_BLOCK_SIZE, fireTable, &fireTableSizes[currentIdx], fireTableCap*currentIdx);
 				if (threadIdx.x == 0) {
 					fire_cnt = 0;
 				}
@@ -234,7 +234,7 @@ __global__ void update_all_life_neuron(GLIFENeurons *data, int num, int offset, 
 			}
 			__syncthreads();
 			if (fire_cnt >= MAX_BLOCK_SIZE) {
-				commit2globalTable(fire_table_t, MAX_BLOCK_SIZE, gFiredTable, &gFiredTableSizes[currentIdx], gFiredTableCap*currentIdx);
+				commit2globalTable(fire_table_t, MAX_BLOCK_SIZE, fireTable, &fireTableSizes[currentIdx], fireTableCap*currentIdx);
 				if (threadIdx.x == 0) {
 					fire_cnt = 0;
 				}
@@ -242,7 +242,7 @@ __global__ void update_all_life_neuron(GLIFENeurons *data, int num, int offset, 
 			__syncthreads();
 
 			if (fire_cnt > 0) {
-				commit2globalTable(fire_table_t, fire_cnt, gFiredTable, &gFiredTableSizes[currentIdx], gFiredTableCap*currentIdx);
+				commit2globalTable(fire_table_t, fire_cnt, fireTable, &fireTableSizes[currentIdx], fireTableCap*currentIdx);
 				if (threadIdx.x == 0) {
 					fire_cnt = 0;
 				}
@@ -284,7 +284,7 @@ __global__ void update_dense_life_neuron(GLIFENeurons *data, int num, int offset
 
 			bool fired = data->p_vm[nid] >= data->p_v_thresh[nid];
 
-			gFiredTable[gFiredTableCap*currentIdx + gnid] = fired;
+			fireTable[fireTableCap*currentIdx + gnid] = fired;
 
 			gFireCount[gnid] += fired;
 
@@ -310,7 +310,7 @@ __global__ void update_dense_life_neuron(GLIFENeurons *data, int num, int offset
 
 		} else {
 			data->p_refrac_step[idx] = data->p_refrac_step[idx] - 1;
-			gFiredTable[gFiredTableCap*currentIdx + gnid] = 0;
+			fireTable[fireTableCap*currentIdx + gnid] = 0;
 		}
 		currentE[gnid] = 0;
 		current_I[gnid] = 0;
@@ -318,11 +318,10 @@ __global__ void update_dense_life_neuron(GLIFENeurons *data, int num, int offset
 	__syncthreads();
 }
 
-//int cudaUpdateLIFE(void *data, int num, int offset, int time, BlockSize *pSize)
-//{
-//	findLIF<<<pSize->gridSize, pSize->blockSize>>>((GLIFENeurons*)data, num, offset);
-//	updateLIF<<<pSize->gridSize, pSize->blockSize>>>((GLIFENeurons*)data, num, offset, time);
-//	//update_dense_life_neuron<<<pSize->gridSize, pSize->blockSize>>>((GLIFENeurons*)data, num, offset);
-//
-//	return 0;
-//}
+void cudaUpdateLIFE(void *data, real *currentE, real *currentI, int num, int offset, int time, BlockSize *pSize)
+{
+	find_lif_neuron<<<pSize->gridSize, pSize->blockSize>>>((GLIFENeurons*)data, num, offset);
+	update_lif_neuron<<<pSize->gridSize, pSize->blockSize>>>((GLIFENeurons*)data, currentE, currentI, num, offset, time);
+	//update_dense_life_neuron<<<pSize->gridSize, pSize->blockSize>>>((GLIFENeurons*)data, num, offset);
+
+}

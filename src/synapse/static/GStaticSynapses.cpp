@@ -27,11 +27,13 @@ int freeStatic(void *pCpu)
 	return 0;
 }
 
-void mpiSendStatic(void *data, int rank, int offset, int size)
+int mpiSendStatic(void *data, int rank, int offset, int size)
 {
+	return 0;
 }
 
-void mpiRecvStatic(void **data, int rank, int rankSize)
+int  mpiRecvStatic(void **data, int rank, int rankSize)
 {
+	return 0;
 }
 

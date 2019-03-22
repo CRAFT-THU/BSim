@@ -1,14 +1,14 @@
-#ifndef LIFENEURON_H
-#define LIFENEURON_H
+#ifndef LIFNEURON_H
+#define LIFNEURON_H
 
 #include <stdio.h>
 #include "../../base/NeuronBase.h"
 
-class LIFENeuron : public NeuronBase {
+class LIFNeuron : public NeuronBase {
 public:
-	LIFENeuron(real v_init, real v_rest, real v_reset, real cm, real tau_m, real tau_refrac, real tau_syn_E, real tau_syn_I, real v_thresh, real i_offset);
-	LIFENeuron(const LIFENeuron &neuron);
-	~LIFENeuron();
+	LIFNeuron(real v_init, real v_rest, real v_reset, real cm, real tau_m, real tau_refrac, real tau_syn_E, real tau_syn_I, real v_thresh, real i_offset);
+	LIFNeuron(const LIFNeuron &neuron);
+	~LIFNeuron();
 
 	virtual int recv(real I)  override;
 
@@ -52,4 +52,4 @@ protected:
 	real _i_syn_I;
 };
 
-#endif /* LIFENEURON_H */
+#endif /* LIFNEURON_H */

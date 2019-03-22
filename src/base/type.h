@@ -8,14 +8,14 @@
 #include "../utils/constant.h"
 
 enum Type { 
-	Constant = 0, Poisson = 1,
-	Array,
-	Decide,
-	FFT,
-	Mem,
-	Max,
-	LIFE,
-	TJ,
+	// Constant = 0, Poisson = 1,
+	Array = 0,
+	// Decide,
+	// FFT,
+	// Mem,
+	// Max,
+	LIF,
+	// TJ,
 	Static,
 	TYPESIZE
 }; 
