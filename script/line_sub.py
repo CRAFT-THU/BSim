@@ -16,8 +16,8 @@ def column_sub(file1="", file2=""):
         line1 = l1.strip()
         string0 = filter(None, re.split(r'\s*[;,:\s]\s*', line0))
         string1 = filter(None, re.split(r'\s*[;,:\s]\s*', line1))
-        data0 = map(ast.literal_eval, string0)
-        data1 = map(ast.literal_eval, string1)
+        data0 = list(map(ast.literal_eval, string0))
+        data1 = list(map(ast.literal_eval, string1))
 
         assert len(data0)==len(data1)
 
@@ -37,11 +37,11 @@ def main(argv):
     try:
         opts, args = getopt.getopt(argv,"h1:2:",["ifile=","ofile="])
     except getopt.GetoptError:
-        print usuage_msg
+        print(usuage_msg)
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
-            print usuage_msg
+            print(usuage_msg)
             sys.exit()
         elif opt in ("-1", "--file1"):
             file1 = arg

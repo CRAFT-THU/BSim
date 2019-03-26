@@ -5,7 +5,7 @@
 #ifndef TYPEFUNC_H
 #define TYPEFUNC_H
 
-#include "../base/type.h"
+#include "type.h"
 #include "BlockSize.h"
 
 extern void* (*createType[TYPESIZE])();

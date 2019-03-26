@@ -1,7 +1,7 @@
-#ifndef GLIFENEURONS_H
-#define GLIFENEURONS_H
+#ifndef GLIFNEURONS_H
+#define GLIFNEURONS_H
 
-#include "../../base/type.h"
+#include "../../utils/type.h"
 #include "../../utils/macros.h"
 
 struct GLIFNeurons {
@@ -27,4 +27,4 @@ int cudaFetchLIF(void *pGpu, void *pCpu, int num);
 
 NEURON_GPU_FUNC_DEFINE(LIF)
 
-#endif /* GLIFENEURONS_H */
+#endif /* GLIFNEURONS_H */

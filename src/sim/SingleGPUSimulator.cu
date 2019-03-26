@@ -108,8 +108,8 @@ int SingleGPUSimulator::run(real time, FireInfo &log)
 #ifdef LOG_DATA
 	real *c_vm = hostMalloc<real>(totalNeuronNum);
 
-	int tj_idx = getIndex(pCpuNet->nTypes, nTypeNum, TJ);
-	int life_idx = getIndex(pCpuNet->nTypes, nTypeNum, LIFE);
+	// int tj_idx = getIndex(pCpuNet->nTypes, nTypeNum, TJ);
+	int life_idx = getIndex(pCpuNet->nTypes, nTypeNum, LIF);
 	int copy_idx = -1;
 	real *c_g_vm = NULL;
 	real *c_g_ie = NULL;
@@ -121,12 +121,11 @@ int SingleGPUSimulator::run(real time, FireInfo &log)
 		c_g_ie = c_g_lif->p_i_E;
 		c_g_ii = c_g_lif->p_i_I;
 		copy_idx = life_idx;
-	} else if (tj_idx >= 0) {
+	} /* else if (tj_idx >= 0) {
 		GTJNeurons *c_g_tj = copyFromGPU<GTJNeurons>(static_cast<GTJNeurons*>(c_pGpuNet->pNeurons[tj_idx]), 1);
 		c_g_vm = c_g_tj->p_vm;
 		copy_idx = tj_idx;
-
-	} else {
+	} */ else {
 	}
 #endif
 

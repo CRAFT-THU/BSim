@@ -32,8 +32,10 @@ int freeMem(void *pCpu)
 }
 
 
-void mpiSendMem(void *data, int rank, int offset, int size) {
+int mpiSendMem(void *data, int rank, int offset, int size) {
+	return 0;
 }
 
-void mpiRecvMem(void **data, int rank, int rankSize) {
+int mpiRecvMem(void **data, int rank, int rankSize) {
+	return 0;
 }

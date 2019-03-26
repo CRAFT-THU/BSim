@@ -36,8 +36,10 @@ int freeConstant(void *pCpu)
 }
 
 
-void mpiSendConstant(void *data, int rank, int offset, int size) {
+int mpiSendConstant(void *data, int rank, int offset, int size) {
+	return 0;
 }
 
-void mpiRecvConstant(void **data, int rank, int rankSize) {
+int mpiRecvConstant(void **data, int rank, int rankSize) {
+	return 0;
 }

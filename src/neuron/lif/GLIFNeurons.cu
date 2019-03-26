@@ -3,7 +3,7 @@
 #include "../../gpu_utils/mem_op.h"
 #include "GLIFNeurons.h"
 
-int cudaAllocLIFE(void *pCpu, void *pGpu, int num)
+int cudaAllocLIF(void *pCpu, void *pGpu, int num)
 {
 	GLIFNeurons *pGpuNeurons = (GLIFNeurons*)pGpu;
 	GLIFNeurons *p = (GLIFNeurons*)pCpu;
@@ -26,7 +26,7 @@ int cudaAllocLIFE(void *pCpu, void *pGpu, int num)
 	return 0;
 }
 
-int cudaFetchLIFE(void *pGpu, void *pCpu, int num)
+int cudaFetchLIF(void *pGpu, void *pCpu, int num)
 {
 	GLIFNeurons *pGpuNeurons = copyFromGPU(static_cast<GLIFNeurons*>(pGpu), 1);
 	GLIFNeurons *p = (GLIFNeurons*)pCpu;
@@ -39,7 +39,7 @@ int cudaFetchLIFE(void *pGpu, void *pCpu, int num)
 	return 0;
 }
 
-int cudaFreeLIFE(void *pGpu)
+int cudaFreeLIF(void *pGpu)
 {
 	GLIFNeurons *pGpuNeurons = (GLIFNeurons*)pGpu;
 	gpuFree(pGpuNeurons->p_vm);

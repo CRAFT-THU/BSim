@@ -12,7 +12,7 @@ def line_sum(file1=""):
     for l0 in inlines1:
         line0 = l0.strip()
         string0 = filter(None, re.split(r'\s*[;,:\s]\s*', line0))
-        data0 = map(ast.literal_eval, string0)
+        data0 = list(map(ast.literal_eval, string0))
 
         sum_res = 0
         for i in data0:
@@ -30,11 +30,11 @@ def main(argv):
     try:
         opts, args = getopt.getopt(argv,"hf:",["file="])
     except getopt.GetoptError:
-        print usuage_msg
+        print(usuage_msg)
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
-            print usuage_msg
+            print(usuage_msg)
             sys.exit()
         elif opt in ("-f", "--file"):
             file1 = arg

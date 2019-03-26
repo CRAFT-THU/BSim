@@ -1,7 +1,7 @@
 #ifndef GSTATICSYNAPSES_H
 #define GSTATICSYNAPSES_H
 
-#include "../../base/type.h"
+#include "../../utils/type.h"
 #include "../../utils/macros.h"
 
 struct GStaticSynapses {

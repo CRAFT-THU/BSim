@@ -5,10 +5,11 @@
 #include "constants.h"
 
 
-__global__ void update_constant_neuron(GConstantNeurons *d_neurons, int num, int start_id, int time)
+__global__ void update_constant_neuron(GConstantNeurons *d_neurons, real *currentE, real *currentI, int *firedTable, int *firedTableSizes, int num, int start_id, int time)
+// __global__ void update_constant_neuron(GConstantNeurons *d_neurons, int num, int start_id, int time)
 {
 	int currentIdx = time % (MAX_DELAY+1);
-	__shared__ int fire_table_t[MAXBLOCKSIZE];
+	__shared__ int fire_table_t[MAX_BLOCK_SIZE];
 	__shared__ volatile unsigned int fire_cnt;
 
 	if (threadIdx.x == 0) {
@@ -27,15 +28,15 @@ __global__ void update_constant_neuron(GConstantNeurons *d_neurons, int num, int
 		for (int i=0; i<2; i++) {
 			if (fired) {
 				test_loc = atomicAdd((int*)&fire_cnt, 1);
-				if (test_loc < MAXBLOCKSIZE) {
+				if (test_loc < MAX_BLOCK_SIZE) {
 					fire_table_t[test_loc] = start_id + idx;
 					d_neurons->p_fire_count[idx] = d_neurons->p_fire_count[idx] + 1;
 					fired = false;
 				}
 			}
 			__syncthreads();
-			if (fire_cnt >= MAXBLOCKSIZE) {
-				commit2globalTable(fire_table_t, MAXBLOCKSIZE, gFiredTable, &(gFiredTableSizes[currentIdx]), gFiredTableCap*currentIdx);
+			if (fire_cnt >= MAX_BLOCK_SIZE) {
+				commit2globalTable(fire_table_t, MAX_BLOCK_SIZE, firedTable, &(firedTableSizes[currentIdx]), gFiredTableCap*currentIdx);
 				if (threadIdx.x == 0) {
 					fire_cnt = 0;
 				}
@@ -46,17 +47,15 @@ __global__ void update_constant_neuron(GConstantNeurons *d_neurons, int num, int
 	__syncthreads();
 
 	if (fire_cnt > 0) {
-		commit2globalTable(fire_table_t, fire_cnt, gFiredTable, &(gFiredTableSizes[currentIdx]), gFiredTableCap*currentIdx);
+		commit2globalTable(fire_table_t, fire_cnt, firedTable, &(firedTableSizes[currentIdx]), gFiredTableCap*currentIdx);
 		if (threadIdx.x == 0) {
 			fire_cnt = 0;
 		}
 	}
 }
 
-int cudaUpdateConstant(void *data, int num, int start_id, int t, BlockSize *pSize)
+void cudaUpdateConstant(void *data, real *currentE, real *currentI, int *firedTable, int *firedTableSizes, int num, int start_id, int t, BlockSize *pSize)
 {
-	update_constant_neuron<<<pSize->gridSize, pSize->blockSize>>>((GConstantNeurons*)data, num, start_id, t);
-
-	return 0;
+	update_constant_neuron<<<pSize->gridSize, pSize->blockSize>>>((GConstantNeurons*)data, currentE, currentI, firedTable, firedTableSizes, num, start_id, t);
 }
 

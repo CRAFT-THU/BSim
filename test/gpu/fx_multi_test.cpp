@@ -40,9 +40,9 @@ const real fv=-74e-3;
 	const real dt=1e-4;
 	Network c;
 
-	Population<LIF_brian> *g[depth+1];
+	Population<LIF_curr_exp> *g[depth+1];
 	
-	g[1]=c.createPopulation(1, N, LIF_brian(LIFENeuron(
+	g[1]=c.createPopulation(1, N, LIF_curr_exp(LIFNeuron(
 	fv,v_rest,freset,
 	c_m,tau_m,
 	frefractory,tau_syn_e,tau_syn_i,
@@ -50,7 +50,7 @@ const real fv=-74e-3;
 	),  tau_syn_e, tau_syn_i));
 	
 	for(int i=2;i<=depth;i++)
-		g[i] = c.createPopulation(i, N, LIF_brian(LIFENeuron(
+		g[i] = c.createPopulation(i, N, LIF_curr_exp(LIFNeuron(
 	fv,v_rest,freset,
 	c_m,tau_m,
 	frefractory,tau_syn_e,tau_syn_i,
@@ -74,11 +74,11 @@ const real fv=-74e-3;
 		c.connect(g[1], g[i], weight6_30, delay, NULL, N*N);	
 	}
 
-	Population<LIF_brian> *p[depth+1];
+	Population<LIF_curr_exp> *p[depth+1];
 	int i=1;
 	while(i+1<=depth)
 	{
-		p[i] = c.createPopulation(i+depth, N, LIF_brian(LIFENeuron(
+		p[i] = c.createPopulation(i+depth, N, LIF_curr_exp(LIFNeuron(
 	fv,v_rest,freset,
 	c_m,tau_m,
 	frefractory,tau_syn_e,tau_syn_i,

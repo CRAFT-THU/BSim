@@ -3,6 +3,8 @@
  * Tue December 15 2015
  */
 
+#include <string.h>
+
 #include "../../include/BSim.h"
 
 using namespace std;
@@ -19,8 +21,8 @@ int main(int argc, char **argv)
 	Network c;
 	int array[30] = { 0, 1, 5, 10, 13, 17, 20, 26, 29, 30, 35, 37, 40, 44, 49, 50, 55, 56, 62, 65, 69, 71, 75, 79, 82, 85, 86, 90, 96, 99};
 	Population<Array_spikes> *pn0 = c.createPopulation(0, N, Array_spikes(ArrayNeuron(array, 30)));
-	Population<IF_curr_exp> *pn1 = c.createPopulation(1, N, IF_curr_exp(LIFENeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-4, 0.0, 1.0, 1.0, 15.0e-3, 0), 1.0, 1.0));
-	Population<IF_curr_exp> *pn2 = c.createPopulation(2, N, IF_curr_exp(LIFENeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-4, 0.0, 1.0, 1.0, 15.0e-3, 0), 1.0, 1.0));
+	Population<LIF_curr_exp> *pn1 = c.createPopulation(1, N, LIF_curr_exp(LIFNeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-4, 0.0, 1.0, 1.0, 15.0e-3, 0), 1.0, 1.0));
+	Population<LIF_curr_exp> *pn2 = c.createPopulation(2, N, LIF_curr_exp(LIFNeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-4, 0.0, 1.0, 1.0, 15.0e-3, 0), 1.0, 1.0));
 
 	real * weight0 = NULL;
 	real * weight1 = NULL;

@@ -13,9 +13,9 @@ int main(int argc, char **argv)
 		n->setRate(i/36.0 * 0.5 + 0.5);
 	}
 
-	Population<LIF_brian> *pn1 = c.createPopulation(1, 36, LIF_brian(LIFENeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-3, 0.0, 1.0, 1.0, 15.0e-3, 0.0e-3), 1.0, 1.0));
+	Population<LIF_curr_exp> *pn1 = c.createPopulation(1, 36, LIF_curr_exp(LIFNeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-3, 0.0, 1.0, 1.0, 15.0e-3, 0.0e-3), 1.0, 1.0));
 	Population<Max_pooling> *pn2 = c.createPopulation(2, 9, Max_pooling(MaxNeuron(4), 0, 0));
-	Population<LIF_brian> *pn3 = c.createPopulation(3, 9, LIF_brian(LIFENeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-3, 0.0, 1.0, 1.0, 15.0e-3, 0.0e-3), 1.0, 1.0));
+	Population<LIF_curr_exp> *pn3 = c.createPopulation(3, 9, LIF_curr_exp(LIFNeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-3, 0.0, 1.0, 1.0, 15.0e-3, 0.0e-3), 1.0, 1.0));
 
 	real * weight0 = NULL;
 	real * weight1 = NULL;

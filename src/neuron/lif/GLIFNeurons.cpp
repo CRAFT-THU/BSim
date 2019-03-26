@@ -7,7 +7,7 @@
 
 NEURON_GPU_FUNC_BASIC(LIF)
 
-int allocLIFE(void *pCpu, int N)
+int allocLIF(void *pCpu, int N)
 {
 	GLIFNeurons *p = (GLIFNeurons*)pCpu;
 	p->p_vm = (real*)malloc(N*sizeof(real));
@@ -29,7 +29,7 @@ int allocLIFE(void *pCpu, int N)
 	return 0;
 }
 
-int freeLIFE(void *pCpu)
+int freeLIF(void *pCpu)
 {
 	GLIFNeurons *pCpuNeurons = (GLIFNeurons*)pCpu;
 	free(pCpuNeurons->p_vm);
@@ -51,11 +51,13 @@ int freeLIFE(void *pCpu)
 	return 0;
 }
 
-void mpiSendLIFE(void *data, int rank, int offset, int size)
+int mpiSendLIF(void *data, int rank, int offset, int size)
 {
+	return 0;
 }
 
-void mpiRecvLIFE(void **data, int rank, int rankSize)
+int mpiRecvLIF(void **data, int rank, int rankSize)
 {
+	return 0;
 }
 

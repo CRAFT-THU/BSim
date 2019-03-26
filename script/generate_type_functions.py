@@ -5,7 +5,7 @@ import shutil
 
 TYPE = "Type"
 
-type_file = open("../src/base/type.h", "r")
+type_file = open("../src/utils/type.h", "r")
 type_file_content = type_file.read();
 type_file.close()
 

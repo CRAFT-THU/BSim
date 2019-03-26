@@ -12,7 +12,7 @@
 #include <map>
 #include <algorithm>
 
-#include "../base/SimInfo.h"
+#include "../utils/SimInfo.h"
 #include "../base/NeuronBase.h"
 #include "../base/SynapseBase.h"
 #include "../base/Population.h"

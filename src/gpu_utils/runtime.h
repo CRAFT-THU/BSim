@@ -8,7 +8,7 @@
 #include "curand_kernel.h"
 #include "curand.h"
 
-#include "../base/type.h"
+#include "../utils/type.h"
 #include "../utils/BlockSize.h"
 #include "../../include/GNeuron.h"
 #include "../../include/GSynapse.h"

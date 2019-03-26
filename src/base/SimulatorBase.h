@@ -5,7 +5,7 @@
 #ifndef SIMULATORBASE_H
 #define SIMULATORBASE_H
 
-#include "../base/SimInfo.h"
+#include "../utils/SimInfo.h"
 #include "../net/Network.h"
 
 class SimulatorBase {

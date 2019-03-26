@@ -3,6 +3,8 @@
  * Tue December 15 2015
  */
 
+#include <string.h>
+
 #include "../../include/BSim.h"
 
 using namespace std;

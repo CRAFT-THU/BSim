@@ -130,7 +130,7 @@ void * run_thread_gpu(void *para) {
 
 #ifdef LOG_DATA
 	real *c_vm = hostMalloc<real>(nodeNeuronNum);
-	int life_idx = getIndex(pCpuNet->nTypes, nTypeNum, LIFE);
+	int life_idx = getIndex(pCpuNet->nTypes, nTypeNum, LIF);
 	int copy_idx = -1;
 	real *c_g_vm = NULL;
 

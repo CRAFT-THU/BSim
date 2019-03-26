@@ -5,7 +5,7 @@
 #ifndef GCONSTANTNEURONS_H
 #define GCONSTANTNEURONS_H
 
-#include "../../base/type.h"
+#include "../../utils/type.h"
 #include "../../utils/macros.h"
 
 struct GConstantNeurons {

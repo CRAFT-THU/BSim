@@ -38,7 +38,7 @@ void * run_single(void *para) {
 	preSize.gridSize = (upzero_else_set_one(totalNeuronNum) + (preSize.blockSize) - 1) / (preSize.blockSize);
 
 	real *c_vm = hostMalloc<real>(totalNeuronNum);
-	int life_idx = getIndex(pCpuNet->nTypes, nTypeNum, LIFE);
+	int life_idx = getIndex(pCpuNet->nTypes, nTypeNum, LIF);
 	int lif_idx = getIndex(pCpuNet->nTypes, nTypeNum, LIF);
 	int copy_idx = -1;
 	real *c_g_vm = NULL;

@@ -8,7 +8,7 @@
 #include <stdio.h>
 
 #include "../third_party/json/json.h"
-#include "../base/type.h"
+#include "type.h"
 
 static bool rand_seed_inited = false;
 

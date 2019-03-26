@@ -319,7 +319,7 @@ __global__ void update_dense_lif_neuron(GLIFNeurons *data, real *currentE, real 
 	__syncthreads();
 }
 
-void cudaUpdateLIFE(void *data, real *currentE, real *currentI, int *firedTable, int *firedTableSizes, int num, int offset, int time, BlockSize *pSize)
+void cudaUpdateLIF(void *data, real *currentE, real *currentI, int *firedTable, int *firedTableSizes, int num, int offset, int time, BlockSize *pSize)
 {
 	find_lif_neuron<<<pSize->gridSize, pSize->blockSize>>>((GLIFNeurons*)data, currentE, currentI, num, offset);
 	update_lif_neuron<<<pSize->gridSize, pSize->blockSize>>>((GLIFNeurons*)data, currentE, currentI, firedTable, firedTableSizes, num, offset, time);

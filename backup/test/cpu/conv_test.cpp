@@ -8,7 +8,7 @@ int main(int argc, char **argv)
 
 	Network c;
 	Population<Constant_spikes> *pn0 = c.createPopulation(0, 36, Constant_spikes(ConstantNeuron(0.5), 1.0, 1.0));
-	Population<LIF_brian> *pn1 = c.createPopulation(1, 36, LIF_brian(LIFENeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-3, 0.0, 1.0, 1.0, 15.0e-3, 0.0e-3), 1.0, 1.0));
+	Population<LIF_curr_exp> *pn1 = c.createPopulation(1, 36, LIF_curr_exp(LIFNeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-3, 0.0, 1.0, 1.0, 15.0e-3, 0.0e-3), 1.0, 1.0));
 
 	real * weight0 = NULL;
 	real * delay = NULL;

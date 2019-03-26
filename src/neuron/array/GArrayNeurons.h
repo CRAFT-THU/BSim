@@ -5,7 +5,7 @@
 #ifndef GARRAYNEURONS_H
 #define GARRAYNEURONS_H
 
-#include "../../base/type.h"
+#include "../../utils/type.h"
 #include "../../utils/macros.h"
 
 struct GArrayNeurons {

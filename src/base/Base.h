@@ -7,7 +7,7 @@
 
 #include <map>
 
-#include "SimInfo.h"
+#include "../utils/SimInfo.h"
 
 using std::map;
 
