@@ -3,19 +3,6 @@
  * Sat March 12 2016
  */
 
-#include "../utils/utils.h"
-#include "../neuron/lif/lif.h"
-#include "../neuron/array/array.h"
-#include "../synapse/static/static.h"
-// #include "../neuron/constant/constants.h"
-// #include "../neuron/decide/decide.h"
-// #include "../neuron/fft/fft.h"
-// #include "../neuron/max/max.h"
-// #include "../neuron/mem/mem.h"
-// #include "../neuron/poisson/poisson.h"
-// #include "../neuron/tj/tj.h"
-#include "runtime.h"
-#include "gpu_func.h"
 
 
 int addCrossNeurons(int *ids, int num, int time)

@@ -10,8 +10,8 @@ struct GBuffers {
 	int *c_gFiredTableSizes;
 	int *c_gActiveTable;
 	// Synapse Tables
-	int *c_gSynapsesActiveTable;
-	int *c_gSynapsesLogTable;
+	// int *c_gSynapsesActiveTable;
+	// int *c_gSynapsesLogTable;
 
 	int *c_neuronsFired;
 	int *c_synapsesFired;
@@ -22,6 +22,6 @@ struct GBuffers {
 	int *c_gFireCount;
 };
 
-void init_buffers(GBuffers * buf);
+// void init_buffers(GBuffers * buf);
 GBuffers* alloc_buffers(int neuron_num, int synapse_num, int max_delay, real dt);
 int free_buffers(GBuffers *buf);

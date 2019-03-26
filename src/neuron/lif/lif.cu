@@ -3,7 +3,7 @@
 
 #include "../../gpu_utils/runtime.h"
 
-// #include "GLIFENeurons.h"
+// #include "GLIFNeurons.h"
 #include "lif.h"
 
 
@@ -323,6 +323,6 @@ void cudaUpdateLIFE(void *data, real *currentE, real *currentI, int *firedTable,
 {
 	find_lif_neuron<<<pSize->gridSize, pSize->blockSize>>>((GLIFNeurons*)data, currentE, currentI, num, offset);
 	update_lif_neuron<<<pSize->gridSize, pSize->blockSize>>>((GLIFNeurons*)data, currentE, currentI, firedTable, firedTableSizes, num, offset, time);
-	//update_dense_life_neuron<<<pSize->gridSize, pSize->blockSize>>>((GLIFENeurons*)data, num, offset);
+	//update_dense_life_neuron<<<pSize->gridSize, pSize->blockSize>>>((GLIFNeurons*)data, num, offset);
 
 }

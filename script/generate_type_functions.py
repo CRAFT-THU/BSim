@@ -58,7 +58,7 @@ cu_content = []
 cpp_content = []
 mpi_content = []
 
-cu_content.append(warn_info + common_headers + '#include "../gpu_utils/gpu_func.h"\n\n')
+cu_content.append(warn_info + common_headers)
 cpp_content.append(warn_info + common_headers)
 
 for (name, body) in zip(func_names, func_mains):

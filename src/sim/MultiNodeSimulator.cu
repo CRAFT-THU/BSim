@@ -12,12 +12,12 @@
 #include "../utils/utils.h"
 #include "../utils/TypeFunc.h"
 #include "../gpu_utils/mem_op.h"
-#include "../gpu_utils/gpu_func.h"
 #include "../gpu_utils/gpu_utils.h"
 #include "../gpu_utils/runtime.h"
 #include "../gpu_utils/GBuffers.h"
 #include "../net/MultiNetwork.h"
 #include "MultiNodeSimulator.h"
+// #include "../gpu_utils/gpu_func.h"
 
 using std::cout;
 using std::endl;

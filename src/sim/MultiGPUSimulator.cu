@@ -12,7 +12,6 @@
 #include "../utils/utils.h"
 #include "../utils/TypeFunc.h"
 #include "../gpu_utils/mem_op.h"
-#include "../gpu_utils/gpu_func.h"
 #include "../gpu_utils/gpu_utils.h"
 #include "../gpu_utils/runtime.h"
 #include "../gpu_utils/GBuffers.h"
@@ -136,7 +135,7 @@ void * run_thread_gpu(void *para) {
 	real *c_g_vm = NULL;
 
 	if (life_idx >= 0) {
-		GLIFENeurons *c_g_lif = copyFromGPU<GLIFENeurons>(static_cast<GLIFENeurons*>(c_pGpuNet->pNeurons[life_idx]), 1);
+		GLIFNeurons *c_g_lif = copyFromGPU<GLIFNeurons>(static_cast<GLIFNeurons*>(c_pGpuNet->pNeurons[life_idx]), 1);
 		c_g_vm = c_g_lif->p_vm;
 		copy_idx = life_idx;
 	} else {
@@ -163,7 +162,7 @@ void * run_thread_gpu(void *para) {
 	//double barrier1_time = 0, gpu_cpy_time = 0, peer_cpy_time = 0, barrier2_time=0, copy_time = 0;
 	gettimeofday(&ts, NULL);
 	for (int time=0; time<network->_sim_cycle; time++) {
-		update_time<<<1, 1>>>(time);
+		update_time<<<1, 1>>>(time, buffers->c_gFiredTableSizes);
 
 		for (int i=0; i<nTypeNum; i++) {
 			assert(c_pGpuNet->neuronNums[i+1]-c_pGpuNet->neuronNums[i] > 0);
@@ -185,7 +184,9 @@ void * run_thread_gpu(void *para) {
 		//		copyFromGPU<int>(global_cross_data[offset]._fired_n_idxs, c_g_global_cross_data + allNeuronNum * i, global_cross_data[offset]._fired_n_num);
 		//	}
 		//}
-		cudaDeliverNeurons(c_g_idx2index, c_g_cross_index2idx, c_g_global_cross_data, c_g_fired_n_num, network->_node_num, allNeuronNum, time);
+
+		cudaDeliverNeurons<<<(allNeuronNum+MAX_BLOCK_SIZE-1)/MAX_BLOCK_SIZE, MAX_BLOCK_SIZE>>>(buffers->c_gFiredTable, buffers->c_gFiredTableSizes, c_g_idx2index, c_g_cross_index2idx, c_g_global_cross_data, c_g_fired_n_num, network->_node_num, time);
+
 		checkCudaErrors(cudaMemcpy(gCrossDataGPU->_fired_num + network->_node_idx * network->_node_num, c_g_fired_n_num, sizeof(int)*network->_node_num, cudaMemcpyDeviceToHost));
 		//gettimeofday(&t3, NULL);
 
@@ -239,7 +240,8 @@ void * run_thread_gpu(void *para) {
 		for (int i=0; i< network->_node_num; i++) {
 			int i2idx = network->_node_idx + network->_node_num * i;
 			if (gCrossDataGPU->_fired_num[i2idx] > 0) {
-				addCrossNeurons(gCrossDataGPU->_fired_arrays[i2idx], gCrossDataGPU->_fired_num[i2idx], time);
+				int num = gCrossDataGPU->_fired_num[i2idx];
+				cudaAddCrossNeurons<<<(num+MAX_BLOCK_SIZE-1)/MAX_BLOCK_SIZE, MAX_BLOCK_SIZE>>>(buffers->c_gFiredTable, buffers->c_gFiredTableSizes, gCrossDataGPU->_fired_arrays[i2idx], gCrossDataGPU->_fired_num[i2idx], time);
 			}
 		}
 		

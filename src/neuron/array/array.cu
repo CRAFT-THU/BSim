@@ -35,7 +35,7 @@ __global__ void update_array_neuron(GArrayNeurons *data, real *currentE, real *c
 			}
 			__syncthreads();
 			if (fire_cnt >= MAX_BLOCK_SIZE) {
-				commit2globalTable(fire_table_t, MAX_BLOCK_SIZE, gFiredTable, &(gFiredTableSizes[currentIdx]), gFiredTableCap*currentIdx);
+				commit2globalTable(fire_table_t, MAX_BLOCK_SIZE, firedTable, &(firedTableSizes[currentIdx]), gFiredTableCap*currentIdx);
 				//advance_array_neuron(data, fire_table_t, MAX_BLOCK_SIZE, start_id);
 				if (threadIdx.x == 0) {
 					fire_cnt = 0;
@@ -47,7 +47,7 @@ __global__ void update_array_neuron(GArrayNeurons *data, real *currentE, real *c
 	__syncthreads();
 
 	if (fire_cnt > 0) {
-		commit2globalTable(fire_table_t, fire_cnt, gFiredTable, &(gFiredTableSizes[currentIdx]), gFiredTableCap*currentIdx);
+		commit2globalTable(fire_table_t, fire_cnt, firedTable, &(firedTableSizes[currentIdx]), gFiredTableCap*currentIdx);
 		//advance_array_neuron(data, fire_table_t, fire_cnt, start_id);
 		if (threadIdx.x == 0) {
 			fire_cnt = 0;

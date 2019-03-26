@@ -1,10 +1,23 @@
 
 #include <assert.h>
 
-#include "../third_party/cuda/helper_cuda.h"
+#include "../utils/utils.h"
+#include "../neuron/lif/lif.h"
+#include "../neuron/array/array.h"
+#include "../synapse/static/static.h"
+// #include "../neuron/constant/constants.h"
+// #include "../neuron/decide/decide.h"
+// #include "../neuron/fft/fft.h"
+// #include "../neuron/max/max.h"
+// #include "../neuron/mem/mem.h"
+// #include "../neuron/poisson/poisson.h"
+// #include "../neuron/tj/tj.h"
+
 #include "mem_op.h"
-// #include "gpu_macros.h"
 #include "runtime.h"
+// #include "gpu_func.h"
+
+#include "../third_party/cuda/helper_cuda.h"
 
 #define MAXBLOCKSIZE 1024
 
@@ -78,14 +91,14 @@ __device__ int commit2globalTable(int *shared_buf, volatile unsigned int size, i
 	return 0;
 }
 
-__global__ void update_time(int time)
+__global__ void update_time(int time, int *firedTableSizes)
 {
 	if ((threadIdx.x == 0) && (blockIdx.x == 0)) {
 		// gCurrentCycle = gCurrentCycle + 1;
 		// gCurrentIdx = (gCurrentIdx +1)%(MAX_DELAY + 1);
 		int currentIdx = time % (MAX_DELAY + 1);
 		gActiveTableSize = 0;
-		gFiredTableSizes[currentIdx] = 0;
+		firedTableSizes[currentIdx] = 0;
 		// gSynapsesActiveTableSize = 0;
 	}
 	__syncthreads();
@@ -113,7 +126,6 @@ __global__ void update_time(int time)
 // 
 // }
 
-
 __global__ void curand_setup_kernel(curandState *state, int num)
 {
 	int id = threadIdx.x + blockIdx.x * blockDim.x;
@@ -122,24 +134,21 @@ __global__ void curand_setup_kernel(curandState *state, int num)
 	}
 }
 
-
-
-
-__global__ void add_cross_neuron(int *ids, int num, int time)
+__global__ void cudaAddCrossNeurons(int *firedTable, int *firedTableSizes, int *ids, int num, int time)
 {
 	int tid = blockIdx.x * blockDim.x + threadIdx.x;
 	int delayIdx = time % (MAX_DELAY+1);
 	if (tid < num) {
-		gFiredTable[gFiredTableCap*delayIdx + gFiredTableSizes[delayIdx] + tid] = ids[tid];
+		firedTable[gFiredTableCap*delayIdx + firedTableSizes[delayIdx] + tid] = ids[tid];
 	}
 	__syncthreads();
 
 	if (tid == 0) {
-		gFiredTableSizes[delayIdx] += num;
+		firedTableSizes[delayIdx] += num;
 	}
 }
 
-__global__ void deliver_neurons(int *idx2index, int *crossnode_index2idx, int *global_cross_data, int *fired_n_num, int node_num, int time)
+__global__ void cudaDeliverNeurons(int *firedTable, int *firedTableSizes, int *idx2index, int *crossnode_index2idx, int *global_cross_data, int *fired_n_num, int node_num, int time)
 {
 	__shared__ int cross_neuron_id[MAXBLOCKSIZE];
 	__shared__ volatile int cross_cnt;
@@ -151,10 +160,10 @@ __global__ void deliver_neurons(int *idx2index, int *crossnode_index2idx, int *g
 
 	int tid = blockIdx.x * blockDim.x + threadIdx.x;
 	int delayIdx = time % (MAX_DELAY+1);
-	int fired_size = gFiredTableSizes[delayIdx];
+	int fired_size = firedTableSizes[delayIdx];
 	for (int node = 0; node < node_num; node++) {
 		for (int idx = tid; idx < fired_size; idx += blockDim.x * gridDim.x) {
-			int nid = gFiredTable[gFiredTableCap*delayIdx + idx];
+			int nid = firedTable[gFiredTableCap*delayIdx + idx];
 			int tmp = idx2index[nid];
 			if (tmp >= 0) {
 				int map_nid = crossnode_index2idx[tmp*node_num + node];
@@ -186,32 +195,41 @@ __global__ void init_connection(N2SConnection *pConnection)
 	}
 }
 
-__global__ void init_buffers(/*int *c_gTimeTable,*/ real *c_gNeuronInput, real *c_gNeuronInput_I, int *c_gFiredTable, int *c_gFiredTableSizes, int *c_gActiveTable, int *c_gSynapsesActiveTable, int *c_gSynapsesLogTable) 
+BlockSize * getBlockSize(int nSize, int sSize)
 {
-	if ((threadIdx.x == 0) && (blockIdx.x == 0)) {
-		// gCurrentIdx = 0;
-		// gCurrentCycle = 0;
-		// gFiredTableSize = 0;
-		gActiveTableSize = 0;
-		// gSynapsesActiveTableSize = 0;
+	BlockSize *ret = (BlockSize*)malloc(sizeof(BlockSize)*TYPESIZE);
+	memset(ret, 0, sizeof(BlockSize)*TYPESIZE);
 
-		//gTimeTable = c_gTimeTable;
-		gNeuronInput = c_gNeuronInput;
-		gNeuronInput_I = c_gNeuronInput_I;
-		gFiredTable = c_gFiredTable;
-		gFiredTableSizes = c_gFiredTableSizes;
-		gActiveTable = c_gActiveTable;
-		//gSynapsesActiveTable = c_gSynapsesActiveTable;
-		//gSynapsesLogTable = c_gSynapsesLogTable;
-	}
+	cudaOccupancyMaxPotentialBlockSize(&(ret[Array].minGridSize), &(ret[Array].blockSize), update_array_neuron, 0, nSize); 
+	ret[Array].gridSize = (upzero_else_set_one(nSize) + (ret[Array].blockSize) - 1) / (ret[Array].blockSize);
+
+	cudaOccupancyMaxPotentialBlockSize(&(ret[LIF].minGridSize), &(ret[LIF].blockSize), update_lif_neuron, 0, nSize); 
+	ret[LIF].gridSize = (upzero_else_set_one(nSize) + (ret[LIF].blockSize) - 1) / (ret[LIF].blockSize);
+
+	// cudaOccupancyMaxPotentialBlockSize(&(ret[Constant].minGridSize), &(ret[Constant].blockSize), update_constant_neuron, 0, nSize); 
+	// ret[Constant].gridSize = (upzero_else_set_one(nSize) + (ret[Constant].blockSize) - 1) / (ret[Constant].blockSize);
+
+	// cudaOccupancyMaxPotentialBlockSize(&(ret[Poisson].minGridSize), &(ret[Poisson].blockSize), update_poisson_neuron, 0, nSize); 
+	// ret[Poisson].gridSize = (upzero_else_set_one(nSize) + (ret[Poisson].blockSize) - 1) / (ret[Poisson].blockSize);
+
+	// cudaOccupancyMaxPotentialBlockSize(&(ret[Decide].minGridSize), &(ret[Decide].blockSize), update_max_neuron, 0, nSize); 
+	// ret[Decide].gridSize = (upzero_else_set_one(nSize) + (ret[Decide].blockSize) - 1) / (ret[Decide].blockSize);
+
+	// cudaOccupancyMaxPotentialBlockSize(&(ret[FFT].minGridSize), &(ret[FFT].blockSize), update_fft_neuron, 0, nSize); 
+	// ret[FFT].gridSize = (upzero_else_set_one(nSize) + (ret[FFT].blockSize) - 1) / (ret[FFT].blockSize);
+
+	// cudaOccupancyMaxPotentialBlockSize(&(ret[Mem].minGridSize), &(ret[Mem].blockSize), update_mem_neuron, 0, nSize); 
+	// ret[Mem].gridSize = (upzero_else_set_one(nSize) + (ret[Mem].blockSize) - 1) / (ret[Mem].blockSize);
+
+	// cudaOccupancyMaxPotentialBlockSize(&(ret[Max].minGridSize), &(ret[Max].blockSize), update_max_neuron, 0, nSize); 
+	// ret[Max].gridSize = (upzero_else_set_one(nSize) + (ret[Max].blockSize) - 1) / (ret[Max].blockSize);
+
+	// cudaOccupancyMaxPotentialBlockSize(&(ret[TJ].minGridSize), &(ret[TJ].blockSize), update_tj_neuron, 0, nSize); 
+	// ret[TJ].gridSize = (upzero_else_set_one(nSize) + (ret[TJ].blockSize) - 1) / (ret[TJ].blockSize);
+
+	// cudaOccupancyMaxPotentialBlockSize(&(ret[Static].minGridSize), &(ret[Static].blockSize), update_static_hit, 0, sSize); 
+	ret[Static].blockSize = 128;
+	ret[Static].gridSize = (upzero_else_set_one(nSize) + (ret[Static].blockSize) - 1) / (ret[Static].blockSize);
+
+	return ret;
 }
-
-__global__ void init_log_buffers(int * layer_input, real * x_input, int * fire_count)
-{
-	if ((threadIdx.x == 0) && (blockIdx.x == 0)) {
-		gLayerInput = layer_input;
-		gXInput = x_input;
-		gFireCount = fire_count;
-	}
-}
-

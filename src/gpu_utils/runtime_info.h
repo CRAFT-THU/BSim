@@ -11,11 +11,10 @@ extern __constant__ int gSynapsesTableCap;
 extern __constant__ real DT;
 
 // Variable
-extern __device__ int gCurrentIdx;
-extern __device__ int gCurrentCycle;
-extern __device__ int gFiredTableSize;
-extern __device__ int gActiveTableSize;
-extern __device__ int gSynapsesActiveTableSize;
+// extern __device__ int gCurrentIdx;
+// extern __device__ int gCurrentCycle;
+// extern __device__ int gFiredTableSize;
+// extern __device__ int gSynapsesActiveTableSize;
 
 #define gMin   0
 #define gMax 0.01
@@ -24,13 +23,14 @@ extern __device__ int gSynapsesActiveTableSize;
 //extern __device__ int *gTimeTable;
 
 // Neuron Arrays
-extern __device__ real *gNeuronInput;
-extern __device__ real *gNeuronInput_I;
+// extern __device__ real *gNeuronInput;
+// extern __device__ real *gNeuronInput_I;
 
 // Neuron Tables
-extern __device__ int *gFiredTable;
-extern __device__ int *gFiredTableSizes;
+// extern __device__ int *gFiredTable;
+// extern __device__ int *gFiredTableSizes;
 extern __device__ int *gActiveTable;
+extern __device__ int gActiveTableSize;
 
 // Synapse Tables
 //extern __device__ int *gSynapsesActiveTable;

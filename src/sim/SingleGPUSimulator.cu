@@ -10,11 +10,11 @@
 #include "../utils/utils.h"
 #include "../utils/TypeFunc.h"
 #include "../gpu_utils/mem_op.h"
-#include "../gpu_utils/gpu_func.h"
 #include "../gpu_utils/gpu_utils.h"
 #include "../gpu_utils/GBuffers.h"
 #include "../gpu_utils/runtime.h"
 #include "../net/MultiNetwork.h"
+// #include "../gpu_utils/gpu_func.h"
 
 #include "SingleGPUSimulator.h"
 
@@ -116,7 +116,7 @@ int SingleGPUSimulator::run(real time, FireInfo &log)
 	real *c_g_ii = NULL;
 
 	if (life_idx >= 0) {
-		GLIFENeurons *c_g_lif = copyFromGPU<GLIFENeurons>(static_cast<GLIFENeurons*>(c_pGpuNet->pNeurons[life_idx]), 1);
+		GLIFNeurons *c_g_lif = copyFromGPU<GLIFNeurons>(static_cast<GLIFNeurons*>(c_pGpuNet->pNeurons[life_idx]), 1);
 		c_g_vm = c_g_lif->p_vm;
 		c_g_ie = c_g_lif->p_i_E;
 		c_g_ii = c_g_lif->p_i_I;
@@ -165,7 +165,7 @@ int SingleGPUSimulator::run(real time, FireInfo &log)
 		}
 #endif
 
-		update_time<<<1, 1>>>(time);
+		update_time<<<1, 1>>>(time, buffers->c_gFiredTableSizes);
 
 		for (int i=0; i<nTypeNum; i++) {
 			cudaUpdateType[pCpuNet->nTypes[i]](c_pGpuNet->pNeurons[i], buffers->c_gNeuronInput, buffers->c_gNeuronInput_I, buffers->c_gFiredTable, buffers->c_gFiredTableSizes, c_pGpuNet->neuronNums[i+1]-c_pGpuNet->neuronNums[i], c_pGpuNet->neuronNums[i],time, &updateSize[c_pGpuNet->nTypes[i]]);

@@ -1,8 +1,11 @@
 
+#include <assert.h>
+
+#include "../third_party/cuda/helper_cuda.h"
 #include "../neuron/lif/GLIFNeurons.h"
 #include "../utils/TypeFunc.h"
+#include "../utils/macros.h"
 #include "mem_op.h"
-#include "gpu_func.h"
 #include "gpu_utils.h"
 
 GNetwork* copyNetworkToGPU(GNetwork *pCpuNet)
@@ -188,4 +191,36 @@ int freeGPUNetwork(GNetwork *pGpuNet)
 	free(pTmpNet);
 
 	return 0;
+}
+
+
+
+int checkGPUNetwork(GNetwork *g, GNetwork *c)
+{
+	int ret = -1;
+
+	CHECK(g, c, nTypeNum);
+	CHECK(g, c, sTypeNum);
+	CHECK(g, c, neuronNums);
+	CHECK(g, c, synapseNums);
+
+	CHECK(g, c, nTypes);
+	CHECK(g, c, sTypes);
+
+	ret = 1;
+
+	//int totalNeuronNum = g->neuronNums[g->nTypeNum+1];
+	//int totalSynapseNum = g->synapseNums[g->sTypeNum+1];
+	int MAX_DELAY = c->MAX_DELAY;
+
+	N2SConnection p;
+	checkCudaErrors(cudaMemcpy(&p, g->pN2SConnection, sizeof(N2SConnection), cudaMemcpyDeviceToHost));
+
+	//CHECK_CROSS_ARRAY(p.pSynapsesIdx, c->pN2SConnection->pSynapsesIdx, sizeof(int)*(c->pN2SConnection->s_num));
+	CHECK_GPU_TO_CPU_ARRAY(p.delayStart, c->pN2SConnection->delayStart, sizeof(int)*(c->pN2SConnection->n_num)*MAX_DELAY);
+	CHECK_GPU_TO_CPU_ARRAY(p.delayNum, c->pN2SConnection->delayNum, sizeof(int)*(c->pN2SConnection->n_num)*MAX_DELAY);
+
+        ret = 2;
+
+	return ret;
 }

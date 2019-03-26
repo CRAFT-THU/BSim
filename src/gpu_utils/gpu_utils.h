@@ -10,6 +10,7 @@
 GNetwork* copyNetworkToGPU(GNetwork *);
 int fetchNetworkFromGPU(GNetwork *, GNetwork*);
 int freeGPUNetwork(GNetwork *);
+int checkGPUNetwork(GNetwork *g, GNetwork *c);
 
 #endif /* GPU_UTILS_H */
 

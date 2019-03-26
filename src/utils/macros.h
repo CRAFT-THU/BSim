@@ -61,6 +61,25 @@ int add##name##Connection(void *pCpu, int *pSynapsesDst) \
 	return 0; \
 }
 
+#define CHECK(p1, p2, para) \
+	do { \
+		assert((p1->para) == (p2->para)); \
+	} while(0)
+
+#define CHECK_ARRAY(p1, p2, n) \
+	do { \
+		for (int i_t=0; i_t<(n); i++) {\
+			assert(((p1)[i_t]) == ((p2)[i_t])); \
+		}\
+	} while(0)
+
+#define CHECK_GPU_TO_CPU_ARRAY(g, c, size) \
+	do { \
+		unsigned char * mem_t = (unsigned char*)malloc(size); \
+		checkCudaErrors(cudaMemcpy(mem_t, (g), size, cudaMemcpyDeviceToHost)); \
+		assert(0==memcmp(mem_t, (c), (size))); \
+		free(mem_t); \
+	} while(0)
 
 #endif /* MACROS_H */
 
