@@ -5,7 +5,7 @@
 #include "array.h"
 
 
-__global__ void update_array_neuron(GArrayNeurons *data, real *currentE, real *currentI, int num, int start_id, int time)
+__global__ void update_array_neuron(GArrayNeurons *data, real *currentE, real *currentI, int *firedTable, int *firedTableSizes, int num, int start_id, int time)
 {
 	int currentIdx = time % (MAX_DELAY+1);
 	__shared__ int fire_table_t[MAX_BLOCK_SIZE];
@@ -55,8 +55,8 @@ __global__ void update_array_neuron(GArrayNeurons *data, real *currentE, real *c
 	}
 }
 
-void cudaUpdateArray(void *data, real *currentE, real *currentI, int * fireTable, int num, int start_id, int time, BlockSize *pSize)
+void cudaUpdateArray(void *data, real *currentE, real *currentI, int *firedTable, int *firedTableSizes, int num, int start_id, int time, BlockSize *pSize)
 {
-	update_array_neuron<<<pSize->gridSize, pSize->blockSize>>>((GArrayNeurons*)data, currentE, currentI, fireTable, num, start_id, time);
+	update_array_neuron<<<pSize->gridSize, pSize->blockSize>>>((GArrayNeurons*)data, currentE, currentI, firedTable, firedTableSizes, num, start_id, time);
 }
 

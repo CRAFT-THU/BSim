@@ -41,12 +41,12 @@ __constant__ real DT;
 //__device__ int *gTimeTable;
 
 // Neuron Arrays
-__device__ real *gNeuronInput;
-__device__ real *gNeuronInput_I;
+// __device__ real *gNeuronInput;
+// __device__ real *gNeuronInput_I;
 
 // Neuron Tables
-__device__ int *gFiredTable;
-__device__ int *gFiredTableSizes;
+// __device__ int *gFiredTable;
+// __device__ int *gFiredTableSizes;
 __device__ int *gActiveTable;
 __device__ int gActiveTableSize;
 

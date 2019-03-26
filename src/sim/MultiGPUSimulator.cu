@@ -17,6 +17,7 @@
 #include "../gpu_utils/runtime.h"
 #include "../gpu_utils/GBuffers.h"
 #include "../net/MultiNetwork.h"
+
 #include "MultiGPUSimulator.h"
 
 using std::cout;
@@ -166,7 +167,7 @@ void * run_thread_gpu(void *para) {
 
 		for (int i=0; i<nTypeNum; i++) {
 			assert(c_pGpuNet->neuronNums[i+1]-c_pGpuNet->neuronNums[i] > 0);
-			cudaUpdateType[pCpuNet->nTypes[i]](c_pGpuNet->pNeurons[i], c_pGpuNet->neuronNums[i+1]-c_pGpuNet->neuronNums[i], c_pGpuNet->neuronNums[i], time, &updateSize[c_pGpuNet->nTypes[i]]);
+			cudaUpdateType[pCpuNet->nTypes[i]](c_pGpuNet->pNeurons[i], buffers->c_gNeuronInput, buffers->c_gNeuronInput_I, buffers->c_gFiredTable, buffers->c_gFiredTableSizes, c_pGpuNet->neuronNums[i+1]-c_pGpuNet->neuronNums[i], c_pGpuNet->neuronNums[i], time, &updateSize[c_pGpuNet->nTypes[i]]);
 		}
 
 		//gettimeofday(&t0, NULL);
@@ -216,7 +217,7 @@ void * run_thread_gpu(void *para) {
 
 		for (int i=0; i<sTypeNum; i++) {
 			assert(c_pGpuNet->synapseNums[i+1]-c_pGpuNet->synapseNums[i] > 0);
-			cudaUpdateType[pCpuNet->sTypes[i]](c_pGpuNet->pSynapses[i], c_pGpuNet->synapseNums[i+1]-c_pGpuNet->synapseNums[i], c_pGpuNet->synapseNums[i], time, &updateSize[pCpuNet->sTypes[i]]);
+			cudaUpdateType[pCpuNet->sTypes[i]](c_pGpuNet->pSynapses[i], buffers->c_gNeuronInput, buffers->c_gNeuronInput_I, buffers->c_gFiredTable, buffers->c_gFiredTableSizes, c_pGpuNet->synapseNums[i+1]-c_pGpuNet->synapseNums[i], c_pGpuNet->synapseNums[i], time, &updateSize[pCpuNet->sTypes[i]]);
 		}
 		//cudaDeviceSynchronize();
 

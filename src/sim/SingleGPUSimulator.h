@@ -14,7 +14,7 @@ public:
 
 	using SimulatorBase::run;
 	virtual int run(real time, FireInfo &log);
-	int runMultiNets(real time, FireInfo &log);
+	int runMultiNets(real time, int parts, FireInfo &log);
 	//int compare_run(real time);
 	//int cudaAllocGlobal();
 	//int cudaFreeGlobal();

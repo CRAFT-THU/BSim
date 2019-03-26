@@ -1,7 +1,7 @@
 
 #include "../../third_party/cuda/helper_cuda.h"
 #include "../../gpu_utils/mem_op.h"
-#include "GLIFENeurons.h"
+#include "GLIFNeurons.h"
 
 int cudaAllocLIFE(void *pCpu, void *pGpu, int num)
 {

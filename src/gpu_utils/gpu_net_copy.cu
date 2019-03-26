@@ -1,5 +1,5 @@
 
-#include "../neuron/lif/GLIFENeurons.h"
+#include "../neuron/lif/GLIFNeurons.h"
 #include "../utils/TypeFunc.h"
 #include "mem_op.h"
 #include "gpu_func.h"
@@ -121,8 +121,8 @@ int fetchNetworkFromGPU(GNetwork *pCpuNet, GNetwork *pGpuNet)
 
 	//TODO support multitype N and S
 	for (int i=0; i<nTypeNum; i++) {
-		if (pCpuNet->nTypes[i] == LIFE) {
-			cudaFetchLIFE(pGpuNet->pNeurons[i], pCpuNet->pNeurons[i], pCpuNet->neuronNums[i+1]-pCpuNet->neuronNums[i]);
+		if (pCpuNet->nTypes[i] == LIF) {
+			cudaFetchLIF(pGpuNet->pNeurons[i], pCpuNet->pNeurons[i], pCpuNet->neuronNums[i+1]-pCpuNet->neuronNums[i]);
 		}
 		//TODO: cudaFetchType
 		//cudaFetchType[pCpuNet->nTypes[i]](pGpuNet->pNeurons[i], pCpuNet->pNeurons[i], pCpuNet->neuronNums[i+1]-pCpuNet->neuronNums[i]);
