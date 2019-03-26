@@ -28,7 +28,7 @@
 	int mpiSend##name(void *data, int rank, int offset, int size); \
 	int mpiRecv##name(void **data, int rank, int size); \
 	int cudaAlloc##name(void *pCpu, void *pGpu, int num); \
-	void cudaUpdate##name(void *data, real *currentE, real *currentI, int *firedTable, int *firedTableSizes, int num, int start_id, int t, BlockSize *pSize); \
+	void cudaUpdate##name(void *connection, void *data, real *currentE, real *currentI, int *firedTable, int *firedTableSizes, int num, int start_id, int t, BlockSize *pSize); \
 	int cudaFree##name(void *pGpu);
 
 #define NEURON_GPU_FUNC_BASIC(name) \

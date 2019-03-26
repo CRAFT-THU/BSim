@@ -96,7 +96,7 @@ int SingleGPUSimulator::run(real time, FireInfo &log)
 	int MAX_DELAY = pCpuNet->MAX_DELAY;
 	fprintf(info_file, "MAX_DELAY: %d\n", pCpuNet->MAX_DELAY);
 
-	init_connection<<<1, 1>>>(c_pGpuNet->pN2SConnection);
+	// init_connection<<<1, 1>>>(c_pGpuNet->pN2SConnection);
 
 	GBuffers *buffers = alloc_buffers(totalNeuronNum, totalSynapseNum, MAX_DELAY, dt);
 
@@ -167,13 +167,13 @@ int SingleGPUSimulator::run(real time, FireInfo &log)
 		update_time<<<1, 1>>>(time, buffers->c_gFiredTableSizes);
 
 		for (int i=0; i<nTypeNum; i++) {
-			cudaUpdateType[pCpuNet->nTypes[i]](c_pGpuNet->pNeurons[i], buffers->c_gNeuronInput, buffers->c_gNeuronInput_I, buffers->c_gFiredTable, buffers->c_gFiredTableSizes, c_pGpuNet->neuronNums[i+1]-c_pGpuNet->neuronNums[i], c_pGpuNet->neuronNums[i],time, &updateSize[c_pGpuNet->nTypes[i]]);
+			cudaUpdateNeuron[pCpuNet->nTypes[i]](c_pGpuNet->pNeurons[i], buffers->c_gNeuronInput, buffers->c_gNeuronInput_I, buffers->c_gFiredTable, buffers->c_gFiredTableSizes, c_pGpuNet->neuronNums[i+1]-c_pGpuNet->neuronNums[i], c_pGpuNet->neuronNums[i],time, &updateSize[c_pGpuNet->nTypes[i]]);
 		}
 
 		//update_pre_synapse<<<preSize.gridSize, preSize.blockSize>>>(c_pGpuNet->pN2SConnection);
 
 		for (int i=0; i<sTypeNum; i++) {
-			cudaUpdateType[pCpuNet->sTypes[i]](c_pGpuNet->pSynapses[i], buffers->c_gNeuronInput, buffers->c_gNeuronInput_I, buffers->c_gFiredTable, buffers->c_gFiredTableSizes, c_pGpuNet->synapseNums[i+1]-c_pGpuNet->synapseNums[i], c_pGpuNet->synapseNums[i], time, &updateSize[pCpuNet->sTypes[i]]);
+			cudaUpdateSynapse[pCpuNet->sTypes[i]](c_pGpuNet->pN2SConnection, c_pGpuNet->pSynapses[i], buffers->c_gNeuronInput, buffers->c_gNeuronInput_I, buffers->c_gFiredTable, buffers->c_gFiredTableSizes, c_pGpuNet->synapseNums[i+1]-c_pGpuNet->synapseNums[i], c_pGpuNet->synapseNums[i], time, &updateSize[pCpuNet->sTypes[i]]);
 		}
 
 

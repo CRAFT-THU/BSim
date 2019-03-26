@@ -84,6 +84,18 @@ for (name, body) in zip(func_names, func_mains):
                 tmp += ("\n\tNULL,")
             else:
                 tmp += ("\n\t" + name.replace("Type", type_name) + ",")
+    elif name.find("Neuron") >= 0:
+        for type_name in type_content_main:
+            if type_content_main.index(type_name) < type_content_main.index("Static"):
+                tmp += ("\n\t" + name.replace("Neuron", type_name) + ",")
+            else:
+                tmp += ("\n\tNULL,")
+    elif name.find("Synapse") >= 0:
+        for type_name in type_content_main:
+            if type_content_main.index(type_name) < type_content_main.index("Static"):
+                tmp += ("\n\tNULL,")
+            else:
+                tmp += ("\n\t" + name.replace("Synapse", type_name) + ",")
     else:
         for type_name in type_content_main:
             tmp += ("\n\t" + name.replace("Type", type_name) + ",")

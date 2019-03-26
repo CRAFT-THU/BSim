@@ -73,7 +73,7 @@ __device__ real *gXInput;
 __device__ int *gFireCount;
 
 // Connection
-__device__ N2SConnection *gConnection;
+// __device__ N2SConnection *gConnection;
 
 
 __device__ int commit2globalTable(int *shared_buf, volatile unsigned int size, int *global_buf, int * global_size, int offset) 
@@ -188,12 +188,12 @@ __global__ void cudaDeliverNeurons(int *firedTable, int *firedTableSizes, int *i
 	}
 }
 
-__global__ void init_connection(N2SConnection *pConnection)
-{
-	if ((threadIdx.x == 0) && (blockIdx.x == 0)) {
-		gConnection = pConnection;
-	}
-}
+// __global__ void init_connection(N2SConnection *pConnection)
+// {
+// 	if ((threadIdx.x == 0) && (blockIdx.x == 0)) {
+// 		gConnection = pConnection;
+// 	}
+// }
 
 BlockSize * getBlockSize(int nSize, int sSize)
 {
