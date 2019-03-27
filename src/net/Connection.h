@@ -16,7 +16,11 @@ struct N2SConnection {
 
 	int n_num;
 	int s_num;
+
+	int MAX_DELAY;
 };
+
+N2SConnection * copyConnectionToGPU(N2SConnection * pCPU);
 
 #endif /* CONNECTION_H */
 

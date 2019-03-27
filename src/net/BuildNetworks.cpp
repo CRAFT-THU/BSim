@@ -183,6 +183,7 @@ N2SConnection* MultiNetwork::arrangeConnect(int n_num, int s_num, int node_idx)
 
 	connection->n_num = n_num;
 	connection->s_num = s_num;
+	connection->MAX_DELAY = _network->maxDelaySteps;
 
 	int *delay_num = (int*)malloc(sizeof(int)*(_network->maxDelaySteps)*(n_num));
 	assert(delay_num != NULL);

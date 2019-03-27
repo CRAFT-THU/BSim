@@ -142,6 +142,7 @@ GNetwork* Network::buildNetwork()
 
 	pAllConnections->n_num = totalNeuronNum;
 	pAllConnections->s_num = totalSynapseNum;
+	pAllConnections->MAX_DELAY = this->maxDelaySteps;
 
 	int *delayNum = (int*)malloc(sizeof(int)*(this->maxDelaySteps)*totalNeuronNum);
 	assert(delayNum != NULL);
