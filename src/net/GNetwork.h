@@ -35,9 +35,15 @@ struct GNetwork {
 
 //This func donot deal with the member of N2SConnection
 GNetwork * initGNetwork(int ntype_num, int stype_num);
-void freeGNetwork(GNetwork * network);
 
 //TODO freeGNetwork
+void freeGNetwork(GNetwork * network);
+
+// Only copy inside data arrays to GPU, the info data is left on CPU
+GNetwork* copyNetworkToGPU(GNetwork *);
+int fetchNetworkFromGPU(GNetwork *, GNetwork*);
+int freeGPUNetwork(GNetwork *);
+int checkGPUNetwork(GNetwork *g, GNetwork *c);
 
 int copyNetwork(GNetwork *dNet, GNetwork *sNet, int rank, int rankSize);
 int mpiSendNetwork(GNetwork *network, int rank, int rankSize);

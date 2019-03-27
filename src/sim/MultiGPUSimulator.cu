@@ -12,7 +12,7 @@
 #include "../utils/utils.h"
 #include "../utils/TypeFunc.h"
 #include "../gpu_utils/mem_op.h"
-#include "../gpu_utils/gpu_utils.h"
+// #include "../gpu_utils/gpu_utils.h"
 #include "../gpu_utils/runtime.h"
 #include "../gpu_utils/GBuffers.h"
 #include "../net/MultiNetwork.h"
@@ -108,19 +108,19 @@ void * run_thread_gpu(void *para) {
 	GNetwork *pCpuNet = network->_network;
 	GNetwork *c_pGpuNet = copyNetworkToGPU(pCpuNet);
 
-	int nTypeNum = pCpuNet->nTypeNum;
-	int sTypeNum = pCpuNet->sTypeNum;
-	int nodeNeuronNum = pCpuNet->neuronNums[nTypeNum];
+	int nTypeNum = c_pGpuNet->nTypeNum;
+	int sTypeNum = c_pGpuNet->sTypeNum;
+	int nodeNeuronNum = c_pGpuNet->neuronNums[nTypeNum];
 	int allNeuronNum = pCpuNet->pN2SConnection->n_num;
-	int nodeSynapseNum = pCpuNet->synapseNums[sTypeNum];
+	int nodeSynapseNum = c_pGpuNet->synapseNums[sTypeNum];
 	printf("Thread %d NeuronTypeNum: %d, SynapseTypeNum: %d\n", network->_node_idx, nTypeNum, sTypeNum);
 	printf("Thread %d NeuronNum: %d, SynapseNum: %d\n", network->_node_idx, nodeNeuronNum, nodeSynapseNum);
 
 	//int dataOffset = network->_node_idx * network->_node_num;
 	//int dataIdx = network->_node_idx * network->_node_num + network->_node_idx;
 
-	int MAX_DELAY = pCpuNet->MAX_DELAY;
-	printf("Thread %d MAX_DELAY: %d\n", network->_node_idx, pCpuNet->MAX_DELAY);
+	int MAX_DELAY = c_pGpuNet->MAX_DELAY;
+	printf("Thread %d MAX_DELAY: %d\n", network->_node_idx, c_pGpuNet->MAX_DELAY);
 
 	// init_connection<<<1, 1>>>(c_pGpuNet->pN2SConnection);
 
@@ -130,7 +130,7 @@ void * run_thread_gpu(void *para) {
 
 #ifdef LOG_DATA
 	real *c_vm = hostMalloc<real>(nodeNeuronNum);
-	int life_idx = getIndex(pCpuNet->nTypes, nTypeNum, LIF);
+	int life_idx = getIndex(c_pGpuNet->nTypes, nTypeNum, LIF);
 	int copy_idx = -1;
 	real *c_g_vm = NULL;
 
@@ -143,10 +143,10 @@ void * run_thread_gpu(void *para) {
 #endif
 
 	for (int i=0; i<nTypeNum; i++) {
-		cout << "Thread " << network->_node_idx << " " << pCpuNet->nTypes[i] << ": <<<" << updateSize[c_pGpuNet->nTypes[i]].gridSize << ", " << updateSize[c_pGpuNet->nTypes[i]].blockSize << ">>>" << endl;
+		cout << "Thread " << network->_node_idx << " " << c_pGpuNet->nTypes[i] << ": <<<" << updateSize[c_pGpuNet->nTypes[i]].gridSize << ", " << updateSize[c_pGpuNet->nTypes[i]].blockSize << ">>>" << endl;
 	}
 	for (int i=0; i<sTypeNum; i++) {
-		cout << "Thread " << network->_node_idx << " " << pCpuNet->sTypes[i] << ": <<<" << updateSize[c_pGpuNet->sTypes[i]].gridSize << ", " << updateSize[c_pGpuNet->sTypes[i]].blockSize << ">>>" << endl;
+		cout << "Thread " << network->_node_idx << " " << c_pGpuNet->sTypes[i] << ": <<<" << updateSize[c_pGpuNet->sTypes[i]].gridSize << ", " << updateSize[c_pGpuNet->sTypes[i]].blockSize << ">>>" << endl;
 	}
 
 	//int * c_g_cross_id = gpuMalloc<int>(global_cross_data[dataIdx]._max_n_num); 
@@ -166,7 +166,7 @@ void * run_thread_gpu(void *para) {
 
 		for (int i=0; i<nTypeNum; i++) {
 			assert(c_pGpuNet->neuronNums[i+1]-c_pGpuNet->neuronNums[i] > 0);
-			cudaUpdateNeuron[pCpuNet->nTypes[i]](c_pGpuNet->pNeurons[i], buffers->c_gNeuronInput, buffers->c_gNeuronInput_I, buffers->c_gFiredTable, buffers->c_gFiredTableSizes, c_pGpuNet->neuronNums[i+1]-c_pGpuNet->neuronNums[i], c_pGpuNet->neuronNums[i], time, &updateSize[c_pGpuNet->nTypes[i]]);
+			cudaUpdateNeuron[c_pGpuNet->nTypes[i]](c_pGpuNet->pNeurons[i], buffers->c_gNeuronInput, buffers->c_gNeuronInput_I, buffers->c_gFiredTable, buffers->c_gFiredTableSizes, c_pGpuNet->neuronNums[i+1]-c_pGpuNet->neuronNums[i], c_pGpuNet->neuronNums[i], time, &updateSize[c_pGpuNet->nTypes[i]]);
 		}
 
 		//gettimeofday(&t0, NULL);
@@ -218,7 +218,7 @@ void * run_thread_gpu(void *para) {
 
 		for (int i=0; i<sTypeNum; i++) {
 			assert(c_pGpuNet->synapseNums[i+1]-c_pGpuNet->synapseNums[i] > 0);
-			cudaUpdateSynapse[pCpuNet->sTypes[i]](c_pGpuNet->pN2SConnection, c_pGpuNet->pSynapses[i], buffers->c_gNeuronInput, buffers->c_gNeuronInput_I, buffers->c_gFiredTable, buffers->c_gFiredTableSizes, c_pGpuNet->synapseNums[i+1]-c_pGpuNet->synapseNums[i], c_pGpuNet->synapseNums[i], time, &updateSize[pCpuNet->sTypes[i]]);
+			cudaUpdateSynapse[c_pGpuNet->sTypes[i]](c_pGpuNet->pN2SConnection, c_pGpuNet->pSynapses[i], buffers->c_gNeuronInput, buffers->c_gNeuronInput_I, buffers->c_gFiredTable, buffers->c_gFiredTableSizes, c_pGpuNet->synapseNums[i+1]-c_pGpuNet->synapseNums[i], c_pGpuNet->synapseNums[i], time, &updateSize[c_pGpuNet->sTypes[i]]);
 		}
 		//cudaDeviceSynchronize();
 
