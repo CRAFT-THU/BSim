@@ -11,7 +11,7 @@ GNetwork* copyNetworkToGPU(GNetwork *pCpuNet)
 {
 	if (pCpuNet == NULL) {
 		printf("NULL POINTER: GNETWORK\n");
-		exit(-1);
+		return NULL;
 	}
 
 	GNetwork *tmpNet = (GNetwork*)malloc(sizeof(GNetwork));

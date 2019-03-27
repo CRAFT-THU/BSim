@@ -8,6 +8,7 @@
 #include <iostream>
 
 #include "../utils/utils.h"
+#include "../utils/FileOp.h"
 #include "../utils/TypeFunc.h"
 #include "../gpu_utils/mem_op.h"
 // #include "../gpu_utils/gpu_utils.h"
@@ -40,47 +41,17 @@ int SingleGPUSimulator::run(real time, FireInfo &log)
 
 	GNetwork *pCPUNet = network->buildNetwork();
 
-	FILE *v_file = fopen("g_v.data", "w+");
-	if (v_file == NULL) {
-		printf("ERROR: Open file g_v.data failed\n");
-		return -1;
-	}
+	FILE *v_file = openFile("v.data", "w+");
 
-	FILE *input_e_file = fopen("g_input_e.data", "w+");
-	if (input_e_file == NULL) {
-		printf("Open file g_input_e.data failed\n");
-		return -1;
-	}
+	FILE *input_e_file = openFile("input_e.data", "w+");
 
-	FILE *input_i_file = fopen("g_input_i.data", "w+");
-	if (input_i_file == NULL) {
-		printf("Open file g_input_i.data failed\n");
-		return -1;
-	}
+	FILE *input_i_file = openFile("input_i.data", "w+");
 
-	FILE *ie_file = fopen("g_ie.data", "w+");
-	if (ie_file == NULL) {
-		printf("ERROR: Open file g_ie.data failed\n");
-		return -1;
-	}
+	FILE *ie_file = openFile("ie.data", "w+");
 
-	FILE *ii_file = fopen("g_ii.data", "w+");
-	if (ii_file == NULL) {
-		printf("ERROR: Open file g_ii.data failed\n");
-		return -1;
-	}
+	FILE *ii_file = openFile("ii.data", "w+");
 
-	FILE *info_file = fopen("GSim.info", "w+");
-	if (info_file == NULL) {
-		printf("ERROR: Open file GSim.info failed\n");
-		return -1;
-	}
-
-	FILE *log_file = fopen("GSim.log", "w+");
-	if (log_file == NULL) {
-		printf("ERROR: Open file GSim.log failed\n");
-		return -1;
-	}
+	FILE *log_file = openFile("sim.log", "w+");
 
 	//findCudaDevice(0, NULL);
 	checkCudaErrors(cudaSetDevice(0));
@@ -90,228 +61,202 @@ int SingleGPUSimulator::run(real time, FireInfo &log)
 	int sTypeNum = c_pGPUNet->sTypeNum;
 	int totalNeuronNum = c_pGPUNet->neuronNums[nTypeNum];
 	int totalSynapseNum = c_pGPUNet->synapseNums[sTypeNum];
-	fprintf(info_file, "NeuronTypeNum: %d, SynapseTypeNum: %d\n", nTypeNum, sTypeNum);
-	fprintf(info_file, "NeuronNum: %d, SynapseNum: %d\n", totalNeuronNum, totalSynapseNum);
+	printf("NeuronTypeNum: %d, SynapseTypeNum: %d\n", nTypeNum, sTypeNum);
+	printf("NeuronNum: %d, SynapseNum: %d\n", totalNeuronNum, totalSynapseNum);
 
 	int MAX_DELAY = c_pGPUNet->MAX_DELAY;
-	fprintf(info_file, "MAX_DELAY: %d\n", c_pGPUNet->MAX_DELAY);
+	printf("MAX_DELAY: %d\n", c_pGPUNet->MAX_DELAY);
 
-	// init_connection<<<1, 1>>>(c_pGPUNet->pN2SConnection);
 
 	GBuffers *buffers = alloc_buffers(totalNeuronNum, totalSynapseNum, MAX_DELAY, dt);
 
 	BlockSize *updateSize = getBlockSize(totalNeuronNum, totalSynapseNum);
-	//BlockSize preSize = { 0, 0, 0};
-	//cudaOccupancyMaxPotentialBlockSize(&(preSize.minGridSize), &(preSize.blockSize), update_pre_synapse, 0, totalNeuronNum); 
-	//preSize.gridSize = (totalSynapseNum + (preSize.blockSize) - 1) / (preSize.blockSize);
 
 #ifdef LOG_DATA
 	real *c_vm = hostMalloc<real>(totalNeuronNum);
 
-	// int tj_idx = getIndex(c_pGPUNet->nTypes, nTypeNum, TJ);
-	int life_idx = getIndex(c_pGPUNet->nTypes, nTypeNum, LIF);
-	int copy_idx = -1;
-	real *c_g_vm = NULL;
-	real *c_g_ie = NULL;
-	real *c_g_ii = NULL;
+	int copy_idx = getIndex(c_pGPUNet->nTypes, nTypeNum, LIF);
 
-	if (life_idx >= 0) {
-		GLIFNeurons *c_g_lif = copyFromGPU<GLIFNeurons>(static_cast<GLIFNeurons*>(c_pGPUNet->pNeurons[life_idx]), 1);
-		c_g_vm = c_g_lif->p_vm;
-		c_g_ie = c_g_lif->p_i_E;
-		c_g_ii = c_g_lif->p_i_I;
-		copy_idx = life_idx;
-	} /* else if (tj_idx >= 0) {
-		 GTJNeurons *c_g_tj = copyFromGPU<GTJNeurons>(static_cast<GTJNeurons*>(c_pGPUNet->pNeurons[tj_idx]), 1);
-		 c_g_vm = c_g_tj->p_vm;
-		 copy_idx = tj_idx;
-		 } */ else {
-		 }
+	GLIFNeurons *c_g_lif = copyFromGPU<GLIFNeurons>(static_cast<GLIFNeurons*>(c_pGPUNet->pNeurons[copy_idx]), 1);
+
+	real *c_g_vm = c_g_lif->p_vm;
+#ifdef DEBUG 
+	real *c_g_ie = c_g_lif->p_i_E;
+	real *c_g_ii = c_g_lif->p_i_I;
+#endif
 #endif
 
-//real *c_I_syn = hostMalloc<real>(totalSynapseNum);
-//int exp_idx = getIndex(c_pGPUNet->sTypes, sTypeNum, Exp);
-//GExpSynapses *c_g_exp = copyFromGPU<GExpSynapses>(static_cast<GExpSynapses*>(c_pGPUNet->pSynapses[exp_idx]), 1);
-//real *c_g_I_syn = c_g_exp->p_I_syn;
+	//real *c_I_syn = hostMalloc<real>(totalSynapseNum);
+	//int exp_idx = getIndex(c_pGPUNet->sTypes, sTypeNum, Exp);
+	//GExpSynapses *c_g_exp = copyFromGPU<GExpSynapses>(static_cast<GExpSynapses*>(c_pGPUNet->pSynapses[exp_idx]), 1);
+	//real *c_g_I_syn = c_g_exp->p_I_syn;
 
-//for (int i=0; i<nTypeNum; i++) {
-//	cout << c_pGPUNet->nTypes[i] << ": <<<" << updateSize[c_pGPUNet->nTypes[i]].gridSize << ", " << updateSize[c_pGPUNet->nTypes[i]].blockSize << ">>>" << endl;
-//}
-//for (int i=0; i<sTypeNum; i++) {
-//	cout << c_pGPUNet->sTypes[i] << ": <<<" << updateSize[c_pGPUNet->sTypes[i]].gridSize << ", " << updateSize[c_pGPUNet->sTypes[i]].blockSize << ">>>" << endl;
-//}
+	//for (int i=0; i<nTypeNum; i++) {
+	//	cout << c_pGPUNet->nTypes[i] << ": <<<" << updateSize[c_pGPUNet->nTypes[i]].gridSize << ", " << updateSize[c_pGPUNet->nTypes[i]].blockSize << ">>>" << endl;
+	//}
+	//for (int i=0; i<sTypeNum; i++) {
+	//	cout << c_pGPUNet->sTypes[i] << ": <<<" << updateSize[c_pGPUNet->sTypes[i]].gridSize << ", " << updateSize[c_pGPUNet->sTypes[i]].blockSize << ">>>" << endl;
+	//}
 
-vector<int> firedInfo;
-fprintf(info_file, "Start runing for %d cycles\n", sim_cycle);
-struct timeval ts, te;
-gettimeofday(&ts, NULL);
-for (int time=0; time<sim_cycle; time++) {
-	//printf("Cycle: %d ", time);
-	//fflush(stdout);
+	vector<int> firedInfo;
+	printf("Start runing for %d cycles\n", sim_cycle);
+	struct timeval ts, te;
+	gettimeofday(&ts, NULL);
+	for (int time=0; time<sim_cycle; time++) {
+		//printf("Cycle: %d ", time);
+		//fflush(stdout);
 
-#ifdef LOG_DATA
-	if (copy_idx >= 0) {
-		//copyFromGPU<real>(c_vm, buffers->c_gNeuronInput + c_pGPUNet->neuronNums[copy_idx], c_pGPUNet->neuronNums[copy_idx+1]-c_pGPUNet->neuronNums[copy_idx]);
+#ifdef DEBUG
 		copyFromGPU<real>(c_vm, buffers->c_gNeuronInput + c_pGPUNet->neuronNums[copy_idx], c_pGPUNet->neuronNums[copy_idx+1]-c_pGPUNet->neuronNums[copy_idx]);
 		for (int i=0; i<c_pGPUNet->neuronNums[copy_idx+1] - c_pGPUNet->neuronNums[copy_idx]; i++) {
 			fprintf(input_e_file, "%.10lf \t", c_vm[i]);
 		}
-		//copyFromGPU<real>(c_vm, buffers->c_gNeuronInput_I + c_pGPUNet->neuronNums[copy_idx], c_pGPUNet->neuronNums[copy_idx+1]-c_pGPUNet->neuronNums[copy_idx]);
+		fprintf(input_e_file, "\n");
 		copyFromGPU<real>(c_vm, buffers->c_gNeuronInput_I + c_pGPUNet->neuronNums[copy_idx], c_pGPUNet->neuronNums[copy_idx+1]-c_pGPUNet->neuronNums[copy_idx]);
 		for (int i=0; i<c_pGPUNet->neuronNums[copy_idx+1] - c_pGPUNet->neuronNums[copy_idx]; i++) {
 			fprintf(input_i_file, "%.10lf \t", c_vm[i]);
 		}
-	}
+		fprintf(input_i_file, "\n");
 #endif
 
-	update_time<<<1, 1>>>(time, buffers->c_gFiredTableSizes);
+		update_time<<<1, 1>>>(time, buffers->c_gFiredTableSizes);
 
-	for (int i=0; i<nTypeNum; i++) {
-		cudaUpdateNeuron[c_pGPUNet->nTypes[i]](c_pGPUNet->pNeurons[i], buffers->c_gNeuronInput, buffers->c_gNeuronInput_I, buffers->c_gFiredTable, buffers->c_gFiredTableSizes, c_pGPUNet->neuronNums[i+1]-c_pGPUNet->neuronNums[i], c_pGPUNet->neuronNums[i],time, &updateSize[c_pGPUNet->nTypes[i]]);
-	}
+		for (int i=0; i<nTypeNum; i++) {
+			cudaUpdateNeuron[c_pGPUNet->nTypes[i]](c_pGPUNet->pNeurons[i], buffers->c_gNeuronInput, buffers->c_gNeuronInput_I, buffers->c_gFiredTable, buffers->c_gFiredTableSizes, c_pGPUNet->neuronNums[i+1]-c_pGPUNet->neuronNums[i], c_pGPUNet->neuronNums[i],time, &updateSize[c_pGPUNet->nTypes[i]]);
+		}
 
-	//update_pre_synapse<<<preSize.gridSize, preSize.blockSize>>>(c_pGPUNet->pN2SConnection);
-
-	for (int i=0; i<sTypeNum; i++) {
-		cudaUpdateSynapse[c_pGPUNet->sTypes[i]](c_pGPUNet->pN2SConnection, c_pGPUNet->pSynapses[i], buffers->c_gNeuronInput, buffers->c_gNeuronInput_I, buffers->c_gFiredTable, buffers->c_gFiredTableSizes, c_pGPUNet->synapseNums[i+1]-c_pGPUNet->synapseNums[i], c_pGPUNet->synapseNums[i], time, &updateSize[c_pGPUNet->sTypes[i]]);
-	}
+		for (int i=0; i<sTypeNum; i++) {
+			cudaUpdateSynapse[c_pGPUNet->sTypes[i]](c_pGPUNet->pN2SConnection, c_pGPUNet->pSynapses[i], buffers->c_gNeuronInput, buffers->c_gNeuronInput_I, buffers->c_gFiredTable, buffers->c_gFiredTableSizes, c_pGPUNet->synapseNums[i+1]-c_pGPUNet->synapseNums[i], c_pGPUNet->synapseNums[i], time, &updateSize[c_pGPUNet->sTypes[i]]);
+		}
 
 
 #ifdef LOG_DATA
-	//LOG DATA
-	int currentIdx = time%(MAX_DELAY+1);
+		//LOG DATA
+		int currentIdx = time%(MAX_DELAY+1);
 
-	//printf("HERE %p %d ", buffers->c_gFiredTableSizes, currentIdx);
-	//fflush(stdout);
-	int copySize = 0;
-	copyFromGPU<int>(&copySize, buffers->c_gFiredTableSizes + currentIdx, 1);
-	//printf("HERE1\n");
-	//fflush(stdout);
-	copyFromGPU<int>(buffers->c_neuronsFired, buffers->c_gFiredTable + (totalNeuronNum*currentIdx), copySize);
+		//printf("HERE %p %d ", buffers->c_gFiredTableSizes, currentIdx);
+		//fflush(stdout);
+		int copySize = 0;
+		copyFromGPU<int>(&copySize, buffers->c_gFiredTableSizes + currentIdx, 1);
+		//printf("HERE1\n");
+		//fflush(stdout);
+		copyFromGPU<int>(buffers->c_neuronsFired, buffers->c_gFiredTable + (totalNeuronNum*currentIdx), copySize);
+		//copyFromGPU<real>(c_I_syn, c_g_I_syn, c_pGPUNet->synapseNums[exp_idx+1]-c_pGPUNet->synapseNums[exp_idx]);
 
-	//copyFromGPU<real>(c_I_syn, c_g_I_syn, c_pGPUNet->synapseNums[exp_idx+1]-c_pGPUNet->synapseNums[exp_idx]);
-
-	//fprintf(dataFile, "Cycle %d: ", time);
-	if (copy_idx >= 0) {
+		//fprintf(dataFile, "Cycle %d: ", time);
 		copyFromGPU<real>(c_vm, c_g_vm, c_pGPUNet->neuronNums[copy_idx+1]-c_pGPUNet->neuronNums[copy_idx]);
 		for (int i=0; i<c_pGPUNet->neuronNums[copy_idx+1] - c_pGPUNet->neuronNums[copy_idx]; i++) {
 			fprintf(v_file, "%.10lf \t", c_vm[i]);
 		}
-
-
-		if (life_idx >= 0) {
-			copyFromGPU<real>(c_vm, c_g_ie, c_pGPUNet->neuronNums[copy_idx+1]-c_pGPUNet->neuronNums[copy_idx]);
-			for (int i=0; i<c_pGPUNet->neuronNums[copy_idx+1] - c_pGPUNet->neuronNums[copy_idx]; i++) {
-				fprintf(ie_file, "%.10lf \t", c_vm[i]);
-			}
-			copyFromGPU<real>(c_vm, c_g_ii, c_pGPUNet->neuronNums[copy_idx+1]-c_pGPUNet->neuronNums[copy_idx]);
-			for (int i=0; i<c_pGPUNet->neuronNums[copy_idx+1] - c_pGPUNet->neuronNums[copy_idx]; i++) {
-				fprintf(ii_file, "%.10lf \t", c_vm[i]);
-			}
+		fprintf(v_file, "\n");
+#ifdef DEBUG
+		copyFromGPU<real>(c_vm, c_g_ie, c_pGPUNet->neuronNums[copy_idx+1]-c_pGPUNet->neuronNums[copy_idx]);
+		for (int i=0; i<c_pGPUNet->neuronNums[copy_idx+1] - c_pGPUNet->neuronNums[copy_idx]; i++) {
+			fprintf(ie_file, "%.10lf \t", c_vm[i]);
 		}
-	}
-	//for (int i=0; i<c_pGPUNet->synapseNums[1] - c_pGPUNet->synapseNums[0]; i++) {
-	//		fprintf(dataFile, ", %lf", c_I_syn[i]);
-	//}
-	fprintf(v_file, "\n");
-	fprintf(input_e_file, "\n");
-	fprintf(input_i_file, "\n");
-	fprintf(ie_file, "\n");
-	fprintf(ii_file, "\n");
-
-	for (int i=0; i<copySize; i++) {
-		fprintf(log_file, "%d ", buffers->c_neuronsFired[i]);
-	}
-	fprintf(log_file, "\n");
-
-	//LOG SYNAPSE
-	//copyFromGPU<int>(buffers->c_synapsesFired, buffers->c_gSynapsesLogTable, totalSynapseNum);
-	//int synapseCount = 0;
-	//if (time > 0) {
-	//	for (int i=0; i<totalSynapseNum; i++) {
-	//		if (buffers->c_synapsesFired[i] == time) {
-	//			if (synapseCount ==  0) {
-	//				if (copySize > 0) {
-	//					fprintf(logFile, ", ");
-	//				}
-	//				fprintf(logFile, "%s", network->idx2sid[i].getInfo().c_str());
-	//				synapseCount++;
-	//			} else {
-	//				fprintf(logFile, ", %s", network->idx2sid[i].getInfo().c_str());
-	//			}
-	//		}
-	//	}
-	//	fprintf(logFile, "\n");
-	//}
+		fprintf(ie_file, "\n");
+		copyFromGPU<real>(c_vm, c_g_ii, c_pGPUNet->neuronNums[copy_idx+1]-c_pGPUNet->neuronNums[copy_idx]);
+		for (int i=0; i<c_pGPUNet->neuronNums[copy_idx+1] - c_pGPUNet->neuronNums[copy_idx]; i++) {
+			fprintf(ii_file, "%.10lf \t", c_vm[i]);
+		}
+		fprintf(ii_file, "\n");
+		//for (int i=0; i<c_pGPUNet->synapseNums[1] - c_pGPUNet->synapseNums[0]; i++) {
+		//		fprintf(dataFile, ", %lf", c_I_syn[i]);
+		//}
 #endif
-}
-cudaDeviceSynchronize();
 
-gettimeofday(&te, NULL);
-long seconds = te.tv_sec - ts.tv_sec;
-long hours = seconds/3600;
-seconds = seconds%3600;
-long minutes = seconds/60;
-seconds = seconds%60;
-long uSeconds = te.tv_usec - ts.tv_usec;
-if (uSeconds < 0) {
-	uSeconds += 1000000;
-	seconds = seconds - 1;
-}
+		for (int i=0; i<copySize; i++) {
+			fprintf(log_file, "%d ", buffers->c_neuronsFired[i]);
+		}
+		fprintf(log_file, "\n");
 
-fprintf(info_file, "Simulation finesed in %ld:%ld:%ld.%06lds\n", hours, minutes, seconds, uSeconds);
+		//LOG SYNAPSE
+		//copyFromGPU<int>(buffers->c_synapsesFired, buffers->c_gSynapsesLogTable, totalSynapseNum);
+		//int synapseCount = 0;
+		//if (time > 0) {
+		//	for (int i=0; i<totalSynapseNum; i++) {
+		//		if (buffers->c_synapsesFired[i] == time) {
+		//			if (synapseCount ==  0) {
+		//				if (copySize > 0) {
+		//					fprintf(logFile, ", ");
+		//				}
+		//				fprintf(logFile, "%s", network->idx2sid[i].getInfo().c_str());
+		//				synapseCount++;
+		//			} else {
+		//				fprintf(logFile, ", %s", network->idx2sid[i].getInfo().c_str());
+		//			}
+		//		}
+		//	}
+		//	fprintf(logFile, "\n");
+		//}
+#endif
+	}
+	cudaDeviceSynchronize();
 
-//CALC Firing Rate
-if (log.find("count") != log.end()) {
-	int *rate = (int*)malloc(sizeof(int)*totalNeuronNum);
-	copyFromGPU<int>(rate, buffers->c_gFireCount, totalNeuronNum);
+	gettimeofday(&te, NULL);
+	long seconds = te.tv_sec - ts.tv_sec;
+	long hours = seconds/3600;
+	seconds = seconds%3600;
+	long minutes = seconds/60;
+	seconds = seconds%60;
+	long uSeconds = te.tv_usec - ts.tv_usec;
+	if (uSeconds < 0) {
+		uSeconds += 1000000;
+		seconds = seconds - 1;
+	}
 
-	log["count"].size = totalNeuronNum;
-	log["count"].data = rate;
+	printf("Simulation finesed in %ld:%ld:%ld.%06lds\n", hours, minutes, seconds, uSeconds);
 
-	//FILE *rateFile = fopen("GFire.log", "w+");
-	//if (rateFile == NULL) {
-	//	printf("ERROR: Open file Sim.log failed\n");
-	//	return -1;
-	//}
+	//CALC Firing Rate
+	if (log.find("count") != log.end()) {
+		int *rate = (int*)malloc(sizeof(int)*totalNeuronNum);
+		copyFromGPU<int>(rate, buffers->c_gFireCount, totalNeuronNum);
 
-	//for (int i=0; i<totalNeuronNum; i++) {
-	//	fprintf(rateFile, "%d \t", rate[i]);
-	//}
+		log["count"].size = totalNeuronNum;
+		log["count"].data = rate;
 
-	//fflush(rateFile);
-	//fclose(rateFile);
-}
+		//FILE *rateFile = fopen("GFire.log", "w+");
+		//if (rateFile == NULL) {
+		//	printf("ERROR: Open file Sim.log failed\n");
+		//	return -1;
+		//}
 
-if (log.find("Y") != log.end()) {
-	real *Y = (real*)malloc(sizeof(real)*totalNeuronNum);
-	copyFromGPU<real>(Y, buffers->c_gXInput, totalNeuronNum);
-	log["Y"].size = totalNeuronNum;
-	log["Y"].data = Y;
-}
+		//for (int i=0; i<totalNeuronNum; i++) {
+		//	fprintf(rateFile, "%d \t", rate[i]);
+		//}
 
-if (log.find("X") != log.end()) {
-	int *X = (int*)malloc(sizeof(int)*totalNeuronNum);
-	copyFromGPU<int>(X, buffers->c_gLayerInput, totalNeuronNum);
-	log["X"].size = totalNeuronNum;
-	log["X"].data = X;
-}
+		//fflush(rateFile);
+		//fclose(rateFile);
+	}
+
+	if (log.find("Y") != log.end()) {
+		real *Y = (real*)malloc(sizeof(real)*totalNeuronNum);
+		copyFromGPU<real>(Y, buffers->c_gXInput, totalNeuronNum);
+		log["Y"].size = totalNeuronNum;
+		log["Y"].data = Y;
+	}
+
+	if (log.find("X") != log.end()) {
+		int *X = (int*)malloc(sizeof(int)*totalNeuronNum);
+		copyFromGPU<int>(X, buffers->c_gLayerInput, totalNeuronNum);
+		log["X"].size = totalNeuronNum;
+		log["X"].data = X;
+	}
 
 
 
-fclose(v_file);
-fclose(input_e_file);
-fclose(input_i_file);
-fclose(ie_file);
-fclose(ii_file);
-fclose(info_file);
-fclose(log_file);
+	closeFile(v_file);
+	closeFile(input_e_file);
+	closeFile(input_i_file);
+	closeFile(ie_file);
+	closeFile(ii_file);
+	closeFile(log_file);
 
-free_buffers(buffers);
-freeGPUNetwork(c_pGPUNet);
-freeGNetwork(pCPUNet);
+	free_buffers(buffers);
+	freeGPUNetwork(c_pGPUNet);
+	freeGNetwork(pCPUNet);
 
-return 0;
+	return 0;
 }
 
 
