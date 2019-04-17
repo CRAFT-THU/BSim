@@ -19,33 +19,6 @@ GNetwork* copyNetworkToGPU(GNetwork *pCpuNet)
 
 	int nTypeNum = pCpuNet->nTypeNum;
 	int sTypeNum = pCpuNet->sTypeNum;
-	//int totalNeuronNum = pCpuNet->neuronNums[pCpuNet->nTypeNum];
-	//int totalSynapseNum = pCpuNet->synapseNums[pCpuNet->sTypeNum];
-	//int MAX_DELAY = pCpuNet->MAX_DELAY;
-
-	//Type *g_nTypes = NULL, *g_sTypes = NULL;
-	//checkCudaErrors(cudaMalloc((void**)&(g_nTypes), sizeof(Type)*nTypeNum));
-	//checkCudaErrors(cudaMemcpy(g_nTypes, pCpuNet->nTypes, sizeof(Type)*nTypeNum, cudaMemcpyHostToDevice));
-	//checkCudaErrors(cudaMalloc((void**)&(sTypes), sizeof(Type)*sTypeNum));
-	//checkCudaErrors(cudaMemcpy(g_sTypes, pCpuNet->sTypes, sizeof(Type)*sTypeNum, cudaMemcpyHostToDevice));
-
-	//int *g_neuronNums = NULL, *g_synapseNums = NULL;
-	//checkCudaErrors(cudaMalloc((void**)&(g_neuronNums), sizeof(int)*(nTypeNum+1)));
-	//checkCudaErrors(cudaMemcpy(g_neuronNums, pCpuNet->neuronNums, sizeof(int)*(nTypeNum+1), cudaMemcpyHostToDevice));
-	//checkCudaErrors(cudaMalloc((void**)&(g_synapseNums), sizeof(int)*(sTypeNum+1)));
-	//checkCudaErrors(cudaMemcpy(g_synapseNums, pCpuNet->synapseNums, sizeof(int)*(sTypeNum+1), cudaMemcpyHostToDevice));
-
-	//int *g_gNeuronNums = NULL, *g_gSynapseNums = NULL;
-	//checkCudaErrors(cudaMalloc((void**)&(g_gNeuronNums), sizeof(int)*(nTypeNum+1)));
-	//checkCudaErrors(cudaMemcpy(g_gNeuronNums, pCpuNet->gNeuronNums, sizeof(int)*(nTypeNum+1), cudaMemcpyHostToDevice));
-	//checkCudaErrors(cudaMalloc((void**)&(g_gSynapseNums), sizeof(int)*(sTypeNum+1)));
-	//checkCudaErrors(cudaMemcpy(g_gSynapseNums, pCpuNet->gSynapseNums, sizeof(int)*(sTypeNum+1), cudaMemcpyHostToDevice));
-
-	//int *nOffsets = NULL, *sOffsets = NULL;
-	//checkCudaErrors(cudaMalloc((void**)&(g_nOffsets), sizeof(int)*(nTypeNum)));
-	//checkCudaErrors(cudaMemcpy(g_nOffsets, pCpuNet->nOffsets, sizeof(int)*(nTypeNum), cudaMemcpyHostToDevice));
-	//checkCudaErrors(cudaMalloc((void**)&(g_sOffsets), sizeof(int)*(sTypeNum)));
-	//checkCudaErrors(cudaMemcpy(g_sOffsets, pCpuNet->sOffsets, sizeof(int)*(sTypeNum), cudaMemcpyHostToDevice));
 
 	//TODO support multitype N and S
 	void **pNs = (void**)malloc(sizeof(void*)*nTypeNum);
@@ -58,8 +31,11 @@ GNetwork* copyNetworkToGPU(GNetwork *pCpuNet)
 		void *pNGpu;
 		checkCudaErrors(cudaMalloc((void**)&(pNGpu), getTypeSize[pCpuNet->nTypes[i]]()));
 		checkCudaErrors(cudaMemcpy(pNGpu, pNTmp, getTypeSize[pCpuNet->nTypes[i]](), cudaMemcpyHostToDevice));
-		free(pNTmp);
 		pNs[i] = pNGpu;
+
+		free(pNTmp);
+		pNTmp = NULL;
+		pNGpu = NULL;
 	}
 
 	for (int i=0; i<sTypeNum; i++) {
@@ -69,8 +45,11 @@ GNetwork* copyNetworkToGPU(GNetwork *pCpuNet)
 		void *pSGpu;
 		checkCudaErrors(cudaMalloc((void**)&(pSGpu), getTypeSize[pCpuNet->sTypes[i]]()));
 		checkCudaErrors(cudaMemcpy(pSGpu, pSTmp, getTypeSize[pCpuNet->sTypes[i]](), cudaMemcpyHostToDevice));
-		free(pSTmp);
 		pSs[i] = pSGpu;
+
+		free(pSTmp);
+		pSTmp = NULL;
+		pSGpu = NULL;
 	}
 
 
@@ -103,8 +82,6 @@ int fetchNetworkFromGPU(GNetwork *pCpuNet, GNetwork *pGpuNet)
 	}
 
 	int nTypeNum = pCpuNet->nTypeNum;
-	//int sTypeNum = pCpuNet->sTypeNum;
-	//int MAX_DELAY = pCpuNet->MAX_DELAY;
 
 	//TODO support multitype N and S
 	for (int i=0; i<nTypeNum; i++) {
@@ -118,17 +95,12 @@ int fetchNetworkFromGPU(GNetwork *pCpuNet, GNetwork *pGpuNet)
 	return 0;
 }
 
-int freeGPUNetwork(GNetwork *pGpuNet)
+int freeNetworkGPU(GNetwork *pGpuNet)
 {
 	GNetwork *pTmpNet = pGpuNet;
 
 	int nTypeNum = pTmpNet->nTypeNum;
 	int sTypeNum = pTmpNet->sTypeNum;
-
-	//Type * pTmpNT = (Type*)malloc(sizeof(Type)*nTypeNum);
-	//checkCudaErrors(cudaMemcpy(pTmpNT, pTmpNet->nTypes, sizeof(Type)*nTypeNum, cudaMemcpyDeviceToHost));
-	//Type * pTmpST = (Type*)malloc(sizeof(Type)*sTypeNum);
-	//checkCudaErrors(cudaMemcpy(pTmpST, pTmpNet->sTypes, sizeof(Type)*sTypeNum, cudaMemcpyDeviceToHost));
 
 	for (int i=0; i<nTypeNum; i++) {
 		void *pTmpN = createType[pTmpNet->nTypes[i]]();
@@ -204,7 +176,7 @@ int checkGPUNetwork(GNetwork *g, GNetwork *c)
 	CHECK_GPU_TO_CPU_ARRAY(p.delayStart, c->pN2SConnection->delayStart, sizeof(int)*(c->pN2SConnection->n_num)*MAX_DELAY);
 	CHECK_GPU_TO_CPU_ARRAY(p.delayNum, c->pN2SConnection->delayNum, sizeof(int)*(c->pN2SConnection->n_num)*MAX_DELAY);
 
-        ret = 2;
+	ret = 2;
 
 	return ret;
 }

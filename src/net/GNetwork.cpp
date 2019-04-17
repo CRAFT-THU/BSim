@@ -8,6 +8,7 @@
 #include <iostream>
 
 #include "../utils/TypeFunc.h"
+#include "../utils/FileOp.h"
 #include "GNetwork.h"
 
 GNetwork *initGNetwork(int ntype_num, int stype_num) {
@@ -35,7 +36,8 @@ GNetwork *initGNetwork(int ntype_num, int stype_num) {
 	ret_net->sTypes = (Type*)malloc(sizeof(Type)*stype_num);
 	assert(ret_net->sTypes != NULL);
 
-	ret_net->MAX_DELAY = 1;
+	ret_net->maxDelay = 1;
+	ret_net->minDelay = 1e7;
 
 	return ret_net;
 }
@@ -62,6 +64,64 @@ void freeGNetwork(GNetwork * network)
 
 	free(network->nTypes);
 	free(network->sTypes);
+}
+
+int saveGNetwork(GNetwork *net, char *filename)
+{
+	FILE * f = openFile(filename, "w+");
+
+	fwrite(&(net->nTypeNum), sizeof(int), 1, f);
+	fwrite(&(net->sTypeNum), sizeof(int), 1, f);
+	fwrite(&(net->maxDelay), sizeof(int), 1, f);
+	fwrite(&(net->minDelay), sizeof(int), 1, f);
+
+	fwrite(net->nTypes, sizeof(Type), net->nTypeNum, f);
+	fwrite(net->sTypes, sizeof(Type), net->sTypeNum, f);
+	fwrite(net->neuronNums, sizeof(int), net->nTypeNum+1, f);
+	fwrite(net->synapseNums, sizeof(int), net->sTypeNum+1, f);
+
+	for (int i=0; i<net->nTypeNum; i++) {
+		saveType[net->nTypes[i]](net->pNeurons[i], net->neuronNums[i+1]-net->neuronNums[i], f);
+	}
+	for (int i=0; i<net->sTypeNum; i++) {
+		saveType[net->sTypes[i]](net->pSynapses[i], net->synapseNums[i+1]-net->synapseNums[i], f);
+	}
+
+	saveConnection(net->pN2SConnection, f);
+
+	closeFile(f);
+	return 0;
+}
+
+GNetwork *loadGNetwork(char *filename)
+{
+	int nTypeNum = 0, sTypeNum = 0;
+	FILE * f = openFile(filename, "w+");
+
+	fread(&nTypeNum, sizeof(int), 1, f);
+	fread(&sTypeNum, sizeof(int), 1, f);
+
+	GNetwork * net = initGNetwork(nTypeNum, sTypeNum);
+
+	fread(&(net->maxDelay), sizeof(int), 1, f);
+	fread(&(net->minDelay), sizeof(int), 1, f);
+
+	fread(net->nTypes, sizeof(Type), net->nTypeNum, f);
+	fread(net->sTypes, sizeof(Type), net->sTypeNum, f);
+	fread(net->neuronNums, sizeof(int), net->nTypeNum+1, f);
+	fread(net->synapseNums, sizeof(int), net->sTypeNum+1, f);
+
+	for (int i=0; i<net->nTypeNum; i++) {
+		net->pNeurons[i] = loadType[net->nTypes[i]](net->neuronNums[i+1]-net->neuronNums[i], f);
+	}
+	for (int i=0; i<net->sTypeNum; i++) {
+		net->pSynapses[i] = saveType[net->sTypes[i]](net->synapseNums[i+1]-net->synapseNums[i], f);
+	}
+
+	net->pN2SConnection = loadConnection(f);
+
+	closeFile(f);
+	return net;
 }
 
 int copyNetwork(GNetwork *dNet, GNetwork *sNet, int rank, int rankSize)

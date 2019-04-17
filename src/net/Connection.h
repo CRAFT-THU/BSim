@@ -5,22 +5,28 @@
 #ifndef CONNECTION_H
 #define CONNECTION_H
 
+#include <stdio.h>
+
 struct N2SConnection {
 	//int *pSynapsesIdx; 
 	//int synapsesNum; 
+	int nNum;
+	int sNum;
+
+	int maxDelay;
+	int minDelay;
+
 	int *delayStart;
 	int *delayNum;
-	int *rev_delayStart;
-	int *rev_delayNum;
-	int *rev_map2sid;
-
-	int n_num;
-	int s_num;
-
-	int MAX_DELAY;
+	int *revDelayStart;
+	int *revDelayNum;
+	int *revMap2Sid;
 };
 
 N2SConnection * copyConnectionToGPU(N2SConnection * pCPU);
+
+int saveConnection(N2SConnection *conn, FILE *f);
+N2SConnection * loadConnection(FILE *f);
 
 #endif /* CONNECTION_H */
 
