@@ -45,23 +45,23 @@ class Data(object):
         for k in self.parameters:
             for v in self.parameters[k]:
                 h.line("{} *p{}".format(k, mycap(v)))
-            h.blank_line(1)
-        h.close_brace()
-        h.blank_line(1)
+            h.blank_line()
+        h.struct_end()
+        h.blank_line()
 
         # h.line("DATA_FUNC_DEFINE({})".format(self.name), 0)
         
-        h.blank_line(1)
+        h.blank_line()
         h.func("void *malloc{}()".format(self.name))
-        h.func("void *alloc{}(int n)".format(self.name))
-        h.func("int free{}(void *pCpu, int n)".format(self.name))
-        h.func("int alloc{}Para(void *pCpu, int n)".format(self.name))
-        h.func("int free{}Para(void *pCpu, int n)".format(self.name))
-        h.func("int save{}(void *pCpu, int n, FILE *f)".format(self.name))
-        h.func("int load{}(int n, FILE *f)".format(self.name))
+        h.func("void *alloc{}(int num)".format(self.name))
+        h.func("int free{}(void *pCpu, int num)".format(self.name))
+        h.func("int alloc{}Para(void *pCpu, int num)".format(self.name))
+        h.func("int free{}Para(void *pCpu, int num)".format(self.name))
+        h.func("int save{}(void *pCpu, int num, FILE *f)".format(self.name))
+        h.func("int load{}(int num, FILE *f)".format(self.name))
         h.blank_line()
 
-        h.func("void* cudaAlloc{}(void *pCpu, int num)".format(self.name))
+        h.func("void *cudaAlloc{}(void *pCpu, int num)".format(self.name))
         h.func("int cuda{}ToGPU(void *pCpu, void *pGPU, int num)".format(self.name))
         h.func("void cudaUpdate{}(void *data, real *currentE, real *currentI, int *firedTable, int *firedTableSizes, int num, int start_id, int t, BlockSize *pSize)".format(self.name))
         h.func("int cudaFree{}(void *pGpu)".format(self.name))
@@ -89,13 +89,13 @@ class Data(object):
         c.func_end("p")
         c.blank_line()
 
-        c.func_start("void *alloc{}(int n)".format(self.name))
+        c.func_start("void *alloc{}(int num)".format(self.name))
         c.line("void *p = malloc{}()".format(self.name, self.name, self.name))
-        c.line("alloc{}Para(p, n)".format(self.name, self.name, self.name))
+        c.line("alloc{}Para(p, num)".format(self.name, self.name, self.name))
         c.func_end("p")
         c.blank_line()
 
-        c.func_start("int free{}(void *pCpu, int n)".format(self.name))
+        c.func_start("int free{}(void *pCpu, int num)".format(self.name))
         c.line("{}Data *p = ({}Data*)pCpu".format(self.name, self.name))
         c.blank_line()
         for t in self.parameters:
@@ -106,7 +106,7 @@ class Data(object):
         c.func_end("0")
         c.blank_line()
 
-        c.func_start("int alloc{}Para(void *pCpu, int n)".format(self.name))
+        c.func_start("int alloc{}Para(void *pCpu, int num)".format(self.name))
         c.line("{}Data *p = ({}Data*)pCpu".format(self.name, self.name))
         c.blank_line()
         for t in self.parameters:
@@ -116,7 +116,7 @@ class Data(object):
         c.func_end(0)
         c.blank_line()
 
-        c.func_start("int free{}Para(void *pCpu, int n)".format(self.name))
+        c.func_start("int free{}Para(void *pCpu, int num)".format(self.name))
         c.line("{}Data *p = ({}Data*)pCpu".format(self.name, self.name))
         c.blank_line()
         for t in self.parameters:
@@ -126,65 +126,60 @@ class Data(object):
         c.func_end("0")
         c.blank_line()
 
-        c.func_start("int save{}(void *pCpu, int n, FILE *f)".format(self.name))
+        c.func_start("int save{}(void *pCpu, int num, FILE *f)".format(self.name))
         c.blank_line()
         c.line("{}Data *p = ({}Data*)pCpu".format(self.name, self.name))
         for t in self.parameters:
             for p in self.parameters[t]:
-                c.line("fwrite(p->p{}, sizeof({}), n, f)".format(mycap(p), t))
+                c.line("fwrite(p->p{}, sizeof({}), num, f)".format(mycap(p), t))
             c.blank_line()
         c.func_end("0")
         c.blank_line()
 
-        c.func_start("int load{}(int n, FILE *f)".format(self.name))
+        c.func_start("int load{}(int num, FILE *f)".format(self.name))
         c.line("{}Data *p = ({}Data*)malloc(sizeof({}Data))".format(self.name, self.name, self.name))
-        c.blank_line(1)
+        c.blank_line()
         for t in self.parameters:
             for p in self.parameters[t]:
-                c.line("fread(p->p{}, sizeof({}), n, f)".format(mycap(p), t))
-            c.blank_line(1)
+                c.line("fread(p->p{}, sizeof({}), num, f)".format(mycap(p), t))
+            c.blank_line()
         c.func_end("p")
         c.blank_line()
 
         return 0
 
     def generate_cu(self):
-        cu = CuGenerator("{}/{}Data.h".format(self.path, self.name))
+        cu = CuGenerator("{}/{}Data.cu".format(self.path, self.name))
 
-        h.blank_line()
-        h.if_define("{}DATA_H ".format(self.name))
-        h.blank_line()
+        cu.include("../../utils/type.h")
+        cu.include("../../utils/macros.h")
+        cu.blank_line()
 
-        h.include("../../utils/type.h")
-        h.include("../../utils/macros.h")
-        h.blank_line()
-
-        c.func_start("int alloc{}Para(void *pCpu, int n)".format(self.name))
-        c.line("{}Data *p = ({}Data*)pCpu".format(self.name, self.name))
-        c.blank_line()
+        cu.func_start("void *cudaAlloc{}Para(void *pCpu, int num)".format(self.name))
+        cu.line("{}Data *p = ({}Data*)pCpu".format(self.name, self.name))
+        cu.blank_line()
         for t in self.parameters:
             for p in self.parameters[t]:
                 c.line("p->p{} = ({}*)malloc(n*sizeof({}))".format(mycap(p), t, t))
             c.blank_line()
-        c.func_end(0)
-        c.blank_line()
+        cu.func_end(0)
+        cu.blank_line()
 
-        h.struct("{}Data".format(self.name), 0)
-        h.blank_line(1)
+        cu.struct("{}Data".format(self.name), 0)
+        cu.blank_line()
         for k in sorted(self.parameters.keys(), key = lambda k:C_TYPE_SORT.get(k, 1000), reverse = False):
             for v in self.parameters[k]:
                 h.line("{} *p{}".format(k, mycap(v)))
-            h.blank_line(1)
-        h.close_brace()
-        h.blank_line(1)
+            h.blank_line()
+        cu.close_brace()
+        cu.blank_line()
 
+        cu.line("DATA_FUNC_DEFINE({})".format(self.name), 0)
+        cu.blank_line()
 
-        h.line("DATA_FUNC_DEFINE({})".format(self.name), 0)
-        h.blank_line(1)
+        cu.end_if_define("{}DATA_H".format(self.name))
 
-        h.end_if_define("{}DATA_H".format(self.name))
-
-        h.close()
+        cu.close()
         return 0
 
     def generate_mpi(self):
@@ -201,13 +196,13 @@ class Data(object):
         c.func_end("p")
         c.blank_line()
 
-        c.func_start("void *alloc{}(int n)".format(self.name))
+        c.func_start("void *alloc{}(int num)".format(self.name))
         c.line("void *p = malloc{}()".format(self.name, self.name, self.name))
-        c.line("alloc{}Para(p, n)".format(self.name, self.name, self.name))
+        c.line("alloc{}Para(p, num)".format(self.name, self.name, self.name))
         c.func_end("p")
         c.blank_line()
 
-        c.func_start("int free{}(void *pCpu, int n)".format(self.name))
+        c.func_start("int free{}(void *pCpu, int num)".format(self.name))
         c.line("{}Data *p = ({}Data*)pCpu".format(self.name, self.name))
         c.blank_line()
         for t in self.parameters:
@@ -218,7 +213,7 @@ class Data(object):
         c.func_end("0")
         c.blank_line()
 
-        c.func_start("int alloc{}Para(void *pCpu, int n)".format(self.name))
+        c.func_start("int alloc{}Para(void *pCpu, int num)".format(self.name))
         c.line("{}Data *p = ({}Data*)pCpu".format(self.name, self.name))
         c.blank_line()
         for t in self.parameters:
@@ -228,7 +223,7 @@ class Data(object):
         c.func_end(0)
         c.blank_line()
 
-        c.func_start("int free{}Para(void *pCpu, int n)".format(self.name))
+        c.func_start("int free{}Para(void *pCpu, int num)".format(self.name))
         c.line("{}Data *p = ({}Data*)pCpu".format(self.name, self.name))
         c.blank_line()
         for t in self.parameters:
@@ -238,23 +233,23 @@ class Data(object):
         c.func_end("0")
         c.blank_line()
 
-        c.func_start("int save{}(void *pCpu, int n, FILE *f)".format(self.name))
+        c.func_start("int save{}(void *pCpu, int num, FILE *f)".format(self.name))
         c.blank_line()
         c.line("{}Data *p = ({}Data*)pCpu".format(self.name, self.name))
         for t in self.parameters:
             for p in self.parameters[t]:
-                c.line("fwrite(p->p{}, sizeof({}), n, f)".format(mycap(p), t))
+                c.line("fwrite(p->p{}, sizeof({}), num, f)".format(mycap(p), t))
             c.blank_line()
         c.func_end("0")
         c.blank_line()
 
-        c.func_start("int load{}(int n, FILE *f)".format(self.name))
+        c.func_start("int load{}(int num, FILE *f)".format(self.name))
         c.line("{}Data *p = ({}Data*)malloc(sizeof({}Data))".format(self.name, self.name, self.name))
-        c.blank_line(1)
+        c.blank_line()
         for t in self.parameters:
             for p in self.parameters[t]:
-                c.line("fread(p->p{}, sizeof({}), n, f)".format(mycap(p), t))
-            c.blank_line(1)
+                c.line("fread(p->p{}, sizeof({}), num, f)".format(mycap(p), t))
+            c.blank_line()
         c.func_end("p")
         c.blank_line()
 

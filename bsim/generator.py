@@ -55,6 +55,9 @@ class CGenerator(BaseGenerator):
     def struct(self, name: str='', tab: int=0):
         self.line_no_end('struct {} {{'.format(name), tab=tab)
 
+    def struct_end(self, name: str='', tab: int=0):
+        self.line('}', tab=tab)
+
     def if_define(self, name: str='', tab: int=0):
         self.line_no_end('#ifndef {}'.format(name.replace('.', '_').upper()), tab=tab)
         self.line_no_end('#define {}'.format(name.replace('.', '_').upper()), tab=tab)

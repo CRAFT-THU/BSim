@@ -22,7 +22,7 @@ struct LIFData {
 	real *pVreset;
 	real *pCm;
 
-}
+};
 
 
 void *mallocLIF();
