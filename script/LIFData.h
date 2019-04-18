@@ -1,12 +1,13 @@
-#ifndef GLIFNEURONS_H
-#define GLIFNEURONS_H
+
+#ifndef LIFDATA_H 
+#define LIFDATA_H 
 
 #include "../../utils/type.h"
 #include "../../utils/macros.h"
 
-struct GLIFNeurons {
-	int *p_refrac_step;
-	int *p_refrac_time;
+struct LIFData {
+	int *pRefrac_step;
+	int *pRefrac_time;
 
 	real *pVm;
 	real *pCi;
@@ -19,10 +20,9 @@ struct GLIFNeurons {
 	real *pVthresh;
 	real *pVreset;
 	real *pCm;
-};
 
-int cudaFetchLIF(void *pGpu, void *pCpu, int num);
+}
 
-DATA_FUNC_DEFINE(LIF)
+DATA_FUNC_DEFINE(LIF);
 
-#endif /* GLIFNEURONS_H */
+#endif // LIFDATA_H

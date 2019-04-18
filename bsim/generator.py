@@ -1,14 +1,16 @@
+
+import os
 import subprocess
 
 
 class BaseGenerator(object):
-    def __init__(self, filename: str= ''):
+    def __init__(self, filename: str = ''):
         self.file = open(filename, "w+")
 
-    def line_no_end(self, line: str='', tab: int=1):
+    def line_no_end(self, line: str = '', tab: int = 1):
         self.file.write('{}{}\n'.format(tab * '\t', line))
 
-    def blank_line(self, num: int=1):
+    def blank_line(self, num: int = 1):
         self.file.write('\n'*num)
 
     def close(self):
@@ -38,6 +40,17 @@ class CGenerator(BaseGenerator):
 
     def line(self, line, tab: int=1):
         self.line_no_end('{};'.format(line), tab=tab)
+
+    def func(self, line, tab: int=0):
+        self.line(line, tab=tab)
+
+    def func_start(self, line, tab: int=0):
+        self.line_no_end(line, tab=tab)
+        self.open_brace(tab=tab)
+
+    def func_end(self, line, tab: int=1):
+        self.line('return {}'.format(line), tab=tab)
+        self.close_brace(tab=abs(tab-1))
 
     def struct(self, name: str='', tab: int=0):
         self.line_no_end('struct {} {{'.format(name), tab=tab)
@@ -77,6 +90,19 @@ class CGenerator(BaseGenerator):
             '/usr/bin/g++ -Wall -Wno-switch -Wfatal-errors -Ofast -fPIC -shared '
             '{} -o {}'.format(src, output),
             shell=True) == 0
+
+class HGenerator(CGenerator):
+    def __init__(self, filename: str= ''):
+        self.file = open(filename, "w+")
+        _, self.name = os.path.split(filename)
+        self.blank_line()
+        self.if_define(self.name.upper().replace('.', '_'))
+        self.blank_line()
+
+    def close(self):
+        self.end_if_define(self.name.upper().replace('.', '_'))
+        self.file.close()
+
 
 
 class CUDAGenerator(CGenerator):
