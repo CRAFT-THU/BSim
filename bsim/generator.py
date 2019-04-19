@@ -81,11 +81,12 @@ class CGenerator(BaseGenerator):
         self.line_no_end(line, tab=0)
 
     def malloc(self, ret: str="", type_: str="", num='1', tab: int=1):
-        self.line(
-            line='{} * {} = static_cast<{}*>(malloc(sizeof({})*{}))'
-                .format(type_, ret, type_, type_, num),
-            tab=tab
-        )
+        self.line(line='{} * {} = ({}*)malloc(sizeof({})*{})'.format(type_, ret, type_, type_, str(num)), tab=tab)
+        self.line(line='memset({}, 0, sizeof({})*{})'.format(ret, type_, str(num)), tab=tab)
+
+    def free(self, pointer: str="", tab: int=1):
+        self.line(line='free({})'.format(pointer), tab=tab)
+        self.line(line="{} = NULL", tab=tab)
 
     @staticmethod
     def compile_(src: str='a.cpp', output: str='a.so'):
@@ -118,12 +119,12 @@ class CUDAGenerator(CGenerator):
     def malloc_gpu(self, ret: str="", type_: str="", num='1', tab: int=1):
         self.cu_line(
             line='cudaMalloc((void**)&({}), sizeof({})*{})'
-                .format(ret, type_, num),
+                .format(ret, type_, str(num)),
             tab=tab
         )
         self.cu_line(
             # TODO: memset to 0
-            line='cudaMemset({}, 0, sizeof({})*{})'.format(ret, type_, num),
+            line='cudaMemset({}, 0, sizeof({})*{})'.format(ret, type_, str(num)),
             # line='cudaMemset({}, 10, sizeof({})*{}/2)'.format(ret, type_, num),
             tab=tab
         )
@@ -135,9 +136,13 @@ class CUDAGenerator(CGenerator):
             tab=tab
         )
 
+    def free_gpu(self, pointer: str="", tab: int=1):
+        self.line(line='cudaFree({})'.format(pointer), tab=tab)
+        self.line(line="{} = NULL", tab=tab)
+
     def to_gpu(self, ret: str, cpu: str, type_:str= 'double', num='1', tab: int=1):
-        self.malloc_gpu(ret=ret, type_=type_, num=num, tab=tab)
-        self.cpu_to_gpu(gpu=ret, cpu=cpu, type_=type_, num=num, tab=tab)
+        self.malloc_gpu(ret=ret, type_=type_, num=str(num), tab=tab)
+        self.cpu_to_gpu(gpu=ret, cpu=cpu, type_=type_, num=str(num), tab=tab)
 
     def from_gpu(self, ret: str, gpu: str, type_:str= 'double', num='1', tab: int=1):
         self.malloc(ret=ret, type_=type_, num=num, tab=tab)
@@ -146,7 +151,7 @@ class CUDAGenerator(CGenerator):
     def cpu_to_gpu(self, cpu: str, gpu: str, type_:str= 'double', num='1', tab: int=1):
         self.cu_line(
             line='cudaMemcpy({}, {}, sizeof({})*{}, cudaMemcpyHostToDevice)'
-                .format(gpu, cpu, type_, num),
+                .format(gpu, cpu, type_, str(num)),
             tab=tab
         )
 

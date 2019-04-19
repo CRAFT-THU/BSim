@@ -1,12 +1,12 @@
 
-#ifndef LIFDATA_H
-#define LIFDATA_H
+#ifndef GLIFNEURONS_H
+#define GLIFNEURONS_H
 
 #include <stdio.h>
 
 #include "../../utils/type.h"
 
-struct LIFData {
+struct GLIFNeurons {
 	int *pRefracStep;
 	int *pRefracTime;
 
@@ -26,19 +26,19 @@ struct LIFData {
 
 
 void *mallocLIF();
-void *allocLIF(int n);
-int freeLIF(void *pCpu, int n);
-int allocLIFPara(void *pCpu, int n);
-int freeLIFPara(void *pCpu, int n);
-int saveLIF(void *pCpu, int n, FILE *f);
-int loadLIF(int n, FILE *f);
+void *allocLIF(int num);
+int freeLIF(void *pCPU, int num);
+int allocLIFPara(void *pCPU, int num);
+int freeLIFPara(void *pCPU, int num);
+int saveLIF(void *pCPU, int num, FILE *f);
+int loadLIF(int num, FILE *f);
 
-void* cudaAllocLIF(void *pCpu, int num);
-int cudaLIFToGPU(void *pCpu, void *pGPU, int num);
+void *cudaAllocLIF(void *pCPU, int num);
+int cudaLIFToGPU(void *pCPU, void *pGPU, int num);
 void cudaUpdateLIF(void *data, real *currentE, real *currentI, int *firedTable, int *firedTableSizes, int num, int start_id, int t, BlockSize *pSize);
-int cudaFreeLIF(void *pGpu);
+int cudaFreeLIF(void *pGPU);
 
 int mpiSendLIF(void *data, int rank, int offset, int size);
 int mpiRecvLIF(void *data, int rank, int offset, int size);
 
-#endif // LIFDATA_H
+#endif // GLIFNEURONS_H

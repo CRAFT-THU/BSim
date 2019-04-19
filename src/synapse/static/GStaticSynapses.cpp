@@ -1,39 +1,75 @@
-
 #include <stdlib.h>
-#include "mpi.h"
-#include "../../utils/macros.h"
-#include "../../utils/TagPool.h"
+#include <string.h>
+
 #include "GStaticSynapses.h"
 
-SYNAPSE_GPU_FUNC_BASIC(Static)
-
-int allocStatic(void *pCpu, int N)
+void *mallocStatic()
 {
-	GStaticSynapses *p = (GStaticSynapses*)pCpu;
-	p->p_weight = (real*)malloc(N*sizeof(real));
-	//p->p_delay = (int*)malloc(N*sizeof(int));
-	//p->p_src = (int *)malloc(N*sizeof(int));
-	p->p_dst = (int *)malloc(N*sizeof(int));
+	GStaticSynapses * p = (GStaticSynapses*)malloc(sizeof(GStaticSynapses)*1);
+	memset(p, 0, sizeof(GStaticSynapses)*1);
+	return (void*)p;
+}
+
+void *allocStatic(int num)
+{
+	void *p = mallocStatic();
+	allocStaticPara(p, num);
+	return p;
+}
+
+int freeStatic(void *pCPU, int num)
+{
+	GStaticSynapses *p = (GStaticSynapses*)pCPU;
+
+	free(p->pDst);
+
+	free(p->pWeight);
+
+	free(p);
 	return 0;
 }
 
-int freeStatic(void *pCpu)
+int allocStaticPara(void *pCPU, int num)
 {
-	GStaticSynapses *pCpuSynapses = (GStaticSynapses*)pCpu;
-	free(pCpuSynapses->p_weight);
-	//free(pCpuSynapses->p_delay);
-	//free(pCpuSynapses->p_src);
-	free(pCpuSynapses->p_dst);
+	GStaticSynapses *p = (GStaticSynapses*)pCPU;
+
+	p->pDst = (int*)malloc(n*sizeof(int));
+
+	p->pWeight = (real*)malloc(n*sizeof(real));
+
 	return 0;
 }
 
-int mpiSendStatic(void *data, int rank, int offset, int size)
+int freeStaticPara(void *pCPU, int num)
 {
+	GStaticSynapses *p = (GStaticSynapses*)pCPU;
+
+	free(p->pDst);
+
+	free(p->pWeight);
+
 	return 0;
 }
 
-int  mpiRecvStatic(void **data, int rank, int rankSize)
+int saveStatic(void *pCPU, int num, FILE *f)
 {
+
+	GStaticSynapses *p = (GStaticSynapses*)pCPU;
+	fwrite(p->pDst, sizeof(int), num, f);
+
+	fwrite(p->pWeight, sizeof(real), num, f);
+
 	return 0;
+}
+
+int loadStatic(int num, FILE *f)
+{
+	GStaticSynapses *p = (GStaticSynapses*)malloc(sizeof(GStaticSynapses));
+
+	fread(p->pDst, sizeof(int), num, f);
+
+	fread(p->pWeight, sizeof(real), num, f);
+
+	return p;
 }
 

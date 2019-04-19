@@ -1,5 +1,4 @@
 #include <stdlib.h>
-#include <string.h>
 
 #include "GLIFNeurons.h"
 
@@ -29,12 +28,12 @@ int freeLIF(void *pCPU, int num)
 	free(p->pCe);
 	free(p->pC_i);
 	free(p->pC_e);
-	free(p->pV_tmp);
-	free(p->pV_i);
-	free(p->pV_e);
-	free(p->pV_thresh);
-	free(p->pV_reset);
-	free(p->pV_m);
+	free(p->pVtmp);
+	free(p->pIi);
+	free(p->pIe);
+	free(p->pVthresh);
+	free(p->pVreset);
+	free(p->pCm);
 
 	free(p);
 	return 0;
@@ -52,12 +51,12 @@ int allocLIFPara(void *pCPU, int num)
 	p->pCe = (real*)malloc(n*sizeof(real));
 	p->pC_i = (real*)malloc(n*sizeof(real));
 	p->pC_e = (real*)malloc(n*sizeof(real));
-	p->pV_tmp = (real*)malloc(n*sizeof(real));
-	p->pV_i = (real*)malloc(n*sizeof(real));
-	p->pV_e = (real*)malloc(n*sizeof(real));
-	p->pV_thresh = (real*)malloc(n*sizeof(real));
-	p->pV_reset = (real*)malloc(n*sizeof(real));
-	p->pV_m = (real*)malloc(n*sizeof(real));
+	p->pVtmp = (real*)malloc(n*sizeof(real));
+	p->pIi = (real*)malloc(n*sizeof(real));
+	p->pIe = (real*)malloc(n*sizeof(real));
+	p->pVthresh = (real*)malloc(n*sizeof(real));
+	p->pVreset = (real*)malloc(n*sizeof(real));
+	p->pCm = (real*)malloc(n*sizeof(real));
 
 	return 0;
 }
@@ -74,12 +73,12 @@ int freeLIFPara(void *pCPU, int num)
 	free(p->pCe);
 	free(p->pC_i);
 	free(p->pC_e);
-	free(p->pV_tmp);
-	free(p->pV_i);
-	free(p->pV_e);
-	free(p->pV_thresh);
-	free(p->pV_reset);
-	free(p->pV_m);
+	free(p->pVtmp);
+	free(p->pIi);
+	free(p->pIe);
+	free(p->pVthresh);
+	free(p->pVreset);
+	free(p->pCm);
 
 	return 0;
 }
@@ -96,12 +95,12 @@ int saveLIF(void *pCPU, int num, FILE *f)
 	fwrite(p->pCe, sizeof(real), num, f);
 	fwrite(p->pC_i, sizeof(real), num, f);
 	fwrite(p->pC_e, sizeof(real), num, f);
-	fwrite(p->pV_tmp, sizeof(real), num, f);
-	fwrite(p->pV_i, sizeof(real), num, f);
-	fwrite(p->pV_e, sizeof(real), num, f);
-	fwrite(p->pV_thresh, sizeof(real), num, f);
-	fwrite(p->pV_reset, sizeof(real), num, f);
-	fwrite(p->pV_m, sizeof(real), num, f);
+	fwrite(p->pVtmp, sizeof(real), num, f);
+	fwrite(p->pIi, sizeof(real), num, f);
+	fwrite(p->pIe, sizeof(real), num, f);
+	fwrite(p->pVthresh, sizeof(real), num, f);
+	fwrite(p->pVreset, sizeof(real), num, f);
+	fwrite(p->pCm, sizeof(real), num, f);
 
 	return 0;
 }
@@ -118,12 +117,12 @@ int loadLIF(int num, FILE *f)
 	fread(p->pCe, sizeof(real), num, f);
 	fread(p->pC_i, sizeof(real), num, f);
 	fread(p->pC_e, sizeof(real), num, f);
-	fread(p->pV_tmp, sizeof(real), num, f);
-	fread(p->pV_i, sizeof(real), num, f);
-	fread(p->pV_e, sizeof(real), num, f);
-	fread(p->pV_thresh, sizeof(real), num, f);
-	fread(p->pV_reset, sizeof(real), num, f);
-	fread(p->pV_m, sizeof(real), num, f);
+	fread(p->pVtmp, sizeof(real), num, f);
+	fread(p->pIi, sizeof(real), num, f);
+	fread(p->pIe, sizeof(real), num, f);
+	fread(p->pVthresh, sizeof(real), num, f);
+	fread(p->pVreset, sizeof(real), num, f);
+	fread(p->pCm, sizeof(real), num, f);
 
 	return p;
 }
