@@ -63,7 +63,7 @@ class CGenerator(BaseGenerator):
         self.line_no_end('#define {}'.format(name.replace('.', '_').upper()), tab=tab)
 
     def end_if_define(self, name: str='', tab: int=0):
-        self.line_no_end('#endif // {}'.format(name.replace('.', '_').upper()), tab=tab)
+        self.line_no_end('#endif /* {} */'.format(name.replace('.', '_').upper()), tab=tab)
 
     def include(self, filename: str='', tab: int=0):
         self.line_no_end('#include "{}"'.format(filename), tab=tab)
