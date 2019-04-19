@@ -179,9 +179,9 @@ class Data(object):
         cu.func_end("ret")
         cu.blank_line()
 
-        cu.func_start("void *cuda{}ToGPU(void *pCPU, void *pGPU, int num)".format(self.name))
+        cu.func_start("int cuda{}ToGPU(void *pCPU, void *pGPU, int num)".format(self.name))
         cu.line("{} *pC = ({}*)pCPU".format(self.classname, self.classname))
-        cu.line("{}Data *pG = ({}Data*)pGPU".format(self.name, self.name))
+        cu.line("{} *pG = ({}*)pGPU".format(self.classname, self.classname))
         cu.blank_line()
         for t in self.parameters:
             for p in self.parameters[t]:
@@ -190,7 +190,7 @@ class Data(object):
         cu.func_end(0)
         cu.blank_line()
 
-        cu.func_start("void *cudaFree{}(void *pGPU)".format(self.name))
+        cu.func_start("int cudaFree{}(void *pGPU)".format(self.name))
         cu.free_gpu("pGPU")
         cu.func_end(0)
         cu.blank_line()

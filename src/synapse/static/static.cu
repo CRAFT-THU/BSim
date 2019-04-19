@@ -45,11 +45,11 @@ __global__ void update_dense_static_hit(N2SConnection *connection, GStaticSynaps
 				for (int j=threadIdx.x; j<synapseNum; j += blockDim.x) {
 					//int sid = connection->pSynapsesIdx[j+start_loc];
 					int sid = j+start_loc;
-					real weight = data->p_weight[sid];
+					real weight = data->pWeight[sid];
 					if (weight >= 0) {
-						atomicAdd(&(currentE[data->p_dst[sid]]), weight);
+						atomicAdd(&(currentE[data->pDst[sid]]), weight);
 					} else {
-						atomicAdd(&(currentI[data->p_dst[sid]]), weight);
+						atomicAdd(&(currentI[data->pDst[sid]]), weight);
 					}
 				}
 			}
@@ -86,11 +86,11 @@ __global__ void update_dense_static_hit(N2SConnection *connection, GStaticSynaps
 			for (int j=threadIdx.x; j<synapseNum; j += blockDim.x) {
 				//int sid = connection->pSynapsesIdx[j+start_loc];
 				int sid = j+start_loc;
-				real weight = data->p_weight[sid];
+				real weight = data->pWeight[sid];
 				if (weight >= 0) {
-					atomicAdd(&(currentE[data->p_dst[sid]]), weight);
+					atomicAdd(&(currentE[data->pDst[sid]]), weight);
 				} else {
-					atomicAdd(&(currentI[data->p_dst[sid]]), weight);
+					atomicAdd(&(currentI[data->pDst[sid]]), weight);
 				}
 			}
 		}
@@ -109,11 +109,11 @@ __global__ void update_dense_static_hit(N2SConnection *connection, GStaticSynaps
 			for (int i=0; i<synapseNum; i++) {
 				//int sid = connection->pSynapsesIdx[i+start_loc];
 				int sid = i+start_loc;
-				real weight = data->p_weight[sid];
+				real weight = data->pWeight[sid];
 				if (weight >= 0) {
-					atomicAdd(&(currentE[data->p_dst[sid]]), weight);
+					atomicAdd(&(currentE[data->pDst[sid]]), weight);
 				} else {
-					atomicAdd(&(currentI[data->p_dst[sid]]), weight);
+					atomicAdd(&(currentI[data->pDst[sid]]), weight);
 				}
 			}
 		}

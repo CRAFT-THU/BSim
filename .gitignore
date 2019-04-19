@@ -30,3 +30,4 @@ src/utils/TypeFunc.cu
 bsim/code_gen/*
 bsim/so_gen/*
 bsim/*_gen/*
+.timestamp

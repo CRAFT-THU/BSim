@@ -6,8 +6,8 @@
 
 N2SConnection * copyConnectionToGPU(N2SConnection * pCPU)
 {
-	int n_num = pCPU->n_num;
-	int MAX_DELAY = pCPU->MAX_DELAY;
+	int n_num = pCPU->nNum;
+	int MAX_DELAY = pCPU->maxDelay;
 
 	N2SConnection * pTmp = (N2SConnection*)malloc(sizeof(N2SConnection));
 	N2SConnection * pGPU = NULL;

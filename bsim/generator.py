@@ -138,7 +138,7 @@ class CUDAGenerator(CGenerator):
 
     def free_gpu(self, pointer: str="", tab: int=1):
         self.line(line='cudaFree({})'.format(pointer), tab=tab)
-        self.line(line="{} = NULL", tab=tab)
+        self.line(line="{} = NULL".format(pointer), tab=tab)
 
     def to_gpu(self, ret: str, cpu: str, type_:str= 'double', num='1', tab: int=1):
         self.malloc_gpu(ret=ret, type_=type_, num=str(num), tab=tab)
