@@ -80,9 +80,8 @@ GNetwork* MultiNetwork::arrangeData(int node_idx) {
 		Type type = tmp_iter->first;
 		net->nTypes[index] = tmp_iter->first;
 
-		void *pN = createType[type]();
+		void *pN = allocType[type](tmp_iter->second);
 		assert(pN != NULL);
-		allocType[type](pN, tmp_iter->second);
 
 		int idx = 0;
 		for (auto piter = _network->pPopulations.begin(); piter != _network->pPopulations.end();  piter++) {
@@ -107,9 +106,8 @@ GNetwork* MultiNetwork::arrangeData(int node_idx) {
 		Type type = tmp_iter->first;
 		net->sTypes[index] = type;
 
-		void *pS = createType[type]();
+		void *pS = allocType[type](tmp_iter->second);
 		assert(pS != NULL);
-		allocType[type](pS, tmp_iter->second);
 
 		//for (siter = _network->pSynapses.begin(); siter != _network->pSynapses.end();  siter++) {
 		//	SynapseBase * p = *siter;
@@ -171,7 +169,8 @@ GNetwork* MultiNetwork::arrangeData(int node_idx) {
 			_crossnode_neuron2idx[node_idx][*iter] = node_n_num + size;
 	}
 
-	net->MAX_DELAY = _network->maxDelaySteps;
+	net->maxDelay = _network->maxDelaySteps;
+	net->minDelay = _network->minDelaySteps;
 
 	return net;
 }
@@ -181,9 +180,10 @@ N2SConnection* MultiNetwork::arrangeConnect(int n_num, int s_num, int node_idx)
 	N2SConnection *connection = (N2SConnection*)malloc(sizeof(N2SConnection));
 	assert(connection != NULL);
 
-	connection->n_num = n_num;
-	connection->s_num = s_num;
-	connection->MAX_DELAY = _network->maxDelaySteps;
+	connection->nNum = n_num;
+	connection->sNum = s_num;
+	connection->maxDelay = _network->maxDelaySteps;
+	connection->minDelay = _network->minDelaySteps;
 
 	int *delay_num = (int*)malloc(sizeof(int)*(_network->maxDelaySteps)*(n_num));
 	assert(delay_num != NULL);

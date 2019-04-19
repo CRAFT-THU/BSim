@@ -22,7 +22,7 @@ void *cudaAllocStatic(void *pCPU, int num)
 	checkCudaErrors(cudaMemset(ret, 0, sizeof(GStaticSynapses)*1));
 	checkCudaErrors(cudaMemcpy(ret, tmp, sizeof(GStaticSynapses)*1, cudaMemcpyHostToDevice));
 	free(tmp);
-	{} = NULL;
+	tmp = NULL;
 	return ret;
 }
 

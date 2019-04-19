@@ -89,10 +89,12 @@ public:
 	//map<int, ID> idx2sid;
 
 	int maxDelaySteps;
+	int minDelaySteps;
 	int totalNeuronNum;
 	int totalSynapseNum;
 private:
 	real maxDelay;
+	real minDelay;
 	real maxFireRate;
 	vector<Type> nTypes;
 	vector<Type> sTypes;

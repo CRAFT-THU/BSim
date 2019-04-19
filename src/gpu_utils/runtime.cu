@@ -3,8 +3,8 @@
 
 #include "../utils/utils.h"
 #include "../neuron/lif/lif.h"
-#include "../neuron/array/array.h"
-#include "../synapse/static/static.h"
+// #include "../neuron/array/array.h"
+// #include "../synapse/static/static.h"
 // #include "../neuron/constant/constants.h"
 // #include "../neuron/decide/decide.h"
 // #include "../neuron/fft/fft.h"
@@ -200,8 +200,8 @@ BlockSize * getBlockSize(int nSize, int sSize)
 	BlockSize *ret = (BlockSize*)malloc(sizeof(BlockSize)*TYPESIZE);
 	memset(ret, 0, sizeof(BlockSize)*TYPESIZE);
 
-	cudaOccupancyMaxPotentialBlockSize(&(ret[Array].minGridSize), &(ret[Array].blockSize), update_array_neuron, 0, nSize); 
-	ret[Array].gridSize = (upzero_else_set_one(nSize) + (ret[Array].blockSize) - 1) / (ret[Array].blockSize);
+	// cudaOccupancyMaxPotentialBlockSize(&(ret[Array].minGridSize), &(ret[Array].blockSize), update_array_neuron, 0, nSize); 
+	// ret[Array].gridSize = (upzero_else_set_one(nSize) + (ret[Array].blockSize) - 1) / (ret[Array].blockSize);
 
 	cudaOccupancyMaxPotentialBlockSize(&(ret[LIF].minGridSize), &(ret[LIF].blockSize), update_lif_neuron, 0, nSize); 
 	ret[LIF].gridSize = (upzero_else_set_one(nSize) + (ret[LIF].blockSize) - 1) / (ret[LIF].blockSize);

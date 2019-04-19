@@ -105,48 +105,48 @@ void * run_thread_gpu(void *para) {
 
 	checkCudaErrors(cudaSetDevice(network->_node_idx));
 
-	GNetwork *pCpuNet = network->_network;
-	GNetwork *c_pGpuNet = copyNetworkToGPU(pCpuNet);
+	GNetwork *pNetCPU = network->_network;
+	GNetwork *c_pNetGPU = copyNetworkToGPU(pNetCPU);
 
-	int nTypeNum = c_pGpuNet->nTypeNum;
-	int sTypeNum = c_pGpuNet->sTypeNum;
-	int nodeNeuronNum = c_pGpuNet->neuronNums[nTypeNum];
-	int allNeuronNum = pCpuNet->pN2SConnection->n_num;
-	int nodeSynapseNum = c_pGpuNet->synapseNums[sTypeNum];
+	int nTypeNum = c_pNetGPU->nTypeNum;
+	int sTypeNum = c_pNetGPU->sTypeNum;
+	int nodeNeuronNum = c_pNetGPU->neuronNums[nTypeNum];
+	int allNeuronNum = pNetCPU->pN2SConnection->nNum;
+	int nodeSynapseNum = c_pNetGPU->synapseNums[sTypeNum];
 	printf("Thread %d NeuronTypeNum: %d, SynapseTypeNum: %d\n", network->_node_idx, nTypeNum, sTypeNum);
 	printf("Thread %d NeuronNum: %d, SynapseNum: %d\n", network->_node_idx, nodeNeuronNum, nodeSynapseNum);
 
 	//int dataOffset = network->_node_idx * network->_node_num;
 	//int dataIdx = network->_node_idx * network->_node_num + network->_node_idx;
 
-	int MAX_DELAY = c_pGpuNet->MAX_DELAY;
-	printf("Thread %d MAX_DELAY: %d\n", network->_node_idx, c_pGpuNet->MAX_DELAY);
+	int maxDelay = c_pNetGPU->maxDelay;
+	printf("Thread %d MaxDelay: %d MinDelay: %d\n", network->_node_idx, c_pNetGPU->maxDelay, c_pNetGPU->minDelay);
 
-	// init_connection<<<1, 1>>>(c_pGpuNet->pN2SConnection);
+	// init_connection<<<1, 1>>>(c_pNetGPU->pN2SConnection);
 
-	GBuffers *buffers = alloc_buffers(allNeuronNum, nodeSynapseNum, MAX_DELAY, network->_dt);
+	GBuffers *buffers = alloc_buffers(allNeuronNum, nodeSynapseNum, maxDelay, network->_dt);
 
 	BlockSize *updateSize = getBlockSize(allNeuronNum, nodeSynapseNum);
 
 #ifdef LOG_DATA
 	real *c_vm = hostMalloc<real>(nodeNeuronNum);
-	int life_idx = getIndex(c_pGpuNet->nTypes, nTypeNum, LIF);
+	int life_idx = getIndex(c_pNetGPU->nTypes, nTypeNum, LIF);
 	int copy_idx = -1;
 	real *c_g_vm = NULL;
 
 	if (life_idx >= 0) {
-		GLIFNeurons *c_g_lif = copyFromGPU<GLIFNeurons>(static_cast<GLIFNeurons*>(c_pGpuNet->pNeurons[life_idx]), 1);
-		c_g_vm = c_g_lif->p_vm;
+		GLIFNeurons *c_g_lif = copyFromGPU<GLIFNeurons>(static_cast<GLIFNeurons*>(c_pNetGPU->pNeurons[life_idx]), 1);
+		c_g_vm = c_g_lif->pV_m;
 		copy_idx = life_idx;
 	} else {
 	}
 #endif
 
 	for (int i=0; i<nTypeNum; i++) {
-		cout << "Thread " << network->_node_idx << " " << c_pGpuNet->nTypes[i] << ": <<<" << updateSize[c_pGpuNet->nTypes[i]].gridSize << ", " << updateSize[c_pGpuNet->nTypes[i]].blockSize << ">>>" << endl;
+		cout << "Thread " << network->_node_idx << " " << c_pNetGPU->nTypes[i] << ": <<<" << updateSize[c_pNetGPU->nTypes[i]].gridSize << ", " << updateSize[c_pNetGPU->nTypes[i]].blockSize << ">>>" << endl;
 	}
 	for (int i=0; i<sTypeNum; i++) {
-		cout << "Thread " << network->_node_idx << " " << c_pGpuNet->sTypes[i] << ": <<<" << updateSize[c_pGpuNet->sTypes[i]].gridSize << ", " << updateSize[c_pGpuNet->sTypes[i]].blockSize << ">>>" << endl;
+		cout << "Thread " << network->_node_idx << " " << c_pNetGPU->sTypes[i] << ": <<<" << updateSize[c_pNetGPU->sTypes[i]].gridSize << ", " << updateSize[c_pNetGPU->sTypes[i]].blockSize << ">>>" << endl;
 	}
 
 	//int * c_g_cross_id = gpuMalloc<int>(global_cross_data[dataIdx]._max_n_num); 
@@ -165,8 +165,8 @@ void * run_thread_gpu(void *para) {
 		update_time<<<1, 1>>>(time, buffers->c_gFiredTableSizes);
 
 		for (int i=0; i<nTypeNum; i++) {
-			assert(c_pGpuNet->neuronNums[i+1]-c_pGpuNet->neuronNums[i] > 0);
-			cudaUpdateNeuron[c_pGpuNet->nTypes[i]](c_pGpuNet->pNeurons[i], buffers->c_gNeuronInput, buffers->c_gNeuronInput_I, buffers->c_gFiredTable, buffers->c_gFiredTableSizes, c_pGpuNet->neuronNums[i+1]-c_pGpuNet->neuronNums[i], c_pGpuNet->neuronNums[i], time, &updateSize[c_pGpuNet->nTypes[i]]);
+			assert(c_pNetGPU->neuronNums[i+1]-c_pNetGPU->neuronNums[i] > 0);
+			cudaUpdateType[c_pNetGPU->nTypes[i]](c_pNetGPU->pNeurons[i], c_pNetGPU->pN2SConnection, buffers->c_gNeuronInput, buffers->c_gNeuronInput_I, buffers->c_gFiredTable, buffers->c_gFiredTableSizes, c_pNetGPU->neuronNums[i+1]-c_pNetGPU->neuronNums[i], c_pNetGPU->neuronNums[i], time, &updateSize[c_pNetGPU->nTypes[i]]);
 		}
 
 		//gettimeofday(&t0, NULL);
@@ -203,7 +203,7 @@ void * run_thread_gpu(void *para) {
 		//peer_cpy_time += (t7.tv_sec - t3.tv_sec) + (t7.tv_usec - t3.tv_usec)/1000000.0;
 
 #ifdef LOG_DATA
-		int currentIdx = time%(MAX_DELAY+1);
+		int currentIdx = time%(maxDelay+1);
 
 		int copySize = 0;
 		copyFromGPU<int>(&copySize, buffers->c_gFiredTableSizes + currentIdx, 1);
@@ -211,14 +211,14 @@ void * run_thread_gpu(void *para) {
 			copyFromGPU<int>(buffers->c_neuronsFired, buffers->c_gFiredTable + (allNeuronNum*currentIdx), copySize);
 		}
 
-		if (copy_idx >= 0 && (c_pGpuNet->neuronNums[copy_idx+1]-c_pGpuNet->neuronNums[copy_idx]) > 0) {
-			copyFromGPU<real>(c_vm, c_g_vm, c_pGpuNet->neuronNums[copy_idx+1]-c_pGpuNet->neuronNums[copy_idx]);
+		if (copy_idx >= 0 && (c_pNetGPU->neuronNums[copy_idx+1]-c_pNetGPU->neuronNums[copy_idx]) > 0) {
+			copyFromGPU<real>(c_vm, c_g_vm, c_pNetGPU->neuronNums[copy_idx+1]-c_pNetGPU->neuronNums[copy_idx]);
 		}
 #endif
 
 		for (int i=0; i<sTypeNum; i++) {
-			assert(c_pGpuNet->synapseNums[i+1]-c_pGpuNet->synapseNums[i] > 0);
-			cudaUpdateSynapse[c_pGpuNet->sTypes[i]](c_pGpuNet->pN2SConnection, c_pGpuNet->pSynapses[i], buffers->c_gNeuronInput, buffers->c_gNeuronInput_I, buffers->c_gFiredTable, buffers->c_gFiredTableSizes, c_pGpuNet->synapseNums[i+1]-c_pGpuNet->synapseNums[i], c_pGpuNet->synapseNums[i], time, &updateSize[c_pGpuNet->sTypes[i]]);
+			assert(c_pNetGPU->synapseNums[i+1]-c_pNetGPU->synapseNums[i] > 0);
+			cudaUpdateType[c_pNetGPU->sTypes[i]](c_pNetGPU->pN2SConnection, c_pNetGPU->pSynapses[i], buffers->c_gNeuronInput, buffers->c_gNeuronInput_I, buffers->c_gFiredTable, buffers->c_gFiredTableSizes, c_pNetGPU->synapseNums[i+1]-c_pNetGPU->synapseNums[i], c_pNetGPU->synapseNums[i], time, &updateSize[c_pNetGPU->sTypes[i]]);
 		}
 		//cudaDeviceSynchronize();
 
@@ -254,7 +254,7 @@ void * run_thread_gpu(void *para) {
 		}
 		fprintf(log_file, "\n");
 
-		for (int i=0; i<c_pGpuNet->neuronNums[copy_idx+1] - c_pGpuNet->neuronNums[copy_idx]; i++) {
+		for (int i=0; i<c_pNetGPU->neuronNums[copy_idx+1] - c_pNetGPU->neuronNums[copy_idx]; i++) {
 			fprintf(v_file, "%.10lf \t", c_vm[i]);
 		}
 		fprintf(v_file, "\n");
@@ -300,7 +300,7 @@ void * run_thread_gpu(void *para) {
 	fclose(v_file);
 
 	free_buffers(buffers);
-	freeGPUNetwork(c_pGpuNet);
+	freeNetworkGPU(c_pNetGPU);
 
 	return NULL;
 }

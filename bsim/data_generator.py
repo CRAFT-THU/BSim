@@ -54,26 +54,25 @@ class Data(object):
         h.struct_end()
         h.blank_line()
 
-        # h.line("DATA_FUNC_DEFINE({})".format(self.name), 0)
-        
         h.blank_line()
+        h.func("size_t get{}Size()".format(self.name))
         h.func("void *malloc{}()".format(self.name))
         h.func("void *alloc{}(int num)".format(self.name))
         h.func("int free{}(void *pCPU)".format(self.name))
         h.func("int alloc{}Para(void *pCPU, int num)".format(self.name))
         h.func("int free{}Para(void *pCPU)".format(self.name))
         h.func("int save{}(void *pCPU, int num, FILE *f)".format(self.name))
-        h.func("int load{}(int num, FILE *f)".format(self.name))
+        h.func("void *load{}(int num, FILE *f)".format(self.name))
         h.blank_line()
 
         h.func("void *cudaAlloc{}(void *pCPU, int num)".format(self.name))
         h.func("int cuda{}ToGPU(void *pCPU, void *pGPU, int num)".format(self.name))
-        h.func("void cudaUpdate{}(void *data, real *currentE, real *currentI, int *firedTable, int *firedTableSizes, int num, int start_id, int t, BlockSize *pSize)".format(self.name))
+        h.func("void cudaUpdate{}(void *data, void *conn, real *currentE, real *currentI, int *firedTable, int *firedTableSizes, int num, int start_id, int t, BlockSize *pSize)".format(self.name))
         h.func("int cudaFree{}(void *pGPU)".format(self.name))
         h.blank_line()
 
         h.func("int mpiSend{}(void *data, int rank, int offset, int size)".format(self.name))
-        h.func("int mpiRecv{}(void *data, int rank, int offset, int size)".format(self.name))
+        h.func("int mpiRecv{}(void **data, int rank, int size)".format(self.name))
         h.blank_line()
 
         h.close()
@@ -85,6 +84,10 @@ class Data(object):
         c.include_std("string.h")
         c.blank_line()
         c.include("{}.h".format(self.classname))
+        c.blank_line()
+
+        c.func_start("size_t get{}Size()".format(self.name))
+        c.func_end("sizeof({})".format(self.classname))
         c.blank_line()
 
         c.func_start("void *malloc{}()".format(self.name))
@@ -103,9 +106,9 @@ class Data(object):
         c.blank_line()
         for t in self.parameters:
             for p in self.parameters[t]:
-                c.line("free(p->p{})".format(mycap(p)))
+                c.free("p->p{}".format(mycap(p)))
             c.blank_line()
-        c.line("free(p)")
+        c.free("p")
         c.func_end("0")
         c.blank_line()
 
@@ -124,7 +127,7 @@ class Data(object):
         c.blank_line()
         for t in self.parameters:
             for p in self.parameters[t]:
-                c.line("free(p->p{})".format(mycap(p)))
+                c.free("p->p{}".format(mycap(p)))
             c.blank_line()
         c.func_end("0")
         c.blank_line()
@@ -139,7 +142,7 @@ class Data(object):
         c.func_end("0")
         c.blank_line()
 
-        c.func_start("int load{}(int num, FILE *f)".format(self.name))
+        c.func_start("void *load{}(int num, FILE *f)".format(self.name))
         c.line("{} *p = ({}*)malloc(sizeof({}))".format(self.classname, self.classname, self.classname))
         c.blank_line()
         for t in self.parameters:
@@ -218,9 +221,9 @@ class Data(object):
         c.blank_line()
         for t in self.parameters:
             for p in self.parameters[t]:
-                c.line("free(p->p{})".format(mycap(p)))
+                c.free("p->p{}".format(mycap(p)))
             c.blank_line()
-        c.line("free(p)")
+        c.free("p")
         c.func_end("0")
         c.blank_line()
 
@@ -254,7 +257,7 @@ class Data(object):
         c.func_end("0")
         c.blank_line()
 
-        c.func_start("int load{}(int num, FILE *f)".format(self.name))
+        c.func_start("void *load{}(int num, FILE *f)".format(self.name))
         c.line("{} *p = ({}*)malloc(sizeof({}))".format(self.classname,
             self.classname, self.classname))
         c.blank_line()
@@ -271,17 +274,19 @@ if __name__ == '__main__':
     parameters_old = {
                     'refracStep' : 'int',
                     'refracTime' : 'int',
-                    'vm' : 'real',
+                    'v_m' : 'real',
                     'ci' : 'real',
                     'ce' : 'real',
                     'c_i' : 'real',
                     'c_e' : 'real',
                     'v_tmp' : 'real',
+                    'i_i' : 'real',
+                    'i_e' : 'real',
                     'v_i' : 'real',
                     'v_e' : 'real',
                     'v_thresh' : 'real',
                     'v_reset' : 'real',
-                    'v_m' : 'real',
+                    'c_m' : 'real',
                 }
     parameters = {}
     for k,v in parameters_old.items():

@@ -3,6 +3,11 @@
 
 #include "GStaticSynapses.h"
 
+size_t getStaticSize()
+{
+	return sizeof(GStaticSynapses);
+}
+
 void *mallocStatic()
 {
 	GStaticSynapses * p = (GStaticSynapses*)malloc(sizeof(GStaticSynapses)*1);
@@ -17,15 +22,18 @@ void *allocStatic(int num)
 	return p;
 }
 
-int freeStatic(void *pCPU, int num)
+int freeStatic(void *pCPU)
 {
 	GStaticSynapses *p = (GStaticSynapses*)pCPU;
 
 	free(p->pDst);
+	p->pDst = NULL;
 
 	free(p->pWeight);
+	p->pWeight = NULL;
 
 	free(p);
+	p = NULL;
 	return 0;
 }
 
@@ -33,20 +41,22 @@ int allocStaticPara(void *pCPU, int num)
 {
 	GStaticSynapses *p = (GStaticSynapses*)pCPU;
 
-	p->pDst = (int*)malloc(n*sizeof(int));
+	p->pDst = (int*)malloc(num*sizeof(int));
 
-	p->pWeight = (real*)malloc(n*sizeof(real));
+	p->pWeight = (real*)malloc(num*sizeof(real));
 
 	return 0;
 }
 
-int freeStaticPara(void *pCPU, int num)
+int freeStaticPara(void *pCPU)
 {
 	GStaticSynapses *p = (GStaticSynapses*)pCPU;
 
 	free(p->pDst);
+	p->pDst = NULL;
 
 	free(p->pWeight);
+	p->pWeight = NULL;
 
 	return 0;
 }
@@ -62,7 +72,7 @@ int saveStatic(void *pCPU, int num, FILE *f)
 	return 0;
 }
 
-int loadStatic(int num, FILE *f)
+void *loadStatic(int num, FILE *f)
 {
 	GStaticSynapses *p = (GStaticSynapses*)malloc(sizeof(GStaticSynapses));
 

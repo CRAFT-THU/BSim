@@ -193,20 +193,20 @@ int LIFNeuron::hardCopy(void * data, int idx, int base)
 {
 	GLIFNeurons *p = (GLIFNeurons *) data;
 	setID(idx+base);
-	p->p_vm[idx] = _vm;
-	p->p_CI[idx] = _CI;
-	p->p_CE[idx] = _CE;
-	p->p_C_I[idx] = _C_I;
-	p->p_C_E[idx] = _C_E;
-	p->p_v_tmp[idx] = _v_tmp;
-	p->p_i_I[idx] = _i_I;
-	p->p_i_E[idx] = _i_E;
-	p->p_v_thresh[idx] = _v_thresh;
-	p->p_v_reset[idx] = _v_reset;
-	p->p_Cm[idx] = _Cm;
+	p->pV_m[idx] = _vm;
+	p->pCi[idx] = _CI;
+	p->pCe[idx] = _CE;
+	p->pC_i[idx] = _C_I;
+	p->pC_e[idx] = _C_E;
+	p->pV_tmp[idx] = _v_tmp;
+	p->pI_i[idx] = _i_I;
+	p->pI_e[idx] = _i_E;
+	p->pV_thresh[idx] = _v_thresh;
+	p->pV_reset[idx] = _v_reset;
+	p->pC_m[idx] = _Cm;
 
-	p->p_refrac_step[idx] = _refrac_step;
-	p->p_refrac_time[idx] = _refrac_time;
+	p->pRefracStep[idx] = _refrac_step;
+	p->pRefracTime[idx] = _refrac_time;
 	//p->p_start_I[idx] = this->_start_I;
 	//p->p_start_E[idx] = this->_start_E;
 	//p->p_end[idx] = this->_end;

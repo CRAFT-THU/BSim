@@ -86,7 +86,7 @@ class CGenerator(BaseGenerator):
 
     def free(self, pointer: str="", tab: int=1):
         self.line(line='free({})'.format(pointer), tab=tab)
-        self.line(line="{} = NULL", tab=tab)
+        self.line(line="{} = NULL".format(pointer), tab=tab)
 
     @staticmethod
     def compile_(src: str='a.cpp', output: str='a.so'):

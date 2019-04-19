@@ -115,7 +115,7 @@ GNetwork *loadGNetwork(char *filename)
 		net->pNeurons[i] = loadType[net->nTypes[i]](net->neuronNums[i+1]-net->neuronNums[i], f);
 	}
 	for (int i=0; i<net->sTypeNum; i++) {
-		net->pSynapses[i] = saveType[net->sTypes[i]](net->synapseNums[i+1]-net->synapseNums[i], f);
+		net->pSynapses[i] = loadType[net->sTypes[i]](net->synapseNums[i+1]-net->synapseNums[i], f);
 	}
 
 	net->pN2SConnection = loadConnection(f);
@@ -228,7 +228,7 @@ int mpiRecvNetwork(GNetwork *network, int rank, int rankSize)
 int printNetwork(GNetwork *net, int rank)
 {
 	printf("NETWORK PRINT START...\n");
-	printf("Server: %d, nTypeNum: %d, sTypeNum: %d, MAX_DELAY: %d\n", rank, net->nTypeNum, net->sTypeNum, net->MAX_DELAY);
+	printf("Server: %d, nTypeNum: %d, sTypeNum: %d, maxDelay: %d, minDelay: %d\n", rank, net->nTypeNum, net->sTypeNum, net->maxDelay, net->minDelay);
 
 	printf("NTypes:");
 	for(int i=0; i<net->nTypeNum; i++) {

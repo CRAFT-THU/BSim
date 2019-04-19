@@ -6,29 +6,34 @@ PREC=$(echo $2 | tr [A-Z] [a-z])
 
 THREAD_NUM=$3 
 
-USE_DOUBLE="ON"
-USE_LOG="OFF"
 C_MODE="Release"
-
-if [ "$MODE" = "debug" ]; then
-	C_MODE="Debug"
-	USE_LOG="ON"
-else
-	C_MODE="Release"
-fi
-
-if [ "$MODE" = "log" ]; then
-	USE_LOG="ON"
-fi
-
-if [ "$PREC" = "float" ]; then
-	USE_DOUBLE="OFF"
-fi
+USE_DOUBLE="OFF"
+USE_LOG="OFF"
 
 TOTAL_THREAD_NUM=`getconf _NPROCESSORS_ONLN`
 if [ x"$THREAD_NUM" = x ]; then
 	((THREAD_NUM=THREAD_NUM/2))
 fi
+
+if [ "$MODE" = "debug" ]; then
+	C_MODE="Debug"
+	USE_LOG="ON"
+elif [ "$MODE" = "log" ]; then
+	C_MODE="Release"
+	USE_LOG="ON"
+elif [ "$MODE" = "test" ]; then
+	C_MODE="Debug"
+	USE_LOG="ON"
+	THREAD_NUM=1
+else
+	C_MODE="Release"
+fi
+
+
+if [ "$PREC" = "double" ]; then
+	USE_DOUBLE="ON"
+fi
+
 
 set -x
 if [ "$MODE" = "clean" ]; then
