@@ -81,7 +81,7 @@ class CGenerator(BaseGenerator):
         self.line_no_end(line, tab=0)
 
     def malloc(self, ret: str="", type_: str="", num='1', tab: int=1):
-        self.line(line='{} * {} = ({}*)malloc(sizeof({})*{})'.format(type_, ret, type_, type_, str(num)), tab=tab)
+        self.line(line='{} *{} = ({}*)malloc(sizeof({})*{})'.format(type_, ret, type_, type_, str(num)), tab=tab)
         self.line(line='memset({}, 0, sizeof({})*{})'.format(ret, type_, str(num)), tab=tab)
 
     def free(self, pointer: str="", tab: int=1):

@@ -5,8 +5,8 @@
 #ifndef NEURON_H
 #define NEURON_H
 
-#include "../src/neuron/constant/ConstantNeuron.h"
-#include "../src/neuron/array/ArrayNeuron.h"
+// #include "../src/neuron/constant/ConstantNeuron.h"
+// #include "../src/neuron/array/ArrayNeuron.h"
 #include "../src/neuron/lif/LIFNeuron.h"
 
 // #include "../src/neuron/mem/MemNeuron.h"
@@ -24,9 +24,9 @@
 #include "Synapse.h"
 
 
-typedef CompositeNeuron<ConstantNeuron, StaticSynapse> Constant_spikes;
+// typedef CompositeNeuron<ConstantNeuron, StaticSynapse> Constant_spikes;
 // typedef CompositeNeuron<PoissonNeuron, StaticSynapse> Poisson_spikes;
-typedef CompositeNeuron<ArrayNeuron, StaticSynapse> Array_spikes;
+// typedef CompositeNeuron<ArrayNeuron, StaticSynapse> Array_spikes;
 
 // typedef CompositeNeuron<MaxNeuron, StaticSynapse> Max_pooling;
 typedef CompositeNeuron<LIFNeuron, StaticSynapse> LIF_curr_exp;
