@@ -37,15 +37,15 @@ After compiling, the binary files are generated under *test/build/bin* directory
 
 For *standard\_test* sample:
 
-Sample with 100Hz firing rate:
+- 100Hz firing rate:
 
 	$ ./standard_test  number_of_populations number_of_neurons_per_population  0.7 0.5 0.6 0.3 6
 
-Sample with 500Hz firing rate:
+- 500Hz firing rate:
 
 	$ ./standard_test  number_of_populations number_of_neurons_per_population  0.7 0.9 0.6 0.2 6
 
-Sample with 2000Hz firing rate:
+- 2000Hz firing rate:
 
 	$ ./standard_test  number_of_populations number_of_neurons_per_population  1.3 1 2 1 50
 
