@@ -36,6 +36,12 @@ class Data(object):
         self.cu_headers = cu_headers
         self.parameters = {k:parameters[k] for k in sorted(parameters.keys(), key= lambda x:myhash(x), reverse = False)}
 
+    def generate(self):
+        self.generate_h()
+        self.generate_c()
+        self.generate_cu()
+        self.generate_mpi()
+
     def generate_h(self):
         h = HGenerator("{}/{}.h".format(self.path, self.classname))
 
@@ -199,73 +205,18 @@ class Data(object):
         return 0
 
     def generate_mpi(self):
-        c = CGenerator("{}/{}.cpp".format(self.path, self.classname))
+        c = CGenerator("{}/{}.mpi.cpp".format(self.path, self.classname))
         c.include("mpi.h")
         c.blank_line()
         c.include("{}.h".format(self.classname))
         c.blank_line()
 
-        c.func_start("void *malloc{}()".format(self.name))
-        c.line("void *p = malloc(sizeof({}))".format(self.classname))
-        c.func_end("p")
-        c.blank_line()
-
-        c.func_start("void *alloc{}(int num)".format(self.name))
-        c.line("void *p = malloc{}()".format(self.name, self.name, self.name))
-        c.line("alloc{}Para(p, num)".format(self.name, self.name, self.name))
-        c.func_end("p")
-        c.blank_line()
-
-        c.func_start("int free{}(void *pCPU, int num)".format(self.name))
-        c.line("{} *p = ({}*)pCPU".format(self.classname, self.classname))
-        c.blank_line()
-        for t in self.parameters:
-            for p in self.parameters[t]:
-                c.free("p->p{}".format(mycap(p)))
-            c.blank_line()
-        c.free("p")
+        c.func_start("int mpiSend{}(void **data, int rank, int offset, int size)".format(self.name))
         c.func_end("0")
         c.blank_line()
 
-        c.func_start("int alloc{}Para(void *pCPU, int num)".format(self.name))
-        c.line("{} *p = ({}*)pCPU".format(self.classname, self.classname))
-        c.blank_line()
-        for t in self.parameters:
-            for p in self.parameters[t]:
-                c.line("p->p{} = ({}*)malloc(num*sizeof({}))".format(mycap(p), t, t))
-            c.blank_line()
-        c.func_end(0)
-        c.blank_line()
-
-        c.func_start("int free{}Para(void *pCPU)".format(self.name))
-        c.line("{} *p = ({}*)pCPU".format(self.classname, self.classname))
-        c.blank_line()
-        for t in self.parameters:
-            for p in self.parameters[t]:
-                c.line("free(p->p{})".format(mycap(p)))
-            c.blank_line()
+        c.func_start("int mpiRecv{}(void **data, int rank, int size)".format(self.classname))
         c.func_end("0")
-        c.blank_line()
-
-        c.func_start("int save{}(void *pCPU, int num, FILE *f)".format(self.name))
-        c.blank_line()
-        c.line("{} *p = ({}*)pCPU".format(self.classname, self.classname))
-        for t in self.parameters:
-            for p in self.parameters[t]:
-                c.line("fwrite(p->p{}, sizeof({}), num, f)".format(mycap(p), t))
-            c.blank_line()
-        c.func_end("0")
-        c.blank_line()
-
-        c.func_start("void *load{}(int num, FILE *f)".format(self.name))
-        c.line("{} *p = ({}*)malloc(sizeof({}))".format(self.classname,
-            self.classname, self.classname))
-        c.blank_line()
-        for t in self.parameters:
-            for p in self.parameters[t]:
-                c.line("fread(p->p{}, sizeof({}), num, f)".format(mycap(p), t))
-            c.blank_line()
-        c.func_end("p")
         c.blank_line()
 
         return 0
@@ -296,15 +247,11 @@ if __name__ == '__main__':
             path='../src/neuron/lif/', pre='G', post='Neurons', 
             headers=['../../utils/type.h', '../../utils/BlockSize.h'], 
             cu_headers=['../../third_party/cuda/helper_cuda.h'])
-    lif.generate_h()
-    lif.generate_c()
-    lif.generate_cu()
+    lif.generate()
 
     static = Data('Static', {'int':['dst'], 'real':['weight']},
             path='../src/synapse/static/', pre='G', post='Synapses',
             headers=['../../utils/type.h', '../../utils/BlockSize.h'], 
             cu_headers=['../../third_party/cuda/helper_cuda.h'])
-    static.generate_h()
-    static.generate_c()
-    static.generate_cu()
+    static.generate()
 
