@@ -8,9 +8,9 @@
 #include "../../utils/BlockSize.h"
 
 struct GStaticSynapses {
-	real *pWeight;
-
 	int *pDst;
+
+	real *pWeight;
 
 };
 

@@ -8,22 +8,22 @@
 #include "../../utils/BlockSize.h"
 
 struct GLIFNeurons {
-	real *pI_i;
-	real *pV_reset;
-	real *pCe;
-	real *pC_e;
-	real *pC_m;
-	real *pI_e;
-	real *pV_tmp;
-	real *pCi;
-	real *pV_thresh;
+	int *pRefracStep;
+	int *pRefracTime;
+
 	real *pV_m;
+	real *pCi;
+	real *pCe;
+	real *pC_i;
+	real *pC_e;
+	real *pV_tmp;
+	real *pI_i;
+	real *pI_e;
 	real *pV_i;
 	real *pV_e;
-	real *pC_i;
-
-	int *pRefracTime;
-	int *pRefracStep;
+	real *pV_thresh;
+	real *pV_reset;
+	real *pC_m;
 
 };
 
