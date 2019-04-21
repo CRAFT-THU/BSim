@@ -211,11 +211,11 @@ class Data(object):
         c.include("{}.h".format(self.classname))
         c.blank_line()
 
-        c.func_start("int mpiSend{}(void **data, int rank, int offset, int size)".format(self.name))
+        c.func_start("int mpiSend{}(void *data, int rank, int offset, int size)".format(self.name))
         c.func_end("0")
         c.blank_line()
 
-        c.func_start("int mpiRecv{}(void **data, int rank, int size)".format(self.classname))
+        c.func_start("int mpiRecv{}(void **data, int rank, int size)".format(self.name))
         c.func_end("0")
         c.blank_line()
 
