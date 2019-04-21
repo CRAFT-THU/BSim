@@ -37,15 +37,20 @@ After compiling, the binary files are generated under *test/build/bin* directory
 
 For *standard\_test* sample:
 
-	$ ./standard_test  number_of_populations number_of_neurons_per_population  0.7 0.5 0.6 0.3 6 # Firing rate is 100Hz
-	$ ./standard_test  number_of_populations number_of_neurons_per_population  0.7 0.9 0.6 0.2 6 # Firing rate is 500Hz
-	$ ./standard_test  number_of_populations number_of_neurons_per_population  1.3 1 2 1 50 # Firing rate is 2000Hz
+Sample with 100Hz firing rate:
+	$ ./standard_test  number_of_populations number_of_neurons_per_population  0.7 0.5 0.6 0.3 6
+
+Sample with 500Hz firing rate:
+	$ ./standard_test  number_of_populations number_of_neurons_per_population  0.7 0.9 0.6 0.2 6
+
+Sample with 2000Hz firing rate:
+	$ ./standard_test  number_of_populations number_of_neurons_per_population  1.3 1 2 1 50
 
 **Branches:**
 
 Currently, different branches provide different optimization methods:
-- *fast\_multi\_device* provides most of the stable optimization methods.
-- *test\_no\_synapse\_sparsity* drops the sparsity exploration of synapses.
-- *test\_no\_neuron\_sparsity* further drops the sparsity exploration of neurons.
+- *fast\_multi\_device*: It provides most of the stable optimization methods.
+- *test\_no\_synapse\_sparsity*: It drops the sparsity exploration of synapses.
+- *test\_no\_neuron\_sparsity*: It further drops the sparsity exploration of neurons.
 
 
