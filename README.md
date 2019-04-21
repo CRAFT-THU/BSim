@@ -1,12 +1,9 @@
 # BSim
-==========
-
 A faster SNN simulator which supports multiple GPGPUs. 
 
 The simulator only intergrates the LIF model and support for clusters is under development.
 
 # Prerequisites
--------------
 
 - g++ 5.4.0
 - CUDA 9.0 
@@ -14,8 +11,7 @@ The simulator only intergrates the LIF model and support for clusters is under d
 - libblas 3.6.0
 
 
-Usage
------
+# Usage
 
 **Samples**
 
