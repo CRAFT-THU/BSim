@@ -64,17 +64,21 @@ class Data(object):
         h.func("size_t get{}Size()".format(self.name))
         h.func("void *malloc{}()".format(self.name))
         h.func("void *alloc{}(int num)".format(self.name))
-        h.func("int free{}(void *pCPU)".format(self.name))
         h.func("int alloc{}Para(void *pCPU, int num)".format(self.name))
+        h.func("int free{}(void *pCPU)".format(self.name))
         h.func("int free{}Para(void *pCPU)".format(self.name))
         h.func("int save{}(void *pCPU, int num, FILE *f)".format(self.name))
         h.func("void *load{}(int num, FILE *f)".format(self.name))
         h.blank_line()
 
+        h.func("void *cudaMalloc{}()".format(self.name))
         h.func("void *cudaAlloc{}(void *pCPU, int num)".format(self.name))
-        h.func("int cuda{}ToGPU(void *pCPU, void *pGPU, int num)".format(self.name))
-        h.func("void cudaUpdate{}(void *data, void *conn, real *currentE, real *currentI, int *firedTable, int *firedTableSizes, int num, int start_id, int t, BlockSize *pSize)".format(self.name))
+        h.func("void *cudaAlloc{}Para(void *pCPU, int num)".format(self.name))
         h.func("int cudaFree{}(void *pGPU)".format(self.name))
+        h.func("int cudaFree{}Para(void *pGPU)".format(self.name))
+        h.func("int cuda{}ParaToGPU(void *pCPU, void *pGPU, int num)".format(self.name))
+        h.func("int cuda{}ParaFromGPU(void *pCPU, void *pGPU, int num)".format(self.name))
+        h.func("void cudaUpdate{}(void *data, void *conn, real *currentE, real *currentI, int *firedTable, int *firedTableSizes, int num, int start_id, int t, BlockSize *pSize)".format(self.name))
         h.blank_line()
 
         h.func("int mpiSend{}(void *data, int rank, int offset, int size)".format(self.name))
@@ -101,23 +105,6 @@ class Data(object):
         c.func_end("(void*)p")
         c.blank_line()
 
-        c.func_start("void *alloc{}(int num)".format(self.name))
-        c.line("void *p = malloc{}()".format(self.name))
-        c.line("alloc{}Para(p, num)".format(self.name, self.name, self.name))
-        c.func_end("p")
-        c.blank_line()
-
-        c.func_start("int free{}(void *pCPU)".format(self.name))
-        c.line("{} *p = ({}*)pCPU".format(self.classname, self.classname))
-        c.blank_line()
-        for t in self.parameters:
-            for p in self.parameters[t]:
-                c.free("p->p{}".format(mycap(p)))
-            c.blank_line()
-        c.free("p")
-        c.func_end("0")
-        c.blank_line()
-
         c.func_start("int alloc{}Para(void *pCPU, int num)".format(self.name))
         c.line("{} *p = ({}*)pCPU".format(self.classname, self.classname))
         c.blank_line()
@@ -128,6 +115,12 @@ class Data(object):
         c.func_end(0)
         c.blank_line()
 
+        c.func_start("void *alloc{}(int num)".format(self.name))
+        c.line("void *p = malloc{}()".format(self.name))
+        c.line("alloc{}Para(p, num)".format(self.name, self.name, self.name))
+        c.func_end("p")
+        c.blank_line()
+
         c.func_start("int free{}Para(void *pCPU)".format(self.name))
         c.line("{} *p = ({}*)pCPU".format(self.classname, self.classname))
         c.blank_line()
@@ -135,6 +128,14 @@ class Data(object):
             for p in self.parameters[t]:
                 c.free("p->p{}".format(mycap(p)))
             c.blank_line()
+        c.func_end("0")
+        c.blank_line()
+
+        c.func_start("int free{}(void *pCPU)".format(self.name))
+        c.line("{} *p = ({}*)pCPU".format(self.classname, self.classname))
+        c.blank_line()
+        c.line("free{}Para(p)".format(self.name))
+        c.free("p")
         c.func_end("0")
         c.blank_line()
 
@@ -169,35 +170,69 @@ class Data(object):
         cu.include("{}.h".format(self.classname))
         cu.blank_line()
 
-        cu.func_start("void *cudaAlloc{}(void *pCPU, int num)".format(self.name))
+        cu.func_start("void *cudaMalloc{}()".format(self.name))
         cu.line("void *ret = NULL")
-        cu.line("{} *p = ({}*)pCPU".format(self.classname, self.classname))
-        cu.malloc("tmp", "{}".format(self.classname), 1)
+        cu.malloc_gpu("ret", "{}".format(self.classname), 1)
+        cu.func_end("ret")
         cu.blank_line()
-        for t in self.parameters:
-            for p in self.parameters[t]:
-                cu.to_gpu("tmp->p{}".format(mycap(p)),
-                          cpu="p->p{}".format(mycap(p)),
-                          type_=t, num="num");
-            cu.blank_line()
-        cu.to_gpu("ret", cpu="tmp", type_="{}".format(self.classname), num=1)
+
+        cu.func_start("void *cudaAlloc{}(void *pCPU, int num)".format(self.name))
+        cu.line("void *ret = cudaMalloc{}()".format(self.name))
+        cu.line("void *tmp = cudaAlloc{}Para(pCPU, num)".format(self.name))
+        cu.cpu_to_gpu(gpu="ret", cpu="tmp", type_="{}".format(self.classname), num=1)
         cu.free("tmp")
         cu.func_end("ret")
         cu.blank_line()
 
-        cu.func_start("int cuda{}ToGPU(void *pCPU, void *pGPU, int num)".format(self.name))
+        cu.func_start("void *cudaAlloc{}Para(void *pCPU, int num)".format(self.name))
+        cu.line("{} *p = ({}*)pCPU".format(self.classname, self.classname))
+        cu.malloc("ret", "{}".format(self.classname), 1)
+        cu.blank_line()
+        for t in self.parameters:
+            for p in self.parameters[t]:
+                cu.to_gpu("ret->p{}".format(mycap(p)),
+                          cpu="p->p{}".format(mycap(p)),
+                          type_=t, num="num");
+            cu.blank_line()
+        cu.func_end("ret")
+        cu.blank_line()
+
+        cu.func_start("int cuda{}ParaToGPU(void *pCPU, void *pGPU, int num)".format(self.name))
         cu.line("{} *pC = ({}*)pCPU".format(self.classname, self.classname))
         cu.line("{} *pG = ({}*)pGPU".format(self.classname, self.classname))
         cu.blank_line()
         for t in self.parameters:
             for p in self.parameters[t]:
-                cu.cpu_to_gpu(cpu="pC", gpu="pG", type_=t, num="num")
+                cu.cpu_to_gpu(cpu="pC->p{}".format(mycap(p)), gpu="pG->p{}".format(p), type_=t, num="num")
+            cu.blank_line()
+        cu.func_end(0)
+        cu.blank_line()
+
+        cu.func_start("int cuda{}ParaFromGPU(void *pCPU, void *pGPU, int num)".format(self.name))
+        cu.line("{} *pC = ({}*)pCPU".format(self.classname, self.classname))
+        cu.line("{} *pG = ({}*)pGPU".format(self.classname, self.classname))
+        cu.blank_line()
+        for t in self.parameters:
+            for p in self.parameters[t]:
+                cu.gpu_to_cpu(cpu="pC->p{}".format(mycap(p)), gpu="pG->p{}".format(p), type_=t, num="num")
             cu.blank_line()
         cu.func_end(0)
         cu.blank_line()
 
         cu.func_start("int cudaFree{}(void *pGPU)".format(self.name))
+        cu.from_gpu("tmp", gpu="pGPU", type_="{}".format(self.classname), num=1)
+        cu.line("cudaFree{}Para(pGPU)".format(self.name))
+        cu.free("tmp")
         cu.free_gpu("pGPU")
+        cu.func_end(0)
+        cu.blank_line()
+
+        cu.func_start("int cudaFree{}Para(void *pGPU)".format(self.name))
+        cu.line("{} *p = ({}*)pGPU".format(self.classname, self.classname))
+        for t in self.parameters:
+            for p in self.parameters[t]:
+                cu.free_gpu("p->p{}".format(mycap(p)))
+            cu.blank_line()
         cu.func_end(0)
         cu.blank_line()
 

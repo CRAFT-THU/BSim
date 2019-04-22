@@ -15,28 +15,6 @@ void *mallocStatic()
 	return (void*)p;
 }
 
-void *allocStatic(int num)
-{
-	void *p = mallocStatic();
-	allocStaticPara(p, num);
-	return p;
-}
-
-int freeStatic(void *pCPU)
-{
-	GStaticSynapses *p = (GStaticSynapses*)pCPU;
-
-	free(p->pDst);
-	p->pDst = NULL;
-
-	free(p->pWeight);
-	p->pWeight = NULL;
-
-	free(p);
-	p = NULL;
-	return 0;
-}
-
 int allocStaticPara(void *pCPU, int num)
 {
 	GStaticSynapses *p = (GStaticSynapses*)pCPU;
@@ -46,6 +24,13 @@ int allocStaticPara(void *pCPU, int num)
 	p->pWeight = (real*)malloc(num*sizeof(real));
 
 	return 0;
+}
+
+void *allocStatic(int num)
+{
+	void *p = mallocStatic();
+	allocStaticPara(p, num);
+	return p;
 }
 
 int freeStaticPara(void *pCPU)
@@ -58,6 +43,16 @@ int freeStaticPara(void *pCPU)
 	free(p->pWeight);
 	p->pWeight = NULL;
 
+	return 0;
+}
+
+int freeStatic(void *pCPU)
+{
+	GStaticSynapses *p = (GStaticSynapses*)pCPU;
+
+	freeStaticPara(p);
+	free(p);
+	p = NULL;
 	return 0;
 }
 
