@@ -20,7 +20,7 @@ extern void* (*loadType[TYPESIZE])(int num, FILE *f);
 // extern int (*addTypeConnection[TYPESIZE])(void *, int *);
 
 extern void *(*cudaAllocType[TYPESIZE])(void *pCPU, int num);
-extern int (*cudaTypeToGPU[TYPESIZE])(void *pCPU, void *pGPU, int num);
+// extern int (*cudaTypeToGPU[TYPESIZE])(void *pCPU, void *pGPU, int num);
 extern int (*cudaFreeType[TYPESIZE])(void *);
 // extern void (*cudaFindType[TYPESIZE])(void *, int, int);
 // extern void (*cudaUpdateNeuron[TYPESIZE])(void *, real *, real *, int *, int*, int, int, int, BlockSize *);
