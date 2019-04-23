@@ -119,12 +119,12 @@ void * run_thread_gpu(void *para) {
 	//int dataOffset = network->_node_idx * network->_node_num;
 	//int dataIdx = network->_node_idx * network->_node_num + network->_node_idx;
 
-	int maxDelay = c_pNetGPU->maxDelay;
+	int deltaDelay = c_pNetGPU->maxDelay - c_pNetGPU->minDelay;
 	printf("Thread %d MaxDelay: %d MinDelay: %d\n", network->_node_idx, c_pNetGPU->maxDelay, c_pNetGPU->minDelay);
 
 	// init_connection<<<1, 1>>>(c_pNetGPU->pN2SConnection);
 
-	GBuffers *buffers = alloc_buffers(allNeuronNum, nodeSynapseNum, maxDelay, network->_dt);
+	GBuffers *buffers = alloc_buffers(allNeuronNum, nodeSynapseNum, deltaDelay, network->_dt);
 
 	BlockSize *updateSize = getBlockSize(allNeuronNum, nodeSynapseNum);
 
@@ -203,7 +203,7 @@ void * run_thread_gpu(void *para) {
 		//peer_cpy_time += (t7.tv_sec - t3.tv_sec) + (t7.tv_usec - t3.tv_usec)/1000000.0;
 
 #ifdef LOG_DATA
-		int currentIdx = time%(maxDelay+1);
+		int currentIdx = time%(deltaDelay+1);
 
 		int copySize = 0;
 		copyFromGPU<int>(&copySize, buffers->c_gFiredTableSizes + currentIdx, 1);

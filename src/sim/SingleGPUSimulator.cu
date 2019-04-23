@@ -64,11 +64,11 @@ int SingleGPUSimulator::run(real time, FireInfo &log)
 	printf("NeuronTypeNum: %d, SynapseTypeNum: %d\n", nTypeNum, sTypeNum);
 	printf("NeuronNum: %d, SynapseNum: %d\n", totalNeuronNum, totalSynapseNum);
 
-	int maxDelay = c_pNetGPU->maxDelay;
+	int deltaDelay = c_pNetGPU->maxDelay;
 	printf("maxDelay: %d minDelay: %d\n", c_pNetGPU->maxDelay, c_pNetGPU->minDelay);
 
 
-	GBuffers *buffers = alloc_buffers(totalNeuronNum, totalSynapseNum, maxDelay, dt);
+	GBuffers *buffers = alloc_buffers(totalNeuronNum, totalSynapseNum, deltaDelay, dt);
 
 	BlockSize *updateSize = getBlockSize(totalNeuronNum, totalSynapseNum);
 
@@ -132,7 +132,7 @@ int SingleGPUSimulator::run(real time, FireInfo &log)
 
 #ifdef LOG_DATA
 		//LOG DATA
-		int currentIdx = time%(maxDelay+1);
+		int currentIdx = time%(deltaDelay+1);
 
 		//printf("HERE %p %d ", buffers->c_gFiredTableSizes, currentIdx);
 		//fflush(stdout);
@@ -292,7 +292,7 @@ int SingleGPUSimulator::runMultiNets(real time, int parts, FireInfo &log) {
 		int allNeuronNum = pNetCPU->pN2SConnection->nNum;
 		int nodeSynapseNum = c_pNetGPU->synapseNums[sTypeNum];
 
-		buffers[i] = alloc_buffers(allNeuronNum, nodeSynapseNum, c_pNetGPU->maxDelay, dt);
+		buffers[i] = alloc_buffers(allNeuronNum, nodeSynapseNum, c_pNetGPU->deltaDelay, dt);
 		updateSizes[i] = getBlockSize(allNeuronNum, nodeSynapseNum);
 
 		printf("Subnet %d NeuronTypeNum: %d, SynapseTypeNum: %d\n", subnets[i]._node_idx, nTypeNum, sTypeNum);

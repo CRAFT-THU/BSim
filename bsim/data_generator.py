@@ -203,7 +203,7 @@ class Data(object):
         cu.blank_line()
         for t in self.parameters:
             for p in self.parameters[t]:
-                cu.cpu_to_gpu(cpu="pC->p{}".format(mycap(p)), gpu="pG->p{}".format(p), type_=t, num="num")
+                cu.cpu_to_gpu(cpu="pC->p{}".format(mycap(p)), gpu="pG->p{}".format(mycap(p)), type_=t, num="num")
             cu.blank_line()
         cu.func_end(0)
         cu.blank_line()
@@ -214,7 +214,7 @@ class Data(object):
         cu.blank_line()
         for t in self.parameters:
             for p in self.parameters[t]:
-                cu.gpu_to_cpu(cpu="pC->p{}".format(mycap(p)), gpu="pG->p{}".format(p), type_=t, num="num")
+                cu.gpu_to_cpu(cpu="pC->p{}".format(mycap(p)), gpu="pG->p{}".format(mycap(p)), type_=t, num="num")
             cu.blank_line()
         cu.func_end(0)
         cu.blank_line()

@@ -36,7 +36,7 @@ __global__ void init_log_buffers(int *layer_input, real *x_input, int *fire_coun
 }
 
 
-GBuffers* alloc_buffers(int neuron_num, int synapse_num, int max_delay, real dt) 
+GBuffers* alloc_buffers(int neuron_num, int synapse_num, int deltaDelay, real dt) 
 {
 	GBuffers *ret = (GBuffers*)malloc(sizeof(GBuffers));
 	memset(ret, 0, sizeof(GBuffers));
@@ -47,11 +47,11 @@ GBuffers* alloc_buffers(int neuron_num, int synapse_num, int max_delay, real dt)
 	checkCudaErrors(cudaMalloc((void**)&(ret->c_gNeuronInput_I), sizeof(real)*(neuron_num)));
 	checkCudaErrors(cudaMemset(ret->c_gNeuronInput_I, 0, sizeof(real)*(neuron_num)));
 
-	checkCudaErrors(cudaMalloc((void**)&(ret->c_gFiredTable), sizeof(int)*((neuron_num)*(max_delay+1))));
-	checkCudaErrors(cudaMemset(ret->c_gFiredTable, 0, sizeof(int)*((neuron_num)*(max_delay+1))));
+	checkCudaErrors(cudaMalloc((void**)&(ret->c_gFiredTable), sizeof(int)*((neuron_num)*(deltaDelay+1))));
+	checkCudaErrors(cudaMemset(ret->c_gFiredTable, 0, sizeof(int)*((neuron_num)*(deltaDelay+1))));
 
-	checkCudaErrors(cudaMalloc((void**)&(ret->c_gFiredTableSizes), sizeof(int)*(max_delay+1)));
-	checkCudaErrors(cudaMemset(ret->c_gFiredTableSizes, 0, sizeof(int)*(max_delay+1)));
+	checkCudaErrors(cudaMalloc((void**)&(ret->c_gFiredTableSizes), sizeof(int)*(deltaDelay+1)));
+	checkCudaErrors(cudaMemset(ret->c_gFiredTableSizes, 0, sizeof(int)*(deltaDelay+1)));
 
 	checkCudaErrors(cudaMalloc((void**)&(ret->c_gActiveTable), sizeof(int)*(neuron_num)));
 	checkCudaErrors(cudaMemset(ret->c_gActiveTable, 0, sizeof(int)*(neuron_num)));
@@ -66,14 +66,15 @@ GBuffers* alloc_buffers(int neuron_num, int synapse_num, int max_delay, real dt)
 	ret->c_gXInput = gpuMalloc<real>(neuron_num);
 	ret->c_gFireCount = gpuMalloc<int>(neuron_num);
 
-	// int timeTableCap = max_delay+1;
-	checkCudaErrors(cudaMemcpyToSymbol(MAX_DELAY, &max_delay, sizeof(int)));
+	// int timeTableCap = deltaDelay+1;
+	// checkCudaErrors(cudaMemcpyToSymbol(MAX_DELAY, &maxDelay, sizeof(int)));
+	// checkCudaErrors(cudaMemcpyToSymbol(MIN_DELAY, &minDelay, sizeof(int)));
 	// checkCudaErrors(cudaMemcpyToSymbol(gTimeTableCap, &timeTableCap, sizeof(int)));
 	checkCudaErrors(cudaMemcpyToSymbol(gFiredTableCap, &neuron_num, sizeof(int)));
 	// checkCudaErrors(cudaMemcpyToSymbol(gSynapsesTableCap, &synapse_num, sizeof(int)));
 	checkCudaErrors(cudaMemcpyToSymbol(DT, &dt, sizeof(real)));
-	//checkCudaErrors(cudaMalloc((void**)&ret->c_gTimeTable, sizeof(int)*(max_delay+1)));
-	//checkCudaErrors(cudaMemset(ret->c_gTimeTable, 0, sizeof(int)*(max_delay+1)));
+	//checkCudaErrors(cudaMalloc((void**)&ret->c_gTimeTable, sizeof(int)*(deltaDelay+1)));
+	//checkCudaErrors(cudaMemset(ret->c_gTimeTable, 0, sizeof(int)*(deltaDelay+1)));
 
 	checkCudaErrors(cudaMallocHost((void**)(&ret->c_neuronsFired), sizeof(int)*(neuron_num)));
 	checkCudaErrors(cudaMallocHost((void**)(&ret->c_synapsesFired), sizeof(int)*(synapse_num)));

@@ -43,9 +43,9 @@ int cudaStaticParaToGPU(void *pCPU, void *pGPU, int num)
 	GStaticSynapses *pC = (GStaticSynapses*)pCPU;
 	GStaticSynapses *pG = (GStaticSynapses*)pGPU;
 
-	checkCudaErrors(cudaMemcpy(pG->pdst, pC->pDst, sizeof(int)*num, cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMemcpy(pG->pDst, pC->pDst, sizeof(int)*num, cudaMemcpyHostToDevice));
 
-	checkCudaErrors(cudaMemcpy(pG->pweight, pC->pWeight, sizeof(real)*num, cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMemcpy(pG->pWeight, pC->pWeight, sizeof(real)*num, cudaMemcpyHostToDevice));
 
 	return 0;
 }
@@ -55,9 +55,9 @@ int cudaStaticParaFromGPU(void *pCPU, void *pGPU, int num)
 	GStaticSynapses *pC = (GStaticSynapses*)pCPU;
 	GStaticSynapses *pG = (GStaticSynapses*)pGPU;
 
-	checkCudaErrors(cudaMemcpy(pC->pDst, pG->pdst, sizeof(int)*num, cudaMemcpyDeviceToHost));
+	checkCudaErrors(cudaMemcpy(pC->pDst, pG->pDst, sizeof(int)*num, cudaMemcpyDeviceToHost));
 
-	checkCudaErrors(cudaMemcpy(pC->pWeight, pG->pweight, sizeof(real)*num, cudaMemcpyDeviceToHost));
+	checkCudaErrors(cudaMemcpy(pC->pWeight, pG->pWeight, sizeof(real)*num, cudaMemcpyDeviceToHost));
 
 	return 0;
 }

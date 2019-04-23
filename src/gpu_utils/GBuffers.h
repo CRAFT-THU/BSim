@@ -23,5 +23,5 @@ struct GBuffers {
 };
 
 // void init_buffers(GBuffers * buf);
-GBuffers* alloc_buffers(int neuron_num, int synapse_num, int max_delay, real dt);
+GBuffers* alloc_buffers(int neuron_num, int synapse_num, int deltaDelay, real dt);
 int free_buffers(GBuffers *buf);

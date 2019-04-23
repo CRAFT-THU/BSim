@@ -82,22 +82,22 @@ int cudaLIFParaToGPU(void *pCPU, void *pGPU, int num)
 	GLIFNeurons *pC = (GLIFNeurons*)pCPU;
 	GLIFNeurons *pG = (GLIFNeurons*)pGPU;
 
-	checkCudaErrors(cudaMemcpy(pG->prefracStep, pC->pRefracStep, sizeof(int)*num, cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaMemcpy(pG->prefracTime, pC->pRefracTime, sizeof(int)*num, cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMemcpy(pG->pRefracStep, pC->pRefracStep, sizeof(int)*num, cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMemcpy(pG->pRefracTime, pC->pRefracTime, sizeof(int)*num, cudaMemcpyHostToDevice));
 
-	checkCudaErrors(cudaMemcpy(pG->pv_m, pC->pV_m, sizeof(real)*num, cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaMemcpy(pG->pci, pC->pCi, sizeof(real)*num, cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaMemcpy(pG->pce, pC->pCe, sizeof(real)*num, cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaMemcpy(pG->pc_i, pC->pC_i, sizeof(real)*num, cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaMemcpy(pG->pc_e, pC->pC_e, sizeof(real)*num, cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaMemcpy(pG->pv_tmp, pC->pV_tmp, sizeof(real)*num, cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaMemcpy(pG->pi_i, pC->pI_i, sizeof(real)*num, cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaMemcpy(pG->pi_e, pC->pI_e, sizeof(real)*num, cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaMemcpy(pG->pv_i, pC->pV_i, sizeof(real)*num, cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaMemcpy(pG->pv_e, pC->pV_e, sizeof(real)*num, cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaMemcpy(pG->pv_thresh, pC->pV_thresh, sizeof(real)*num, cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaMemcpy(pG->pv_reset, pC->pV_reset, sizeof(real)*num, cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaMemcpy(pG->pc_m, pC->pC_m, sizeof(real)*num, cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMemcpy(pG->pV_m, pC->pV_m, sizeof(real)*num, cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMemcpy(pG->pCi, pC->pCi, sizeof(real)*num, cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMemcpy(pG->pCe, pC->pCe, sizeof(real)*num, cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMemcpy(pG->pC_i, pC->pC_i, sizeof(real)*num, cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMemcpy(pG->pC_e, pC->pC_e, sizeof(real)*num, cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMemcpy(pG->pV_tmp, pC->pV_tmp, sizeof(real)*num, cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMemcpy(pG->pI_i, pC->pI_i, sizeof(real)*num, cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMemcpy(pG->pI_e, pC->pI_e, sizeof(real)*num, cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMemcpy(pG->pV_i, pC->pV_i, sizeof(real)*num, cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMemcpy(pG->pV_e, pC->pV_e, sizeof(real)*num, cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMemcpy(pG->pV_thresh, pC->pV_thresh, sizeof(real)*num, cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMemcpy(pG->pV_reset, pC->pV_reset, sizeof(real)*num, cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMemcpy(pG->pC_m, pC->pC_m, sizeof(real)*num, cudaMemcpyHostToDevice));
 
 	return 0;
 }
@@ -107,22 +107,22 @@ int cudaLIFParaFromGPU(void *pCPU, void *pGPU, int num)
 	GLIFNeurons *pC = (GLIFNeurons*)pCPU;
 	GLIFNeurons *pG = (GLIFNeurons*)pGPU;
 
-	checkCudaErrors(cudaMemcpy(pC->pRefracStep, pG->prefracStep, sizeof(int)*num, cudaMemcpyDeviceToHost));
-	checkCudaErrors(cudaMemcpy(pC->pRefracTime, pG->prefracTime, sizeof(int)*num, cudaMemcpyDeviceToHost));
+	checkCudaErrors(cudaMemcpy(pC->pRefracStep, pG->pRefracStep, sizeof(int)*num, cudaMemcpyDeviceToHost));
+	checkCudaErrors(cudaMemcpy(pC->pRefracTime, pG->pRefracTime, sizeof(int)*num, cudaMemcpyDeviceToHost));
 
-	checkCudaErrors(cudaMemcpy(pC->pV_m, pG->pv_m, sizeof(real)*num, cudaMemcpyDeviceToHost));
-	checkCudaErrors(cudaMemcpy(pC->pCi, pG->pci, sizeof(real)*num, cudaMemcpyDeviceToHost));
-	checkCudaErrors(cudaMemcpy(pC->pCe, pG->pce, sizeof(real)*num, cudaMemcpyDeviceToHost));
-	checkCudaErrors(cudaMemcpy(pC->pC_i, pG->pc_i, sizeof(real)*num, cudaMemcpyDeviceToHost));
-	checkCudaErrors(cudaMemcpy(pC->pC_e, pG->pc_e, sizeof(real)*num, cudaMemcpyDeviceToHost));
-	checkCudaErrors(cudaMemcpy(pC->pV_tmp, pG->pv_tmp, sizeof(real)*num, cudaMemcpyDeviceToHost));
-	checkCudaErrors(cudaMemcpy(pC->pI_i, pG->pi_i, sizeof(real)*num, cudaMemcpyDeviceToHost));
-	checkCudaErrors(cudaMemcpy(pC->pI_e, pG->pi_e, sizeof(real)*num, cudaMemcpyDeviceToHost));
-	checkCudaErrors(cudaMemcpy(pC->pV_i, pG->pv_i, sizeof(real)*num, cudaMemcpyDeviceToHost));
-	checkCudaErrors(cudaMemcpy(pC->pV_e, pG->pv_e, sizeof(real)*num, cudaMemcpyDeviceToHost));
-	checkCudaErrors(cudaMemcpy(pC->pV_thresh, pG->pv_thresh, sizeof(real)*num, cudaMemcpyDeviceToHost));
-	checkCudaErrors(cudaMemcpy(pC->pV_reset, pG->pv_reset, sizeof(real)*num, cudaMemcpyDeviceToHost));
-	checkCudaErrors(cudaMemcpy(pC->pC_m, pG->pc_m, sizeof(real)*num, cudaMemcpyDeviceToHost));
+	checkCudaErrors(cudaMemcpy(pC->pV_m, pG->pV_m, sizeof(real)*num, cudaMemcpyDeviceToHost));
+	checkCudaErrors(cudaMemcpy(pC->pCi, pG->pCi, sizeof(real)*num, cudaMemcpyDeviceToHost));
+	checkCudaErrors(cudaMemcpy(pC->pCe, pG->pCe, sizeof(real)*num, cudaMemcpyDeviceToHost));
+	checkCudaErrors(cudaMemcpy(pC->pC_i, pG->pC_i, sizeof(real)*num, cudaMemcpyDeviceToHost));
+	checkCudaErrors(cudaMemcpy(pC->pC_e, pG->pC_e, sizeof(real)*num, cudaMemcpyDeviceToHost));
+	checkCudaErrors(cudaMemcpy(pC->pV_tmp, pG->pV_tmp, sizeof(real)*num, cudaMemcpyDeviceToHost));
+	checkCudaErrors(cudaMemcpy(pC->pI_i, pG->pI_i, sizeof(real)*num, cudaMemcpyDeviceToHost));
+	checkCudaErrors(cudaMemcpy(pC->pI_e, pG->pI_e, sizeof(real)*num, cudaMemcpyDeviceToHost));
+	checkCudaErrors(cudaMemcpy(pC->pV_i, pG->pV_i, sizeof(real)*num, cudaMemcpyDeviceToHost));
+	checkCudaErrors(cudaMemcpy(pC->pV_e, pG->pV_e, sizeof(real)*num, cudaMemcpyDeviceToHost));
+	checkCudaErrors(cudaMemcpy(pC->pV_thresh, pG->pV_thresh, sizeof(real)*num, cudaMemcpyDeviceToHost));
+	checkCudaErrors(cudaMemcpy(pC->pV_reset, pG->pV_reset, sizeof(real)*num, cudaMemcpyDeviceToHost));
+	checkCudaErrors(cudaMemcpy(pC->pC_m, pG->pC_m, sizeof(real)*num, cudaMemcpyDeviceToHost));
 
 	return 0;
 }

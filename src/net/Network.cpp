@@ -14,7 +14,9 @@ using namespace std::chrono;
 Network::Network()
 {
 	maxDelay = 0.0;
+	minDelay = 1e-7.0;
 	maxDelaySteps = 0;
+	minDelaySteps = 1e7;
 	maxFireRate = 0.0;
 	populationNum = 0;
 	totalNeuronNum = 0;
@@ -145,6 +147,9 @@ SynapseBase* Network::connect(NeuronBase *pn1, NeuronBase *pn2, real weight, rea
 
 	if (delay > maxDelay) {
 		maxDelay = delay;
+	}
+	if (delay < minDelay) {
+		minDelay = delay;
 	}
 	
 	return p;
@@ -287,6 +292,8 @@ int Network::connect(int populationIDSrc, int neuronIDSrc, int populationIDDst, 
 int Network::reset(SimInfo &info)
 {
 	maxDelaySteps = static_cast<int>(round(maxDelay/info.dt));
+	minDelaySteps = static_cast<int>(round(minDelay/info.dt));
+
 	vector<SynapseBase*>::iterator iterS;
 	vector<NeuronBase*>::iterator iterN;
 	vector<PopulationBase*>::iterator iterP;
