@@ -21,23 +21,23 @@ GNetwork * allocNetwork(int nTypeNum, int sTypeNum) {
 	// ret->maxDelay = 1;
 	// ret->minDelay = 1e7;
 
-	ret->pNeurons = (void **)malloc(sizeof(void*)*nTypeNum);
-	assert(ret->pNeurons != NULL);
-	ret->pSynapses = (void **)malloc(sizeof(void*)*sTypeNum);
-	assert(ret->pSynapses != NULL);
+	ret->pNTypes = (Type *)malloc(sizeof(Type)*nTypeNum);
+	assert(ret->pNTypes != NULL);
+	ret->pSTypes = (Type *)malloc(sizeof(Type)*sTypeNum);
+	assert(ret->pSTypes != NULL);
 
-	ret->nTypes = (Type *)malloc(sizeof(Type)*nTypeNum);
-	assert(ret->nTypes != NULL);
-	ret->sTypes = (Type *)malloc(sizeof(Type)*sTypeNum);
-	assert(ret->sTypes != NULL);
+	ret->pNeuronNums = (int*)malloc(sizeof(int)*(nTypeNum + 1));
+	assert(ret->pNeuronNums != NULL);
+	ret->pSynapseNums = (int*)malloc(sizeof(int)*(sTypeNum + 1));
+	assert(ret->pSynapseNums != NULL);
 
-	ret->neuronNums = (int*)malloc(sizeof(int)*(nTypeNum + 1));
-	assert(ret->neuronNums != NULL);
-	ret->synapseNums = (int*)malloc(sizeof(int)*(sTypeNum + 1));
-	assert(ret->synapseNums != NULL);
+	ret->pNeuronNums[0] = 0;
+	ret->pSynapseNums[0] = 0;
 
-	ret->neuronNums[0] = 0;
-	ret->synapseNums[0] = 0;
+	ret->ppNeurons = (void **)malloc(sizeof(void*)*nTypeNum);
+	assert(ret->ppNeurons != NULL);
+	ret->ppSynapses = (void **)malloc(sizeof(void*)*sTypeNum);
+	assert(ret->ppSynapses != NULL);
 
 	ret->pConnection = NULL;
 
@@ -48,24 +48,22 @@ GNetwork * allocNetwork(int nTypeNum, int sTypeNum) {
 void freeGNetwork(GNetwork * network)
 {
 	for (int i=0; i<network->nTypeNum; i++) {
-		freeType[network->nTypes[i]](network->pNeurons[i]);
+		freeType[network->pNTypes[i]](network->ppNeurons[i]);
 	}
-	free(network->pNeurons);
+	free(network->ppNeurons);
 
 	for (int i=0; i<network->sTypeNum; i++) {
-		freeType[network->sTypes[i]](network->pSynapses[i]);
+		freeType[network->pSTypes[i]](network->ppSynapses[i]);
 	}
-	free(network->pSynapses);
+	free(network->ppSynapses);
 
-	free(network->pN2SConnection->delayStart);
-	free(network->pN2SConnection->delayNum);
-	free(network->pN2SConnection);
+	freeConnection(network->pConnection);
 
-	free(network->neuronNums);
-	free(network->synapseNums);
+	free(network->pNeuronNums);
+	free(network->pSynapseNums);
 
-	free(network->nTypes);
-	free(network->sTypes);
+	free(network->pNTypes);
+	free(network->pSTypes);
 }
 
 int saveGNetwork(GNetwork *net, char *filename)
@@ -74,22 +72,22 @@ int saveGNetwork(GNetwork *net, char *filename)
 
 	fwrite(&(net->nTypeNum), sizeof(int), 1, f);
 	fwrite(&(net->sTypeNum), sizeof(int), 1, f);
-	fwrite(&(net->maxDelay), sizeof(int), 1, f);
-	fwrite(&(net->minDelay), sizeof(int), 1, f);
+	// fwrite(&(net->maxDelay), sizeof(int), 1, f);
+	// fwrite(&(net->minDelay), sizeof(int), 1, f);
 
-	fwrite(net->nTypes, sizeof(Type), net->nTypeNum, f);
-	fwrite(net->sTypes, sizeof(Type), net->sTypeNum, f);
-	fwrite(net->neuronNums, sizeof(int), net->nTypeNum+1, f);
-	fwrite(net->synapseNums, sizeof(int), net->sTypeNum+1, f);
+	fwrite(net->pNTypes, sizeof(Type), net->nTypeNum, f);
+	fwrite(net->pSTypes, sizeof(Type), net->sTypeNum, f);
+	fwrite(net->pNeuronNums, sizeof(int), net->nTypeNum+1, f);
+	fwrite(net->pSynapseNums, sizeof(int), net->sTypeNum+1, f);
 
 	for (int i=0; i<net->nTypeNum; i++) {
-		saveType[net->nTypes[i]](net->pNeurons[i], net->neuronNums[i+1]-net->neuronNums[i], f);
+		saveType[net->pNTypes[i]](net->ppNeurons[i], net->pNeuronNums[i+1]-net->pNeuronNums[i], f);
 	}
 	for (int i=0; i<net->sTypeNum; i++) {
-		saveType[net->sTypes[i]](net->pSynapses[i], net->synapseNums[i+1]-net->synapseNums[i], f);
+		saveType[net->pSTypes[i]](net->ppSynapses[i], net->pSynapseNums[i+1]-net->pSynapseNums[i], f);
 	}
 
-	saveConnection(net->pN2SConnection, f);
+	saveConnection(net->pConnection, f);
 
 	closeFile(f);
 	return 0;
@@ -103,24 +101,24 @@ GNetwork *loadGNetwork(char *filename)
 	fread(&nTypeNum, sizeof(int), 1, f);
 	fread(&sTypeNum, sizeof(int), 1, f);
 
-	GNetwork * net = initGNetwork(nTypeNum, sTypeNum);
+	GNetwork * net = allocNetwork(nTypeNum, sTypeNum);
 
-	fread(&(net->maxDelay), sizeof(int), 1, f);
-	fread(&(net->minDelay), sizeof(int), 1, f);
+	// fread(&(net->maxDelay), sizeof(int), 1, f);
+	// fread(&(net->minDelay), sizeof(int), 1, f);
 
-	fread(net->nTypes, sizeof(Type), net->nTypeNum, f);
-	fread(net->sTypes, sizeof(Type), net->sTypeNum, f);
-	fread(net->neuronNums, sizeof(int), net->nTypeNum+1, f);
-	fread(net->synapseNums, sizeof(int), net->sTypeNum+1, f);
+	fread(net->pNTypes, sizeof(Type), net->nTypeNum, f);
+	fread(net->pSTypes, sizeof(Type), net->sTypeNum, f);
+	fread(net->pNeuronNums, sizeof(int), net->nTypeNum+1, f);
+	fread(net->pSynapseNums, sizeof(int), net->sTypeNum+1, f);
 
 	for (int i=0; i<net->nTypeNum; i++) {
-		net->pNeurons[i] = loadType[net->nTypes[i]](net->neuronNums[i+1]-net->neuronNums[i], f);
+		net->ppNeurons[i] = loadType[net->pNTypes[i]](net->pNeuronNums[i+1]-net->pNeuronNums[i], f);
 	}
 	for (int i=0; i<net->sTypeNum; i++) {
-		net->pSynapses[i] = loadType[net->sTypes[i]](net->synapseNums[i+1]-net->synapseNums[i], f);
+		net->ppSynapses[i] = loadType[net->pSTypes[i]](net->pSynapseNums[i+1]-net->pSynapseNums[i], f);
 	}
 
-	net->pN2SConnection = loadConnection(f);
+	net->pConnection = loadConnection(f);
 
 	closeFile(f);
 	return net;
@@ -128,8 +126,8 @@ GNetwork *loadGNetwork(char *filename)
 
 int copyNetwork(GNetwork *dNet, GNetwork *sNet, int rank, int rankSize)
 {
-	dNet->pNeurons = sNet->pNeurons;
-	dNet->pSynapses = sNet->pSynapses;
+	dNet->ppNeurons = sNet->ppNeurons;
+	dNet->ppSynapses = sNet->ppSynapses;
 
 	for (int i=0; i<dNet->nTypeNum; i++) {
 		//int size = dNet->neuronNums[i+1] - dNet->neuronNums[i];
@@ -227,47 +225,47 @@ int mpiRecvNetwork(GNetwork *network, int rank, int rankSize)
 }
 
 
-int printNetwork(GNetwork *net, int rank)
-{
-	printf("NETWORK PRINT START...\n");
-	printf("Server: %d, nTypeNum: %d, sTypeNum: %d, maxDelay: %d, minDelay: %d\n", rank, net->nTypeNum, net->sTypeNum, net->maxDelay, net->minDelay);
-
-	printf("NTypes:");
-	for(int i=0; i<net->nTypeNum; i++) {
-		printf("%d ", net->nTypes[i]);
-	}
-	printf("\n");
-	printf("STypes:");
-	for(int i=0; i<net->sTypeNum; i++) {
-		printf("%d ", net->sTypes[i]);
-	}
-	printf("\n");
-
-	printf("NNum:");
-	for(int i=0; i<net->nTypeNum+1; i++) {
-		printf("%d ", net->neuronNums[i]);
-	}
-	printf("\n");
-	printf("SNum:");
-	for(int i=0; i<net->sTypeNum+1; i++) {
-		printf("%d ", net->synapseNums[i]);
-	}
-	printf("\n");
-
-	printf("Neurons:");
-	for(int i=0; i<net->nTypeNum; i++) {
-		printf("%d: %p\n", i, net->pNeurons[i]);
-		//for (int i=0; i<(net->neuronNums[i+1]-net->neuronNums[i]); i++){
-		//}
-	}
-	printf("\n");
-	printf("Synapses:");
-	for(int i=0; i<net->sTypeNum; i++) {
-		printf("%d: %p\n", i, net->pSynapses[i]);
-	}
-	printf("\n");
-
-	printf("NETWORK PRINT END...\n");
-
-	return 0;
-}
+// int printNetwork(GNetwork *net, int rank)
+// {
+// 	printf("NETWORK PRINT START...\n");
+// 	// printf("Server: %d, nTypeNum: %d, sTypeNum: %d, maxDelay: %d, minDelay: %d\n", rank, net->nTypeNum, net->sTypeNum, net->maxDelay, net->minDelay);
+// 
+// 	printf("NTypes:");
+// 	for(int i=0; i<net->nTypeNum; i++) {
+// 		printf("%d ", net->nTypes[i]);
+// 	}
+// 	printf("\n");
+// 	printf("STypes:");
+// 	for(int i=0; i<net->sTypeNum; i++) {
+// 		printf("%d ", net->sTypes[i]);
+// 	}
+// 	printf("\n");
+// 
+// 	printf("NNum:");
+// 	for(int i=0; i<net->nTypeNum+1; i++) {
+// 		printf("%d ", net->neuronNums[i]);
+// 	}
+// 	printf("\n");
+// 	printf("SNum:");
+// 	for(int i=0; i<net->sTypeNum+1; i++) {
+// 		printf("%d ", net->synapseNums[i]);
+// 	}
+// 	printf("\n");
+// 
+// 	printf("Neurons:");
+// 	for(int i=0; i<net->nTypeNum; i++) {
+// 		printf("%d: %p\n", i, net->pNeurons[i]);
+// 		//for (int i=0; i<(net->neuronNums[i+1]-net->neuronNums[i]); i++){
+// 		//}
+// 	}
+// 	printf("\n");
+// 	printf("Synapses:");
+// 	for(int i=0; i<net->sTypeNum; i++) {
+// 		printf("%d: %p\n", i, net->pSynapses[i]);
+// 	}
+// 	printf("\n");
+// 
+// 	printf("NETWORK PRINT END...\n");
+// 
+// 	return 0;
+// }

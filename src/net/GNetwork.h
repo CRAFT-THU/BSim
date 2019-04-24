@@ -19,17 +19,17 @@ struct GNetwork {
 	// int minDelay;
 
 	//Type 
-	Type * nTypes;
-	Type * sTypes;
+	Type * pNTypes;
+	Type * pSTypes;
 
 	//Index for each type
-	int *neuronNums;
-	int *synapseNums;
+	int *pNeuronNums;
+	int *pSynapseNums;
 
 	//Pointers to neurons
-	void **pNeurons;
+	void **ppNeurons;
 	//Pointers to synapses
-	void **pSynapses;
+	void **ppSynapses;
 
 	//Neuron to Synapse Connection
 	Connection *pConnection;
