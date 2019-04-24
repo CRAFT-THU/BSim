@@ -16,17 +16,17 @@ Connection * allocConnection(int nNum, int sNum, int maxDelay, int minDelay)
 
 	int length = (maxDelay - minDelay + 1) * nNum;
 
-	ret->delayStart = (int*)malloc(sizeof(int)*length);
-	assert(ret->delayStart != NULL);
-	ret->delayNum = (int*)malloc(sizeof(int)*length);
-	assert(ret->delayNum != NULL);
+	ret->pDelayStart = (int*)malloc(sizeof(int)*length);
+	assert(ret->pDelayStart != NULL);
+	ret->pDelayNum = (int*)malloc(sizeof(int)*length);
+	assert(ret->pDelayNum != NULL);
 
-	ret->delayStartRev = (int*)malloc(sizeof(int)*length);
-	assert(ret->delayStartRev != NULL);
-	ret->delayNumRev = (int*)malloc(sizeof(int)*length);
-	assert(ret->delayNumRev != NULL);
-	ret->sidMapRev = (int*)malloc(sizeof(int)*sNum);
-	assert(ret->sidMapRev != NULL);
+	ret->pDelayStartRev = (int*)malloc(sizeof(int)*length);
+	assert(ret->pDelayStartRev != NULL);
+	ret->pDelayNumRev = (int*)malloc(sizeof(int)*length);
+	assert(ret->pDelayNumRev != NULL);
+	ret->pSidMapRev = (int*)malloc(sizeof(int)*sNum);
+	assert(ret->pSidMapRev != NULL);
 
 	return ret;
 }
@@ -38,12 +38,12 @@ int saveConnection(Connection *conn, FILE *f)
 	fwrite(&(conn->maxDelay), sizeof(int), 1, f);
 	fwrite(&(conn->minDelay), sizeof(int), 1, f);
 
-	fwrite(conn->delayStart, sizeof(int), conn->nNum, f);
-	fwrite(conn->delayNum, sizeof(int), conn->nNum, f);
+	fwrite(conn->pDelayStart, sizeof(int), conn->nNum, f);
+	fwrite(conn->pDelayNum, sizeof(int), conn->nNum, f);
 
-	fwrite(conn->delayStartRev, sizeof(int), conn->nNum, f);
-	fwrite(conn->delayNumRev, sizeof(int), conn->nNum, f);
-	fwrite(conn->sidMapRev, sizeof(int), conn->sNum, f);
+	fwrite(conn->pDelayStartRev, sizeof(int), conn->nNum, f);
+	fwrite(conn->pDelayNumRev, sizeof(int), conn->nNum, f);
+	fwrite(conn->pSidMapRev, sizeof(int), conn->sNum, f);
 
 	return 0;
 }
@@ -57,19 +57,19 @@ Connection * loadConnection(FILE *f)
 	fread(&(conn->maxDelay), sizeof(int), 1, f);
 	fread(&(conn->minDelay), sizeof(int), 1, f);
 
-	conn->delayStart = (int*)malloc(sizeof(int)*conn->nNum);
-	conn->delayNum = (int*)malloc(sizeof(int)*conn->nNum);
+	conn->pDelayStart = (int*)malloc(sizeof(int)*conn->nNum);
+	conn->pDelayNum = (int*)malloc(sizeof(int)*conn->nNum);
 
-	conn->delayStartRev = (int*)malloc(sizeof(int)*conn->nNum);
-	conn->delayNumRev = (int*)malloc(sizeof(int)*conn->nNum);
-	conn->sidMapRev = (int*)malloc(sizeof(int)*conn->sNum);
+	conn->pDelayStartRev = (int*)malloc(sizeof(int)*conn->nNum);
+	conn->pDelayNumRev = (int*)malloc(sizeof(int)*conn->nNum);
+	conn->pSidMapRev = (int*)malloc(sizeof(int)*conn->sNum);
 
-	fread(conn->delayStart, sizeof(int), conn->nNum, f);
-	fread(conn->delayNum, sizeof(int), conn->nNum, f);
+	fread(conn->pDelayStart, sizeof(int), conn->nNum, f);
+	fread(conn->pDelayNum, sizeof(int), conn->nNum, f);
 
-	fread(conn->delayStartRev, sizeof(int), conn->nNum, f);
-	fread(conn->delayNumRev, sizeof(int), conn->nNum, f);
-	fread(conn->sidMapRev, sizeof(int), conn->sNum, f);
+	fread(conn->pDelayStartRev, sizeof(int), conn->nNum, f);
+	fread(conn->pDelayNumRev, sizeof(int), conn->nNum, f);
+	fread(conn->pSidMapRev, sizeof(int), conn->sNum, f);
 
 	return conn;
 }

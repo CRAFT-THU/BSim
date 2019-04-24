@@ -4,22 +4,39 @@
 #include "../gpu_utils/mem_op.h"
 #include "Connection.h"
 
-N2SConnection * copyConnectionToGPU(N2SConnection * pCPU)
+Connection * cudaAllocConnection(Connection * pCPU)
 {
-	int n_num = pCPU->nNum;
-	int maxDelay = pCPU->maxDelay;
+	int nNum = pCPU->nNum;
+	int sNum = pCPU->sNum;
+	int length = (pCPU->maxDelay - pCPU->minDelay + 1) * nNum;
 
-	N2SConnection * pGPU = NULL;
-	N2SConnection * pTmp = (N2SConnection*)malloc(sizeof(N2SConnection));
+	Connection * pGPU = NULL;
+	Connection *pTmp = (Connection*)malloc(sizeof(Connection));
+	pTmp->nNum = nNum;
+	pTmp->nNum = sNum;
+	pTmp->maxDelay = pCPU->maxDelay;
+	pTmp->minDelay = pCPU->minDelay;
 
-	checkCudaErrors(cudaMalloc((void**)&(pTmp->delayStart), sizeof(int)*n_num*maxDelay));
-	checkCudaErrors(cudaMemcpy(pTmp->delayStart, pCPU->delayStart, sizeof(int)*n_num*maxDelay, cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMalloc((void**)&(pTmp->pDelayStart), sizeof(int)*length));
+	checkCudaErrors(cudaMemcpy(pTmp->pDelayStart, pCPU->pDelayStart, sizeof(int)*length, cudaMemcpyHostToDevice));
 
-	checkCudaErrors(cudaMalloc((void**)&(pTmp->delayNum), sizeof(int)*n_num*maxDelay));
-	checkCudaErrors(cudaMemcpy(pTmp->delayNum, pCPU->delayNum, sizeof(int)*n_num*maxDelay, cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMalloc((void**)&(pTmp->pDelayNum), sizeof(int)*length));
+	checkCudaErrors(cudaMemcpy(pTmp->pDelayNum, pCPU->pDelayNum, sizeof(int)*length, cudaMemcpyHostToDevice));
 
-	checkCudaErrors(cudaMalloc((void**)&(pGPU), sizeof(N2SConnection)));
-	checkCudaErrors(cudaMemcpy(pGPU, pTmp, sizeof(N2SConnection), cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMalloc((void**)&(pTmp->pDelayStartRev), sizeof(int)*length));
+	checkCudaErrors(cudaMemcpy(pTmp->pDelayStartRev, pCPU->pDelayStartRev, sizeof(int)*length, cudaMemcpyHostToDevice));
+
+	checkCudaErrors(cudaMalloc((void**)&(pTmp->pDelayNumRev), sizeof(int)*length));
+	checkCudaErrors(cudaMemcpy(pTmp->pDelayNumRev, pCPU->pDelayNumRev, sizeof(int)*length, cudaMemcpyHostToDevice));
+
+	checkCudaErrors(cudaMalloc((void**)&(pTmp->pDelayNumRev), sizeof(int)*length));
+	checkCudaErrors(cudaMemcpy(pTmp->pDelayNumRev, pCPU->pDelayNumRev, sizeof(int)*length, cudaMemcpyHostToDevice));
+
+	checkCudaErrors(cudaMalloc((void**)&(pTmp->pSidMapRev), sizeof(int)*sNum));
+	checkCudaErrors(cudaMemcpy(pTmp->pSidMapRev, pCPU->pSidMapRev, sizeof(int)*sNum, cudaMemcpyHostToDevice));
+
+	checkCudaErrors(cudaMalloc((void**)&(pGPU), sizeof(Connection)));
+	checkCudaErrors(cudaMemcpy(pGPU, pTmp, sizeof(Connection), cudaMemcpyHostToDevice));
 	free(pTmp);
 	pTmp = NULL;
 
