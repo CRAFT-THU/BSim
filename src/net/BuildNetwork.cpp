@@ -44,22 +44,7 @@ GNetwork* Network::buildNetwork()
 	int neuronTypeNum = nTypes.size();
 	int synapseTypeNum = sTypes.size();
 
-	void **pAllNeurons = (void**)malloc(sizeof(void*)*neuronTypeNum);
-	assert(pAllNeurons != NULL);
-	void **pAllSynapses = (void**)malloc(sizeof(void*)*synapseTypeNum);
-	assert(pAllSynapses != NULL);
-
-	int *pNeuronsNum = (int*)malloc(sizeof(int)*(neuronTypeNum + 1));
-	assert(pNeuronsNum != NULL);
-	int *pSynapsesNum = (int*)malloc(sizeof(int)*(synapseTypeNum + 1));
-	assert(pSynapsesNum != NULL);
-	pNeuronsNum[0] = 0;
-	pSynapsesNum[0] = 0;
-
-	Type *pNTypes = (Type*)malloc(sizeof(Type)*neuronTypeNum);
-	assert(pNTypes != NULL);
-	Type *pSTypes = (Type*)malloc(sizeof(Type)*synapseTypeNum);
-	assert(pSTypes != NULL);
+	GNetwork * ret = allocNetwork(neuronTypeNum, synapseTypeNum);
 
 	vector<int> array_neuron_start;
 	vector<int> array_neuron_fire_times;
@@ -140,20 +125,7 @@ GNetwork* Network::buildNetwork()
 
 	logMap();
 
-	N2SConnection *pAllConnections = (N2SConnection*)malloc(sizeof(N2SConnection));
-	assert(pAllConnections != NULL);
 
-	pAllConnections->nNum = totalNeuronNum;
-	pAllConnections->nNum = totalSynapseNum;
-	pAllConnections->maxDelay = this->maxDelaySteps;
-	pAllConnections->minDelay = this->minDelaySteps;
-
-	int *delayNum = (int*)malloc(sizeof(int)*(this->maxDelaySteps)*totalNeuronNum);
-	assert(delayNum != NULL);
-	int *delayStart = (int*)malloc(sizeof(int)*(this->maxDelaySteps)*totalNeuronNum);
-	assert(delayStart != NULL);
-	int *pSynapsesIdx = (int*)malloc(sizeof(int)*totalSynapseNum);
-	assert(pSynapsesIdx != NULL);
 
 
 

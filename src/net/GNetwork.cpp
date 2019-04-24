@@ -11,35 +11,37 @@
 #include "../utils/FileOp.h"
 #include "GNetwork.h"
 
-GNetwork *initGNetwork(int ntype_num, int stype_num) {
-	GNetwork *ret_net = (GNetwork *)malloc(sizeof(GNetwork));
+GNetwork * allocNetwork(int nTypeNum, int sTypeNum) {
+	GNetwork *ret = (GNetwork *)malloc(sizeof(GNetwork));
+	assert(ret != NULL);
 
-	ret_net->pNeurons = (void**)malloc(sizeof(void*)*ntype_num);
-	assert(ret_net->pNeurons != NULL);
-	ret_net->pSynapses = (void**)malloc(sizeof(void*)*stype_num);
-	assert(ret_net->pSynapses != NULL);
+	ret->nTypeNum = nTypeNum;
+	ret->sTypeNum = sTypeNum;
 
-	ret_net->pN2SConnection = (N2SConnection*)malloc(sizeof(N2SConnection));
+	// ret->maxDelay = 1;
+	// ret->minDelay = 1e7;
 
-	ret_net->neuronNums = (int*)malloc(sizeof(int)*(ntype_num + 1));
-	assert(ret_net->neuronNums != NULL);
-	ret_net->synapseNums = (int*)malloc(sizeof(int)*(stype_num + 1));
-	assert(ret_net->synapseNums != NULL);
-	ret_net->neuronNums[0] = 0;
-	ret_net->synapseNums[0] = 0;
+	ret->pNeurons = (void **)malloc(sizeof(void*)*nTypeNum);
+	assert(ret->pNeurons != NULL);
+	ret->pSynapses = (void **)malloc(sizeof(void*)*sTypeNum);
+	assert(ret->pSynapses != NULL);
 
-	ret_net->nTypeNum = ntype_num;
-	ret_net->sTypeNum = stype_num;
+	ret->nTypes = (Type *)malloc(sizeof(Type)*nTypeNum);
+	assert(ret->nTypes != NULL);
+	ret->sTypes = (Type *)malloc(sizeof(Type)*sTypeNum);
+	assert(ret->sTypes != NULL);
 
-	ret_net->nTypes = (Type*)malloc(sizeof(Type)*ntype_num);
-	assert(ret_net->nTypes != NULL);
-	ret_net->sTypes = (Type*)malloc(sizeof(Type)*stype_num);
-	assert(ret_net->sTypes != NULL);
+	ret->neuronNums = (int*)malloc(sizeof(int)*(nTypeNum + 1));
+	assert(ret->neuronNums != NULL);
+	ret->synapseNums = (int*)malloc(sizeof(int)*(sTypeNum + 1));
+	assert(ret->synapseNums != NULL);
 
-	ret_net->maxDelay = 1;
-	ret_net->minDelay = 1e7;
+	ret->neuronNums[0] = 0;
+	ret->synapseNums[0] = 0;
 
-	return ret_net;
+	ret->pConnection = NULL;
+
+	return ret;
 }
 
 

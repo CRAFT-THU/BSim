@@ -7,7 +7,7 @@
 
 #include <stdio.h>
 
-struct N2SConnection {
+struct Connection {
 	//int *pSynapsesIdx; 
 	//int synapsesNum; 
 	int nNum;
@@ -18,15 +18,18 @@ struct N2SConnection {
 
 	int *delayStart;
 	int *delayNum;
-	int *revDelayStart;
-	int *revDelayNum;
-	int *revMap2Sid;
+
+	int *delayStartRev;
+	int *delayNumRev; 
+	int *sidMapRev;
 };
 
-N2SConnection * copyConnectionToGPU(N2SConnection * pCPU);
+Connection * allocConnection(int nNum, int sNum, int maxDelay, int minDelay);
 
-int saveConnection(N2SConnection *conn, FILE *f);
-N2SConnection * loadConnection(FILE *f);
+Connection * copyConnectionToGPU(Connection * pCPU);
+
+int saveConnection(Connection *conn, FILE *f);
+Connection * loadConnection(FILE *f);
 
 #endif /* CONNECTION_H */
 

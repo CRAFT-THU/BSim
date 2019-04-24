@@ -14,9 +14,9 @@ struct GNetwork {
 	int nTypeNum;
 	int sTypeNum;
 
-	// Delay info
-	int maxDelay;
-	int minDelay;
+	// Delay info moved into connection
+	// int maxDelay;
+	// int minDelay;
 
 	//Type 
 	Type * nTypes;
@@ -32,14 +32,14 @@ struct GNetwork {
 	void **pSynapses;
 
 	//Neuron to Synapse Connection
-	N2SConnection *pN2SConnection;
+	Connection *pConnection;
 
 };
 
 
 // init and free
-// This func do not deal with the member of N2SConnection
-GNetwork * initGNetwork(int nTypeNum, int sTypeNum);
+// This func just set pConnection to NULL
+GNetwork * allocNetwork(int nTypeNum, int sTypeNum);
 // TODO freeGNetwork
 void freeGNetwork(GNetwork * network);
 
