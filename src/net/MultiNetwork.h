@@ -22,8 +22,8 @@ public:
 private:
 	void splitNetwork();
 	void countTypeNum();
-        GNetwork* arrangeData(int node);
-        N2SConnection* arrangeConnect(int n_num, int s_num, int node_idx);
+	GNetwork* arrangeData(int node);
+	Connection* arrangeConnect(int n_num, int s_num, int node_idx);
 	CrossNodeMap* arrangeCrossNodeMap(int n_num, int node_idx, int node_num);
 
 public:

@@ -40,11 +40,7 @@
 
 void MultiNetwork::countTypeNum() 
 {
-	vector<PopulationBase*>::iterator piter;
-	vector<NeuronBase*>::iterator niter;
-	vector<SynapseBase*>::iterator siter;
-
-	for (piter = _network->pPopulations.begin(); piter != _network->pPopulations.end();  piter++) {
+	for (auto piter = _network->pPopulations.begin(); piter != _network->pPopulations.end();  piter++) {
 		PopulationBase * p = *piter;
 		Type type = p->getType();
 		int node = p->getNode();
@@ -56,7 +52,7 @@ void MultiNetwork::countTypeNum()
 		}
 	}
 
-	for (siter = _network->pSynapses.begin(); siter != _network->pSynapses.end();  siter++) {
+	for (auto siter = _network->pSynapses.begin(); siter != _network->pSynapses.end();  siter++) {
 		SynapseBase * p = *siter;
 		Type type = p->getType();
 		int node = p->getNode();
@@ -73,12 +69,12 @@ GNetwork* MultiNetwork::arrangeData(int node_idx) {
 	int ntype_num = _global_ntype_num[node_idx].size();
 	int stype_num = _global_stype_num[node_idx].size();
 
-	GNetwork * net = initGNetwork(ntype_num, stype_num);
+	GNetwork * net = allocNetwork(ntype_num, stype_num);
 
 	int index = 0;
 	for (map<Type, int>::const_iterator tmp_iter = _global_ntype_num[node_idx].begin(); tmp_iter != _global_ntype_num[node_idx].end(); tmp_iter++) {
 		Type type = tmp_iter->first;
-		net->nTypes[index] = tmp_iter->first;
+		net->pNTypes[index] = tmp_iter->first;
 
 		void *pN = allocType[type](tmp_iter->second);
 		assert(pN != NULL);
@@ -89,14 +85,14 @@ GNetwork* MultiNetwork::arrangeData(int node_idx) {
 			int node = p->getNode();
 
 			if (node == node_idx && p->getType() == type) {
-				size_t copied = p->hardCopy(pN, idx, net->neuronNums[index]);
+				size_t copied = p->hardCopy(pN, idx, net->pNeuronNums[index]);
 				idx += copied;
 			}
 		}
 
 		assert(idx == tmp_iter->second);
-		net->neuronNums[index+1] = idx + net->neuronNums[index];
-		net->pNeurons[index] = pN;
+		net->pNeuronNums[index+1] = idx + net->pNeuronNums[index];
+		net->ppNeurons[index] = pN;
 		index++;
 	}
 	assert(index == ntype_num);
@@ -104,7 +100,7 @@ GNetwork* MultiNetwork::arrangeData(int node_idx) {
 	index = 0;
 	for (map<Type, int>::const_iterator tmp_iter = _global_stype_num[node_idx].begin(); tmp_iter != _global_stype_num[node_idx].end(); tmp_iter++) {
 		Type type = tmp_iter->first;
-		net->sTypes[index] = type;
+		net->pSTypes[index] = type;
 
 		void *pS = allocType[type](tmp_iter->second);
 		assert(pS != NULL);
@@ -132,7 +128,7 @@ GNetwork* MultiNetwork::arrangeData(int node_idx) {
 						if ((*siter)->getDelay() == delay_t + 1) {
 							if ((*siter)->getType() == type && (*siter)->getNode() == node_idx) {
 								assert(idx < tmp_iter->second);
-								int copied = (*siter)->hardCopy(pS, idx, net->synapseNums[index]);
+								int copied = (*siter)->hardCopy(pS, idx, net->pSynapseNums[index]);
 								idx += copied;
 							}
 						}
@@ -156,21 +152,21 @@ GNetwork* MultiNetwork::arrangeData(int node_idx) {
 
 
 		assert(idx == tmp_iter->second); 
-		net->synapseNums[index+1] = idx + net->synapseNums[index];
-		net->pSynapses[index] = pS;
+		net->pSynapseNums[index+1] = idx + net->pSynapseNums[index];
+		net->ppSynapses[index] = pS;
 		index++;
 	}
 	assert(index == stype_num);
 
-	int node_n_num = net->neuronNums[net->nTypeNum];
+	int node_n_num = net->pNeuronNums[net->nTypeNum];
 
 	for (auto iter = _crossnode_neurons_recv[node_idx].begin(); iter !=  _crossnode_neurons_recv[node_idx].end(); iter++) {
 			int size = _crossnode_neuron2idx[node_idx].size();
 			_crossnode_neuron2idx[node_idx][*iter] = node_n_num + size;
 	}
 
-	net->maxDelay = _network->maxDelaySteps;
-	net->minDelay = _network->minDelaySteps;
+	// net->maxDelay = _network->maxDelaySteps;
+	// net->minDelay = _network->minDelaySteps;
 
 	return net;
 }
