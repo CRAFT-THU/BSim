@@ -16,17 +16,17 @@ struct Connection {
 	int maxDelay;
 	int minDelay;
 
-	int *delayStart;
-	int *delayNum;
+	int *pDelayStart;
+	int *pDelayNum;
 
-	int *delayStartRev;
-	int *delayNumRev; 
-	int *sidMapRev;
+	int *pDelayStartRev;
+	int *pDelayNumRev; 
+	int *pSidMapRev;
 };
 
 Connection * allocConnection(int nNum, int sNum, int maxDelay, int minDelay);
 
-Connection * copyConnectionToGPU(Connection * pCPU);
+Connection * cudaAllocConnection(Connection * pCPU);
 
 int saveConnection(Connection *conn, FILE *f);
 Connection * loadConnection(FILE *f);
