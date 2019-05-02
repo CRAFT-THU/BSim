@@ -76,8 +76,8 @@ GNetwork* MultiNetwork::arrangeData(int node_idx) {
 		Type type = tmp_iter->first;
 		net->pNTypes[index] = tmp_iter->first;
 
-		void *pN = allocType[type](tmp_iter->second);
-		assert(pN != NULL);
+		net->ppNeurons[index] = allocType[type](tmp_iter->second);
+		assert(net->ppNeurons[index] != NULL);
 
 		int idx = 0;
 		for (auto piter = _network->pPopulations.begin(); piter != _network->pPopulations.end();  piter++) {
@@ -85,14 +85,13 @@ GNetwork* MultiNetwork::arrangeData(int node_idx) {
 			int node = p->getNode();
 
 			if (node == node_idx && p->getType() == type) {
-				size_t copied = p->hardCopy(pN, idx, net->pNeuronNums[index]);
+				size_t copied = p->hardCopy(net->ppNeurons[index], idx, net->pNeuronNums[index]);
 				idx += copied;
 			}
 		}
 
 		assert(idx == tmp_iter->second);
 		net->pNeuronNums[index+1] = idx + net->pNeuronNums[index];
-		net->ppNeurons[index] = pN;
 		index++;
 	}
 	assert(index == ntype_num);
@@ -102,8 +101,8 @@ GNetwork* MultiNetwork::arrangeData(int node_idx) {
 		Type type = tmp_iter->first;
 		net->pSTypes[index] = type;
 
-		void *pS = allocType[type](tmp_iter->second);
-		assert(pS != NULL);
+		net->ppSynapses[index] = allocType[type](tmp_iter->second);
+		assert(net->ppSynapses[index] != NULL);
 
 		//for (siter = _network->pSynapses.begin(); siter != _network->pSynapses.end();  siter++) {
 		//	SynapseBase * p = *siter;
@@ -114,7 +113,7 @@ GNetwork* MultiNetwork::arrangeData(int node_idx) {
 		//		idx += copied;
 		//	}
 		//}
-		
+
 		int idx = 0;
 		for (auto piter = _network->pPopulations.begin(); piter != _network->pPopulations.end(); piter++) {
 			PopulationBase *pop = *piter;
@@ -128,7 +127,7 @@ GNetwork* MultiNetwork::arrangeData(int node_idx) {
 						if ((*siter)->getDelay() == delay_t + 1) {
 							if ((*siter)->getType() == type && (*siter)->getNode() == node_idx) {
 								assert(idx < tmp_iter->second);
-								int copied = (*siter)->hardCopy(pS, idx, net->pSynapseNums[index]);
+								int copied = (*siter)->hardCopy(net->ppSynapses[index], idx, net->pSynapseNums[index]);
 								idx += copied;
 							}
 						}
@@ -143,7 +142,7 @@ GNetwork* MultiNetwork::arrangeData(int node_idx) {
 				for (auto iter = s_vec.begin(); iter != s_vec.end(); iter++) {
 					if (((*iter)->getNode() == node_idx) && ((*iter)->getDelay() == delay_t + 1) && ((*iter)->getType() == type)) {
 						assert(idx < tmp_iter->second);
-						int copied = (*iter)->hardCopy(pS, idx, net->synapseNums[index]);
+						int copied = (*iter)->hardCopy(net->ppSynapses[index], idx, net->pSynapseNums[index]);
 						idx += copied;
 					}
 				}
@@ -153,7 +152,6 @@ GNetwork* MultiNetwork::arrangeData(int node_idx) {
 
 		assert(idx == tmp_iter->second); 
 		net->pSynapseNums[index+1] = idx + net->pSynapseNums[index];
-		net->ppSynapses[index] = pS;
 		index++;
 	}
 	assert(index == stype_num);
@@ -161,8 +159,8 @@ GNetwork* MultiNetwork::arrangeData(int node_idx) {
 	int node_n_num = net->pNeuronNums[net->nTypeNum];
 
 	for (auto iter = _crossnode_neurons_recv[node_idx].begin(); iter !=  _crossnode_neurons_recv[node_idx].end(); iter++) {
-			int size = _crossnode_neuron2idx[node_idx].size();
-			_crossnode_neuron2idx[node_idx][*iter] = node_n_num + size;
+		int size = _crossnode_neuron2idx[node_idx].size();
+		_crossnode_neuron2idx[node_idx][*iter] = node_n_num + size;
 	}
 
 	// net->maxDelay = _network->maxDelaySteps;
@@ -173,21 +171,10 @@ GNetwork* MultiNetwork::arrangeData(int node_idx) {
 
 N2SConnection* MultiNetwork::arrangeConnect(int n_num, int s_num, int node_idx)
 {
-	N2SConnection *connection = (N2SConnection*)malloc(sizeof(N2SConnection));
+	N2SConnection *connection = allocConnection(n_num, s_num, _network->maxDelaySteps, _network->minDelaySteps);
 	assert(connection != NULL);
 
-	connection->nNum = n_num;
-	connection->sNum = s_num;
-	connection->maxDelay = _network->maxDelaySteps;
-	connection->minDelay = _network->minDelaySteps;
-
-	int *delay_num = (int*)malloc(sizeof(int)*(_network->maxDelaySteps)*(n_num));
-	assert(delay_num != NULL);
-	int *delay_start = (int*)malloc(sizeof(int)*(_network->maxDelaySteps)*(n_num));
-	assert(delay_start != NULL);
-	int *s_idxs = (int*)malloc(sizeof(int)*s_num);
-	assert(s_idxs != NULL);
-
+	int delayLength = _network->maxDelaySteps - _network->minDelaySteps + 1;
 	int synapseIdx = 0;
 	for (auto piter = _network->pPopulations.begin(); piter != _network->pPopulations.end(); piter++) {
 		PopulationBase * p = *piter;
@@ -197,18 +184,17 @@ N2SConnection* MultiNetwork::arrangeConnect(int n_num, int s_num, int node_idx)
 		for (int i=0; i<p->getNum(); i++) {
 			ID nid = p->getNeuron(i)->getID();
 			const vector<SynapseBase*> &s_vec = p->getNeuron(i)->getSynapses();
-			for (int delay_t=0; delay_t < _network->maxDelaySteps; delay_t++) {
-				delay_start[delay_t + _network->maxDelaySteps*nid] = synapseIdx;
+			for (int delay_t=0; delay_t<delayLength; delay_t++) {
+				connection->pDelayStart[delay_t + delayLength*nid] = synapseIdx;
 
 				for (auto iter = s_vec.begin(); iter != s_vec.end(); iter++) {
-					if (((*iter)->getNode() == node_idx) && ((*iter)->getDelay() == delay_t + 1)) {
+					if (((*iter)->getNode() == node_idx) && ((*iter)->getDelay() == delay_t + _network->minDelaySteps)) {
 						int sid = (*iter)->getID();
 						assert(synapseIdx < s_num);
-					        s_idxs[synapseIdx] = sid;
 						synapseIdx++;
 					}
 				}
-				delay_num[delay_t + _network->maxDelaySteps*nid] = synapseIdx - delay_start[delay_t + _network->maxDelaySteps*nid];
+				connection->pDelayNum[delay_t + delayLength*nid] = synapseIdx - connection->pDelayStart[delay_t + delayLength*nid];
 			}
 		}
 	}
@@ -216,31 +202,23 @@ N2SConnection* MultiNetwork::arrangeConnect(int n_num, int s_num, int node_idx)
 	for (auto niter = _crossnode_neurons_recv[node_idx].begin(); niter != _crossnode_neurons_recv[node_idx].end(); niter++) {
 		int nid = _crossnode_neuron2idx[node_idx][*niter];
 		const vector<SynapseBase*> &s_vec = (*niter)->getSynapses();
-		for (int delay_t=0; delay_t < _network->maxDelaySteps; delay_t++) {
-			delay_start[delay_t + _network->maxDelaySteps*nid] = synapseIdx;
+		for (int delay_t=0; delay_t<delayLength; delay_t++) {
+			connection->pDelayStart[delay_t + delayLength*nid] = synapseIdx;
 
 			for (auto iter = s_vec.begin(); iter != s_vec.end(); iter++) {
-				if (((*iter)->getNode() == node_idx) && ((*iter)->getDelay() == delay_t + 1)) {
+				if (((*iter)->getNode() == node_idx) && ((*iter)->getDelay() == delay_t + _network->minDelaySteps)) {
 					int sid = (*iter)->getID();
 					assert(synapseIdx < s_num);
-					s_idxs[synapseIdx] = sid;
 					synapseIdx++;
 				}
 			}
-			delay_num[delay_t + _network->maxDelaySteps*nid] = synapseIdx - delay_start[delay_t + _network->maxDelaySteps*nid];
+			connection->pDelayNum[delay_t + delayLength*nid] = synapseIdx - connection->pDelayStart[delay_t + delayLength*nid];
 		}
 	}
 
 	for (int i=0; i<s_num; i++) {
 		assert(i==s_idxs[i]);
 	}
-
-
-	//TODO assert s_idx is in order
-	//connection->pSynapsesIdx = s_idxs;
-	free(s_idxs);
-	connection->delayStart = delay_start;
-	connection->delayNum = delay_num;
 
 	return connection;
 }
@@ -250,17 +228,17 @@ CrossNodeMap* MultiNetwork::arrangeCrossNodeMap(int n_num, int node_idx, int nod
 {
 	CrossNodeMap* cross_map = (CrossNodeMap*)malloc(sizeof(CrossNodeMap));
 	assert(cross_map != NULL);
-	
+
 	cross_map->_idx2index = (int*)malloc(sizeof(int)*n_num);
 	assert(cross_map->_idx2index != NULL);
 	std::fill(cross_map->_idx2index, cross_map->_idx2index + n_num, -1);
 
 	cross_map->_crossnode_index2idx = (int*)malloc(sizeof(int) * node_num * _crossnode_neurons_send[node_idx].size());
 	cross_map->_cross_size = node_num * _crossnode_neurons_send[node_idx].size();
-	
+
 	assert(cross_map->_crossnode_index2idx != NULL);
 
-	
+
 	int index = 0;
 	for (auto iter = _crossnode_neurons_send[node_idx].begin(); iter != _crossnode_neurons_send[node_idx].end(); iter++) {
 		int nidx = (*iter)->getID();
