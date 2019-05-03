@@ -52,7 +52,7 @@ GNetwork* Network::buildNetwork()
 	for (int i=0; i<neuronTypeNum; i++) {
 		ret->pNTypes[i] = nTypes[i];
 
-		ret->ppNeurons[i] = allocType[nTypes[i]](ret->pNeuronNums[i]);
+		ret->ppNeurons[i] = allocType[nTypes[i]](neuronNums[i]);
 		assert(ret->ppNeurons[i] != NULL);
 
 		int idx = 0;
@@ -70,7 +70,7 @@ GNetwork* Network::buildNetwork()
 			}
 		}
 
-		assert(idx == ret->pNeuronNums[i]);
+		assert(idx == neuronNums[i]);
 
 		// TODO uncomment to support array
 		// if (nTypes[i] == Array) {
@@ -84,7 +84,7 @@ GNetwork* Network::buildNetwork()
 	for (int i=0; i<synapseTypeNum; i++) {
 		ret->pSTypes[i] = sTypes[i];
 
-		ret->ppSynapses[i] = allocType[sTypes[i]](ret->pSynapseNums[i]);
+		ret->ppSynapses[i] = allocType[sTypes[i]](synapseNums[i]);
 		assert(ret->ppSynapses[i] != NULL);
 
 		int idx = 0;
@@ -134,7 +134,7 @@ GNetwork* Network::buildNetwork()
 				ret->pConnection->pDelayStart[delay_t + deltaDelay*nid] = synapseIdx;
 
 				for (auto iter = s_vec.begin(); iter != s_vec.end(); iter++) {
-					if ((*iter)->getDelay() == delay_t + minDelay) {
+					if ((*iter)->getDelay() == delay_t + minDelaySteps) {
 						int sid = (*iter)->getID();
 						assert(synapseIdx < totalSynapseNum);
 						assert(synapseIdx == sid);

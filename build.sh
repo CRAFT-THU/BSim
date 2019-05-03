@@ -40,7 +40,7 @@ fi
 
 set -x
 if [ "$MODE" = "clean" ]; then
-	cd .. && make clean-all
+	cd ./build && make clean-all
 else
-	cd .. && cmake -DCMAKE_BUILD_TYPE=$C_MODE -DUSE_DOUBLE=$USE_DOUBLE -DUSE_LOG=$USE_LOG .. 2>./bin/error.log && make -j$THREAD_NUM VERBOSE=$VERBOSE 2>>./bin/error.log && cd bin
+	cd ./build && cmake -DCMAKE_BUILD_TYPE=$C_MODE -DUSE_DOUBLE=$USE_DOUBLE -DUSE_LOG=$USE_LOG -lpthread .. 2>../error.log && make -j$THREAD_NUM VERBOSE=$VERBOSE 2>>../error.log && cd bin
 fi

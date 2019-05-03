@@ -15,6 +15,7 @@ public:
 
 	virtual int run(real time, FireInfo &log) = 0;
 	virtual int reset();
+    GNetwork * getNet();
 
 	int run(real time);
 protected:

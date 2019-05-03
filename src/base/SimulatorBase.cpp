@@ -15,6 +15,12 @@ SimulatorBase::~SimulatorBase()
 {
 }
 
+GNetwork * SimulatorBase::getNet()
+{
+	reset();
+    return this->network->buildNetwork();
+}
+
 int SimulatorBase::reset()
 {
 	SimInfo info;

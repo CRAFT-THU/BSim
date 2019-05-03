@@ -2,6 +2,10 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
 
 PROJECT (BSim)
 
+SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+
 FIND_PACKAGE(CUDA REQUIRED)
 FIND_PACKAGE(MPI REQUIRED)
 FIND_PACKAGE(BLAS REQUIRED)
@@ -9,14 +13,46 @@ FIND_PACKAGE(BLAS REQUIRED)
 INCLUDE_DIRECTORIES(${MPI_INCLUDE_PATH})
 INCLUDE_DIRECTORIES(${BLAS_INCLUDE_PATH})
 
-SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+MESSAGE(STATUS "C Compiler: " ${CMAKE_C_COMPILER_ID} " " ${CMAKE_C_COMPILER_VERSION})
+MESSAGE(STATUS "C++ Compiler: " ${CMAKE_CXX_COMPILER_ID} " " ${CMAKE_CXX_COMPILER_VERSION})
+MESSAGE(STATUS "CUDA Version: " ${CUDA_VERSION})
+MESSAGE(STATUS "MPI Library: ${MPI_LIBRARIES}")
+MESSAGE(STATUS "BLAS Libraries: ${BLAS_LIBRARIES}")
+
+
+# Download and unpack googletest at configure time
+CONFIGURE_FILE(CMakeLists.gtest.txt googletest-download/CMakeLists.txt)
+EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
+	RESULT_VARIABLE result
+	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/googletest-download )
+IF(result)
+	MESSAGE(FATAL_ERROR "CMake step for googletest failed: ${result}")
+ENDIF()
+EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND} --build .
+	RESULT_VARIABLE result
+	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/googletest-download )
+IF(result)
+	MESSAGE(FATAL_ERROR "Build step for googletest failed: ${result}")
+ENDIF()
+# Prevent overriding the parent project's compiler/linker
+# settings on Windows
+SET(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+# Add googletest directly to our build. This defines
+# the gtest and gtest_main targets.
+ADD_SUBDIRECTORY(${CMAKE_CURRENT_BINARY_DIR}/googletest-src
+	${CMAKE_CURRENT_BINARY_DIR}/googletest-build
+	EXCLUDE_FROM_ALL)
+# The gtest/gtest_main targets carry header search path
+# dependencies automatically when using CMake 2.8.11 or
+# later. Otherwise we have to add them here ourselves.
+IF (CMAKE_VERSION VERSION_LESS 2.8.11)
+	INCLUDE_DIRECTORIES("${gtest_SOURCE_DIR}/include")
+ENDIF()
+
 
 IF(NOT CMAKE_BUILD_TYPE)
 	SET(CMAKE_BUILD_TYPE Release)
 ENDIF(NOT CMAKE_BUILD_TYPE)
-
 
 OPTION(USE_DOUBLE "Use double" OFF) # Disabled by default
 IF(USE_DOUBLE)
@@ -35,28 +71,21 @@ STRING(TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE_UPPER)
 
 if (CMAKE_BUILD_TYPE_UPPER STREQUAL "RELEASE")
 	IF ( "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang" )
-		SET(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -std=c++11 -stdlib=libc++ -O3 -fPIC")
+		SET(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -std=c++11 -stdlib=libc++ -O3 -fPIC -pthread")
 	ELSE( "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang" )
-		SET(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -std=c++11 -O3 -fPIC")
+		SET(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -std=c++11 -O3 -fPIC -pthread")
 	ENDIF ( "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang" )
 	SET(CUDA_NVCC_FLAGS_RELEASE "-std=c++11;-O3;-arch=sm_60;-lcufft")
 	# SET(CUDA_NVCC_FLAGS_RELEASE "-std=c++11;-O3;-arch=compute_60;-code=sm_60;-lcufft")
 elseif (CMAKE_BUILD_TYPE_UPPER STREQUAL "DEBUG")
 	IF ( "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang" )
-		SET(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -std=c++11 -stdlib=libc++ -O0 -Wall -g -ggdb -fPIC -D LOG_DATA -D DEBUG")
+		SET(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -std=c++11 -stdlib=libc++ -O0 -Wall -g -ggdb -fPIC -D LOG_DATA -D DEBUG -pthread")
 	ELSE( "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang" )
-		SET(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -std=c++11 -O0 -Wall -g -ggdb -fPIC -D LOG_DATA -D DEBUG")
+		SET(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -std=c++11 -O0 -Wall -g -ggdb -fPIC -D LOG_DATA -D DEBUG -pthread")
 	ENDIF ( "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang" )
 	#SET(CUDA_NVCC_FLAGS_DEBUG "-std=c++11;-g;-G;-lineinfo;-Xcompiler;-D LOG_DATA;-arch=sm_60")
 	SET(CUDA_NVCC_FLAGS_DEBUG "-std=c++11;-g;-G;-D LOG_DATA;-D DEBUG;-arch=sm_60;-lcufft")
 endif (CMAKE_BUILD_TYPE_UPPER STREQUAL "RELEASE")
-
-
-MESSAGE(STATUS "C Compiler: " ${CMAKE_C_COMPILER_ID} " " ${CMAKE_C_COMPILER_VERSION})
-MESSAGE(STATUS "C++ Compiler: " ${CMAKE_CXX_COMPILER_ID} " " ${CMAKE_CXX_COMPILER_VERSION})
-MESSAGE(STATUS "CUDA Version: " ${CUDA_VERSION})
-MESSAGE(STATUS "MPI Library: ${MPI_LIBRARIES}")
-MESSAGE(STATUS "BLAS Libraries: ${BLAS_LIBRARIES}")
 
 
 SET(CPU_LIB bsim)
@@ -77,6 +106,7 @@ LIST(REMOVE_ITEM GPU_SRC "${AUTO_GPU_SRC}")
 
 FILE(GLOB CPU_TEST "test/cpu/*.cpp" "test/cpu/*.c")
 FILE(GLOB GPU_TEST "test/gpu/*.cpp" "test/gpu/*.c" "test/gpu/*.cu")
+FILE(GLOB UNIT_TEST "test/unit/*.cpp" "test/unit/*.c" "test/unit/*.cu")
 
 FILE(COPY ${PROJECT_SOURCE_DIR}/CLEAN_ALL.cmake DESTINATION ${CMAKE_BINARY_DIR})
 
@@ -123,6 +153,13 @@ FOREACH(exec_path ${GPU_TEST})
 	TARGET_LINK_LIBRARIES(${exec_file} ${GPU_LIB} ${CUDA_CUFFT_LIBRARIES} ${CPU_LIB} ${MPI_LIBRARIES} blas ${BLAS_LIBRARIES} python2.7)
 ENDFOREACH()
 
+FOREACH(exec_path ${UNIT_TEST})
+	GET_FILENAME_COMPONENT(exec_file ${exec_path} NAME_WE)
+	CUDA_ADD_EXECUTABLE(${exec_file} ${exec_path})
+	CUDA_ADD_CUFFT_TO_TARGET(${exec_file})
+	TARGET_LINK_LIBRARIES(${exec_file} ${GPU_LIB} ${CUDA_CUFFT_LIBRARIES} ${CPU_LIB} ${MPI_LIBRARIES} blas ${BLAS_LIBRARIES} python2.7 gmock_main)
+	ADD_TEST(NAME ${exec_file}_test COMMAND ${exec_file}) 
+ENDFOREACH()
 
 #ADD_CUSTOM_COMMAND(TARGET multi-gpusim_test
 #	POST_BUILD
