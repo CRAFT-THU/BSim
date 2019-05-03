@@ -49,12 +49,11 @@ GNetwork* Network::buildNetwork()
 
 	GNetwork * ret = allocNetwork(neuronTypeNum, synapseTypeNum);
 
-
 	for (int i=0; i<neuronTypeNum; i++) {
 		ret->pNTypes[i] = nTypes[i];
 
 		ret->ppNeurons[i] = allocType[nTypes[i]](ret->pNeuronNums[i]);
-		assert(pN != NULL);
+		assert(ret->ppNeurons[i] != NULL);
 
 		int idx = 0;
 		for (piter = pPopulations.begin(); piter != pPopulations.end();  piter++) {
@@ -86,7 +85,7 @@ GNetwork* Network::buildNetwork()
 		ret->pSTypes[i] = sTypes[i];
 
 		ret->ppSynapses[i] = allocType[sTypes[i]](ret->pSynapseNums[i]);
-		assert(pS != NULL);
+		assert(ret->ppSynapses[i] != NULL);
 
 		int idx = 0;
 		for (auto piter = pPopulations.begin(); piter != pPopulations.end(); piter++) {

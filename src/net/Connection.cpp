@@ -31,6 +31,18 @@ Connection * allocConnection(int nNum, int sNum, int maxDelay, int minDelay)
 	return ret;
 }
 
+int freeConnection(Connection *pCPU)
+{
+	free(pCPU->pDelayStart);
+	free(pCPU->pDelayNum);
+	free(pCPU->pDelayStartRev);
+	free(pCPU->pDelayNumRev);
+	free(pCPU->pSidMapRev);
+	free(pCPU);
+	pCPU = NULL;
+	return 0;
+}
+
 int saveConnection(Connection *conn, FILE *f)
 {
 	fwrite(&(conn->nNum), sizeof(int), 1, f);

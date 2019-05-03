@@ -11,19 +11,19 @@ struct GLIFNeurons {
 	int *pRefracStep;
 	int *pRefracTime;
 
-	real *pV_m;
-	real *pCi;
 	real *pCe;
-	real *pC_i;
-	real *pC_e;
-	real *pV_tmp;
-	real *pI_i;
-	real *pI_e;
+	real *pCi;
 	real *pV_i;
-	real *pV_e;
+	real *pV_tmp;
+	real *pI_e;
+	real *pC_e;
 	real *pV_thresh;
-	real *pV_reset;
+	real *pC_i;
+	real *pV_m;
 	real *pC_m;
+	real *pV_e;
+	real *pI_i;
+	real *pV_reset;
 
 };
 

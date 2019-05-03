@@ -42,4 +42,4 @@ extern __device__ real *gXInput;
 extern __device__ int *gFireCount;
 
 // Connection
-extern __device__ N2SConnection *gConnection;
+extern __device__ Connection *gConnection;

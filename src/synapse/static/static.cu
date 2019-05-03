@@ -5,7 +5,7 @@
 #include "static.h"
 
 
-__global__ void update_dense_static_hit(N2SConnection *connection, GStaticSynapses *data, real *currentE, real *currentI, int *firedTable, int *firedTableSizes, int num, int start_id, int time)
+__global__ void update_dense_static_hit(Connection *connection, GStaticSynapses *data, real *currentE, real *currentI, int *firedTable, int *firedTableSizes, int num, int start_id, int time)
 {
 	//int tid = blockIdx.x * blockDim.x + threadIdx.x;
 	int delayLength = connection->maxDelay - connection->minDelay + 1;
@@ -27,8 +27,8 @@ __global__ void update_dense_static_hit(N2SConnection *connection, GStaticSynaps
 
 		for (int idx = 0; idx < fired_size_block; idx++) {
 			int nid = firedTable[time_idx*gFiredTableCap + (block_idx)*num_per_block + idx];
-			int start_loc = connection->delayStart[delta_t + nid * MAX_DELAY];
-			int synapseNum = connection->delayNum[delta_t + nid * MAX_DELAY];
+			int start_loc = connection->pDelayStart[delta_t + nid * delayLength];
+			int synapseNum = connection->pDelayNum[delta_t + nid * delayLength];
 			if (threadIdx.x == 0) {
 				gLayerInput[nid]++;
 			}
@@ -51,7 +51,7 @@ void cudaUpdateStatic(void * connection, void *data, real *currentE, real *curre
 {
 	//update_static_hit<<<pSize->gridSize, pSize->blockSize>>>((GStaticSynapses*)data, num, start_id);
 	//reset_active_synapse<<<1, 1>>>();
-	update_dense_static_hit<<<pSize->gridSize, pSize->blockSize>>>((N2SConnection *)connection,  (GStaticSynapses *)data, currentE, currentI, firedTable, firedTableSizes, num, start_id, time);
+	update_dense_static_hit<<<pSize->gridSize, pSize->blockSize>>>((Connection *)connection,  (GStaticSynapses *)data, currentE, currentI, firedTable, firedTableSizes, num, start_id, time);
 
 }
 

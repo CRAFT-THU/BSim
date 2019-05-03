@@ -109,7 +109,7 @@ GNetwork* MultiNetwork::arrangeData(int node_idx) {
 		//	int node = p->getNode();
 
 		//	if (node == node_idx && p->getType() == type) {
-		//		int copied = p->hardCopy(pS, idx, net->synapseNums[index] );
+		//		int copied = p->hardCopy(pS, idx, net->pSynapseNums[index] );
 		//		idx += copied;
 		//	}
 		//}
@@ -169,9 +169,9 @@ GNetwork* MultiNetwork::arrangeData(int node_idx) {
 	return net;
 }
 
-N2SConnection* MultiNetwork::arrangeConnect(int n_num, int s_num, int node_idx)
+Connection* MultiNetwork::arrangeConnect(int n_num, int s_num, int node_idx)
 {
-	N2SConnection *connection = allocConnection(n_num, s_num, _network->maxDelaySteps, _network->minDelaySteps);
+	Connection *connection = allocConnection(n_num, s_num, _network->maxDelaySteps, _network->minDelaySteps);
 	assert(connection != NULL);
 
 	int delayLength = _network->maxDelaySteps - _network->minDelaySteps + 1;
@@ -189,7 +189,7 @@ N2SConnection* MultiNetwork::arrangeConnect(int n_num, int s_num, int node_idx)
 
 				for (auto iter = s_vec.begin(); iter != s_vec.end(); iter++) {
 					if (((*iter)->getNode() == node_idx) && ((*iter)->getDelay() == delay_t + _network->minDelaySteps)) {
-						int sid = (*iter)->getID();
+						// int sid = (*iter)->getID();
 						assert(synapseIdx < s_num);
 						synapseIdx++;
 					}
@@ -207,17 +207,13 @@ N2SConnection* MultiNetwork::arrangeConnect(int n_num, int s_num, int node_idx)
 
 			for (auto iter = s_vec.begin(); iter != s_vec.end(); iter++) {
 				if (((*iter)->getNode() == node_idx) && ((*iter)->getDelay() == delay_t + _network->minDelaySteps)) {
-					int sid = (*iter)->getID();
+					// int sid = (*iter)->getID();
 					assert(synapseIdx < s_num);
 					synapseIdx++;
 				}
 			}
 			connection->pDelayNum[delay_t + delayLength*nid] = synapseIdx - connection->pDelayStart[delay_t + delayLength*nid];
 		}
-	}
-
-	for (int i=0; i<s_num; i++) {
-		assert(i==s_idxs[i]);
 	}
 
 	return connection;
@@ -269,14 +265,14 @@ DistriNetwork* MultiNetwork::buildNetworks(bool auto_splited)
 	for (int node_idx =0; node_idx <_node_num; node_idx++) {
 		net[node_idx]._network = arrangeData(node_idx);
 
-		int n_num = net[node_idx]._network->neuronNums[net[node_idx]._network->nTypeNum] + _crossnode_neuron2idx[node_idx].size();
-		int s_num = net[node_idx]._network->synapseNums[net[node_idx]._network->sTypeNum];
-		net[node_idx]._network->pN2SConnection = arrangeConnect(n_num, s_num, node_idx);
+		int n_num = net[node_idx]._network->pNeuronNums[net[node_idx]._network->nTypeNum] + _crossnode_neuron2idx[node_idx].size();
+		int s_num = net[node_idx]._network->pSynapseNums[net[node_idx]._network->sTypeNum];
+		net[node_idx]._network->pConnection = arrangeConnect(n_num, s_num, node_idx);
 
 	}
 
 	for (int node_idx =0; node_idx <_node_num; node_idx++) {
-		int n_num = net[node_idx]._network->neuronNums[net[node_idx]._network->nTypeNum] + _crossnode_neuron2idx[node_idx].size();
+		int n_num = net[node_idx]._network->pNeuronNums[net[node_idx]._network->nTypeNum] + _crossnode_neuron2idx[node_idx].size();
 		net[node_idx]._crossnode_map = arrangeCrossNodeMap(n_num, node_idx, _node_num);
 	}
 

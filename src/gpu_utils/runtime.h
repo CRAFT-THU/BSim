@@ -17,7 +17,7 @@
 #include "runtime_info.h"
 
 
-__global__ void init_connection(N2SConnection *pConnection);
+__global__ void init_connection(Connection *pConnection);
 
 __device__ int commit2globalTable(int *shared_buf, volatile unsigned int size, int *global_buf, int * global_size, int offset);
 
