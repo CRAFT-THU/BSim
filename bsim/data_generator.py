@@ -76,6 +76,7 @@ class Data(object):
         h.func("void *cudaAlloc{}Para(void *pCPU, int num)".format(self.name))
         h.func("int cudaFree{}(void *pGPU)".format(self.name))
         h.func("int cudaFree{}Para(void *pGPU)".format(self.name))
+        h.func("int cudaFetch{}(void *pCPU, void *pGPU, int num)".format(self.name))
         h.func("int cuda{}ParaToGPU(void *pCPU, void *pGPU, int num)".format(self.name))
         h.func("int cuda{}ParaFromGPU(void *pCPU, void *pGPU, int num)".format(self.name))
         h.func("void cudaUpdate{}(void *data, void *conn, real *currentE, real *currentI, int *firedTable, int *firedTableSizes, int num, int start_id, int t, BlockSize *pSize)".format(self.name))
@@ -195,6 +196,14 @@ class Data(object):
                           type_=t, num="num");
             cu.blank_line()
         cu.func_end("ret")
+        cu.blank_line()
+
+        cu.func_start("int cudaFetch{}(void *pCPU, void *pGPU, int num)".format(self.name))
+        cu.malloc("pTmp", "{}".format(self.classname), 1)
+        cu.gpu_to_cpu(cpu="pTmp", gpu="pGPU", type_="{}".format(self.classname), num=1)
+        cu.blank_line()
+        cu.line("cuda{}ParaFromGPU(pCPU, pTmp, num)".format(self.name))
+        cu.func_end(0)
         cu.blank_line()
 
         cu.func_start("int cuda{}ParaToGPU(void *pCPU, void *pGPU, int num)".format(self.name))

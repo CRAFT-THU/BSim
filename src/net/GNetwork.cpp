@@ -11,6 +11,29 @@
 #include "../utils/FileOp.h"
 #include "GNetwork.h"
 
+GNetwork * deepcopyNetwork(GNetwork * net) {
+	GNetwork * ret = allocNetwork(net->nTypeNum, net->sTypeNum);
+
+	for (int i=0; i<net->nTypeNum; i++) {
+		ret->pNTypes[i] = net->pNTypes[i];
+		ret->pNeuronNums[i] = net->pNeuronNums[i];
+		ret->ppNeurons[i] = allocType[net->pNTypes[i]](net->pNeuronNums[i+1]-net->pNeuronNums[i]);
+	}
+	ret->pNeuronNums[net->nTypeNum] = net->pNeuronNums[net->nTypeNum];
+
+	for (int i=0; i<net->sTypeNum; i++) {
+		ret->pSTypes[i] = net->pSTypes[i];
+		ret->pSynapseNums[i] = net->pSynapseNums[i];
+		ret->ppSynapses[i] = allocType[net->pSTypes[i]](net->pSynapseNums[i+1]-net->pSynapseNums[i]);
+	}
+	ret->pSynapseNums[net->sTypeNum] = net->pSynapseNums[net->sTypeNum];
+
+	ret->pConnection = allocConnection(net->pConnection->nNum, net->pConnection->sNum, 
+			net->pConnection->maxDelay, net->pConnection->minDelay);
+
+	return ret;
+}
+
 GNetwork * allocNetwork(int nTypeNum, int sTypeNum) {
 	GNetwork *ret = (GNetwork *)malloc(sizeof(GNetwork));
 	assert(ret != NULL);

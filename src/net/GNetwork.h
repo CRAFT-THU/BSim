@@ -40,6 +40,7 @@ struct GNetwork {
 // init and free
 // This func just set pConnection to NULL
 GNetwork * allocNetwork(int nTypeNum, int sTypeNum);
+GNetwork * deepcopyNetwork(GNetwork *net);
 // TODO freeGNetwork
 void freeGNetwork(GNetwork * network);
 

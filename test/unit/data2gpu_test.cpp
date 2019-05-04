@@ -152,8 +152,9 @@ int main(int argc, char **argv)
 	GNetwork * netCPU = sg.getNet();
 	GNetwork * netGPU = copyNetworkToGPU(netCPU);
 
-	net = fetchNetworkFromGPU(netGPU);
+	net = deepcopyNetwork(netCPU);
 
+	fetchNetworkFromGPU(net, netGPU);
 
 	::testing::InitGoogleMock(&argc, argv);
 	return RUN_ALL_TESTS();

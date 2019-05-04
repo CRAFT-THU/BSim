@@ -58,8 +58,8 @@ int fetchNetworkFromGPU(GNetwork *pCpuNet, GNetwork *pGpuNet)
 	int nTypeNum = pGpuNet->nTypeNum;
 	int sTypeNum = pGpuNet->sTypeNum;
 
-	pCpuNet->nTypeNum = nTypeNum;
-	pCpuNet->sTypeNum = sTypeNum;
+	assert(pCpuNet->nTypeNum == nTypeNum);
+	assert(pCpuNet->sTypeNum == sTypeNum);
 
 	for (int i=0; i<nTypeNum; i++) {
 		pCpuNet->pNTypes[i] = pGpuNet->pNTypes[i];
@@ -67,7 +67,7 @@ int fetchNetworkFromGPU(GNetwork *pCpuNet, GNetwork *pGpuNet)
 	}
 	pCpuNet->pNeuronNums[nTypeNum] = pGpuNet->pNeuronNums[nTypeNum];
 
-	for (int i=0; i<nTypeNum; i++) {
+	for (int i=0; i<sTypeNum; i++) {
 		pCpuNet->pSTypes[i] = pGpuNet->pSTypes[i];
 		pCpuNet->pSynapseNums[i] = pGpuNet->pSynapseNums[i];
 	}
@@ -80,7 +80,7 @@ int fetchNetworkFromGPU(GNetwork *pCpuNet, GNetwork *pGpuNet)
 	}
 	for (int i=0; i<sTypeNum; i++) {
 		//TODO: cudaFetchType
-		cudaFetchType[pCpuNet->pSTypes[i]](pCpuNet->ppSynapses[i], pGpuNet->ppSynapses[i], pCpuNet->pSynapseNums[i+1]-pCpuNet->pSynapsesNums[i]);
+		cudaFetchType[pCpuNet->pSTypes[i]](pCpuNet->ppSynapses[i], pGpuNet->ppSynapses[i], pCpuNet->pSynapseNums[i+1]-pCpuNet->pSynapseNums[i]);
 	}
 
 	cudaFetchConnection(pCpuNet->pConnection, pGpuNet->pConnection);

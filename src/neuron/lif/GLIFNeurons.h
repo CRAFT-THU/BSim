@@ -8,22 +8,22 @@
 #include "../../utils/BlockSize.h"
 
 struct GLIFNeurons {
+	real *pCe;
+	real *pV_m;
+	real *pI_i;
+	real *pC_e;
+	real *pCi;
+	real *pV_i;
+	real *pI_e;
+	real *pC_m;
+	real *pV_reset;
+	real *pV_e;
+	real *pV_thresh;
+	real *pV_tmp;
+	real *pC_i;
+
 	int *pRefracTime;
 	int *pRefracStep;
-
-	real *pV_thresh;
-	real *pI_i;
-	real *pV_tmp;
-	real *pV_e;
-	real *pC_i;
-	real *pCe;
-	real *pC_m;
-	real *pV_m;
-	real *pV_reset;
-	real *pCi;
-	real *pI_e;
-	real *pC_e;
-	real *pV_i;
 
 };
 
@@ -42,6 +42,7 @@ void *cudaAllocLIF(void *pCPU, int num);
 void *cudaAllocLIFPara(void *pCPU, int num);
 int cudaFreeLIF(void *pGPU);
 int cudaFreeLIFPara(void *pGPU);
+int cudaFetchLIF(void *pCPU, void *pGPU, int num);
 int cudaLIFParaToGPU(void *pCPU, void *pGPU, int num);
 int cudaLIFParaFromGPU(void *pCPU, void *pGPU, int num);
 void cudaUpdateLIF(void *data, void *conn, real *currentE, real *currentI, int *firedTable, int *firedTableSizes, int num, int start_id, int t, BlockSize *pSize);

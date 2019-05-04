@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 MODE=$(echo $1 | tr [A-Z] [a-z]) 
 
@@ -9,11 +9,11 @@ THREAD_NUM=$3
 C_MODE="Release"
 USE_DOUBLE="OFF"
 USE_LOG="OFF"
-VERBOSE=''
+VERBOSE=0
 
 TOTAL_THREAD_NUM=`getconf _NPROCESSORS_ONLN`
 if [ x"$THREAD_NUM" = x ]; then
-	((THREAD_NUM=THREAD_NUM/2))
+	((THREAD_NUM=TOTAL_THREAD_NUM/2))
 fi
 
 if [ "$MODE" = "debug" ]; then
@@ -22,6 +22,7 @@ if [ "$MODE" = "debug" ]; then
 	USE_LOG="ON"
 elif [ "$MODE" = "log" ]; then
 	C_MODE="Release"
+	VERBOSE=1
 	USE_LOG="ON"
 elif [ "$MODE" = "test" ]; then
 	C_MODE="Debug"
@@ -42,5 +43,5 @@ set -x
 if [ "$MODE" = "clean" ]; then
 	cd ./build && make clean-all
 else
-	cd ./build && cmake -DCMAKE_BUILD_TYPE=$C_MODE -DUSE_DOUBLE=$USE_DOUBLE -DUSE_LOG=$USE_LOG -lpthread .. 2>../error.log && make -j$THREAD_NUM VERBOSE=$VERBOSE 2>>../error.log && cd bin
+	cd ./build && cmake -DCMAKE_BUILD_TYPE=$C_MODE -DUSE_DOUBLE=$USE_DOUBLE -DUSE_LOG=$USE_LOG -lpthread .. 2> >(tee ../error.log) && make -j$THREAD_NUM VERBOSE=$VERBOSE 2> >(tee -a ../error.log) && cd bin
 fi

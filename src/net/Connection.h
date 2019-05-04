@@ -29,6 +29,7 @@ Connection * allocConnection(int nNum, int sNum, int maxDelay, int minDelay);
 int freeConnection(Connection * pCPU);
 
 Connection * cudaAllocConnection(Connection * pCPU);
+int cudaFetchConnection(Connection *pCPU, Connection *pGPU);
 
 int saveConnection(Connection *conn, FILE *f);
 Connection * loadConnection(FILE *f);
