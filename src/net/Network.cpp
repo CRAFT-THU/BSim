@@ -14,7 +14,7 @@ using namespace std::chrono;
 Network::Network()
 {
 	maxDelay = 0.0;
-	minDelay = 1.0e-7;
+	minDelay = 1.0e7;
 	maxDelaySteps = 0;
 	minDelaySteps = 1e7;
 	maxFireRate = 0.0;

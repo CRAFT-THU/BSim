@@ -10,7 +10,7 @@ Connection * allocConnection(int nNum, int sNum, int maxDelay, int minDelay)
 	assert(ret != NULL);
 
 	ret->nNum = nNum;
-	ret->nNum = sNum;
+	ret->sNum = sNum;
 	ret->maxDelay = maxDelay;
 	ret->minDelay = minDelay;
 

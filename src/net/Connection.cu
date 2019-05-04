@@ -13,7 +13,7 @@ Connection * cudaAllocConnection(Connection * pCPU)
 	Connection * pGPU = NULL;
 	Connection *pTmp = (Connection*)malloc(sizeof(Connection));
 	pTmp->nNum = nNum;
-	pTmp->nNum = sNum;
+	pTmp->sNum = sNum;
 	pTmp->maxDelay = pCPU->maxDelay;
 	pTmp->minDelay = pCPU->minDelay;
 

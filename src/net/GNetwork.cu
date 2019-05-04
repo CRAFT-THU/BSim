@@ -35,7 +35,6 @@ GNetwork* copyNetworkToGPU(GNetwork *pCpuNet)
 	tmp->pSynapseNums[sTypeNum] = pCpuNet->pSynapseNums[sTypeNum];
 
 
-
 	for (int i=0; i<nTypeNum; i++) {
 		tmp->ppNeurons[i] = cudaAllocType[pCpuNet->pNTypes[i]](pCpuNet->ppNeurons[i], pCpuNet->pNeuronNums[i+1]-pCpuNet->pNeuronNums[i]);
 	}
@@ -51,19 +50,40 @@ GNetwork* copyNetworkToGPU(GNetwork *pCpuNet)
 
 int fetchNetworkFromGPU(GNetwork *pCpuNet, GNetwork *pGpuNet)
 {
-	if (pCpuNet == NULL && pGpuNet == NULL) {
-		printf("NULL POINTER: GNETWORK\n");
+	if (pCpuNet == NULL || pGpuNet == NULL) {
+		printf("NULL POINTER: FETCH GNETWORK\n");
 		return -1;
 	}
 
-	int nTypeNum = pCpuNet->nTypeNum;
+	int nTypeNum = pGpuNet->nTypeNum;
+	int sTypeNum = pGpuNet->sTypeNum;
+
+	pCpuNet->nTypeNum = nTypeNum;
+	pCpuNet->sTypeNum = sTypeNum;
+
+	for (int i=0; i<nTypeNum; i++) {
+		pCpuNet->pNTypes[i] = pGpuNet->pNTypes[i];
+		pCpuNet->pNeuronNums[i] = pGpuNet->pNeuronNums[i];
+	}
+	pCpuNet->pNeuronNums[nTypeNum] = pGpuNet->pNeuronNums[nTypeNum];
+
+	for (int i=0; i<nTypeNum; i++) {
+		pCpuNet->pSTypes[i] = pGpuNet->pSTypes[i];
+		pCpuNet->pSynapseNums[i] = pGpuNet->pSynapseNums[i];
+	}
+	pCpuNet->pSynapseNums[sTypeNum] = pGpuNet->pSynapseNums[sTypeNum];
 
 	//TODO support multitype N and S
 	for (int i=0; i<nTypeNum; i++) {
 		//TODO: cudaFetchType
-		//cudaFetchType[pCpuNet->pNTypes[i]](pGpuNet->ppNeurons[i], pCpuNet->ppNeurons[i], pCpuNet->pNeuronNums[i+1]-pCpuNet->pNeuronNums[i]);
+		cudaFetchType[pCpuNet->pNTypes[i]](pCpuNet->ppNeurons[i], pGpuNet->ppNeurons[i], pCpuNet->pNeuronNums[i+1]-pCpuNet->pNeuronNums[i]);
+	}
+	for (int i=0; i<sTypeNum; i++) {
+		//TODO: cudaFetchType
+		cudaFetchType[pCpuNet->pSTypes[i]](pCpuNet->ppSynapses[i], pGpuNet->ppSynapses[i], pCpuNet->pSynapseNums[i+1]-pCpuNet->pSynapsesNums[i]);
 	}
 
+	cudaFetchConnection(pCpuNet->pConnection, pGpuNet->pConnection);
 	return 0;
 }
 

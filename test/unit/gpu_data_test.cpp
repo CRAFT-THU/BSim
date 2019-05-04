@@ -149,7 +149,11 @@ int main(int argc, char **argv)
 
 	SGSim sg(&c, 1.0e-4);
 
-	net = sg.getNet();
+	GNetwork * netCPU = sg.getNet();
+	GNetwork * netGPU = copyNetworkToGPU(netCPU);
+
+	net = fetchNetworkFromGPU(netGPU);
+
 
 	::testing::InitGoogleMock(&argc, argv);
 	return RUN_ALL_TESTS();
