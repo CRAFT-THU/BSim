@@ -38,7 +38,7 @@
 //#endif
 
 
-__constant__ int MAX_DELAY;
+// __constant__ int MAX_DELAY;
 __constant__ int gTimeTableCap;
 __constant__ int gFiredTableCap;
 // __constant__ int gSynapsesTableCap;
@@ -91,12 +91,12 @@ __device__ int commit2globalTable(int *shared_buf, volatile unsigned int size, i
 	return 0;
 }
 
-__global__ void update_time(int time, int *firedTableSizes)
+__global__ void update_time(Connection *connection, int time, int *firedTableSizes)
 {
 	if ((threadIdx.x == 0) && (blockIdx.x == 0)) {
 		// gCurrentCycle = gCurrentCycle + 1;
 		// gCurrentIdx = (gCurrentIdx +1)%(MAX_DELAY + 1);
-		int currentIdx = time % (MAX_DELAY + 1);
+		int currentIdx = time % (connection->maxDelay-connection->minDelay + 1);
 		gActiveTableSize = 0;
 		firedTableSizes[currentIdx] = 0;
 		// gSynapsesActiveTableSize = 0;
@@ -134,10 +134,10 @@ __global__ void curand_setup_kernel(curandState *state, int num)
 	}
 }
 
-__global__ void cudaAddCrossNeurons(int *firedTable, int *firedTableSizes, int *ids, int num, int time)
+__global__ void cudaAddCrossNeurons(Connection *connection, int *firedTable, int *firedTableSizes, int *ids, int num, int time)
 {
 	int tid = blockIdx.x * blockDim.x + threadIdx.x;
-	int delayIdx = time % (MAX_DELAY+1);
+	int delayIdx = time % (connection->maxDelay-connection->minDelay+1);
 	if (tid < num) {
 		firedTable[gFiredTableCap*delayIdx + firedTableSizes[delayIdx] + tid] = ids[tid];
 	}
@@ -148,7 +148,7 @@ __global__ void cudaAddCrossNeurons(int *firedTable, int *firedTableSizes, int *
 	}
 }
 
-__global__ void cudaDeliverNeurons(int *firedTable, int *firedTableSizes, int *idx2index, int *crossnode_index2idx, int *global_cross_data, int *fired_n_num, int node_num, int time)
+__global__ void cudaDeliverNeurons(Connection *conn, int *firedTable, int *firedTableSizes, int *idx2index, int *crossnode_index2idx, int *global_cross_data, int *fired_n_num, int node_num, int time)
 {
 	__shared__ int cross_neuron_id[MAXBLOCKSIZE];
 	__shared__ volatile int cross_cnt;
@@ -159,7 +159,7 @@ __global__ void cudaDeliverNeurons(int *firedTable, int *firedTableSizes, int *i
 	__syncthreads();
 
 	int tid = blockIdx.x * blockDim.x + threadIdx.x;
-	int delayIdx = time % (MAX_DELAY+1);
+	int delayIdx = time % (conn->maxDelay-conn->minDelay+1);
 	int fired_size = firedTableSizes[delayIdx];
 	for (int node = 0; node < node_num; node++) {
 		for (int idx = tid; idx < fired_size; idx += blockDim.x * gridDim.x) {

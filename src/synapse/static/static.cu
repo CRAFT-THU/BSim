@@ -47,7 +47,7 @@ __global__ void update_dense_static_hit(Connection *connection, GStaticSynapses 
 	}
 }
 
-void cudaUpdateStatic(void * connection, void *data, real *currentE, real *currentI, int *firedTable, int *firedTableSizes, int num, int start_id, int time, BlockSize *pSize)
+void cudaUpdateStatic(Connection * connection, void *data, real *currentE, real *currentI, int *firedTable, int *firedTableSizes, int num, int start_id, int time, BlockSize *pSize)
 {
 	//update_static_hit<<<pSize->gridSize, pSize->blockSize>>>((GStaticSynapses*)data, num, start_id);
 	//reset_active_synapse<<<1, 1>>>();

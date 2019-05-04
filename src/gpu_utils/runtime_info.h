@@ -4,11 +4,11 @@
 #include "../net/Connection.h"
 
 // Constant
-extern __constant__ int MAX_DELAY;
-extern __constant__ int gTimeTableCap;
+// extern __constant__ int MAX_DELAY;
+// extern __constant__ int gTimeTableCap;
 extern __constant__ int gFiredTableCap;
-extern __constant__ int gSynapsesTableCap;
-extern __constant__ real DT;
+// extern __constant__ int gSynapsesTableCap;
+// extern __constant__ real DT;
 
 // Variable
 // extern __device__ int gCurrentIdx;
@@ -42,4 +42,4 @@ extern __device__ real *gXInput;
 extern __device__ int *gFireCount;
 
 // Connection
-extern __device__ Connection *gConnection;
+// extern __device__ Connection *gConnection;

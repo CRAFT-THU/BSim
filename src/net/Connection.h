@@ -30,6 +30,7 @@ int freeConnection(Connection * pCPU);
 
 Connection * cudaAllocConnection(Connection * pCPU);
 int cudaFetchConnection(Connection *pCPU, Connection *pGPU);
+int cudaFreeConnection(Connection *pGPU);
 
 int saveConnection(Connection *conn, FILE *f);
 Connection * loadConnection(FILE *f);

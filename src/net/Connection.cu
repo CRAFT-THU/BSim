@@ -67,3 +67,17 @@ int cudaFetchConnection(Connection *pCPU, Connection *pGPU)
 
 	return 0;
 }
+
+int cudaFreeConnection(Connection *pGPU)
+{
+	Connection * pTmp = (Connection*)malloc(sizeof(Connection));
+	checkCudaErrors(cudaMemcpy(pTmp, pGPU, sizeof(Connection), cudaMemcpyDeviceToHost));
+	checkCudaErrors(cudaFree(pTmp->pDelayStart));
+	checkCudaErrors(cudaFree(pTmp->pDelayNum));
+	checkCudaErrors(cudaFree(pTmp->pDelayStartRev));
+	checkCudaErrors(cudaFree(pTmp->pDelayNumRev));
+	checkCudaErrors(cudaFree(pTmp->pSidMapRev));
+	free(pTmp);
+	pTmp = NULL;
+	return 0;
+}

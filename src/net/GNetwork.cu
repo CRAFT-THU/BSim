@@ -95,28 +95,14 @@ int freeNetworkGPU(GNetwork *pGpuNet)
 	int sTypeNum = pTmp->sTypeNum;
 
 	for (int i=0; i<nTypeNum; i++) {
-		void *pTmpN = mallocType[pTmp->pNTypes[i]]();
-		checkCudaErrors(cudaMemcpy(pTmpN, pTmp->ppNeurons[i], getTypeSize[pTmp->pNTypes[i]](), cudaMemcpyDeviceToHost));
-		cudaFreeType[pTmp->pNTypes[i]](pTmpN);
-		checkCudaErrors(cudaFree(pTmp->ppNeurons[i]));
-		free(pTmpN);
+		cudaFreeType[pTmp->pNTypes[i]](pTmp->ppNeurons[i]);
 	}
 
 	for (int i=0; i<sTypeNum; i++) {
-		void *pTmpS = mallocType[pTmp->pSTypes[i]]();
-		checkCudaErrors(cudaMemcpy(pTmpS, pTmp->ppSynapses[i], getTypeSize[pTmp->pSTypes[i]](), cudaMemcpyDeviceToHost));
-		cudaFreeType[pTmp->pSTypes[i]](pTmpS);
-		checkCudaErrors(cudaFree(pTmp->ppSynapses[i]));
-		free(pTmpS);
+		cudaFreeType[pTmp->pSTypes[i]](pTmp->ppSynapses[i]);
 	}
 
-	Connection * pConnection = (Connection*)malloc(sizeof(Connection));
-	checkCudaErrors(cudaMemcpy(pConnection, pTmp->pConnection, sizeof(Connection), cudaMemcpyDeviceToHost));
-	//checkCudaErrors(cudaFree(pConnection->ppSynapsesIdx));
-	checkCudaErrors(cudaFree(pConnection->pDelayStart));
-	checkCudaErrors(cudaFree(pConnection->pDelayNum));
-	checkCudaErrors(cudaFree(pTmp->pConnection));
-	free(pConnection);
+	cudaFreeConnection(pTmp->pConnection);
 
 	free(pTmp->ppNeurons);
 	free(pTmp->ppSynapses);

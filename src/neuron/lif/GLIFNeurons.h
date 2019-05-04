@@ -4,26 +4,28 @@
 
 #include <stdio.h>
 
+#include "../../net/Connection.h"
+
 #include "../../utils/type.h"
 #include "../../utils/BlockSize.h"
 
 struct GLIFNeurons {
-	real *pCe;
-	real *pV_m;
-	real *pI_i;
-	real *pC_e;
-	real *pCi;
-	real *pV_i;
-	real *pI_e;
-	real *pC_m;
-	real *pV_reset;
-	real *pV_e;
-	real *pV_thresh;
-	real *pV_tmp;
-	real *pC_i;
-
 	int *pRefracTime;
 	int *pRefracStep;
+
+	real *pV_thresh;
+	real *pC_m;
+	real *pV_m;
+	real *pI_i;
+	real *pC_i;
+	real *pI_e;
+	real *pC_e;
+	real *pV_e;
+	real *pV_tmp;
+	real *pV_i;
+	real *pCi;
+	real *pV_reset;
+	real *pCe;
 
 };
 
@@ -45,7 +47,7 @@ int cudaFreeLIFPara(void *pGPU);
 int cudaFetchLIF(void *pCPU, void *pGPU, int num);
 int cudaLIFParaToGPU(void *pCPU, void *pGPU, int num);
 int cudaLIFParaFromGPU(void *pCPU, void *pGPU, int num);
-void cudaUpdateLIF(void *data, void *conn, real *currentE, real *currentI, int *firedTable, int *firedTableSizes, int num, int start_id, int t, BlockSize *pSize);
+void cudaUpdateLIF(Connection *conn, void *data, real *currentE, real *currentI, int *firedTable, int *firedTableSizes, int num, int start_id, int t, BlockSize *pSize);
 
 int mpiSendLIF(void *data, int rank, int offset, int size);
 int mpiRecvLIF(void **data, int rank, int size);

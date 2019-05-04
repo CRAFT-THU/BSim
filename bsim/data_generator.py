@@ -47,6 +47,8 @@ class Data(object):
 
         h.include_std("stdio.h")
         h.blank_line()
+        h.include("../../net/Connection.h")
+        h.blank_line()
         for i in self.headers:
             h.include(i)
         # h.include("../../utils/macros.h")
@@ -79,7 +81,7 @@ class Data(object):
         h.func("int cudaFetch{}(void *pCPU, void *pGPU, int num)".format(self.name))
         h.func("int cuda{}ParaToGPU(void *pCPU, void *pGPU, int num)".format(self.name))
         h.func("int cuda{}ParaFromGPU(void *pCPU, void *pGPU, int num)".format(self.name))
-        h.func("void cudaUpdate{}(void *data, void *conn, real *currentE, real *currentI, int *firedTable, int *firedTableSizes, int num, int start_id, int t, BlockSize *pSize)".format(self.name))
+        h.func("void cudaUpdate{}(Connection *conn, void *data, real *currentE, real *currentI, int *firedTable, int *firedTableSizes, int num, int start_id, int t, BlockSize *pSize)".format(self.name))
         h.blank_line()
 
         h.func("int mpiSend{}(void *data, int rank, int offset, int size)".format(self.name))
@@ -230,7 +232,7 @@ class Data(object):
 
         cu.func_start("int cudaFree{}(void *pGPU)".format(self.name))
         cu.from_gpu("tmp", gpu="pGPU", type_="{}".format(self.classname), num=1)
-        cu.line("cudaFree{}Para(pGPU)".format(self.name))
+        cu.line("cudaFree{}Para(tmp)".format(self.name))
         cu.free("tmp")
         cu.free_gpu("pGPU")
         cu.func_end(0)
