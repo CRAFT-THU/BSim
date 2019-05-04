@@ -1,4 +1,5 @@
 #!/bin/bash
+SCRIPT_PATH=`dirname "$0"`
 
 MODE=$(echo $1 | tr [A-Z] [a-z]) 
 
@@ -41,7 +42,8 @@ fi
 
 set -x
 if [ "$MODE" = "clean" ]; then
-	cd ./build && make clean-all
+	cd $SCRIPT_PATH/build && make clean-all
+    rm -rf $SCRIPT_PATH/build/bin/*
 else
-	cd ./build && cmake -DCMAKE_BUILD_TYPE=$C_MODE -DUSE_DOUBLE=$USE_DOUBLE -DUSE_LOG=$USE_LOG -lpthread .. 2> >(tee ../error.log) && make -j$THREAD_NUM VERBOSE=$VERBOSE 2> >(tee -a ../error.log) && cd bin
+	cd $SCRIPT_PATH/build && cmake -DCMAKE_BUILD_TYPE=$C_MODE -DUSE_DOUBLE=$USE_DOUBLE -DUSE_LOG=$USE_LOG -lpthread .. 2> >(tee ../error.log) && make -j$THREAD_NUM VERBOSE=$VERBOSE 2> >(tee -a ../error.log) && cd bin
 fi
