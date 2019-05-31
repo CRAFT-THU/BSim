@@ -27,21 +27,31 @@ private:
 	CrossNodeMap* arrangeCrossNodeMap(int n_num, int node_idx, int node_num);
 
 public:
-	//Cross Node
-	//map<ID, int> _nID2node;
-	//map<ID, int> _sID2node;
+	/** Cross Node Data **/
+	// map<ID, int> _nID2node;
+	// map<ID, int> _sID2node;
+	// Neurons that on this node and would issue spikes to others.
+	// Acessed by neurons = _crossnode_neurons_send[node]
 	vector<set<NeuronBase*> > _crossnode_neurons_send;
+	// Neurons that on other nodes and would issue spike to this node.
+	// Accessed by neurons = _crossnode_neurons_recv[node]
 	vector<set<NeuronBase*> > _crossnode_neurons_recv;
+	// Get idx of shadow neuron on destination node, the idxs of shadow neurons are larger than that of real neurons.
+	// Accessed by idx = _crossnode_neuron2idx[node][neuron]
 	vector<map<NeuronBase*, int> > _crossnode_neuron2idx;
 
-	//Per Node
-	//vector<map<int, ID> > _global_idx2nID;
-	//vector<map<int, ID> > _global_idx2sID;
+	/** Per Node Data **/
+	// vector<map<int, ID> > _global_idx2nID;
+	// vector<map<int, ID> > _global_idx2sID;
+	// Number of neurons for different types on different nodes accessed by _global_ntype_num[node][type]
 	vector<map<Type, int> >	_global_ntype_num;
+	// Number of synapses for different types on different nodes accessed by _global_ntype_num[node][type]
 	vector<map<Type, int> > _global_stype_num;
 
-	//Class Var
+	/** Class Var **/
+	// NNs for each node
 	Network * _network;
+	// Number of nodes
 	int _node_num;
 };
 
