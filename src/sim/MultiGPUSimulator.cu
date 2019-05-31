@@ -119,12 +119,12 @@ void * run_thread_gpu(void *para) {
 	//int dataOffset = network->_node_idx * network->_node_num;
 	//int dataIdx = network->_node_idx * network->_node_num + network->_node_idx;
 
-	int deltaDelay = c_pNetGPU->pConnection->maxDelay - c_pNetGPU->pConnection->minDelay;
-	printf("Thread %d MaxDelay: %d MinDelay: %d\n", network->_node_idx, c_pNetGPU->pConnection->maxDelay, c_pNetGPU->pConnection->minDelay);
+	int deltaDelay = pNetCPU->pConnection->maxDelay - pNetCPU->pConnection->minDelay;
+	printf("Thread %d MaxDelay: %d MinDelay: %d\n", network->_node_idx, pNetCPU->pConnection->maxDelay, pNetCPU->pConnection->minDelay);
 
 	// init_connection<<<1, 1>>>(c_pNetGPU->pConnection);
 
-	GBuffers *buffers = alloc_buffers(allNeuronNum, nodeSynapseNum, deltaDelay, network->_dt);
+	GBuffers *buffers = alloc_buffers(allNeuronNum, nodeSynapseNum, pNetCPU->pConnection->maxDelay, network->_dt);
 
 	BlockSize *updateSize = getBlockSize(allNeuronNum, nodeSynapseNum);
 

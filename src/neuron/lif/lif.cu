@@ -73,7 +73,7 @@ __global__ void find_lif_neuron(GLIFNeurons *data, real * currentE, real * curre
 
 __global__ void update_lif_neuron(Connection *connection, GLIFNeurons *data, real *currentE, real *currentI, int *firedTable, int *firedTableSizes, int num, int offset, int time)
 {
-	int currentIdx = time % (connection->maxDelay-connection->minDelay+1);
+	int currentIdx = time % (connection->maxDelay+1);
 	__shared__ int fire_table_t[MAX_BLOCK_SIZE];
 	__shared__ volatile int fire_cnt;
 	if (threadIdx.x == 0) {
@@ -166,7 +166,7 @@ __global__ void update_lif_neuron(Connection *connection, GLIFNeurons *data, rea
 __global__ void update_all_lif_neuron(Connection *connection, GLIFNeurons *data, real *currentE, real *currentI, int *firedTable, int *firedTableSizes, int num, int offset, int time)
 // __global__ void update_all_lif_neuron(GLIFNeurons *data, int num, int offset, int time)
 {
-	int currentIdx = time % (connection->maxDelay - connection->minDelay + 1);
+	int currentIdx = time % (connection->maxDelay + 1);
 	__shared__ int fire_table_t[MAX_BLOCK_SIZE];
 	__shared__ volatile int fire_cnt;
 
@@ -269,7 +269,7 @@ __global__ void update_dense_lif_neuron(Connection *connection, GLIFNeurons *dat
 	//__syncthreads();
 
 	int tid = blockIdx.x * blockDim.x + threadIdx.x;
-	int currentIdx = time % (connection->maxDelay-connection->minDelay+1);
+	int currentIdx = time % (connection->maxDelay+1);
 	for (int idx = tid; idx < num; idx +=blockDim.x*gridDim.x) {
 		//bool fired = false;
 		//int testLoc = 0;

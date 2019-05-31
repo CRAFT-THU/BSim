@@ -36,7 +36,7 @@ __global__ void init_log_buffers(int *layer_input, real *x_input, int *fire_coun
 }
 
 
-GBuffers* alloc_buffers(int neuron_num, int synapse_num, int deltaDelay, real dt) 
+GBuffers* alloc_buffers(int neuron_num, int synapse_num, int maxDelay, real dt) 
 {
 	GBuffers *ret = (GBuffers*)malloc(sizeof(GBuffers));
 	memset(ret, 0, sizeof(GBuffers));
@@ -47,11 +47,11 @@ GBuffers* alloc_buffers(int neuron_num, int synapse_num, int deltaDelay, real dt
 	checkCudaErrors(cudaMalloc((void**)&(ret->c_gNeuronInput_I), sizeof(real)*(neuron_num)));
 	checkCudaErrors(cudaMemset(ret->c_gNeuronInput_I, 0, sizeof(real)*(neuron_num)));
 
-	checkCudaErrors(cudaMalloc((void**)&(ret->c_gFiredTable), sizeof(int)*((neuron_num)*(deltaDelay+1))));
-	checkCudaErrors(cudaMemset(ret->c_gFiredTable, 0, sizeof(int)*((neuron_num)*(deltaDelay+1))));
+	checkCudaErrors(cudaMalloc((void**)&(ret->c_gFiredTable), sizeof(int)*((neuron_num)*(maxDelay+1))));
+	checkCudaErrors(cudaMemset(ret->c_gFiredTable, 0, sizeof(int)*((neuron_num)*(maxDelay+1))));
 
-	checkCudaErrors(cudaMalloc((void**)&(ret->c_gFiredTableSizes), sizeof(int)*(deltaDelay+1)));
-	checkCudaErrors(cudaMemset(ret->c_gFiredTableSizes, 0, sizeof(int)*(deltaDelay+1)));
+	checkCudaErrors(cudaMalloc((void**)&(ret->c_gFiredTableSizes), sizeof(int)*(maxDelay+1)));
+	checkCudaErrors(cudaMemset(ret->c_gFiredTableSizes, 0, sizeof(int)*(maxDelay+1)));
 
 	checkCudaErrors(cudaMalloc((void**)&(ret->c_gActiveTable), sizeof(int)*(neuron_num)));
 	checkCudaErrors(cudaMemset(ret->c_gActiveTable, 0, sizeof(int)*(neuron_num)));

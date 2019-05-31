@@ -20,7 +20,7 @@ fi
 if [ "$MODE" = "debug" ]; then
 	C_MODE="Debug"
 	VERBOSE=1
-	USE_LOG="ON"
+	USE_LOG="OFF"
 elif [ "$MODE" = "log" ]; then
 	C_MODE="Release"
 	VERBOSE=1

@@ -71,6 +71,8 @@ GNetwork* MultiNetwork::arrangeData(int node_idx) {
 
 	GNetwork * net = allocNetwork(ntype_num, stype_num);
 
+	int delayLength = _network->maxDelaySteps - _network->minDelaySteps + 1;
+
 	int index = 0;
 	for (map<Type, int>::const_iterator tmp_iter = _global_ntype_num[node_idx].begin(); tmp_iter != _global_ntype_num[node_idx].end(); tmp_iter++) {
 		Type type = tmp_iter->first;
@@ -122,9 +124,9 @@ GNetwork* MultiNetwork::arrangeData(int node_idx) {
 
 			for (int nidx=0; nidx<pop->getNum(); nidx++) {
 				const vector<SynapseBase*> &s_vec = pop->getNeuron(nidx)->getSynapses();
-				for (int delay_t=0; delay_t < _network->maxDelaySteps; delay_t++) {
+				for (int delay_t=0; delay_t<delayLength; delay_t++) {
 					for (auto siter = s_vec.begin(); siter != s_vec.end(); siter++) {
-						if ((*siter)->getDelay() == delay_t + 1) {
+						if ((*siter)->getDelay() == delay_t + _network->minDelaySteps) {
 							if ((*siter)->getType() == type && (*siter)->getNode() == node_idx) {
 								assert(idx < tmp_iter->second);
 								int copied = (*siter)->hardCopy(net->ppSynapses[index], idx, net->pSynapseNums[index]);
@@ -138,9 +140,9 @@ GNetwork* MultiNetwork::arrangeData(int node_idx) {
 
 		for (auto niter = _crossnode_neurons_recv[node_idx].begin(); niter != _crossnode_neurons_recv[node_idx].end(); niter++) {
 			const vector<SynapseBase*> &s_vec = (*niter)->getSynapses();
-			for (int delay_t=0; delay_t < _network->maxDelaySteps; delay_t++) {
+			for (int delay_t=0; delay_t<delayLength; delay_t++) {
 				for (auto iter = s_vec.begin(); iter != s_vec.end(); iter++) {
-					if (((*iter)->getNode() == node_idx) && ((*iter)->getDelay() == delay_t + 1) && ((*iter)->getType() == type)) {
+					if (((*iter)->getNode() == node_idx) && ((*iter)->getDelay() == delay_t + _network->minDelaySteps) && ((*iter)->getType() == type)) {
 						assert(idx < tmp_iter->second);
 						int copied = (*iter)->hardCopy(net->ppSynapses[index], idx, net->pSynapseNums[index]);
 						idx += copied;

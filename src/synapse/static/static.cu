@@ -11,7 +11,7 @@ __global__ void update_dense_static_hit(Connection *connection, GStaticSynapses 
 	int delayLength = connection->maxDelay - connection->minDelay + 1;
 	for (int delta_t = 0; delta_t<delayLength; delta_t++) {
 		int block_idx = blockIdx.x;
-		int time_idx = (time - connection->minDelay - delta_t)%(delayLength);
+		int time_idx = (time+delayLength-delta_t)%(connection->maxDelay+1);
 		int firedSize = firedTableSizes[time_idx];
 		int num_per_block = (firedSize - 1)/gridDim.x + 1;
 		int block_nums_minus_1 = (firedSize - 1) / num_per_block;

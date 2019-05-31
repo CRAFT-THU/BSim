@@ -96,8 +96,8 @@ const real fv=-74e-3;
 		STSim st(&c, dt);	// cpu
 		st.run(run_time);
 	#else
-		MGSim mg(&c, dt);	//gpu
-		mg.run(run_time);	
+		SGSim gs(&c, dt);	//gpu
+		gs.run(run_time);	
 	#endif
 	
 	end=clock(); //time(NULL);

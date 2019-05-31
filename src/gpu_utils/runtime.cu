@@ -96,7 +96,7 @@ __global__ void update_time(Connection *connection, int time, int *firedTableSiz
 	if ((threadIdx.x == 0) && (blockIdx.x == 0)) {
 		// gCurrentCycle = gCurrentCycle + 1;
 		// gCurrentIdx = (gCurrentIdx +1)%(MAX_DELAY + 1);
-		int currentIdx = time % (connection->maxDelay-connection->minDelay + 1);
+		int currentIdx = time % (connection->maxDelay + 1);
 		gActiveTableSize = 0;
 		firedTableSizes[currentIdx] = 0;
 		// gSynapsesActiveTableSize = 0;

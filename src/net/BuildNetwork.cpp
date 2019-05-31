@@ -142,7 +142,7 @@ GNetwork* Network::buildNetwork()
 					}
 				}
 
-				ret->pConnection->pDelayNum[delay_t + maxDelaySteps*nid] = synapseIdx - ret->pConnection->pDelayStart[delay_t + maxDelaySteps*nid];
+				ret->pConnection->pDelayNum[delay_t + deltaDelay*nid] = synapseIdx - ret->pConnection->pDelayStart[delay_t + deltaDelay*nid];
 			}
 		}
 	}
