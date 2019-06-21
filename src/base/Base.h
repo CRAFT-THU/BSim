@@ -34,7 +34,10 @@ public:
 
 	virtual Type getType() = 0;
 	virtual int reset(SimInfo &info) = 0;
-	virtual int update(SimInfo &info) = 0;
+	virtual int update(SimInfo &info) {
+		printf("Update Not implemented");
+		return 0;
+	}
 	virtual void monitor(SimInfo &info) = 0;
 
 	virtual size_t getSize() = 0;
