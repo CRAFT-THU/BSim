@@ -65,7 +65,7 @@ void MultiNetwork::countTypeNum()
 	}
 }
 
-GNetwork* MultiNetwork::arrangeData(int node_idx) {
+GNetwork* MultiNetwork::arrangeData(int node_idx, SimInfo &info) {
 	int ntype_num = _global_ntype_num[node_idx].size();
 	int stype_num = _global_stype_num[node_idx].size();
 
@@ -87,7 +87,7 @@ GNetwork* MultiNetwork::arrangeData(int node_idx) {
 			int node = p->getNode();
 
 			if (node == node_idx && p->getType() == type) {
-				size_t copied = p->hardCopy(net->ppNeurons[index], idx, net->pNeuronNums[index]);
+				size_t copied = p->hardCopy(net->ppNeurons[index], idx, net->pNeuronNums[index], info);
 				idx += copied;
 			}
 		}
@@ -129,7 +129,7 @@ GNetwork* MultiNetwork::arrangeData(int node_idx) {
 						if ((*siter)->getDelay() == delay_t + _network->minDelaySteps) {
 							if ((*siter)->getType() == type && (*siter)->getNode() == node_idx) {
 								assert(idx < tmp_iter->second);
-								int copied = (*siter)->hardCopy(net->ppSynapses[index], idx, net->pSynapseNums[index]);
+								int copied = (*siter)->hardCopy(net->ppSynapses[index], idx, net->pSynapseNums[index], info);
 								idx += copied;
 							}
 						}
@@ -144,7 +144,7 @@ GNetwork* MultiNetwork::arrangeData(int node_idx) {
 				for (auto iter = s_vec.begin(); iter != s_vec.end(); iter++) {
 					if (((*iter)->getNode() == node_idx) && ((*iter)->getDelay() == delay_t + _network->minDelaySteps) && ((*iter)->getType() == type)) {
 						assert(idx < tmp_iter->second);
-						int copied = (*iter)->hardCopy(net->ppSynapses[index], idx, net->pSynapseNums[index]);
+						int copied = (*iter)->hardCopy(net->ppSynapses[index], idx, net->pSynapseNums[index], info);
 						idx += copied;
 					}
 				}
@@ -254,7 +254,7 @@ CrossNodeMap* MultiNetwork::arrangeCrossNodeMap(int n_num, int node_idx, int nod
 	return cross_map;
 }
 
-DistriNetwork* MultiNetwork::buildNetworks(bool auto_splited)
+DistriNetwork* MultiNetwork::buildNetworks(SimInfo &info, bool auto_splited)
 {
 	DistriNetwork * net = initDistriNet(_node_num);
 
@@ -265,7 +265,7 @@ DistriNetwork* MultiNetwork::buildNetworks(bool auto_splited)
 	countTypeNum();
 
 	for (int node_idx =0; node_idx <_node_num; node_idx++) {
-		net[node_idx]._network = arrangeData(node_idx);
+		net[node_idx]._network = arrangeData(node_idx, info);
 
 		int n_num = net[node_idx]._network->pNeuronNums[net[node_idx]._network->nTypeNum] + _crossnode_neuron2idx[node_idx].size();
 		int s_num = net[node_idx]._network->pSynapseNums[net[node_idx]._network->sTypeNum];

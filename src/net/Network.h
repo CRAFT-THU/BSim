@@ -52,7 +52,7 @@ public:
 	int connect(int populationIDSrc, int neuronIDSrc, int populationIDDst, int neuronIDDst, real weight, real delay, real tau = 0);
 	SynapseBase* connect(NeuronBase *pSrc, NeuronBase *pDst, real weight, real delay, SpikeType type = Excitatory, real tau = 0, bool store = true);
 
-	GNetwork* buildNetwork();
+	GNetwork* buildNetwork(SimInfo &info);
 
 	int addNeuronNum(Type type, int num);
 	int addConnectionNum(Type type, int num);

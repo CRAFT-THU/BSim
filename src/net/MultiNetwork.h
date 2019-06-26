@@ -14,7 +14,7 @@ public:
 	MultiNetwork(Network *net, int node_num = 1);
 	~MultiNetwork();
 
-	DistriNetwork * buildNetworks(bool auto_splited = true);
+	DistriNetwork * buildNetworks(SimInfo &info, bool auto_splited = true);
 	CrossNodeData* arrangeCrossNodeData(int node_num);
 	CrossNodeDataGPU* arrangeCrossNodeDataGPU(int node_num);
 	//int addConnectionInfo(ID nID, int nid, int offset, int *delayStart, int *delayNum, int *pSynapsesIdx, int nodeIdx =0);
@@ -22,7 +22,7 @@ public:
 private:
 	void splitNetwork();
 	void countTypeNum();
-	GNetwork* arrangeData(int node);
+	GNetwork* arrangeData(int node, SimInfo &info);
 	Connection* arrangeConnect(int n_num, int s_num, int node_idx);
 	CrossNodeMap* arrangeCrossNodeMap(int n_num, int node_idx, int node_num);
 

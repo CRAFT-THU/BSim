@@ -24,7 +24,7 @@ public:
 
 	virtual size_t getSize() override;
 	virtual int getData(void *data) override;
-	virtual int hardCopy(void * data, int idx, int base) override;
+	virtual int hardCopy(void * data, int idx, int base, SimInfo &info) override;
 
 protected:
 	const static Type type;

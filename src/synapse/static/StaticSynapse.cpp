@@ -87,7 +87,7 @@ int StaticSynapse::getData(void *data)
 	return 0;
 }
 
-int StaticSynapse::hardCopy(void * data, int idx, int base)
+int StaticSynapse::hardCopy(void * data, int idx, int base, SimInfo &info)
 {
 	GStaticSynapses *p = (GStaticSynapses *) data;
 	setID(idx+base);

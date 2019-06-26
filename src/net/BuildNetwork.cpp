@@ -35,7 +35,7 @@
 // 	std::copy(fire_array.begin(), fire_array.end(), p->p_fire_time);
 // }
 
-GNetwork* Network::buildNetwork()
+GNetwork* Network::buildNetwork(SimInfo &info)
 {
 	vector<PopulationBase*>::iterator piter;
 	vector<NeuronBase*>::iterator niter;
@@ -59,7 +59,7 @@ GNetwork* Network::buildNetwork()
 		for (piter = pPopulations.begin(); piter != pPopulations.end();  piter++) {
 			PopulationBase * p = *piter;
 			if (p->getType() == nTypes[i]) {
-				size_t copied = p->hardCopy(ret->ppNeurons[i], idx, ret->pNeuronNums[i]);
+				size_t copied = p->hardCopy(ret->ppNeurons[i], idx, ret->pNeuronNums[i], info);
 				idx += copied;
 
 				// TODO uncomment to support array
@@ -99,7 +99,7 @@ GNetwork* Network::buildNetwork()
 								//int sid = (*iter)->getID();
 								//assert(synapseIdx < totalSynapseNum);
 								//synapseIdx++;
-								int copied = (*siter)->hardCopy(ret->ppSynapses[i], idx, ret->pSynapseNums[i]);
+								int copied = (*siter)->hardCopy(ret->ppSynapses[i], idx, ret->pSynapseNums[i], info);
 								idx += copied;
 							}
 						}

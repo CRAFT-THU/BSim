@@ -17,8 +17,11 @@ SimulatorBase::~SimulatorBase()
 
 GNetwork * SimulatorBase::getNet()
 {
+	SimInfo info;
+	info.currCycle = 0;
+	info.dt = dt;
 	reset();
-    return this->network->buildNetwork();
+    return this->network->buildNetwork(info);
 }
 
 int SimulatorBase::reset()

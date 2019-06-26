@@ -20,36 +20,38 @@ public:
 
 	virtual size_t getSize() override;
 	virtual int getData(void *data) override;
-	virtual int hardCopy(void * data, int idx, int base) override;
+	virtual int hardCopy(void * data, int idx, int base, SimInfo &info) override;
 
 	const static Type type;
 protected:
-	real _vm;
-	real _CI;
-	real _CE;
-	real _C_I;
-	real _C_E;
-	real _v_tmp;
-	real _i_I;
-	real _i_E;
-	real _v_thresh;
-	real _v_reset;
-	real _Cm;
+	// real _vm;
+	// real _CI;
+	// real _CE;
+	// real _C_I;
+	// real _C_E;
+	// real _v_tmp;
+	// real _i_I;
+	// real _i_E;
+	// real _v_thresh;
+	// real _v_reset;
+	// real _Cm;
 
-	int _refrac_step;
-	int _refrac_time;
+	// int _refrac_step;
+	// int _refrac_time;
 
 	real _v_init;
 	real _v_rest;
+	real _v_reset;
 	real _cm;
 	real _tau_m;
 	real _tau_refrac;
 	real _tau_syn_E;
 	real _tau_syn_I;
+	real _v_thresh;
 	real _i_offset;
 
-	real _i_syn_E;
-	real _i_syn_I;
+	// real _i_syn_E;
+	// real _i_syn_I;
 };
 
 #endif /* LIFNEURON_H */
