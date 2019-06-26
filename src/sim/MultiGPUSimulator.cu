@@ -61,7 +61,11 @@ int MultiGPUSimulator::run(real time, FireInfo &log)
 	pthread_barrier_init(&gpuCycleBarrier, NULL, device_count);
 
 	MultiNetwork multiNet(network, device_count);
-	DistriNetwork *node_nets = multiNet.buildNetworks();
+
+	SimInfo info;
+	info.currCycle = 0;
+	info.dt = dt;
+	DistriNetwork *node_nets = multiNet.buildNetworks(info);
 	assert(node_nets != NULL);
 	gCrossDataGPU = multiNet.arrangeCrossNodeDataGPU(device_count);
 	assert(gCrossDataGPU != NULL);

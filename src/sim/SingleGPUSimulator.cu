@@ -39,7 +39,10 @@ int SingleGPUSimulator::run(real time, FireInfo &log)
 
 	reset();
 
-	GNetwork *pNetCPU = network->buildNetwork();
+	SimInfo info;
+	info.currCycle = 0;
+	info.dt = dt;
+	GNetwork *pNetCPU = network->buildNetwork(info);
 
 	FILE *v_file = openFile("v.data", "w+");
 
@@ -267,7 +270,10 @@ int SingleGPUSimulator::runMultiNets(real time, int parts, FireInfo &log) {
 	checkCudaErrors(cudaSetDevice(0));
 
 	MultiNetwork multiNet(network, parts);
-	DistriNetwork *subnets = multiNet.buildNetworks();
+	SimInfo info;
+	info.currCycle = 0;
+	info.dt = dt;
+	DistriNetwork *subnets = multiNet.buildNetworks(info);
 	assert(subnets != NULL);
 	CrossNodeDataGPU *crossData = multiNet.arrangeCrossNodeDataGPU(parts);
 	assert(crossData != NULL);
