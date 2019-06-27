@@ -2,8 +2,8 @@
  * usually just for fun
  * Mon February 22 2016
  */
-#ifndef BASE_H
-#define BASE_H
+#ifndef MODEL_H
+#define MODEL_H
 
 #include <map>
 
@@ -11,10 +11,10 @@
 
 using std::map;
 
-class Base {
+class Model {
 public:
-	Base(int node=0) : _id(0), _node(node) {}
-	virtual ~Base() {}
+	Model(int node=0) : _id(0), _node(node) {}
+	virtual ~Model() {}
 
 	inline ID getID() {
 		return _id;
@@ -45,8 +45,8 @@ public:
 	// 	printf("monitor is depracated, it is not required anymore.");
 	// }
 
-	virtual size_t getSize() = 0;
-	virtual int getData(void *data) = 0;
+	// virtual size_t getSize() = 0;
+	// virtual int getData(void *data) = 0;
 	virtual int hardCopy(void *data, int idx, int base, SimInfo &info) = 0;
 	
 private:
@@ -54,5 +54,5 @@ private:
 	int _node;
 };
 
-#endif /* BASE_H */
+#endif /* MODEL_H */
 

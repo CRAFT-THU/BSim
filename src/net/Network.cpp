@@ -28,9 +28,9 @@ Network::Network()
 Network::~Network()
 {
 	if (!pPopulations.empty()) {
-		vector<PopulationBase*>::iterator iter;
+		vector<Population*>::iterator iter;
 		for (iter = pPopulations.begin(); iter != pPopulations.end(); iter++) {
-			PopulationBase * t = *iter;
+			Population* t = *iter;
 			delete t;
 		}
 	}
@@ -44,7 +44,7 @@ Network::~Network()
 	//}
 
 	if (!pSynapses.empty()) {
-		vector<SynapseBase*>::iterator iter;
+		vector<Synapse*>::iterator iter;
 		for (iter = pSynapses.begin(); iter != pSynapses.end(); iter++) {
 			SynapseBase * t = *iter;
 			delete t;
@@ -118,7 +118,7 @@ int Network::addSynapseNum(Type type, int num)
 	return num;
 }
 
-SynapseBase* Network::connect(NeuronBase *pn1, NeuronBase *pn2, real weight, real delay, SpikeType type, real tau, bool store)
+SynapseBase* Network::connect(Neuron *pn1, Neuron *pn2, real weight, real delay, SpikeType type, real tau, bool store)
 {
 	//if (store) {
 	//	if (find(pNeurons.begin(), pNeurons.end(), pn1) == pNeurons.end()) {
@@ -131,7 +131,7 @@ SynapseBase* Network::connect(NeuronBase *pn1, NeuronBase *pn2, real weight, rea
 	//	}
 	//}
 
-	SynapseBase * p = pn2->createSynapse(weight, delay, type, tau, pn2);
+	Synapse * p = pn2->createSynapse(weight, delay, type, tau, pn2);
 	//p->setSrc(pn1);
 	pn1->addSynapse(p);
 

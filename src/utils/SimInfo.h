@@ -17,6 +17,12 @@ using std::string;
 using std::vector;
 
 struct SimInfo {
+	SimInfo(real _dt, int cycle = 0) : currCycle(cycle), dt(_dt) {}
+	~SimInfo() {
+		fired.clear();
+		input.clear();
+	}
+
 	int currCycle;
 	real dt;
 	vector<ID> fired;

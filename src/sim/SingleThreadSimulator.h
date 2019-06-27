@@ -5,14 +5,14 @@
 #ifndef SINGLETHREADSIMULATOR_H
 #define SINGLETHREADSIMULATOR_H
 
-#include "../base/SimulatorBase.h"
+#include "../interface/Simulator.h"
 
-class SingleThreadSimulator : public SimulatorBase {
+class SingleThreadSimulator : public Simulator{
 public:
 	SingleThreadSimulator(Network *network, real dt);
 	~SingleThreadSimulator();
 
-	using SimulatorBase::run;
+	using Simulator::run;
 	virtual int run(real time, FireInfo &log);
 };
 

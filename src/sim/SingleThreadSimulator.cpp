@@ -10,7 +10,7 @@
 #include "SingleThreadSimulator.h"
 
 SingleThreadSimulator::SingleThreadSimulator(Network *network, real dt)
-	: SimulatorBase(network, dt)
+	: Simulator(network, dt)
 {
 }
 
@@ -20,7 +20,7 @@ SingleThreadSimulator::~SingleThreadSimulator()
 
 int SingleThreadSimulator::run(real time, FireInfo &log)
 {
-	int sim_cycle =  round((time)/dt);
+	int sim_cycle =  round((time)/_dt);
 
 	FILE *v_file = fopen("v.data", "w+");
 	if (v_file == NULL) {
@@ -169,13 +169,13 @@ int SingleThreadSimulator::run(real time, FireInfo &log)
 		return -1;
 	}
 
-	for (auto piter = network->pPopulations.begin(); piter != network->pPopulations.end(); piter++) {
-		PopulationBase * p = *piter;
-		for (int i=0; i<p->getNum(); i++) {
-			int rate = p->getNeuron(i)->getFireCount();
-			fprintf(rateFile, "%d ", rate);
-		}
-	}
+	//for (auto piter = _network->pPopulations.begin(); piter != _network->pPopulations.end(); piter++) {
+	//	Population * p = *piter;
+	//	for (int i=0; i<p->getNum(); i++) {
+	//		int rate = p->locate(i)->getFireCount();
+	//		fprintf(rateFile, "%d ", rate);
+	//	}
+	//}
 
 	fclose(rateFile);
 
