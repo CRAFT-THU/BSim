@@ -93,10 +93,10 @@ int SingleThreadSimulator::run(real time, FireInfo &log)
 		info.input.clear();
 
 		//Update
-		network->update(info);
+		// network->update(info);
 
 		//Log info
-		network->monitor(info);
+		// network->monitor(info);
 
 #ifdef LOG_DATA
 		int isize = info.input.size();

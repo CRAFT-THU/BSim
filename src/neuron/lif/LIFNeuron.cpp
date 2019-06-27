@@ -54,8 +54,8 @@ Type LIFNeuron::getType()
 	return type;
 }
 
-int LIFNeuron::reset(SimInfo &info)
-{
+// int LIFNeuron::reset(SimInfo &info)
+// {
 	// real dt = info.dt;
 
 	// real rm = 1.0;
@@ -98,11 +98,11 @@ int LIFNeuron::reset(SimInfo &info)
 	// _vm = _v_init;
 
 	// return 0;
-}
+// }
 
-void LIFNeuron::monitor(SimInfo &info)
-{
-}
+// void LIFNeuron::monitor(SimInfo &info)
+// {
+// }
 
 size_t LIFNeuron::getSize()
 {
@@ -149,3 +149,20 @@ int LIFNeuron::hardCopy(void * data, int idx, int base, SimInfo &info)
 	return 1;
 }
 
+int LIFNeuron::getData(void *data)
+{
+	Json::Value *p = (Json::Value *)data;
+	(*p)["id"] = getID();
+	(*p)["v_init"] = _v_init;
+	(*p)["v_rest"] = _v_rest;
+	(*p)["_v_reset"] = _v_reset;
+	(*p)["_cm"] = _cm;
+	(*p)["_tau_n"] = _tau_m;
+	(*p)["_tau_refrac"] = _tau_refrac;
+	(*p)["_tau_syn_E"] = _tau_syn_E;
+	(*p)["_tau_syn_I"] = _tau_syn_I;
+	(*p)["v_thresh"] = _v_thresh;
+	(*p)["i_offset"] = _i_offset;
+
+	return 0;
+}

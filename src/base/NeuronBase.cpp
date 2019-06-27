@@ -44,14 +44,14 @@ void NeuronBase::monitorOn()
 	monitored = true;
 }
 
-int NeuronBase::fire() 
-{
-	for (auto iter=pSynapses.begin(); iter!=pSynapses.end(); iter++) {
-		(*iter)->recv();
-	}
-
-	return 0;
-}
+// int NeuronBase::fire() 
+// {
+// 	for (auto iter=pSynapses.begin(); iter!=pSynapses.end(); iter++) {
+// 		(*iter)->recv();
+// 	}
+// 
+// 	return 0;
+// }
 
 //void NeuronBase::setStartExec(int idx)
 //{

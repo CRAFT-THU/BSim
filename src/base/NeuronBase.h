@@ -20,12 +20,12 @@ public:
 	virtual int getFireCount() final;
 	virtual real getInputCurrent() final;
 
-	virtual int fire() final;
-	virtual int recv(real I) = 0;
+	// virtual int fire() final;
+	// virtual int recv(real I) = 0;
 
-	//virtual  void setStartExec(int idx) final;
-	//virtual  void setStartInhi(int idx) final;
-	//virtual  void setEnd(int idx) final;
+	// virtual  void setStartExec(int idx) final;
+	// virtual  void setStartInhi(int idx) final;
+	// virtual  void setEnd(int idx) final;
 
 	virtual SynapseBase *addSynapse(SynapseBase *addSynapse) final;
 	virtual SynapseBase *createSynapse(real weight, real delay, SpikeType type, real tau, NeuronBase *dst);

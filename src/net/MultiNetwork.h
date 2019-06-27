@@ -23,7 +23,7 @@ private:
 	void splitNetwork();
 	void countTypeNum();
 	GNetwork* arrangeData(int node, SimInfo &info);
-	Connection* arrangeConnect(int n_num, int s_num, int node_idx);
+	Connection* arrangeConnect(int n_num, int s_num, int node_idx, SimInfo &info);
 	CrossNodeMap* arrangeCrossNodeMap(int n_num, int node_idx, int node_num);
 
 public:

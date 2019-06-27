@@ -12,6 +12,8 @@ def column_sub(file1="", file2=""):
     diff = data1 - data2
 
     print (np.max(np.abs(diff)))
+    print (np.max(np.abs(diff))/max(np.max(np.abs(data1)),
+                                    np.max(np.abs(data2))))
 
 def main(argv):
     file1 = ''

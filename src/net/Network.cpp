@@ -15,8 +15,8 @@ Network::Network()
 {
 	maxDelay = 0.0;
 	minDelay = 1.0e7;
-	maxDelaySteps = 0;
-	minDelaySteps = 1e7;
+	// maxDelaySteps = 0;
+	// minDelaySteps = 1e7;
 	maxFireRate = 0.0;
 	populationNum = 0;
 	totalNeuronNum = 0;
@@ -291,75 +291,75 @@ int Network::connect(int populationIDSrc, int neuronIDSrc, int populationIDDst, 
 
 int Network::reset(SimInfo &info)
 {
-	maxDelaySteps = static_cast<int>(round(maxDelay/info.dt));
-	minDelaySteps = static_cast<int>(round(minDelay/info.dt));
+	// maxDelaySteps = static_cast<int>(round(maxDelay/info.dt));
+	// minDelaySteps = static_cast<int>(round(minDelay/info.dt));
 
-	vector<SynapseBase*>::iterator iterS;
-	vector<NeuronBase*>::iterator iterN;
-	vector<PopulationBase*>::iterator iterP;
-	for (iterS=pSynapses.begin(); iterS!=pSynapses.end(); iterS++) {
-		SynapseBase *p = *iterS;
-		p->reset(info);
-	}
-	//for (iterN=pNeurons.begin(); iterN!=pNeurons.end(); iterN++) {
-	//	NeuronBase * p = *iterN;
-	//	p->reset(info);
-	//}
-	for (iterP=pPopulations.begin(); iterP!=pPopulations.end(); iterP++) {
-		PopulationBase * p = *iterP;
-		p->reset(info);
-	}
-
-	return 0;
-}
-
-int Network::update(SimInfo &info)
-{
-	vector<SynapseBase*>::iterator iterS;
-	vector<NeuronBase*>::iterator iterN;
-	vector<PopulationBase*>::iterator iterP;
-
-	for (iterP=pPopulations.begin(); iterP!=pPopulations.end(); iterP++) {
-		PopulationBase * p = *iterP;
-		p->update(info);
-	}
-
-	//for (iterN=pNeurons.begin(); iterN!=pNeurons.end(); iterN++) {
-	//	NeuronBase * p = *iterN;
-	//	p->update(info);
-	//}
-
-	for (iterS=pSynapses.begin(); iterS!=pSynapses.end(); iterS++) {
-		SynapseBase *p = *iterS;
-		p->update(info);
-	}
+	// vector<SynapseBase*>::iterator iterS;
+	// vector<NeuronBase*>::iterator iterN;
+	// vector<PopulationBase*>::iterator iterP;
+	// for (iterS=pSynapses.begin(); iterS!=pSynapses.end(); iterS++) {
+	// 	SynapseBase *p = *iterS;
+	// 	p->reset(info);
+	// }
+	// //for (iterN=pNeurons.begin(); iterN!=pNeurons.end(); iterN++) {
+	// //	NeuronBase * p = *iterN;
+	// //	p->reset(info);
+	// //}
+	// for (iterP=pPopulations.begin(); iterP!=pPopulations.end(); iterP++) {
+	// 	PopulationBase * p = *iterP;
+	// 	p->reset(info);
+	// }
 
 	return 0;
 }
-
-void Network::monitor(SimInfo &info)
-{
-	vector<SynapseBase*>::iterator iterS;
-	vector<NeuronBase*>::iterator iterN;
-	vector<PopulationBase*>::iterator iterP;
-
-	for (iterP=pPopulations.begin(); iterP!=pPopulations.end(); iterP++) {
-		PopulationBase * p = *iterP;
-		//p->monitorOn();
-		p->monitor(info);
-	}
-
-	//for (iterN=pNeurons.begin(); iterN!=pNeurons.end(); iterN++) {
-	//	NeuronBase * p = *iterN;
-	//	p->monitor(info);
-	//}
-
-	for (iterS=pSynapses.begin(); iterS!=pSynapses.end(); iterS++) {
-		SynapseBase *p = *iterS;
-		//p->monitorOn();
-		p->monitor(info);
-	}
-}
+// 
+// int Network::update(SimInfo &info)
+// {
+// 	vector<SynapseBase*>::iterator iterS;
+// 	vector<NeuronBase*>::iterator iterN;
+// 	vector<PopulationBase*>::iterator iterP;
+// 
+// 	for (iterP=pPopulations.begin(); iterP!=pPopulations.end(); iterP++) {
+// 		PopulationBase * p = *iterP;
+// 		p->update(info);
+// 	}
+// 
+// 	//for (iterN=pNeurons.begin(); iterN!=pNeurons.end(); iterN++) {
+// 	//	NeuronBase * p = *iterN;
+// 	//	p->update(info);
+// 	//}
+// 
+// 	for (iterS=pSynapses.begin(); iterS!=pSynapses.end(); iterS++) {
+// 		SynapseBase *p = *iterS;
+// 		p->update(info);
+// 	}
+// 
+// 	return 0;
+// }
+// 
+// void Network::monitor(SimInfo &info)
+// {
+// 	vector<SynapseBase*>::iterator iterS;
+// 	vector<NeuronBase*>::iterator iterN;
+// 	vector<PopulationBase*>::iterator iterP;
+// 
+// 	for (iterP=pPopulations.begin(); iterP!=pPopulations.end(); iterP++) {
+// 		PopulationBase * p = *iterP;
+// 		//p->monitorOn();
+// 		p->monitor(info);
+// 	}
+// 
+// 	//for (iterN=pNeurons.begin(); iterN!=pNeurons.end(); iterN++) {
+// 	//	NeuronBase * p = *iterN;
+// 	//	p->monitor(info);
+// 	//}
+// 
+// 	for (iterS=pSynapses.begin(); iterS!=pSynapses.end(); iterS++) {
+// 		SynapseBase *p = *iterS;
+// 		//p->monitorOn();
+// 		p->monitor(info);
+// 	}
+// }
 
 void Network::logMap() {
 	//FILE *f = fopen("NID.map", "w+");

@@ -298,7 +298,7 @@ int SingleGPUSimulator::runMultiNets(real time, int parts, FireInfo &log) {
 		int allNeuronNum = pNetCPU->pConnection->nNum;
 		int nodeSynapseNum = c_pNetGPU->pSynapseNums[sTypeNum];
 
-		int deltaDelay = pNetCPU->pConnection->maxDelay - pNetCPU->pConnection->minDelay + 1;
+		// int deltaDelay = pNetCPU->pConnection->maxDelay - pNetCPU->pConnection->minDelay + 1;
 
 		buffers[i] = alloc_buffers(allNeuronNum, nodeSynapseNum, pNetCPU->pConnection->maxDelay, dt);
 		updateSizes[i] = getBlockSize(allNeuronNum, nodeSynapseNum);

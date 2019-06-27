@@ -65,8 +65,8 @@ public:
 	NeuronBase* findNeuron(int populationIDSrc, int neuronIDSrc);
 
 	int reset(SimInfo &info);
-	int update(SimInfo &info);
-	void monitor(SimInfo &info);
+	// int update(SimInfo &info);
+	// void monitor(SimInfo &info);
 
 	void logMap();
 private:
@@ -88,13 +88,13 @@ public:
 	//map<int, ID> idx2nid;
 	//map<int, ID> idx2sid;
 
-	int maxDelaySteps;
-	int minDelaySteps;
+	// int maxDelaySteps;
+	// int minDelaySteps;
+	real maxDelay;
+	real minDelay;
 	int totalNeuronNum;
 	int totalSynapseNum;
 private:
-	real maxDelay;
-	real minDelay;
 	real maxFireRate;
 	vector<Type> nTypes;
 	vector<Type> sTypes;

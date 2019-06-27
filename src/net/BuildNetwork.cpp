@@ -45,6 +45,8 @@ GNetwork* Network::buildNetwork(SimInfo &info)
 
 	int neuronTypeNum = nTypes.size();
 	int synapseTypeNum = sTypes.size();
+	int maxDelaySteps = static_cast<int>(round(maxDelay/info.dt));
+	int minDelaySteps = static_cast<int>(round(minDelay/info.dt));
 	int deltaDelay = maxDelaySteps - minDelaySteps + 1;
 
 	GNetwork * ret = allocNetwork(neuronTypeNum, synapseTypeNum);
@@ -94,7 +96,7 @@ GNetwork* Network::buildNetwork(SimInfo &info)
 				const vector<SynapseBase*> &s_vec = p->getNeuron(nidx)->getSynapses();
 				for (int delay_t=0; delay_t < deltaDelay; delay_t++) {
 					for (auto siter = s_vec.begin(); siter != s_vec.end(); siter++) {
-						if ((*siter)->getDelay() == delay_t + minDelaySteps) {
+						if ((*siter)->getDelaySteps(info.dt) == delay_t + minDelaySteps) {
 							if ((*siter)->getType() == sTypes[i]) {
 								//int sid = (*iter)->getID();
 								//assert(synapseIdx < totalSynapseNum);
@@ -134,7 +136,7 @@ GNetwork* Network::buildNetwork(SimInfo &info)
 				ret->pConnection->pDelayStart[delay_t + deltaDelay*nid] = synapseIdx;
 
 				for (auto iter = s_vec.begin(); iter != s_vec.end(); iter++) {
-					if ((*iter)->getDelay() == delay_t + minDelaySteps) {
+					if ((*iter)->getDelaySteps(info.dt) == delay_t + minDelaySteps) {
 						int sid = (*iter)->getID();
 						assert(synapseIdx < totalSynapseNum);
 						assert(synapseIdx == sid);

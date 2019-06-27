@@ -39,6 +39,10 @@ if [ "$PREC" = "double" ]; then
 	USE_DOUBLE="ON"
 fi
 
+if [ ! -d $SCRIPT_PATH/build ]; then
+	mkdir $SCRIPT_PATH/build
+fi
+
 
 set -x
 if [ "$MODE" = "clean" ]; then

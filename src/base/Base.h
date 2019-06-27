@@ -33,12 +33,17 @@ public:
 	}
 
 	virtual Type getType() = 0;
-	virtual int reset(SimInfo &info) = 0;
-	virtual int update(SimInfo &info) {
-		printf("Update Not implemented");
-		return 0;
-	}
-	virtual void monitor(SimInfo &info) = 0;
+	// virtual int reset(SimInfo &info) {
+	// 	printf("Reset is depracated, it is not required anymore.");
+	// 	return 0;
+	// }
+	// virtual int update(SimInfo &info) {
+	// 	printf("Update is depracated, it is not required anymore.");
+	// 	return 0;
+	// }
+	// virtual void monitor(SimInfo &info) {
+	// 	printf("monitor is depracated, it is not required anymore.");
+	// }
 
 	virtual size_t getSize() = 0;
 	virtual int getData(void *data) = 0;

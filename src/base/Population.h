@@ -25,10 +25,10 @@ public:
 	int getNum();
 	virtual size_t getSize();
 
-	//virtual void setNode(int node) final;
-	virtual int reset(SimInfo &info);
-	virtual int update(SimInfo &info);
-	virtual void monitor(SimInfo &info);
+	// virtual void setNode(int node) final;
+	// virtual int reset(SimInfo &info);
+	// virtual int update(SimInfo &info);
+	// virtual void monitor(SimInfo &info);
 
 	virtual int getData(void *data);
 	virtual int hardCopy(void *data, int idx, int base, SimInfo &info);
@@ -111,39 +111,39 @@ NeuronBase* Population<Neuron>::findNeuron(ID id)
 //	}
 //}
 
-template<class Neuron>
-void Population<Neuron>::monitor(SimInfo &info)
-{
-	if(monitored) {
-		typename vector<Neuron>::iterator iter;
-		for (iter = neurons.begin(); iter != neurons.end(); iter++) {
-			iter->monitorOn();
-			iter->monitor(info);
-		}
-	}
-}
+// template<class Neuron>
+// void Population<Neuron>::monitor(SimInfo &info)
+// {
+// 	if(monitored) {
+// 		typename vector<Neuron>::iterator iter;
+// 		for (iter = neurons.begin(); iter != neurons.end(); iter++) {
+// 			iter->monitorOn();
+// 			iter->monitor(info);
+// 		}
+// 	}
+// }
 
-template<class Neuron>
-int Population<Neuron>::update(SimInfo &info)
-{
-	int ret = 0;
-	typename vector<Neuron>::iterator iter;
-	for (iter = neurons.begin(); iter != neurons.end(); iter++) {
-		ret += iter->update(info);
-	}
-	return ret;
-}
-
-template<class Neuron>
-int Population<Neuron>::reset(SimInfo &info)
-{
-	int ret = 0;
-	typename vector<Neuron>::iterator iter;
-	for (iter = neurons.begin(); iter != neurons.end(); iter++) {
-		ret += iter->reset(info);
-	}
-	return ret;
-}
+// template<class Neuron>
+// int Population<Neuron>::update(SimInfo &info)
+// {
+// 	int ret = 0;
+// 	typename vector<Neuron>::iterator iter;
+// 	for (iter = neurons.begin(); iter != neurons.end(); iter++) {
+// 		ret += iter->update(info);
+// 	}
+// 	return ret;
+// }
+// 
+// template<class Neuron>
+// int Population<Neuron>::reset(SimInfo &info)
+// {
+// 	int ret = 0;
+// 	typename vector<Neuron>::iterator iter;
+// 	for (iter = neurons.begin(); iter != neurons.end(); iter++) {
+// 		ret += iter->reset(info);
+// 	}
+// 	return ret;
+// }
 
 template<class Neuron>
 size_t Population<Neuron>::getSize()

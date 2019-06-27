@@ -10,13 +10,13 @@ public:
 	LIFNeuron(const LIFNeuron &neuron);
 	~LIFNeuron();
 
-	virtual int recv(real I)  override;
+	// virtual int recv(real I)  override;
 
 	virtual Type getType() override;
 
-	virtual int reset(SimInfo &info) override;
-	virtual int update(SimInfo &info) override;
-	virtual void monitor(SimInfo &info) override;
+	// virtual int reset(SimInfo &info) override;
+	// virtual int update(SimInfo &info) override;
+	// virtual void monitor(SimInfo &info) override;
 
 	virtual size_t getSize() override;
 	virtual int getData(void *data) override;
