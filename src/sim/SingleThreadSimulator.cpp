@@ -72,13 +72,11 @@ int SingleThreadSimulator::run(real time, FireInfo &log)
 	//}
 
 	reset();
-	vector<SynapseBase*>::iterator iterS;
-	vector<NeuronBase*>::iterator iterN;
-	vector<PopulationBase*>::iterator iterP;
+	vector<Synapse*>::iterator iterS;
+	vector<Neuron*>::iterator iterN;
+	vector<Population*>::iterator iterP;
 
-	SimInfo info;
-	info.currCycle = 0;
-	info.dt = dt;
+	SimInfo info(_dt);
 
 	printf("Start runing for %d cycles\n", sim_cycle);
 	struct timeval ts, te;

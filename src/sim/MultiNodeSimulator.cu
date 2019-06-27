@@ -26,7 +26,7 @@ pthread_barrier_t nodeCycleBarrier;
 
 CrossNodeDataGPU * gCrossDataNode;
 
-MultiNodeSimulator::MultiNodeSimulator(Network *network, real dt) : SimulatorBase(network, dt)
+MultiNodeSimulator::MultiNodeSimulator(Network *network, real dt) : Simulator(network, dt)
 {
 }
 

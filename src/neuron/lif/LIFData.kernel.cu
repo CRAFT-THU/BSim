@@ -1,14 +1,10 @@
 
-#include "GLIFNeurons.h"
+#include "LIFData.h"
 
 #include "../../gpu_utils/runtime.h"
 #include "../../net/Connection.h"
 
-// #include "GLIFNeurons.h"
-#include "lif.h"
-
-
-__global__ void find_lif_neuron(GLIFNeurons *data, real * currentE, real * currentI, int num, int offset)
+__global__ void find_lif_neuron(LIFData *data, real * currentE, real * currentI, int num, int offset)
 {
 	__shared__ int tActiveTable[MAX_BLOCK_SIZE];
 	__shared__ volatile int activeCnt;
@@ -71,7 +67,7 @@ __global__ void find_lif_neuron(GLIFNeurons *data, real * currentE, real * curre
 	}
 }
 
-__global__ void update_lif_neuron(Connection *connection, GLIFNeurons *data, real *currentE, real *currentI, int *firedTable, int *firedTableSizes, int num, int offset, int time)
+__global__ void update_lif_neuron(Connection *connection, LIFData *data, real *currentE, real *currentI, int *firedTable, int *firedTableSizes, int num, int offset, int time)
 {
 	int currentIdx = time % (connection->maxDelay+1);
 	__shared__ int fire_table_t[MAX_BLOCK_SIZE];
@@ -163,8 +159,8 @@ __global__ void update_lif_neuron(Connection *connection, GLIFNeurons *data, rea
 	//}
 }
 
-__global__ void update_all_lif_neuron(Connection *connection, GLIFNeurons *data, real *currentE, real *currentI, int *firedTable, int *firedTableSizes, int num, int offset, int time)
-// __global__ void update_all_lif_neuron(GLIFNeurons *data, int num, int offset, int time)
+__global__ void update_all_lif_neuron(Connection *connection, LIFData *data, real *currentE, real *currentI, int *firedTable, int *firedTableSizes, int num, int offset, int time)
+// __global__ void update_all_lif_neuron(LIFData *data, int num, int offset, int time)
 {
 	int currentIdx = time % (connection->maxDelay + 1);
 	__shared__ int fire_table_t[MAX_BLOCK_SIZE];
@@ -258,7 +254,7 @@ __global__ void update_all_lif_neuron(Connection *connection, GLIFNeurons *data,
 	__syncthreads();
 }
 
-__global__ void update_dense_lif_neuron(Connection *connection, GLIFNeurons *data, real *currentE, real *currentI, int *firedTable, int *firedTableSizes, int num, int offset, int time)
+__global__ void update_dense_lif_neuron(Connection *connection, LIFData *data, real *currentE, real *currentI, int *firedTable, int *firedTableSizes, int num, int offset, int time)
 {
 	//__shared__ int fire_table_t[MAX_BLOCK_SIZE];
 	//__shared__ volatile int fire_cnt;
@@ -322,8 +318,8 @@ __global__ void update_dense_lif_neuron(Connection *connection, GLIFNeurons *dat
 
 void cudaUpdateLIF(Connection *conn, void *data, real *currentE, real *currentI, int *firedTable, int *firedTableSizes, int num, int offset, int time, BlockSize *pSize)
 {
-	find_lif_neuron<<<pSize->gridSize, pSize->blockSize>>>((GLIFNeurons*)data, currentE, currentI, num, offset);
-	update_lif_neuron<<<pSize->gridSize, pSize->blockSize>>>(conn, (GLIFNeurons*)data, currentE, currentI, firedTable, firedTableSizes, num, offset, time);
-	//update_dense_life_neuron<<<pSize->gridSize, pSize->blockSize>>>((GLIFNeurons*)data, num, offset);
+	find_lif_neuron<<<pSize->gridSize, pSize->blockSize>>>((LIFData*)data, currentE, currentI, num, offset);
+	update_lif_neuron<<<pSize->gridSize, pSize->blockSize>>>(conn, (LIFData*)data, currentE, currentI, firedTable, firedTableSizes, num, offset, time);
+	//update_dense_life_neuron<<<pSize->gridSize, pSize->blockSize>>>((LIFData*)data, num, offset);
 
 }

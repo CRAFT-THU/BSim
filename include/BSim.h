@@ -10,7 +10,7 @@
 #include "../src/generator/generator.h"
 //#include "../src/rw/SNNWriter.h"
 
-#include "Simulator.h"
+#include "Simulators.h"
 
 #endif /* BSIM_H */
 

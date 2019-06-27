@@ -1,7 +1,7 @@
 #include <assert.h>
 
 #include "../third_party/cuda/helper_cuda.h"
-#include "../neuron/lif/GLIFNeurons.h"
+#include "../neuron/lif/LIFData.h"
 #include "../utils/TypeFunc.h"
 #include "../utils/macros.h"
 #include "../gpu_utils/mem_op.h"

@@ -5,14 +5,14 @@
 #ifndef SINGLEGPUSIMULATOR_H
 #define SINGLEGPUSIMULATOR_H
 
-#include "../base/SimulatorBase.h"
+#include "../interface/Simulator.h"
 
-class SingleGPUSimulator : public SimulatorBase {
+class SingleGPUSimulator : public Simulator{
 public:
 	SingleGPUSimulator(Network *network, real dt);
 	~SingleGPUSimulator();
 
-	using SimulatorBase::run;
+	using Simulator::run;
 	virtual int run(real time, FireInfo &log);
 	int runMultiNets(real time, int parts, FireInfo &log);
 	//int compare_run(real time);

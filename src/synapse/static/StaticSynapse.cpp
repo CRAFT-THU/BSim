@@ -5,17 +5,17 @@
 #include "../../third_party/json/json.h"
 
 #include "StaticSynapse.h"
-#include "GStaticSynapses.h"
+#include "StaticData.h"
 
 const Type StaticSynapse::type = Static;
 
 StaticSynapse::StaticSynapse(real weight, real delay, real tau_syn)
-	: SynapseBase(0, weight, delay), _tau_syn(tau_syn)
+	: Synapse(0, weight, delay), _tau_syn(tau_syn)
 {
 	this->monitored = false;
 }
 
-StaticSynapse::StaticSynapse(const StaticSynapse &synapse) : SynapseBase()
+StaticSynapse::StaticSynapse(const StaticSynapse &synapse) : Synapse()
 {
 	this->_weight = synapse._weight;
 	this->_delay = synapse._delay;
@@ -35,7 +35,7 @@ StaticSynapse::~StaticSynapse()
 // 	return 0;
 // }
 
-Type StaticSynapse::getType()
+Type StaticSynapse::getType() const
 {
 	return type;
 }
@@ -73,23 +73,23 @@ Type StaticSynapse::getType()
 // {
 // }
 
-size_t StaticSynapse::getSize()
-{
-	return sizeof(GStaticSynapses);
-}
-
-int StaticSynapse::getData(void *data)
-{
-	Json::Value *p = (Json::Value *)data;
-	(*p)["id"] = getID();
-	(*p)["weight"] = _weight;
-
-	return 0;
-}
+// size_t StaticSynapse::getSize()
+// {
+// 	return sizeof(GStaticSynapses);
+// }
+// 
+// int StaticSynapse::getData(void *data)
+// {
+// 	Json::Value *p = (Json::Value *)data;
+// 	(*p)["id"] = getID();
+// 	(*p)["weight"] = _weight;
+// 
+// 	return 0;
+// }
 
 int StaticSynapse::hardCopy(void * data, int idx, int base, SimInfo &info)
 {
-	GStaticSynapses *p = (GStaticSynapses *) data;
+	StaticData *p = (StaticData *) data;
 
 	real dt = info.dt;
 	int delay_steps = static_cast<int>(round(_delay/dt));

@@ -16,11 +16,11 @@ public:
 	Model(int node=0) : _id(0), _node(node) {}
 	virtual ~Model() {}
 
-	inline ID getID() {
+	inline ID getID() const {
 		return _id;
 	}
 
-	inline int getNode() {
+	inline int getNode() const {
 		return _node;
 	}
 
@@ -32,7 +32,7 @@ public:
 		this->_node = node;
 	}
 
-	virtual Type getType() = 0;
+	virtual Type getType() const = 0;
 	// virtual int reset(SimInfo &info) {
 	// 	printf("Reset is depracated, it is not required anymore.");
 	// 	return 0;
@@ -49,7 +49,7 @@ public:
 	// virtual int getData(void *data) = 0;
 	virtual int hardCopy(void *data, int idx, int base, SimInfo &info) = 0;
 	
-private:
+protected:
 	ID _id;
 	int _node;
 };

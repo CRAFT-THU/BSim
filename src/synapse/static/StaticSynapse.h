@@ -3,11 +3,11 @@
 
 #include <stdio.h>
 #include <list>
-#include "../../base/SynapseBase.h"
+#include "../../interface/Synapse.h"
 
 using std::list;
 
-class StaticSynapse : public SynapseBase {
+class StaticSynapse : public Synapse {
 public:
 	StaticSynapse(real weight, real delay, real tau_syn);
 	StaticSynapse(const StaticSynapse &synapse);
@@ -16,14 +16,14 @@ public:
 	// virtual int recv()  override;
 	// virtual void setDst(NeuronBase *p)  override;
 
-	virtual Type getType() override;
+	virtual Type getType() const override;
 
 	// virtual int reset(SimInfo &info) override;
 	// virtual int update(SimInfo &info) override;
 	// virtual void monitor(SimInfo &info) override;
 
-	virtual size_t getSize() override;
-	virtual int getData(void *data) override;
+	// virtual size_t getSize() override;
+	// virtual int getData(void *data) override;
 	virtual int hardCopy(void * data, int idx, int base, SimInfo &info) override;
 
 protected:

@@ -12,10 +12,10 @@ int main(int argc, char **argv)
 	const int N = 10;
 	Network c;
 	//createPopulation(int id, int N, LIFNeuron(ID id, real v_init, real v_rest, real v_reset, real cm, real tau_m, real tau_refrac, real tau_syn_E, real tau_syn_I, real v_thresh, real i_offset)), ID(0, 0), real tau_syn_E, real tau_syn_I);
-	Population<LIF_curr_exp> *pn0 = c.createPopulation(N, LIF_curr_exp(LIFNeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-3, 2e-4, 1.0, 1.0, 15.0e-3, 100.0e-1), 1.0, 1.0));
-	Population<LIF_curr_exp> *pn1 = c.createPopulation(N, LIF_curr_exp(LIFNeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-3, 1e-4, 1.0, 1.0, 15.0e-3, 0.0e-3), 1.0, 1.0));
-	Population<LIF_curr_exp> *pn2 = c.createPopulation(N, LIF_curr_exp(LIFNeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-3, 0.0, 1.0, 1.0, 15.0e-3, 0.0e-3), 1.0, 1.0));
-	//Population<LIF_curr_exp> *pn3 = c.createPopulation(N, LIF_curr_exp(LIFNeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-3, 0.0, 1.0, 1.0, 15.0e-3, 0.0e-3), 1.0, 1.0));
+	Population *pn0 = c.createPopulation(N, LIF_curr_exp(LIFNeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-3, 2e-4, 1.0, 1.0, 15.0e-3, 100.0e-1), 1.0, 1.0));
+	Population *pn1 = c.createPopulation(N, LIF_curr_exp(LIFNeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-3, 1e-4, 1.0, 1.0, 15.0e-3, 0.0e-3), 1.0, 1.0));
+	Population *pn2 = c.createPopulation(N, LIF_curr_exp(LIFNeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-3, 0.0, 1.0, 1.0, 15.0e-3, 0.0e-3), 1.0, 1.0));
+	//Population *pn3 = c.createPopulation(N, LIF_curr_exp(LIFNeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-3, 0.0, 1.0, 1.0, 15.0e-3, 0.0e-3), 1.0, 1.0));
 
 	real * weight0 = NULL;
 	real * weight1 = NULL;

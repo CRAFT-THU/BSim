@@ -41,7 +41,7 @@
 void MultiNetwork::countTypeNum() 
 {
 	for (auto piter = _network->pPopulations.begin(); piter != _network->pPopulations.end();  piter++) {
-		PopulationBase * p = *piter;
+		Population * p = *piter;
 		Type type = p->getType();
 		int node = p->getNode();
 
@@ -53,7 +53,7 @@ void MultiNetwork::countTypeNum()
 	}
 
 	for (auto siter = _network->pSynapses.begin(); siter != _network->pSynapses.end();  siter++) {
-		SynapseBase * p = *siter;
+		Synapse * p = *siter;
 		Type type = p->getType();
 		int node = p->getNode();
 
@@ -85,7 +85,7 @@ GNetwork* MultiNetwork::arrangeData(int node_idx, SimInfo &info) {
 
 		int idx = 0;
 		for (auto piter = _network->pPopulations.begin(); piter != _network->pPopulations.end();  piter++) {
-			PopulationBase * p = *piter;
+			Population * p = *piter;
 			int node = p->getNode();
 
 			if (node == node_idx && p->getType() == type) {
@@ -120,12 +120,12 @@ GNetwork* MultiNetwork::arrangeData(int node_idx, SimInfo &info) {
 
 		int idx = 0;
 		for (auto piter = _network->pPopulations.begin(); piter != _network->pPopulations.end(); piter++) {
-			PopulationBase *pop = *piter;
+			Population *pop = *piter;
 			if (pop->getNode() != node_idx)
 				continue;
 
 			for (int nidx=0; nidx<pop->getNum(); nidx++) {
-				const vector<SynapseBase*> &s_vec = pop->getNeuron(nidx)->getSynapses();
+				const vector<Synapse *> &s_vec = pop->locate(nidx)->getSynapses();
 				for (int delay_t=0; delay_t<delayLength; delay_t++) {
 					for (auto siter = s_vec.begin(); siter != s_vec.end(); siter++) {
 						if ((*siter)->getDelaySteps(info.dt) == delay_t + minDelaySteps) {
@@ -141,7 +141,7 @@ GNetwork* MultiNetwork::arrangeData(int node_idx, SimInfo &info) {
 		}
 
 		for (auto niter = _crossnode_neurons_recv[node_idx].begin(); niter != _crossnode_neurons_recv[node_idx].end(); niter++) {
-			const vector<SynapseBase*> &s_vec = (*niter)->getSynapses();
+			const vector<Synapse *> &s_vec = (*niter)->getSynapses();
 			for (int delay_t=0; delay_t<delayLength; delay_t++) {
 				for (auto iter = s_vec.begin(); iter != s_vec.end(); iter++) {
 					if (((*iter)->getNode() == node_idx) && ((*iter)->getDelaySteps(info.dt) == delay_t + minDelaySteps) && ((*iter)->getType() == type)) {
@@ -183,13 +183,13 @@ Connection* MultiNetwork::arrangeConnect(int n_num, int s_num, int node_idx, Sim
 	int delayLength = maxDelaySteps - minDelaySteps + 1;
 	int synapseIdx = 0;
 	for (auto piter = _network->pPopulations.begin(); piter != _network->pPopulations.end(); piter++) {
-		PopulationBase * p = *piter;
+		Population * p = *piter;
 		if (p->getNode() != node_idx) 
 			continue;
 
 		for (int i=0; i<p->getNum(); i++) {
-			ID nid = p->getNeuron(i)->getID();
-			const vector<SynapseBase*> &s_vec = p->getNeuron(i)->getSynapses();
+			ID nid = p->locate(i)->getID();
+			const vector<Synapse *> &s_vec = p->locate(i)->getSynapses();
 			for (int delay_t=0; delay_t<delayLength; delay_t++) {
 				connection->pDelayStart[delay_t + delayLength*nid] = synapseIdx;
 
@@ -207,7 +207,7 @@ Connection* MultiNetwork::arrangeConnect(int n_num, int s_num, int node_idx, Sim
 
 	for (auto niter = _crossnode_neurons_recv[node_idx].begin(); niter != _crossnode_neurons_recv[node_idx].end(); niter++) {
 		int nid = _crossnode_neuron2idx[node_idx][*niter];
-		const vector<SynapseBase*> &s_vec = (*niter)->getSynapses();
+		const vector<Synapse *> &s_vec = (*niter)->getSynapses();
 		for (int delay_t=0; delay_t<delayLength; delay_t++) {
 			connection->pDelayStart[delay_t + delayLength*nid] = synapseIdx;
 

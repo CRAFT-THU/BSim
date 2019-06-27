@@ -3,19 +3,19 @@
 
 #include "../../third_party/json/json.h"
 #include "LIFNeuron.h"
-#include "GLIFNeurons.h"
+#include "LIFData.h"
 
 const Type LIFNeuron::type = LIF;
 
 LIFNeuron::LIFNeuron(real v_init, real v_rest, real v_reset, real cm, real tau_m, real tau_refrac, real tau_syn_E, real tau_syn_I, real v_thresh, real i_offset)
-	: NeuronBase(),_v_init(v_init), _v_rest(v_rest), _v_reset(v_reset), _cm(cm), _tau_m(tau_m), _tau_refrac(tau_refrac), _tau_syn_E(tau_syn_E), _tau_syn_I(tau_syn_I), _v_thresh(v_thresh), _i_offset(i_offset)
+	: Neuron(),_v_init(v_init), _v_rest(v_rest), _v_reset(v_reset), _cm(cm), _tau_m(tau_m), _tau_refrac(tau_refrac), _tau_syn_E(tau_syn_E), _tau_syn_I(tau_syn_I), _v_thresh(v_thresh), _i_offset(i_offset)
 {
 	// this->_i_syn_E = 0.0;
 	// this->_i_syn_I = 0.0;
-	this->monitored = false;
+	// this->monitored = false;
 }
 
-LIFNeuron::LIFNeuron(const LIFNeuron &neuron) : NeuronBase()
+LIFNeuron::LIFNeuron(const LIFNeuron &neuron) : Neuron()
 {
 	// this->_vm = neuron._vm;
 	// this->_CI = neuron._CI;
@@ -42,14 +42,14 @@ LIFNeuron::LIFNeuron(const LIFNeuron &neuron) : NeuronBase()
 
 	// this->_i_syn_E = 0.0;
 	// this->_i_syn_I = 0.0;
-	this->monitored = false;
+	// this->monitored = false;
 }
 
 LIFNeuron::~LIFNeuron()
 {
 }
 
-Type LIFNeuron::getType()
+Type LIFNeuron::getType() const
 {
 	return type;
 }
@@ -104,14 +104,19 @@ Type LIFNeuron::getType()
 // {
 // }
 
-size_t LIFNeuron::getSize()
+// size_t LIFNeuron::getSize()
+// {
+// 	return sizeof(GLIFNeurons);
+// }
+
+Synapse * LIFNeuron::createSynapse(real weight, real delay, SpikeType type, real tau, Neuron *dst) 
 {
-	return sizeof(GLIFNeurons);
+	return NULL;
 }
 
 int LIFNeuron::hardCopy(void * data, int idx, int base, SimInfo &info)
 {
-	GLIFNeurons *p = (GLIFNeurons *) data;
+	LIFData *p = (LIFData *) data;
 
 	real dt = info.dt;
 	real rm = (fabs(_cm) > ZERO)?(_tau_m/_cm):1.0;
@@ -149,20 +154,20 @@ int LIFNeuron::hardCopy(void * data, int idx, int base, SimInfo &info)
 	return 1;
 }
 
-int LIFNeuron::getData(void *data)
-{
-	Json::Value *p = (Json::Value *)data;
-	(*p)["id"] = getID();
-	(*p)["v_init"] = _v_init;
-	(*p)["v_rest"] = _v_rest;
-	(*p)["_v_reset"] = _v_reset;
-	(*p)["_cm"] = _cm;
-	(*p)["_tau_n"] = _tau_m;
-	(*p)["_tau_refrac"] = _tau_refrac;
-	(*p)["_tau_syn_E"] = _tau_syn_E;
-	(*p)["_tau_syn_I"] = _tau_syn_I;
-	(*p)["v_thresh"] = _v_thresh;
-	(*p)["i_offset"] = _i_offset;
-
-	return 0;
-}
+// int LIFNeuron::getData(void *data)
+// {
+// 	Json::Value *p = (Json::Value *)data;
+// 	(*p)["id"] = getID();
+// 	(*p)["v_init"] = _v_init;
+// 	(*p)["v_rest"] = _v_rest;
+// 	(*p)["_v_reset"] = _v_reset;
+// 	(*p)["_cm"] = _cm;
+// 	(*p)["_tau_n"] = _tau_m;
+// 	(*p)["_tau_refrac"] = _tau_refrac;
+// 	(*p)["_tau_syn_E"] = _tau_syn_E;
+// 	(*p)["_tau_syn_I"] = _tau_syn_I;
+// 	(*p)["v_thresh"] = _v_thresh;
+// 	(*p)["i_offset"] = _i_offset;
+// 
+// 	return 0;
+// }

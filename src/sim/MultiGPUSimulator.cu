@@ -12,10 +12,10 @@
 #include "../utils/utils.h"
 #include "../utils/TypeFunc.h"
 #include "../gpu_utils/mem_op.h"
-// #include "../gpu_utils/gpu_utils.h"
 #include "../gpu_utils/runtime.h"
 #include "../gpu_utils/GBuffers.h"
 #include "../net/MultiNetwork.h"
+#include "../neuron/lif/LIFData.h"
 
 #include "MultiGPUSimulator.h"
 
@@ -26,7 +26,7 @@ pthread_barrier_t gpuCycleBarrier;
 
 CrossNodeDataGPU * gCrossDataGPU;
 
-MultiGPUSimulator::MultiGPUSimulator(Network *network, real dt) : SimulatorBase(network, dt)
+MultiGPUSimulator::MultiGPUSimulator(Network *network, real dt) : Simulator(network, dt)
 {
 }
 
@@ -38,7 +38,7 @@ void *run_thread_gpu(void *para);
 
 int MultiGPUSimulator::run(real time, FireInfo &log)
 {
-	int sim_cycle = round(time/dt);
+	int sim_cycle = round(time/_dt);
 	reset();
 
 	int device_count = 4;
@@ -60,11 +60,9 @@ int MultiGPUSimulator::run(real time, FireInfo &log)
 
 	pthread_barrier_init(&gpuCycleBarrier, NULL, device_count);
 
-	MultiNetwork multiNet(network, device_count);
+	MultiNetwork multiNet(_network, device_count);
 
-	SimInfo info;
-	info.currCycle = 0;
-	info.dt = dt;
+	SimInfo info(_dt);
 	DistriNetwork *node_nets = multiNet.buildNetworks(info);
 	assert(node_nets != NULL);
 	gCrossDataGPU = multiNet.arrangeCrossNodeDataGPU(device_count);
@@ -78,7 +76,7 @@ int MultiGPUSimulator::run(real time, FireInfo &log)
 		node_nets[i]._sim_cycle = sim_cycle;
 		node_nets[i]._node_idx = i;
 		node_nets[i]._node_num = device_count;
-		node_nets[i]._dt = dt;
+		node_nets[i]._dt = _dt;
 
 
 		int ret = pthread_create(&(thread_ids[i]), NULL, &run_thread_gpu, (void*)&(node_nets[i]));
@@ -139,7 +137,7 @@ void * run_thread_gpu(void *para) {
 	real *c_g_vm = NULL;
 
 	if (life_idx >= 0) {
-		GLIFNeurons *c_g_lif = copyFromGPU<GLIFNeurons>(static_cast<GLIFNeurons*>(c_pNetGPU->ppNeurons[life_idx]), 1);
+		LIFData *c_g_lif = copyFromGPU<LIFData>(static_cast<LIFData *>(c_pNetGPU->ppNeurons[life_idx]), 1);
 		c_g_vm = c_g_lif->pV_m;
 		copy_idx = life_idx;
 	} else {

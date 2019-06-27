@@ -2,11 +2,11 @@
  * usually just for fun
  * Sat October 24 2015
  */
-#ifndef SYNAPSE_H
-#define SYNAPSE_H
+#ifndef SYNAPSES_H
+#define SYNAPSES_H
 
 #include "../src/synapse/static/StaticSynapse.h"
-#include "GSynapse.h"
+#include "../src/synapse/static/StaticData.h"
 
-#endif /* SYNAPSE_H */
+#endif /* SYNAPSES_H */
 

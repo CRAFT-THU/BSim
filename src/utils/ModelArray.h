@@ -16,7 +16,7 @@ using std::vector;
 template<class Item>
 class ModelArray : public Model {
 public:
-	ModelArray(size_t n, int node = 0);
+	ModelArray(size_t n, Type type, int node = 0);
 
 	template<class N>
 	ModelArray(size_t n, const N &templ);
@@ -26,7 +26,7 @@ public:
 
 	~ModelArray();
 
-	Type getType();
+	Type getType() const override;
 
 	int getNum();
 	// virtual size_t getSize();
@@ -46,9 +46,8 @@ public:
 	Item* locate(int idx);
 	
 protected:
-	const static Type _type;
-
 	size_t _N;
+	Type _type;
 	vector<Item*> _items;
 };
 
@@ -56,25 +55,25 @@ typedef ModelArray<Neuron> Population;
 typedef ModelArray<Synapse> Projection;
 
 template<class Item>
-const Type ModelArray<Item>::_type = Item::type;
-
-template<class Item>
-ModelArray<Item>::ModelArray(size_t n, int node) : Model(node)
+ModelArray<Item>::ModelArray(size_t n, Type type, int node) : Model(node)
 {
 	_items.reserve(n);
+	_type = type;
 	_N = n;
 }
 
 template<class Item>
 template<class N>
-ModelArray<Item>::ModelArray(size_t n, const N &templ) : Model(templ.node)
+ModelArray<Item>::ModelArray(size_t n, const N &templ) : Model()
 {
+	this->_node = templ.getNode();
+	_type = templ.getType();
+	_N = n;
 	_items.resize(n, NULL);
-	for(int i=0; i<_N; i++) {
-		Item * p = new Item(templ);
+	for(unsigned int i=0; i<_N; i++) {
+		Item * p = new N(templ);
 		_items[i] = p;
 	}
-	_N = n;
 }
 
 template<class Item>
@@ -100,6 +99,19 @@ template<class Item>
 int ModelArray<Item>::getNum()
 {
 	return _N;
+}
+
+template<class Item>
+int ModelArray<Item>::append(Item *templ)
+{
+	assert(_type == templ->getType());
+	_items.push_back(templ);
+	if (_items.size() > _N) {
+		printf("ModelArray overflow!!");
+		_N = _items.size();
+	}
+
+	return _items.size() - 1;
 }
 
 template<class Item>
@@ -176,31 +188,19 @@ Item* ModelArray<Item>::find(ID id)
 // }
 
 template<class Item>
-int ModelArray<Item>::append(Item *templ)
-{
-	_items.push_back(templ);
-	if (_items.size() > _N) {
-		printf("ModelArray overflow!!");
-		_N = _items.size();
-	}
-
-	return _items.size() - 1;
-}
-
-template<class Item>
 int ModelArray<Item>::hardCopy(void *data, int idx, int base, SimInfo &info)
 {
 	size_t copiedIdxs = 0;
-	typename vector<Item>::iterator iter;
-	for (iter = _items.begin(); iter != _items.end(); iter++) {
-		size_t copied = iter->hardCopy(data, idx+copiedIdxs, base, info);
+	for (auto iter = _items.begin(); iter != _items.end(); iter++) {
+		size_t copied = (*iter)->hardCopy(data, idx+copiedIdxs, base, info);
 		copiedIdxs += copied;
 	}
 	return copiedIdxs;
 }
 
 template<class Item>
-Type ModelArray<Item>::getType() {
+Type ModelArray<Item>::getType() const 
+{
 	return _type;
 }
 

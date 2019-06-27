@@ -37,9 +37,9 @@
 
 GNetwork* Network::buildNetwork(SimInfo &info)
 {
-	vector<PopulationBase*>::iterator piter;
-	vector<NeuronBase*>::iterator niter;
-	vector<SynapseBase*>::iterator siter;
+	vector<Population *>::iterator piter;
+	vector<Neuron *>::iterator niter;
+	vector<Synapse *>::iterator siter;
 	// vector<int> array_neuron_start;
 	// vector<int> array_neuron_fire_times;
 
@@ -59,7 +59,7 @@ GNetwork* Network::buildNetwork(SimInfo &info)
 
 		int idx = 0;
 		for (piter = pPopulations.begin(); piter != pPopulations.end();  piter++) {
-			PopulationBase * p = *piter;
+			Population * p = *piter;
 			if (p->getType() == nTypes[i]) {
 				size_t copied = p->hardCopy(ret->ppNeurons[i], idx, ret->pNeuronNums[i], info);
 				idx += copied;
@@ -91,9 +91,9 @@ GNetwork* Network::buildNetwork(SimInfo &info)
 
 		int idx = 0;
 		for (auto piter = pPopulations.begin(); piter != pPopulations.end(); piter++) {
-			PopulationBase * p = *piter;
+			Population * p = *piter;
 			for (int nidx=0; nidx<p->getNum(); nidx++) {
-				const vector<SynapseBase*> &s_vec = p->getNeuron(nidx)->getSynapses();
+				const vector<Synapse *> &s_vec = p->locate(nidx)->getSynapses();
 				for (int delay_t=0; delay_t < deltaDelay; delay_t++) {
 					for (auto siter = s_vec.begin(); siter != s_vec.end(); siter++) {
 						if ((*siter)->getDelaySteps(info.dt) == delay_t + minDelaySteps) {
@@ -128,10 +128,10 @@ GNetwork* Network::buildNetwork(SimInfo &info)
 
 	int synapseIdx = 0;
 	for (auto piter = pPopulations.begin(); piter != pPopulations.end(); piter++) {
-		PopulationBase * p = *piter;
+		Population * p = *piter;
 		for (int i=0; i<p->getNum(); i++) {
-			ID nid = p->getNeuron(i)->getID();
-			const vector<SynapseBase*> &s_vec = p->getNeuron(i)->getSynapses();
+			ID nid = p->locate(i)->getID();
+			const vector<Synapse *> &s_vec = p->locate(i)->getSynapses();
 			for (int delay_t=0; delay_t < deltaDelay; delay_t++) {
 				ret->pConnection->pDelayStart[delay_t + deltaDelay*nid] = synapseIdx;
 

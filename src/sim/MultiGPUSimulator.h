@@ -5,13 +5,13 @@
 #ifndef MULTIGPUSIMULATOR_H
 #define MULTIGPUSIMULATOR_H
 
-#include "../base/SimulatorBase.h"
+#include "../interface/Simulator.h"
 
-class MultiGPUSimulator : public SimulatorBase {
+class MultiGPUSimulator : public Simulator {
 public:
 	MultiGPUSimulator(Network *network, real dt);
 	~MultiGPUSimulator();
-	using SimulatorBase::run;
+	using Simulator::run;
 	virtual int run(real time, FireInfo &log);
 	// virtual int single_run(real time);
 	int init(int argc, char**argv);

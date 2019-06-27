@@ -46,7 +46,7 @@ Network::~Network()
 	if (!pSynapses.empty()) {
 		vector<Synapse*>::iterator iter;
 		for (iter = pSynapses.begin(); iter != pSynapses.end(); iter++) {
-			SynapseBase * t = *iter;
+			Synapse * t = *iter;
 			delete t;
 		}
 	}
@@ -70,6 +70,159 @@ Network::~Network()
 	nTypes.clear();
 	sTypes.clear();
 }
+
+int Network::connect(Population *pSrc, Population *pDst, real weight, real delay, SpikeType type) {
+	int srcSize = pSrc->getNum();
+	int dstSize = pDst->getNum();
+	int size = srcSize * dstSize; 
+
+	if (find(pPopulations.begin(), pPopulations.end(), pSrc) == pPopulations.end()) {
+		pPopulations.push_back(pSrc);
+		populationNum++;
+		//neuronNum += pSrc->getNum();
+		addNeuronNum(pSrc->getType(), pSrc->getNum());
+	}
+	if (find(pPopulations.begin(), pPopulations.end(), pDst) == pPopulations.end()) {
+		pPopulations.push_back(pDst);
+		populationNum++;
+		//neuronNum += pDst->getNum();
+		addNeuronNum(pDst->getType(), pDst->getNum());
+	}
+
+	int count = 0;
+	for (int i=0; i<size; i++) {
+		int iSrc = i/dstSize;
+		int iDst = i%dstSize;
+		connect(pSrc->locate(iSrc), pDst->locate(iDst), weight, delay, type, 0.0, false);
+		count++;
+	}
+
+	return count;
+}
+
+int Network::connect(Population *pSrc, Population *pDst, real *weight, real *delay, SpikeType *type, int size) {
+	int srcSize = pSrc->getNum();
+	int dstSize = pDst->getNum();
+	assert(size == (srcSize * dstSize)); 
+
+	if (find(pPopulations.begin(), pPopulations.end(), pSrc) == pPopulations.end()) {
+		pPopulations.push_back(pSrc);
+		populationNum++;
+		//neuronNum += pSrc->getNum();
+		addNeuronNum(pSrc->getType(), pSrc->getNum());
+	}
+	if (find(pPopulations.begin(), pPopulations.end(), pDst) == pPopulations.end()) {
+		pPopulations.push_back(pDst);
+		populationNum++;
+		//neuronNum += pDst->getNum();
+		addNeuronNum(pDst->getType(), pDst->getNum());
+	}
+
+	int count = 0;
+	for (int i=0; i<size; i++) {
+		int iSrc = i/dstSize;
+		int iDst = i%dstSize;
+		        //connect(Neuron *pn1, Neuron *pn2, real weight, real delay, SpikeType type, real tau, bool store)
+		if (type == NULL) {
+			connect(pSrc->locate(iSrc), pDst->locate(iDst), weight[i], delay[i], Excitatory, 0.0, false);
+		} else {
+			connect(pSrc->locate(iSrc), pDst->locate(iDst), weight[i], delay[i], type[i], 0.0, false);
+		}
+		count++;
+	}
+
+	return count;
+}
+
+int Network::connectOne2One(Population *pSrc, Population *pDst, real *weight, real *delay, SpikeType *type, int size) {
+	int srcSize = pSrc->getNum();
+	int dstSize = pDst->getNum();
+	assert(size == srcSize);
+	assert(size == dstSize); 
+
+	if (find(pPopulations.begin(), pPopulations.end(), pSrc) == pPopulations.end()) {
+		pPopulations.push_back(pSrc);
+		populationNum++;
+		//neuronNum += pSrc->getNum();
+		addNeuronNum(pSrc->getType(), pSrc->getNum());
+	}
+	if (find(pPopulations.begin(), pPopulations.end(), pDst) == pPopulations.end()) {
+		pPopulations.push_back(pDst);
+		populationNum++;
+		//neuronNum += pDst->getNum();
+		addNeuronNum(pDst->getType(), pDst->getNum());
+	}
+
+	int count = 0;
+	for (int i=0; i<size; i++) {
+		if (type == NULL) {
+			connect(pSrc->locate(i), pDst->locate(i), weight[i], delay[i], Excitatory, 0.0, false);
+		} else {
+			connect(pSrc->locate(i), pDst->locate(i), weight[i], delay[i], type[i], 0.0, false);
+		}
+		count++;
+	}
+
+	return count;
+}
+
+int Network::connectConv(Population *pSrc, Population *pDst, real *weight, real *delay, SpikeType *type, int height, int width, int k_height, int k_width) {
+	int srcSize = pSrc->getNum();
+	int dstSize = pDst->getNum();
+	assert(srcSize == height * width); 
+	assert(dstSize == height * width); 
+
+	int count = 0;
+	for (int h = 0; h < height; h++) {
+		for (int w = 0; w < width; w++) {
+			for (int i = 0; i< k_height; i++) {
+				for (int j = 0; j < k_width; j++) {
+					int idx_h = h + i - (k_height - 1)/2;
+					int idx_w = w + j - (k_width - 1)/2;
+
+					if (idx_h >= 0 && idx_h < height && idx_w >= 0 && idx_w < width) {
+						count++;
+						if (type == NULL) {
+							connect(pSrc->locate(idx_h * width + idx_w), pDst->locate(h * width + w), weight[i*k_width + j], delay[i*k_width + j], Excitatory, 0.0, false);
+
+						} else {
+							connect(pSrc->locate(idx_h * width + idx_w), pDst->locate(h * width + w), weight[i*k_width + j], delay[i*k_width + j], type[i*k_width + j], 0.0, false);
+						}
+					}
+				}
+			}
+		}	
+	}
+
+	return count;
+}
+
+int Network::connectPooling(Population *pSrc, Population *pDst, real delay, int height, int width, int p_height, int p_width)
+{
+	int srcSize = pSrc->getNum();
+	int dstSize = pDst->getNum();
+	assert(dstSize == srcSize / p_height / p_width); 
+
+	//int d_height = height/p_height;
+	int d_width = width/p_width;
+
+	int count = 0;
+	for (int h = 0; h < height; h++) {
+		for (int w = 0; w < width; w++) {
+			int d_h = h/p_height;
+			int d_w = w/p_width;
+			int d_h_ = h % p_height;
+			int d_w_ = w % p_width;
+			int idx = d_h_ * p_width + d_w_;
+
+			count++;
+			connect(pSrc->locate(h * width + w), pDst->locate(d_h*d_width + d_w), (real)(1 << idx), delay, Excitatory, 0.0, false);
+		}	
+	}
+
+	return count;
+}
+
 
 int Network::addNeuronNum(Type type, int num)
 {
@@ -118,7 +271,7 @@ int Network::addSynapseNum(Type type, int num)
 	return num;
 }
 
-SynapseBase* Network::connect(Neuron *pn1, Neuron *pn2, real weight, real delay, SpikeType type, real tau, bool store)
+Synapse* Network::connect(Neuron *pn1, Neuron *pn2, real weight, real delay, SpikeType type, real tau, bool store)
 {
 	//if (store) {
 	//	if (find(pNeurons.begin(), pNeurons.end(), pn1) == pNeurons.end()) {
@@ -155,9 +308,9 @@ SynapseBase* Network::connect(Neuron *pn1, Neuron *pn2, real weight, real delay,
 	return p;
 }
 
-PopulationBase* Network::findPopulation(int populationID)
+Population * Network::findPopulation(int populationID)
 {
-	vector<PopulationBase*>::iterator iter;
+	vector<Population*>::iterator iter;
 	if (populationID >= (int)pPopulations.size()) {
 		return NULL;
 	}
@@ -165,17 +318,17 @@ PopulationBase* Network::findPopulation(int populationID)
 	return pPopulations[populationID];
 }
 
-NeuronBase* Network::findNeuron(int populationIDSrc, int neuronIDSrc)
+Neuron * Network::findNeuron(int populationIDSrc, int neuronIDSrc)
 {
-	PopulationBase *pP = findPopulation(populationIDSrc);
+	Population *pP = findPopulation(populationIDSrc);
 
 	if (pP == NULL) {
 		printf("Cann't find population: %d\n", populationIDSrc);
 		return NULL;
 	}
 
-	NeuronBase *pN = NULL;
-	pN = pP->getNeuron(neuronIDSrc);
+	Neuron *pN = NULL;
+	pN = pP->locate(neuronIDSrc);
 	if (pN == NULL) {
 		printf("Cann't find neuron: %d:%d\n", populationIDSrc, neuronIDSrc);
 		return NULL;
@@ -184,18 +337,18 @@ NeuronBase* Network::findNeuron(int populationIDSrc, int neuronIDSrc)
 	return pN;
 }
 
-int Network::addOutput(int populationIDSrc, int neuronIDSrc)
-{
-	NeuronBase *pN = findNeuron(populationIDSrc, neuronIDSrc);
-	if (pN == NULL) {
-		printf("OUTPUT Cann't find neuron: %d:%d\n", populationIDSrc, neuronIDSrc);
-		return -1;
-	} else {
-		pOutputs.push_back(pN);
-	}
-
-	return 0;
-}
+// int Network::addOutput(int populationIDSrc, int neuronIDSrc)
+// {
+// 	Neuron *pN = findNeuron(populationIDSrc, neuronIDSrc);
+// 	if (pN == NULL) {
+// 		printf("OUTPUT Cann't find neuron: %d:%d\n", populationIDSrc, neuronIDSrc);
+// 		return -1;
+// 	} else {
+// 		pOutputs.push_back(pN);
+// 	}
+// 
+// 	return 0;
+// }
 
 //int Network::addProbe(int populationIDSrc, int neuronIDSrc, double weight)
 //{
@@ -225,18 +378,18 @@ int Network::addOutput(int populationIDSrc, int neuronIDSrc)
 //	return 0;
 //}
 
-int Network::addMonitor(int populationIDSrc, int neuronIDSrc)
-{
-	NeuronBase *pN = findNeuron(populationIDSrc, neuronIDSrc);
-	if (pN == NULL) {
-		printf("MONITOR Cann't find neuron: %d:%d\n", populationIDSrc, neuronIDSrc);
-		return -1;
-	} else {
-		pN->monitorOn();
-	}
-
-	return 0;
-}
+// int Network::addMonitor(int populationIDSrc, int neuronIDSrc)
+// {
+// 	Neuron *pN = findNeuron(populationIDSrc, neuronIDSrc);
+// 	if (pN == NULL) {
+// 		printf("MONITOR Cann't find neuron: %d:%d\n", populationIDSrc, neuronIDSrc);
+// 		return -1;
+// 	} else {
+// 		pN->monitorOn();
+// 	}
+// 
+// 	return 0;
+// }
 
 int Network::connect(int populationIDSrc, int neuronIDSrc, int populationIDDst, int neuronIDDst, real weight, real delay, real tau)
 {
@@ -266,7 +419,7 @@ int Network::connect(int populationIDSrc, int neuronIDSrc, int populationIDDst, 
 	//	return -2;
 	//}
 
-	NeuronBase *pnSrc = NULL, *pnDst = NULL;
+	Neuron *pnSrc = NULL, *pnDst = NULL;
 	pnSrc = findNeuron(populationIDSrc, neuronIDSrc);
 	pnDst = findNeuron(populationIDDst, neuronIDDst);
 

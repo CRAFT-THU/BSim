@@ -290,13 +290,13 @@ if __name__ == '__main__':
         parameters.setdefault(v, []).append(k)
 
     lif = Data('LIF', parameters, 
-            path='../src/neuron/lif/', pre='G', post='Neurons', 
+            path='../src/neuron/lif/', pre='', post='Data', 
             headers=['../../utils/type.h', '../../utils/BlockSize.h'], 
             cu_headers=['../../third_party/cuda/helper_cuda.h'])
     lif.generate()
 
     static = Data('Static', {'int':['dst'], 'real':['weight']},
-            path='../src/synapse/static/', pre='G', post='Synapses',
+            path='../src/synapse/static/', pre='', post='Data',
             headers=['../../utils/type.h', '../../utils/BlockSize.h'], 
             cu_headers=['../../third_party/cuda/helper_cuda.h'])
     static.generate()

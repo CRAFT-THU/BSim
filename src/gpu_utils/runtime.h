@@ -10,8 +10,6 @@
 
 #include "../utils/type.h"
 #include "../utils/BlockSize.h"
-#include "../../include/GNeuron.h"
-#include "../../include/GSynapse.h"
 #include "../net/GNetwork.h"
 
 #include "runtime_info.h"

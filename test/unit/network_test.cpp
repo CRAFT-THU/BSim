@@ -25,7 +25,7 @@ TEST(NetworkTest, NeuronTest) {
 			ElementsAreArray({0, 6})
 			);
 
-	GLIFNeurons *n = (GLIFNeurons*)net->ppNeurons[0];
+	LIFData *n = (LIFData*)net->ppNeurons[0];
 
 	ASSERT_THAT(
 			vector<int>(n->pRefracTime, n->pRefracTime + net->pNeuronNums[net->nTypeNum]), 
@@ -101,7 +101,7 @@ TEST(NetworkTest, SynapseTest) {
 			ElementsAreArray({0, 9})
 			);
 
-	GStaticSynapses *s = (GStaticSynapses*)net->ppSynapses[0];
+	StaticData *s = (StaticData*)net->ppSynapses[0];
 	ASSERT_THAT(
 			vector<real>(s->pWeight, s->pWeight + 9), 
 			ElementsAreArray({1.0, 1.2, 1.1, 1.4, 1.3, 1.5, 2.0, 2.1, 2.2})
@@ -134,9 +134,9 @@ TEST(NetworkTest, ConnectionTest) {
 int main(int argc, char **argv)
 {
 	Network c;
-	Population<LIF_curr_exp> *pn0 = c.createPopulation(2, LIF_curr_exp(LIFNeuron(1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9), 1.6, 1.7));
-	Population<LIF_curr_exp> *pn1 = c.createPopulation(3, LIF_curr_exp(LIFNeuron(2.0, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8, 2.9), 2.6, 2.7));
-	Population<LIF_curr_exp> *pn2 = c.createPopulation(1, LIF_curr_exp(LIFNeuron(3.0, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7, 3.8, 3.9), 3.6, 3.7));
+	Population *pn0 = c.createPopulation(2, LIF_curr_exp(LIFNeuron(1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9), 1.6, 1.7));
+	Population *pn1 = c.createPopulation(3, LIF_curr_exp(LIFNeuron(2.0, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8, 2.9), 2.6, 2.7));
+	Population *pn2 = c.createPopulation(1, LIF_curr_exp(LIFNeuron(3.0, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7, 3.8, 3.9), 3.6, 3.7));
 
 	real weight0[] = {1.0, 1.1, 1.2, 1.3, 1.4, 1.5};
 	real weight1[] = {2.0, 2.1, 2.2};

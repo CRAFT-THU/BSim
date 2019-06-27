@@ -2,8 +2,8 @@
  * usually just for fun
  * Sat October 24 2015
  */
-#ifndef NEURON_H
-#define NEURON_H
+#ifndef NEURONS_H
+#define NEURONS_H
 
 // #include "../src/neuron/constant/ConstantNeuron.h"
 // #include "../src/neuron/array/ArrayNeuron.h"
@@ -18,10 +18,28 @@
 // #include "../src/neuron/decide/DecideNeuron.h"
 // #include "../src/neuron/fft/FFTNeuron.h"
 
-#include "../src/base/CompositeNeuron.h"
+#include "../src/interface/CompositeNeuron.h"
 
-#include "GNeuron.h"
-#include "Synapse.h"
+#include "Synapses.h"
+
+// #include "../src/neuron/constant/GConstantNeurons.h"
+// #include "../src/neuron/array/GArrayNeurons.h"
+#include "../src/neuron/lif/LIFData.h"
+
+// #include "../src/neuron/mem/GMemNeurons.h"
+// #include "../src/neuron/poisson/GPoissonNeurons.h"
+// #include "../src/neuron/max/GMaxNeurons.h"
+// #include "../src/neuron/tj/GTJNeurons.h"
+// 
+// #include "../src/neuron/decide/GDecideNeurons.h"
+// #include "../src/neuron/fft/GFFTNeurons.h"
+
+//#include "../src/neuron/constant/GConstant.h"
+//#include "../src/neuron/poisson/GPoisson.h"
+//#include "../src/neuron/array/GArray.h"
+//#include "../src/neuron/lif/GLIF.h"
+//#include "../src/neuron/max/GMax.h"
+//#include "../src/neuron/tj/GTJ.h"
 
 
 // typedef CompositeNeuron<ConstantNeuron, StaticSynapse> Constant_spikes;
@@ -39,4 +57,4 @@ typedef CompositeNeuron<LIFNeuron, StaticSynapse> LIF_curr_exp;
 // 
 // typedef CompositeNeuron<DecideNeuron, StaticSynapse> DecisionMaker;
 
-#endif /* NEURON_H */
+#endif /* NEURONS_H */

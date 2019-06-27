@@ -40,7 +40,7 @@ const real fv=-74e-3;
 	const real dt=1e-4;
 	Network c;
 
-	Population<LIF_curr_exp> *g[depth+1];
+	Population *g[depth+1];
 	
 	g[1]=c.createPopulation(1, N, LIF_curr_exp(LIFNeuron(
 	fv,v_rest,freset,
@@ -74,7 +74,7 @@ const real fv=-74e-3;
 		c.connect(g[1], g[i], weight6_30, delay, NULL, N*N);	
 	}
 
-	Population<LIF_curr_exp> *p[depth+1];
+	Population *p[depth+1];
 	int i=1;
 	while(i+1<=depth)
 	{

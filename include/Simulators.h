@@ -2,11 +2,11 @@
  * usually just for fun
  * Sun December 13 2015
  */
-#ifndef SIMULATOR_H
-#define SIMULATOR_H
+#ifndef SIMULATORS_H
+#define SIMULATORS_H
 
-#include "Neuron.h"
-#include "Synapse.h"
+#include "Neurons.h"
+#include "Synapses.h"
 
 //CPU SIM
 #include "../src/sim/SingleThreadSimulator.h"
@@ -21,5 +21,5 @@ typedef SingleThreadSimulator STSim;
 typedef SingleGPUSimulator SGSim;
 typedef MultiGPUSimulator MGSim;
 
-#endif /* SIMULATOR_H */
+#endif /* SIMULATORS_H */
 

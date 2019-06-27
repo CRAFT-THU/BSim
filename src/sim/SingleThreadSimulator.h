@@ -7,7 +7,7 @@
 
 #include "../interface/Simulator.h"
 
-class SingleThreadSimulator : public Simulator{
+class SingleThreadSimulator : public Simulator {
 public:
 	SingleThreadSimulator(Network *network, real dt);
 	~SingleThreadSimulator();

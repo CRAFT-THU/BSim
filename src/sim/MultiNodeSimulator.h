@@ -5,13 +5,14 @@
 #ifndef MULTIGPUSIMULATOR_H
 #define MULTIGPUSIMULATOR_H
 
-#include "../base/SimulatorBase.h"
+#include "../interface/Simulator.h"
 
-class MultiNodeSimulator : public SimulatorBase {
+class MultiNodeSimulator : public Simulator {
 public:
 	MultiNodeSimulator(Network *network, real dt);
 	~MultiNodeSimulator();
-	using SimulatorBase::run;
+
+	using Simulator::run;
 	virtual int run(real time, FireInfo &log);
 	int init(int argc, char**argv);
 protected:

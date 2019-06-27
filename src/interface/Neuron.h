@@ -46,21 +46,5 @@ protected:
 	//int _end;
 };
 
-Neuron::~Neuron() 
-{
-	pSynapses.clear();
-}
-
-Synapse * Neuron::addSynapse(Synapse * synapse)
-{
-	pSynapses.push_back(synapse);
-	return synapse;
-}
-
-const vector<Synapse*> & Neuron::getSynapses() const 
-{
-	return pSynapses;
-}
-
 #endif /* NEURON_H */
 

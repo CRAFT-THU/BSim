@@ -15,6 +15,7 @@
 #include "../gpu_utils/GBuffers.h"
 #include "../gpu_utils/runtime.h"
 #include "../net/MultiNetwork.h"
+#include "../neuron/lif/LIFData.h"
 // #include "../gpu_utils/gpu_func.h"
 
 #include "SingleGPUSimulator.h"
@@ -24,7 +25,7 @@ using std::endl;
 
 CrossNodeDataGPU * gCrossDataNet;
 
-SingleGPUSimulator::SingleGPUSimulator(Network *network, real dt) : SimulatorBase(network, dt)
+SingleGPUSimulator::SingleGPUSimulator(Network *network, real dt) : Simulator(network, dt)
 {
 }
 
@@ -35,14 +36,12 @@ SingleGPUSimulator::~SingleGPUSimulator()
 int SingleGPUSimulator::run(real time, FireInfo &log)
 {
 
-	int sim_cycle = round(time/dt);
+	int sim_cycle = round(time/_dt);
 
 	reset();
 
-	SimInfo info;
-	info.currCycle = 0;
-	info.dt = dt;
-	GNetwork *pNetCPU = network->buildNetwork(info);
+	SimInfo info(_dt);
+	GNetwork *pNetCPU = _network->buildNetwork(info);
 
 	FILE *v_file = openFile("v.data", "w+");
 
@@ -71,7 +70,7 @@ int SingleGPUSimulator::run(real time, FireInfo &log)
 	printf("maxDelay: %d minDelay: %d\n", pNetCPU->pConnection->maxDelay, pNetCPU->pConnection->minDelay);
 
 
-	GBuffers *buffers = alloc_buffers(totalNeuronNum, totalSynapseNum, pNetCPU->pConnection->maxDelay, dt);
+	GBuffers *buffers = alloc_buffers(totalNeuronNum, totalSynapseNum, pNetCPU->pConnection->maxDelay, _dt);
 
 	BlockSize *updateSize = getBlockSize(totalNeuronNum, totalSynapseNum);
 
@@ -80,7 +79,7 @@ int SingleGPUSimulator::run(real time, FireInfo &log)
 
 	int copy_idx = getIndex(c_pNetGPU->pNTypes, nTypeNum, LIF);
 
-	GLIFNeurons *c_g_lif = copyFromGPU<GLIFNeurons>(static_cast<GLIFNeurons*>(c_pNetGPU->ppNeurons[copy_idx]), 1);
+	LIFData *c_g_lif = copyFromGPU<LIFData>(static_cast<LIFData *>(c_pNetGPU->ppNeurons[copy_idx]), 1);
 
 	real *c_g_vm = c_g_lif->pV_m;
 #ifdef DEBUG 
@@ -264,15 +263,13 @@ int SingleGPUSimulator::run(real time, FireInfo &log)
 
 
 int SingleGPUSimulator::runMultiNets(real time, int parts, FireInfo &log) {
-	int sim_cycle = round(time/dt);
+	int sim_cycle = round(time/_dt);
 	reset();
 
 	checkCudaErrors(cudaSetDevice(0));
 
-	MultiNetwork multiNet(network, parts);
-	SimInfo info;
-	info.currCycle = 0;
-	info.dt = dt;
+	MultiNetwork multiNet(_network, parts);
+	SimInfo info(_dt);
 	DistriNetwork *subnets = multiNet.buildNetworks(info);
 	assert(subnets != NULL);
 	CrossNodeDataGPU *crossData = multiNet.arrangeCrossNodeDataGPU(parts);
@@ -286,7 +283,7 @@ int SingleGPUSimulator::runMultiNets(real time, int parts, FireInfo &log) {
 		subnets[i]._sim_cycle = sim_cycle;
 		subnets[i]._node_idx = i;
 		subnets[i]._node_num = parts;
-		subnets[i]._dt = dt;
+		subnets[i]._dt = _dt;
 
 		GNetwork *pNetCPU = subnets[i]._network;
 		networks[i] = copyNetworkToGPU(pNetCPU);
@@ -300,7 +297,7 @@ int SingleGPUSimulator::runMultiNets(real time, int parts, FireInfo &log) {
 
 		// int deltaDelay = pNetCPU->pConnection->maxDelay - pNetCPU->pConnection->minDelay + 1;
 
-		buffers[i] = alloc_buffers(allNeuronNum, nodeSynapseNum, pNetCPU->pConnection->maxDelay, dt);
+		buffers[i] = alloc_buffers(allNeuronNum, nodeSynapseNum, pNetCPU->pConnection->maxDelay, _dt);
 		updateSizes[i] = getBlockSize(allNeuronNum, nodeSynapseNum);
 
 		printf("Subnet %d NeuronTypeNum: %d, SynapseTypeNum: %d\n", subnets[i]._node_idx, nTypeNum, sTypeNum);

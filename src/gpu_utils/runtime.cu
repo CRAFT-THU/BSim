@@ -2,7 +2,6 @@
 #include <assert.h>
 
 #include "../utils/utils.h"
-#include "../neuron/lif/lif.h"
 // #include "../neuron/array/array.h"
 // #include "../synapse/static/static.h"
 // #include "../neuron/constant/constants.h"
@@ -203,7 +202,8 @@ BlockSize * getBlockSize(int nSize, int sSize)
 	// cudaOccupancyMaxPotentialBlockSize(&(ret[Array].minGridSize), &(ret[Array].blockSize), update_array_neuron, 0, nSize); 
 	// ret[Array].gridSize = (upzero_else_set_one(nSize) + (ret[Array].blockSize) - 1) / (ret[Array].blockSize);
 
-	cudaOccupancyMaxPotentialBlockSize(&(ret[LIF].minGridSize), &(ret[LIF].blockSize), update_lif_neuron, 0, nSize); 
+	// cudaOccupancyMaxPotentialBlockSize(&(ret[LIF].minGridSize), &(ret[LIF].blockSize), update_lif_neuron, 0, nSize); 
+	ret[LIF].blockSize = 128;
 	ret[LIF].gridSize = (upzero_else_set_one(nSize) + (ret[LIF].blockSize) - 1) / (ret[LIF].blockSize);
 
 	// cudaOccupancyMaxPotentialBlockSize(&(ret[Constant].minGridSize), &(ret[Constant].blockSize), update_constant_neuron, 0, nSize); 
