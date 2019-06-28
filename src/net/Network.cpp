@@ -795,36 +795,36 @@ CrossNodeMap* Network::arrangeCrossNodeMap(int n_num, int node_idx, int node_num
 
 void Network::splitNetwork()
 {
-	int node_idx = 0;
-	int synapse_count = 0;
-	int synapse_per_node = _totalSynapseNum/_nodeNum;
+	int nodeIdx = 0;
+	int synapseCount = 0;
+	int synapsePerNode = _totalSynapseNum/_nodeNum;
 
-	map<Neuron *, vector<Synapse *>> n2s_input;
-	for (auto siter = _pSynapses.begin(); siter != _pSynapses.end(); siter++) {
-		Synapse * p = *siter;
-		n2s_input[p->getDst()].push_back(p);
+	map<Neuron *, vector<Synapse *>> n2sInput;
+	for (auto sIter = _pSynapses.begin(); sIter != _pSynapses.end(); sIter++) {
+		Synapse * p = *sIter;
+		n2sInput[p->getDst()].push_back(p);
 	}
 
-	for (auto piter = _pPopulations.begin(); piter != _pPopulations.end(); piter++) {
-		Population * p = *piter;
-		p->setNode(node_idx);
+	for (auto pIter = _pPopulations.begin(); pIter != _pPopulations.end(); pIter++) {
+		Population * p = *pIter;
+		p->setNode(nodeIdx);
 		for (int i=0; i<p->getNum(); i++) {
-			p->locate(i)->setNode(node_idx);
-			auto n2siter = n2s_input.find(p->locate(i));
-			if (n2siter != n2s_input.end()) {
-				synapse_count += n2siter->second.size();
-				for (auto viter = n2siter->second.begin(); viter != n2siter->second.end(); viter++) {
-					(*viter)->setNode(node_idx);
+			p->locate(i)->setNode(nodeIdx);
+			auto n2sIter = n2sInput.find(p->locate(i));
+			if (n2sIter != n2sInput.end()) {
+				synapseCount += n2sIter->second.size();
+				for (auto vIter = n2sIter->second.begin(); vIter != n2sIter->second.end(); vIter++) {
+					(*vIter)->setNode(nodeIdx);
 				}
 			}
 
 		}
-		if (synapse_count >= (node_idx+1) * synapse_per_node && node_idx < _nodeNum - 1) {
-			node_idx++;	
+		if (synapseCount >= (nodeIdx+1) * synapsePerNode && nodeIdx < _nodeNum - 1) {
+			nodeIdx++;	
 		}
 	}
 
-	n2s_input.clear();
+	n2sInput.clear();
 
 	for (auto piter= _pPopulations.begin(); piter != _pPopulations.end(); piter++) {
 		Population * p = *piter;
@@ -853,9 +853,10 @@ void Network::splitNetwork()
 
 DistriNetwork* Network::buildNetworks(SimInfo &info, bool auto_splited)
 {
+	assert(_nodeNum >= 1);
 	DistriNetwork * net = initDistriNet(_nodeNum);
 
-	if (auto_splited) {
+	if (auto_splited && _nodeNum > 1) {
 		splitNetwork();
 	}
 
