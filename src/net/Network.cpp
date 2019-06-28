@@ -11,25 +11,32 @@
 
 using namespace std::chrono;
 
-Network::Network()
+Network::Network(int nodeNum)
 {
-	maxDelay = 0.0;
-	minDelay = 1.0e7;
+	_maxDelay = 0.0;
+	_minDelay = 1.0e7;
 	// maxDelaySteps = 0;
 	// minDelaySteps = 1e7;
-	maxFireRate = 0.0;
-	populationNum = 0;
-	totalNeuronNum = 0;
-	totalSynapseNum = 0;
+	_maxFireRate = 0.0;
+	_populationNum = 0;
+	_totalNeuronNum = 0;
+	_totalSynapseNum = 0;
 
+	_nodeNum = nodeNum;
 	//n2sNetwork.clear();
+	//
+	_crossnode_neurons_send.resize(nodeNum);
+	_crossnode_neurons_recv.resize(nodeNum);
+	_crossnode_neuron2idx.resize(nodeNum);
+
+	_global_ntype_num.resize(nodeNum);
+	_global_stype_num.resize(nodeNum);
 }
 
 Network::~Network()
 {
-	if (!pPopulations.empty()) {
-		vector<Population*>::iterator iter;
-		for (iter = pPopulations.begin(); iter != pPopulations.end(); iter++) {
+	if (!_pPopulations.empty()) {
+		for (auto iter = _pPopulations.begin(); iter != _pPopulations.end(); iter++) {
 			Population* t = *iter;
 			delete t;
 		}
@@ -43,32 +50,38 @@ Network::~Network()
 	//	}
 	//}
 
-	if (!pSynapses.empty()) {
-		vector<Synapse*>::iterator iter;
-		for (iter = pSynapses.begin(); iter != pSynapses.end(); iter++) {
+	if (!_pSynapses.empty()) {
+		for (auto iter = _pSynapses.begin(); iter != _pSynapses.end(); iter++) {
 			Synapse * t = *iter;
 			delete t;
 		}
 	}
 
-	pPopulations.clear();
-	pSynapses.clear();
-	pOutputs.clear();
-	//n2sNetwork.clear();
-	//n2sTargetNetwork.clear();
-	//s2nNetwork.clear();
-	//s2nForwardNetwork.clear();
-	//id2neuron.clear();
-	//id2synapse.clear();
-	//nid2idx.clear();
-	//idx2nid.clear();
-	//sid2idx.clear();
-	//idx2sid.clear();
-	neuronNums.clear();
-	connectNums.clear();
-	synapseNums.clear();
-	nTypes.clear();
-	sTypes.clear();
+	_pPopulations.clear();
+	_pSynapses.clear();
+	// _pOutputs.clear();
+	// n2sNetwork.clear();
+	// n2sTargetNetwork.clear();
+	// s2nNetwork.clear();
+	// s2nForwardNetwork.clear();
+	// id2neuron.clear();
+	// id2synapse.clear();
+	// nid2idx.clear();
+	// idx2nid.clear();
+	// sid2idx.clear();
+	// idx2sid.clear();
+	_neuronNums.clear();
+	_connectNums.clear();
+	_synapseNums.clear();
+	_nTypes.clear();
+	_sTypes.clear();
+
+	_crossnode_neurons_send.clear();
+	_crossnode_neurons_recv.clear();
+	_crossnode_neuron2idx.clear();
+
+	_global_ntype_num.clear();
+	_global_stype_num.clear();
 }
 
 int Network::connect(Population *pSrc, Population *pDst, real weight, real delay, SpikeType type) {
@@ -76,15 +89,15 @@ int Network::connect(Population *pSrc, Population *pDst, real weight, real delay
 	int dstSize = pDst->getNum();
 	int size = srcSize * dstSize; 
 
-	if (find(pPopulations.begin(), pPopulations.end(), pSrc) == pPopulations.end()) {
-		pPopulations.push_back(pSrc);
-		populationNum++;
+	if (find(_pPopulations.begin(), _pPopulations.end(), pSrc) == _pPopulations.end()) {
+		_pPopulations.push_back(pSrc);
+		_populationNum++;
 		//neuronNum += pSrc->getNum();
 		addNeuronNum(pSrc->getType(), pSrc->getNum());
 	}
-	if (find(pPopulations.begin(), pPopulations.end(), pDst) == pPopulations.end()) {
-		pPopulations.push_back(pDst);
-		populationNum++;
+	if (find(_pPopulations.begin(), _pPopulations.end(), pDst) == _pPopulations.end()) {
+		_pPopulations.push_back(pDst);
+		_populationNum++;
 		//neuronNum += pDst->getNum();
 		addNeuronNum(pDst->getType(), pDst->getNum());
 	}
@@ -519,4 +532,290 @@ void Network::logMap() {
 	//for (map<int, ID>::const_iterator iter = idx2nid.begin(); iter != idx2nid.end(); iter++) {
 	//	fprintf(f, "%d:%s\n", iter->first, iter->second.getInfo().c_str());
 	//}
+}
+
+CrossNodeData* Network::arrangeCrossNodeData(int node_num)
+{
+	CrossNodeData * cross_data = (CrossNodeData*)malloc(sizeof(CrossNodeData) * node_num * node_num);
+	assert(cross_data != NULL);
+
+	for (int i=0; i<_node_num; i++) {
+		for (int j=0; j<_node_num; j++) {
+			// i->j 
+			int i2j = j * _node_num + i;
+			cross_data[i2j]._fired_n_num = 0;
+
+			int count = 0;
+			for (auto iter = _crossnode_neurons_send[i].begin(); iter != _crossnode_neurons_send[i].end(); iter++) {
+				if (_crossnode_neurons_recv[j].find(*iter) != _crossnode_neurons_recv[j].end()) {
+					count++;
+				}
+			}
+			cross_data[i2j]._max_n_num = count;
+			cross_data[i2j]._fired_n_idxs = (int*)malloc(sizeof(int)*count);
+			assert(cross_data[i2j]._fired_n_idxs != NULL || count == 0);
+		}
+	}
+
+
+	for (int i=0; i<_node_num; i++) {
+		int idx = i*_node_num + i;
+		for (int j=0; j<_node_num; j++) {
+			if (j != i) {
+				cross_data[idx]._max_n_num += cross_data[i*_node_num+j]._max_n_num;
+			}
+		}
+
+		cross_data[idx]._fired_n_idxs = (int*)malloc(sizeof(int)*cross_data[idx]._max_n_num);
+		assert(cross_data[idx]._fired_n_idxs != NULL || cross_data[idx]._max_n_num == 0);
+	}
+
+	return cross_data;
+}
+
+void MultiNetwork::countTypeNum() 
+{
+	for (auto piter = _network->pPopulations.begin(); piter != _network->pPopulations.end();  piter++) {
+		Population * p = *piter;
+		Type type = p->getType();
+		int node = p->getNode();
+
+		if (_global_ntype_num[node].find(type) == _global_ntype_num[node].end()) {
+			_global_ntype_num[node][type] = p->getNum();
+		} else {
+			_global_ntype_num[node][type] += p->getNum();
+		}
+	}
+
+	for (auto siter = _network->pSynapses.begin(); siter != _network->pSynapses.end();  siter++) {
+		Synapse * p = *siter;
+		Type type = p->getType();
+		int node = p->getNode();
+
+		if (_global_stype_num[node].find(type) == _global_stype_num[node].end()) {
+			_global_stype_num[node][type] = 1;
+		} else {
+			_global_stype_num[node][type] += 1;
+		}
+	}
+}
+
+GNetwork* MultiNetwork::arrangeData(int node_idx, SimInfo &info) {
+	int ntype_num = _global_ntype_num[node_idx].size();
+	int stype_num = _global_stype_num[node_idx].size();
+
+	GNetwork * net = allocNetwork(ntype_num, stype_num);
+
+	int maxDelaySteps = static_cast<int>(round(_network->maxDelay/info.dt));
+	int minDelaySteps = static_cast<int>(round(_network->minDelay/info.dt));
+	int delayLength = maxDelaySteps - minDelaySteps + 1;
+
+	int index = 0;
+	for (map<Type, int>::const_iterator tmp_iter = _global_ntype_num[node_idx].begin(); tmp_iter != _global_ntype_num[node_idx].end(); tmp_iter++) {
+		Type type = tmp_iter->first;
+		net->pNTypes[index] = tmp_iter->first;
+
+		net->ppNeurons[index] = allocType[type](tmp_iter->second);
+		assert(net->ppNeurons[index] != NULL);
+
+		int idx = 0;
+		for (auto piter = _network->pPopulations.begin(); piter != _network->pPopulations.end();  piter++) {
+			Population * p = *piter;
+			int node = p->getNode();
+
+			if (node == node_idx && p->getType() == type) {
+				size_t copied = p->hardCopy(net->ppNeurons[index], idx, net->pNeuronNums[index], info);
+				idx += copied;
+			}
+		}
+
+		assert(idx == tmp_iter->second);
+		net->pNeuronNums[index+1] = idx + net->pNeuronNums[index];
+		index++;
+	}
+	assert(index == ntype_num);
+
+	index = 0;
+	for (map<Type, int>::const_iterator tmp_iter = _global_stype_num[node_idx].begin(); tmp_iter != _global_stype_num[node_idx].end(); tmp_iter++) {
+		Type type = tmp_iter->first;
+		net->pSTypes[index] = type;
+
+		net->ppSynapses[index] = allocType[type](tmp_iter->second);
+		assert(net->ppSynapses[index] != NULL);
+
+		//for (siter = _network->pSynapses.begin(); siter != _network->pSynapses.end();  siter++) {
+		//	SynapseBase * p = *siter;
+		//	int node = p->getNode();
+
+		//	if (node == node_idx && p->getType() == type) {
+		//		int copied = p->hardCopy(pS, idx, net->pSynapseNums[index] );
+		//		idx += copied;
+		//	}
+		//}
+
+		int idx = 0;
+		for (auto piter = _network->pPopulations.begin(); piter != _network->pPopulations.end(); piter++) {
+			Population *pop = *piter;
+			if (pop->getNode() != node_idx)
+				continue;
+
+			for (int nidx=0; nidx<pop->getNum(); nidx++) {
+				const vector<Synapse *> &s_vec = pop->locate(nidx)->getSynapses();
+				for (int delay_t=0; delay_t<delayLength; delay_t++) {
+					for (auto siter = s_vec.begin(); siter != s_vec.end(); siter++) {
+						if ((*siter)->getDelaySteps(info.dt) == delay_t + minDelaySteps) {
+							if ((*siter)->getType() == type && (*siter)->getNode() == node_idx) {
+								assert(idx < tmp_iter->second);
+								int copied = (*siter)->hardCopy(net->ppSynapses[index], idx, net->pSynapseNums[index], info);
+								idx += copied;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		for (auto niter = _crossnode_neurons_recv[node_idx].begin(); niter != _crossnode_neurons_recv[node_idx].end(); niter++) {
+			const vector<Synapse *> &s_vec = (*niter)->getSynapses();
+			for (int delay_t=0; delay_t<delayLength; delay_t++) {
+				for (auto iter = s_vec.begin(); iter != s_vec.end(); iter++) {
+					if (((*iter)->getNode() == node_idx) && ((*iter)->getDelaySteps(info.dt) == delay_t + minDelaySteps) && ((*iter)->getType() == type)) {
+						assert(idx < tmp_iter->second);
+						int copied = (*iter)->hardCopy(net->ppSynapses[index], idx, net->pSynapseNums[index], info);
+						idx += copied;
+					}
+				}
+			}
+		}
+
+
+		assert(idx == tmp_iter->second); 
+		net->pSynapseNums[index+1] = idx + net->pSynapseNums[index];
+		index++;
+	}
+	assert(index == stype_num);
+
+	int node_n_num = net->pNeuronNums[net->nTypeNum];
+
+	for (auto iter = _crossnode_neurons_recv[node_idx].begin(); iter !=  _crossnode_neurons_recv[node_idx].end(); iter++) {
+		int size = _crossnode_neuron2idx[node_idx].size();
+		_crossnode_neuron2idx[node_idx][*iter] = node_n_num + size;
+	}
+
+	// net->maxDelay = _network->maxDelaySteps;
+	// net->minDelay = _network->minDelaySteps;
+
+	return net;
+}
+
+Connection* MultiNetwork::arrangeConnect(int n_num, int s_num, int node_idx, SimInfo &info)
+{
+	int maxDelaySteps = static_cast<int>(round(_network->maxDelay/info.dt));
+	int minDelaySteps = static_cast<int>(round(_network->minDelay/info.dt));
+	Connection *connection = allocConnection(n_num, s_num, maxDelaySteps, minDelaySteps);
+	assert(connection != NULL);
+
+	int delayLength = maxDelaySteps - minDelaySteps + 1;
+	int synapseIdx = 0;
+	for (auto piter = _network->pPopulations.begin(); piter != _network->pPopulations.end(); piter++) {
+		Population * p = *piter;
+		if (p->getNode() != node_idx) 
+			continue;
+
+		for (int i=0; i<p->getNum(); i++) {
+			ID nid = p->locate(i)->getID();
+			const vector<Synapse *> &s_vec = p->locate(i)->getSynapses();
+			for (int delay_t=0; delay_t<delayLength; delay_t++) {
+				connection->pDelayStart[delay_t + delayLength*nid] = synapseIdx;
+
+				for (auto iter = s_vec.begin(); iter != s_vec.end(); iter++) {
+					if (((*iter)->getNode() == node_idx) && ((*iter)->getDelaySteps(info.dt) == delay_t + minDelaySteps)) {
+						// int sid = (*iter)->getID();
+						assert(synapseIdx < s_num);
+						synapseIdx++;
+					}
+				}
+				connection->pDelayNum[delay_t + delayLength*nid] = synapseIdx - connection->pDelayStart[delay_t + delayLength*nid];
+			}
+		}
+	}
+
+	for (auto niter = _crossnode_neurons_recv[node_idx].begin(); niter != _crossnode_neurons_recv[node_idx].end(); niter++) {
+		int nid = _crossnode_neuron2idx[node_idx][*niter];
+		const vector<Synapse *> &s_vec = (*niter)->getSynapses();
+		for (int delay_t=0; delay_t<delayLength; delay_t++) {
+			connection->pDelayStart[delay_t + delayLength*nid] = synapseIdx;
+
+			for (auto iter = s_vec.begin(); iter != s_vec.end(); iter++) {
+				if (((*iter)->getNode() == node_idx) && ((*iter)->getDelaySteps(info.dt) == delay_t + minDelaySteps)) {
+					// int sid = (*iter)->getID();
+					assert(synapseIdx < s_num);
+					synapseIdx++;
+				}
+			}
+			connection->pDelayNum[delay_t + delayLength*nid] = synapseIdx - connection->pDelayStart[delay_t + delayLength*nid];
+		}
+	}
+
+	return connection;
+}
+
+// Should finish data arrange of all nodes first.
+CrossNodeMap* MultiNetwork::arrangeCrossNodeMap(int n_num, int node_idx, int node_num)
+{
+	CrossNodeMap* cross_map = (CrossNodeMap*)malloc(sizeof(CrossNodeMap));
+	assert(cross_map != NULL);
+
+	cross_map->_idx2index = (int*)malloc(sizeof(int)*n_num);
+	assert(cross_map->_idx2index != NULL);
+	std::fill(cross_map->_idx2index, cross_map->_idx2index + n_num, -1);
+
+	cross_map->_crossnode_index2idx = (int*)malloc(sizeof(int) * node_num * _crossnode_neurons_send[node_idx].size());
+	cross_map->_cross_size = node_num * _crossnode_neurons_send[node_idx].size();
+
+	assert(cross_map->_crossnode_index2idx != NULL);
+
+
+	int index = 0;
+	for (auto iter = _crossnode_neurons_send[node_idx].begin(); iter != _crossnode_neurons_send[node_idx].end(); iter++) {
+		int nidx = (*iter)->getID();
+		cross_map->_idx2index[nidx] = index;
+		for (int t=0; t<node_num; t++) {
+			if (_crossnode_neurons_recv[t].find(*iter) != _crossnode_neurons_recv[t].end()) {
+				cross_map->_crossnode_index2idx[index*node_num + t] = _crossnode_neuron2idx[t][*iter];
+			} else {
+				cross_map->_crossnode_index2idx[index*node_num + t] = -1;
+			}
+		}
+		index++;
+	}
+
+	return cross_map;
+}
+
+DistriNetwork* MultiNetwork::buildNetworks(SimInfo &info, bool auto_splited)
+{
+	DistriNetwork * net = initDistriNet(_node_num);
+
+	if (auto_splited) {
+		splitNetwork();
+	}
+
+	countTypeNum();
+
+	for (int node_idx =0; node_idx <_node_num; node_idx++) {
+		net[node_idx]._network = arrangeData(node_idx, info);
+
+		int n_num = net[node_idx]._network->pNeuronNums[net[node_idx]._network->nTypeNum] + _crossnode_neuron2idx[node_idx].size();
+		int s_num = net[node_idx]._network->pSynapseNums[net[node_idx]._network->sTypeNum];
+		net[node_idx]._network->pConnection = arrangeConnect(n_num, s_num, node_idx, info);
+
+	}
+
+	for (int node_idx =0; node_idx <_node_num; node_idx++) {
+		int n_num = net[node_idx]._network->pNeuronNums[net[node_idx]._network->nTypeNum] + _crossnode_neuron2idx[node_idx].size();
+		net[node_idx]._crossnode_map = arrangeCrossNodeMap(n_num, node_idx, _node_num);
+	}
+
+	return net;
 }

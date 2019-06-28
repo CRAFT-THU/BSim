@@ -16,7 +16,7 @@
 #include "../interface/Neuron.h"
 #include "../interface/Synapse.h"
 #include "../utils/ModelArray.h"
-#include "GNetwork.h"
+#include "DistriNetwork.h"
 
 using std::pair;
 using std::find;
@@ -27,11 +27,11 @@ using std::set;
 
 class Network {
 public:
-	Network();
+	Network(int nodeNum = 1);
 	~Network();
 
-	//template<class N>
-	//Population<N>* createNeuron(N n1);
+	// template<class N>
+	// Population<N>* createNeuron(N n1);
 	template<class N>
 	Population* createPopulation(int id, int num, N templ, bool empty = false);
 
@@ -47,7 +47,7 @@ public:
 	int connect(int populationIDSrc, int neuronIDSrc, int populationIDDst, int neuronIDDst, real weight, real delay, real tau = 0);
 	Synapse* connect(Neuron *pSrc, Neuron *pDst, real weight, real delay, SpikeType type = Excitatory, real tau = 0, bool store = true);
 
-	GNetwork* buildNetwork(SimInfo &info);
+	// GNetwork* buildNetwork(SimInfo &info);
 
 	int addNeuronNum(Type type, int num);
 	int addConnectionNum(Type type, int num);
@@ -62,41 +62,75 @@ public:
 	int reset(SimInfo &info);
 	// int update(SimInfo &info);
 	// void monitor(SimInfo &info);
-
+	
 	void logMap();
+
+	DistriNetwork * buildNetworks(SimInfo &info, bool auto_splited = true);
+	CrossNodeData* arrangeCrossNodeData(int node_num);
+	CrossNodeDataGPU* arrangeCrossNodeDataGPU(int node_num);
+
 private:
 	void mapIDtoIdx(GNetwork *net);
-	//bool checkIDtoIdx();
+	// bool checkIDtoIdx();
+	
+	void splitNetwork();
+	void countTypeNum();
+	GNetwork* arrangeData(int node, SimInfo &info);
+	Connection* arrangeConnect(int n_num, int s_num, int node_idx, SimInfo &info);
+	CrossNodeMap* arrangeCrossNodeMap(int n_num, int node_idx, int node_num);
 
 public:
-	vector<Neuron*> pOutputs;
-	vector<Population*> pPopulations;
-	vector<Synapse*> pSynapses;
-	//map<ID, vector<ID> > n2sNetwork;
-	//map<ID, vector<ID> > n2sTargetNetwork;
-	//map<ID, ID> s2nNetwork;
-	//map<ID, ID> s2nForwardNetwork;
-	//map<ID, Neuron*> id2neuron;
-	//map<ID, Synapse*> id2synapse;
-	//map<ID, int> nid2idx;
-	//map<ID, int> sid2idx;
-	//map<int, ID> idx2nid;
-	//map<int, ID> idx2sid;
+	// vector<Neuron*> pOutputs;
+	vector<Population*> _pPopulations;
+	vector<Synapse*> _pSynapses;
+	// map<ID, vector<ID> > n2sNetwork;
+	// map<ID, vector<ID> > n2sTargetNetwork;
+	// map<ID, ID> s2nNetwork;
+	// map<ID, ID> s2nForwardNetwork;
+	// map<ID, Neuron*> id2neuron;
+	// map<ID, Synapse*> id2synapse;
+	// map<ID, int> nid2idx;
+	// map<ID, int> sid2idx;
+	// map<int, ID> idx2nid;
+	// map<int, ID> idx2sid;
 
 	// int maxDelaySteps;
 	// int minDelaySteps;
-	real maxDelay;
-	real minDelay;
-	int totalNeuronNum;
-	int totalSynapseNum;
+	
+	/** Cross Node Data **/
+	// map<ID, int> _nID2node;
+	// map<ID, int> _sID2node;
+	// Neurons that on this node and would issue spikes to others.
+	// Acessed by neurons = _crossnode_neurons_send[node]
+	vector<set<Neuron *> > _crossnode_neurons_send;
+	// Neurons that on other nodes and would issue spike to this node.
+	// Accessed by neurons = _crossnode_neurons_recv[node]
+	vector<set<Neuron *> > _crossnode_neurons_recv;
+	// Get idx of shadow neuron on destination node, the idxs of shadow neurons are larger than that of real neurons.
+	// Accessed by idx = _crossnode_neuron2idx[node][neuron]
+	vector<map<Neuron *, int> > _crossnode_neuron2idx;
+
+	/** Per Node Data **/
+	// vector<map<int, ID> > _global_idx2nID;
+	// vector<map<int, ID> > _global_idx2sID;
+	// Number of neurons for different types on different nodes accessed by _global_ntype_num[node][type]
+	vector<map<Type, int> >	_global_ntype_num;
+	// Number of synapses for different types on different nodes accessed by _global_ntype_num[node][type]
+	vector<map<Type, int> > _global_stype_num;
+
+	real _maxDelay;
+	real _minDelay;
+	int _totalNeuronNum;
+	int _totalSynapseNum;
+	int _nodeNum;
 private:
-	real maxFireRate;
-	vector<Type> nTypes;
-	vector<Type> sTypes;
-	int populationNum;
-	vector<int> neuronNums;
-	vector<int> connectNums;
-	vector<int> synapseNums;
+	real _maxFireRate;
+	vector<Type> _nTypes;
+	vector<Type> _sTypes;
+	int _populationNum;
+	vector<int> _neuronNums;
+	vector<int> _connectNums;
+	vector<int> _synapseNums;
 };
 
 //template<class Neuron>
