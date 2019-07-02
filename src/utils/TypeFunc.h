@@ -20,6 +20,8 @@ extern int (*saveType[TYPESIZE])(void *pCPU, int num, FILE *f);
 extern void* (*loadType[TYPESIZE])(int num, FILE *f);
 // extern int (*addTypeConnection[TYPESIZE])(void *, int *);
 
+extern bool (*isEqualType[TYPESIZE])(void *p1, void *p2, int num);
+
 extern void *(*cudaAllocType[TYPESIZE])(void *pCPU, int num);
 // extern int (*cudaTypeToGPU[TYPESIZE])(void *pCPU, void *pGPU, int num);
 extern int (*cudaFetchType[TYPESIZE])(void *pCPU, void *pGPU, int num);

@@ -6,6 +6,7 @@
 #define UTILS_H
 
 #include <stdio.h>
+#include <math.h>
 
 #include "../third_party/json/json.h"
 #include "type.h"
@@ -55,6 +56,17 @@ T *getConstArray(T value, int size)
 	}
 
 	return res;
+}
+
+template<typename T>
+bool isEqualArray(T const & a, T const & b, size_t size)
+{
+	for (size_t i=0; i<size; i++) {
+		if (fabs(a[i] - b[i]) > 1e-10) {
+			return false;
+		}
+	}
+	return true;
 }
 
 

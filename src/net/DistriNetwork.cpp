@@ -13,14 +13,14 @@ DistriNetwork* initDistriNet(int num)
 	DistriNetwork * ret_net = (DistriNetwork*)malloc(sizeof(DistriNetwork) * num);
 
 	for (int i=0; i<num; i++) {
-		ret_net[i]._sim_cycle = 0;
-		ret_net[i]._node_idx = i;
-		ret_net[i]._node_num = num;
+		ret_net[i]._simCycle = 0;
+		ret_net[i]._nodeIdx = i;
+		ret_net[i]._nodeNum = num;
 
 		ret_net[i]._dt = 0;
 
 		ret_net[i]._network = NULL;
-		ret_net[i]._crossnode_map = NULL; 
+		ret_net[i]._crossnodeMap = NULL; 
 
 		//ret_net[i]._crossnode_data = (CrossNodeData*)malloc(sizeof(CrossNodeData)*num);
 		//assert(ret_net[i]._crossnode_data != NULL);
@@ -36,7 +36,7 @@ DistriNetwork* initDistriNet(int num)
 
 void freeDistriNet(DistriNetwork * net)
 {
-	int num = net->_node_num;
+	int num = net->_nodeNum;
 	for (int i=0; i<num; i++) {
 		//if (net[i]._crossnode_data != NULL) {
 		//	for (int j=0; j<num; j++) {
@@ -46,11 +46,11 @@ void freeDistriNet(DistriNetwork * net)
 		//	net[i]._crossnode_data = NULL;
 		//}
 
-		if (net[i]._crossnode_map != NULL) {
-			free(net[i]._crossnode_map->_idx2index);
-			free(net[i]._crossnode_map->_crossnode_index2idx);
-			free(net[i]._crossnode_map); 
-			net[i]._crossnode_map = NULL;
+		if (net[i]._crossnodeMap != NULL) {
+			free(net[i]._crossnodeMap->_idx2index);
+			free(net[i]._crossnodeMap->_crossnodeIndex2idx);
+			free(net[i]._crossnodeMap); 
+			net[i]._crossnodeMap = NULL;
 		}
 
 		//TODO free GNetwork

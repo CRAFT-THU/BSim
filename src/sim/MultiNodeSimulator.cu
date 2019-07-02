@@ -15,7 +15,7 @@
 // #include "../gpu_utils/gpu_utils.h"
 #include "../gpu_utils/runtime.h"
 #include "../gpu_utils/GBuffers.h"
-#include "../net/MultiNetwork.h"
+#include "../net/Network.h"
 #include "MultiNodeSimulator.h"
 // #include "../gpu_utils/gpu_func.h"
 

@@ -10,9 +10,9 @@
 #include "../../utils/BlockSize.h"
 
 struct StaticData {
-	real *pWeight;
-
 	int *pDst;
+
+	real *pWeight;
 
 };
 
@@ -25,6 +25,7 @@ int freeStatic(void *pCPU);
 int freeStaticPara(void *pCPU);
 int saveStatic(void *pCPU, int num, FILE *f);
 void *loadStatic(int num, FILE *f);
+bool isEqualStatic(void *p1, void *p2, int num);
 
 void *cudaMallocStatic();
 void *cudaAllocStatic(void *pCPU, int num);

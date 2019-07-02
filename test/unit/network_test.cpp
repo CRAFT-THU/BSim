@@ -7,12 +7,14 @@
 #include "gtest/gtest.h"
 
 #include "../../include/BSim.h"
+#include "../../src/net/GNetwork.h"
 
 using std::vector;
 using ::testing::AtLeast;
 using ::testing::ElementsAreArray;
 
 GNetwork *net = NULL;
+Network * network = NULL;
 
 TEST(NetworkTest, NeuronTest) {
 	ASSERT_EQ(net->nTypeNum, 1);
@@ -130,10 +132,18 @@ TEST(NetworkTest, ConnectionTest) {
 			);
 }
 
+TEST(NetworkTest, BuildTest) {
+	SimInfo info(1e-4);
+	DistriNetwork* n1 = network->buildNetworks(info);
+	GNetwork * n2 = network->buildNetwork(info);
+	ASSERT_TRUE(isEqualNetwork(n1->_network, n2));
+}
+
 
 int main(int argc, char **argv)
 {
 	Network c;
+	network = &c;
 	Population *pn0 = c.createPopulation(2, LIF_curr_exp(LIFNeuron(1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9), 1.6, 1.7));
 	Population *pn1 = c.createPopulation(3, LIF_curr_exp(LIFNeuron(2.0, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8, 2.9), 2.6, 2.7));
 	Population *pn2 = c.createPopulation(1, LIF_curr_exp(LIFNeuron(3.0, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7, 3.8, 3.9), 3.6, 3.7));

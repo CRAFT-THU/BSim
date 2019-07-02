@@ -18,8 +18,7 @@ enum Type {
 	LIF = 0,
 	// TJ,
 	Static,
-	TYPESIZE,
-	POPULATION
+	TYPESIZE
 }; 
 
 enum SpikeType { Excitatory = 0, Inhibitory = 1, SPIKETYPESIZE = 2};

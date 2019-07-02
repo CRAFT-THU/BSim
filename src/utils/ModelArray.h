@@ -26,7 +26,7 @@ public:
 
 	~ModelArray();
 
-	Type getType() const override;
+	virtual Type getType() const override;
 
 	int getNum();
 	// virtual size_t getSize();

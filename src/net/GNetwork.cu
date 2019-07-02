@@ -113,7 +113,7 @@ int freeNetworkGPU(GNetwork *pGpuNet)
 
 
 
-int checkGPUNetwork(GNetwork *g, GNetwork *c)
+int checkNetworkGPU(GNetwork *g, GNetwork *c)
 {
 	int ret = -1;
 

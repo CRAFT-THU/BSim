@@ -30,6 +30,10 @@ public:
 	Network(int nodeNum = 1);
 	~Network();
 
+	inline int setNodeNum(int nodeNum) {
+		_nodeNum = nodeNum;
+		return _nodeNum;
+	}
 	// template<class N>
 	// Population<N>* createNeuron(N n1);
 	template<class N>
@@ -47,7 +51,7 @@ public:
 	int connect(int populationIDSrc, int neuronIDSrc, int populationIDDst, int neuronIDDst, real weight, real delay, real tau = 0);
 	Synapse* connect(Neuron *pSrc, Neuron *pDst, real weight, real delay, SpikeType type = Excitatory, real tau = 0, bool store = true);
 
-	// GNetwork* buildNetwork(SimInfo &info);
+	GNetwork* buildNetwork(SimInfo &info);
 
 	int addNeuronNum(Type type, int num);
 	int addConnectionNum(Type type, int num);
@@ -101,22 +105,22 @@ public:
 	// map<ID, int> _nID2node;
 	// map<ID, int> _sID2node;
 	// Neurons that on this node and would issue spikes to others.
-	// Acessed by neurons = _crossnode_neurons_send[node]
-	vector<set<Neuron *> > _crossnode_neurons_send;
+	// Acessed by neurons = _crossnodeNeuronsSend[node]
+	vector<set<Neuron *> > _crossnodeNeuronsSend;
 	// Neurons that on other nodes and would issue spike to this node.
-	// Accessed by neurons = _crossnode_neurons_recv[node]
-	vector<set<Neuron *> > _crossnode_neurons_recv;
+	// Accessed by neurons = _crossnodeNeuronsRecv[node]
+	vector<set<Neuron *> > _crossnodeNeuronsRecv;
 	// Get idx of shadow neuron on destination node, the idxs of shadow neurons are larger than that of real neurons.
-	// Accessed by idx = _crossnode_neuron2idx[node][neuron]
-	vector<map<Neuron *, int> > _crossnode_neuron2idx;
+	// Accessed by idx = _crossnodeNeuron2idx[node][neuron]
+	vector<map<Neuron *, int> > _crossnodeNeuron2idx;
 
 	/** Per Node Data **/
 	// vector<map<int, ID> > _global_idx2nID;
 	// vector<map<int, ID> > _global_idx2sID;
 	// Number of neurons for different types on different nodes accessed by _global_ntype_num[node][type]
-	vector<map<Type, int> >	_global_ntype_num;
+	vector<map<Type, int> >	_globalNTypeNum;
 	// Number of synapses for different types on different nodes accessed by _global_ntype_num[node][type]
-	vector<map<Type, int> > _global_stype_num;
+	vector<map<Type, int> > _globalSTypeNum;
 
 	real _maxDelay;
 	real _minDelay;
@@ -165,9 +169,9 @@ Population * Network::createPopulation(int num, N templ, bool empty)
 		pp1 = new Population(num, templ);
 	}
 
-	if (find(pPopulations.begin(), pPopulations.end(), pp1) == pPopulations.end()) {
-		pPopulations.push_back(pp1);
-		populationNum++;
+	if (find(_pPopulations.begin(), _pPopulations.end(), pp1) == _pPopulations.end()) {
+		_pPopulations.push_back(pp1);
+		_populationNum++;
 		addNeuronNum(pp1->getType(), pp1->getNum());
 	}
 

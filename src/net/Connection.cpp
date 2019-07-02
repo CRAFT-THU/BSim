@@ -1,6 +1,9 @@
 
 #include <stdlib.h>
 #include <assert.h>
+#include <string.h>
+
+#include "../utils/utils.h"
 
 #include "Connection.h"
 
@@ -18,15 +21,20 @@ Connection * allocConnection(int nNum, int sNum, int maxDelay, int minDelay)
 
 	ret->pDelayStart = (int*)malloc(sizeof(int)*length);
 	assert(ret->pDelayStart != NULL);
+	memset(ret->pDelayStart, 0, sizeof(int)*length);
 	ret->pDelayNum = (int*)malloc(sizeof(int)*length);
 	assert(ret->pDelayNum != NULL);
+	memset(ret->pDelayNum, 0, sizeof(int)*length);
 
 	ret->pDelayStartRev = (int*)malloc(sizeof(int)*length);
 	assert(ret->pDelayStartRev != NULL);
+	memset(ret->pDelayStartRev, 0, sizeof(int)*length);
 	ret->pDelayNumRev = (int*)malloc(sizeof(int)*length);
 	assert(ret->pDelayNumRev != NULL);
+	memset(ret->pDelayNumRev, 0, sizeof(int)*length);
 	ret->pSidMapRev = (int*)malloc(sizeof(int)*sNum);
 	assert(ret->pSidMapRev != NULL);
+	memset(ret->pSidMapRev, 0, sizeof(int)*sNum);
 
 	return ret;
 }
@@ -50,11 +58,13 @@ int saveConnection(Connection *conn, FILE *f)
 	fwrite(&(conn->maxDelay), sizeof(int), 1, f);
 	fwrite(&(conn->minDelay), sizeof(int), 1, f);
 
-	fwrite(conn->pDelayStart, sizeof(int), conn->nNum, f);
-	fwrite(conn->pDelayNum, sizeof(int), conn->nNum, f);
+	int length = (conn->maxDelay - conn->minDelay + 1) * conn->nNum;
 
-	fwrite(conn->pDelayStartRev, sizeof(int), conn->nNum, f);
-	fwrite(conn->pDelayNumRev, sizeof(int), conn->nNum, f);
+	fwrite(conn->pDelayStart, sizeof(int), length, f);
+	fwrite(conn->pDelayNum, sizeof(int), length, f);
+
+	fwrite(conn->pDelayStartRev, sizeof(int), length, f);
+	fwrite(conn->pDelayNumRev, sizeof(int), length, f);
 	fwrite(conn->pSidMapRev, sizeof(int), conn->sNum, f);
 
 	return 0;
@@ -69,19 +79,43 @@ Connection * loadConnection(FILE *f)
 	fread(&(conn->maxDelay), sizeof(int), 1, f);
 	fread(&(conn->minDelay), sizeof(int), 1, f);
 
-	conn->pDelayStart = (int*)malloc(sizeof(int)*conn->nNum);
-	conn->pDelayNum = (int*)malloc(sizeof(int)*conn->nNum);
+	int length = (conn->maxDelay - conn->minDelay + 1) * conn->nNum;
 
-	conn->pDelayStartRev = (int*)malloc(sizeof(int)*conn->nNum);
-	conn->pDelayNumRev = (int*)malloc(sizeof(int)*conn->nNum);
+	conn->pDelayStart = (int*)malloc(sizeof(int)*length);
+	conn->pDelayNum = (int*)malloc(sizeof(int)*length);
+
+	conn->pDelayStartRev = (int*)malloc(sizeof(int)*length);
+	conn->pDelayNumRev = (int*)malloc(sizeof(int)*length);
 	conn->pSidMapRev = (int*)malloc(sizeof(int)*conn->sNum);
 
-	fread(conn->pDelayStart, sizeof(int), conn->nNum, f);
-	fread(conn->pDelayNum, sizeof(int), conn->nNum, f);
+	fread(conn->pDelayStart, sizeof(int), length, f);
+	fread(conn->pDelayNum, sizeof(int), length, f);
 
-	fread(conn->pDelayStartRev, sizeof(int), conn->nNum, f);
-	fread(conn->pDelayNumRev, sizeof(int), conn->nNum, f);
+	fread(conn->pDelayStartRev, sizeof(int), length, f);
+	fread(conn->pDelayNumRev, sizeof(int), length, f);
 	fread(conn->pSidMapRev, sizeof(int), conn->sNum, f);
 
 	return conn;
+}
+
+
+bool isEqualConnection(Connection *c1, Connection *c2)
+{
+	bool ret = true;
+	ret = ret && (c1->nNum == c2->nNum);
+	ret = ret && (c1->sNum == c2->sNum);
+	ret = ret && (c1->maxDelay == c2->maxDelay);
+	ret = ret && (c1->minDelay == c2->minDelay);
+
+	int length = (c1->maxDelay - c1->minDelay + 1) * c1->nNum;
+
+	ret = ret && isEqualArray(c1->pDelayStart, c2->pDelayStart, length);
+	ret = ret && isEqualArray(c1->pDelayNum, c2->pDelayNum, length);
+
+	ret = ret && isEqualArray(c1->pDelayStartRev, c2->pDelayStartRev, length);
+	ret = ret && isEqualArray(c1->pDelayNumRev, c2->pDelayNumRev, length);
+
+	ret = ret && isEqualArray(c1->pSidMapRev, c2->pSidMapRev, c1->sNum);
+
+	return ret;
 }

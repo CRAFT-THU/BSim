@@ -10,22 +10,22 @@
 #include "../../utils/BlockSize.h"
 
 struct LIFData {
-	real *pV_i;
+	int *pRefracStep;
+	int *pRefracTime;
+
 	real *pV_m;
-	real *pI_e;
+	real *pC_i;
+	real *pV_i;
 	real *pCe;
-	real *pV_thresh;
+	real *pI_e;
+	real *pCi;
+	real *pV_reset;
 	real *pV_e;
 	real *pC_m;
-	real *pCi;
-	real *pC_i;
-	real *pI_i;
 	real *pC_e;
-	real *pV_reset;
+	real *pV_thresh;
+	real *pI_i;
 	real *pV_tmp;
-
-	int *pRefracTime;
-	int *pRefracStep;
 
 };
 
@@ -38,6 +38,7 @@ int freeLIF(void *pCPU);
 int freeLIFPara(void *pCPU);
 int saveLIF(void *pCPU, int num, FILE *f);
 void *loadLIF(int num, FILE *f);
+bool isEqualLIF(void *p1, void *p2, int num);
 
 void *cudaMallocLIF();
 void *cudaAllocLIF(void *pCPU, int num);

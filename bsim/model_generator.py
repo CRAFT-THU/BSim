@@ -71,6 +71,7 @@ class Data(object):
         h.func("int free{}Para(void *pCPU)".format(self.name))
         h.func("int save{}(void *pCPU, int num, FILE *f)".format(self.name))
         h.func("void *load{}(int num, FILE *f)".format(self.name))
+        h.func("bool isEqual{}(void *p1, void *p2, int num)".format(self.name))
         h.blank_line()
 
         h.func("void *cudaMalloc{}()".format(self.name))
@@ -95,6 +96,9 @@ class Data(object):
         c = CGenerator("{}/{}.cpp".format(self.path, self.classname))
         c.include_std("stdlib.h")
         c.include_std("string.h")
+        c.blank_line()
+        c.include("../../utils/utils.h")
+        c.blank_line()
         c.blank_line()
         c.include("{}.h".format(self.classname))
         c.blank_line()
@@ -160,6 +164,18 @@ class Data(object):
                 c.line("fread(p->p{}, sizeof({}), num, f)".format(mycap(p), t))
             c.blank_line()
         c.func_end("p")
+        c.blank_line()
+
+        c.func_start("bool isEqual{}(void *p1, void *p2, int num)".format(self.name))
+        c.line("{} *t1 = ({}*)p1".format(self.classname, self.classname))
+        c.line("{} *t2 = ({}*)p2".format(self.classname, self.classname))
+        c.blank_line()
+        c.line("bool ret = true")
+        for t in self.parameters:
+            for p in self.parameters[t]:
+                c.line("ret = ret && isEqualArray(t1->p{}, t2->p{}, num)".format(mycap(p), mycap(p)))
+            c.blank_line()
+        c.func_end("ret")
         c.blank_line()
 
         return 0

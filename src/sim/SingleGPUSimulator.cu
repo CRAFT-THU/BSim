@@ -14,7 +14,7 @@
 // #include "../gpu_utils/gpu_utils.h"
 #include "../gpu_utils/GBuffers.h"
 #include "../gpu_utils/runtime.h"
-#include "../net/MultiNetwork.h"
+#include "../net/Network.h"
 #include "../neuron/lif/LIFData.h"
 // #include "../gpu_utils/gpu_func.h"
 
@@ -268,11 +268,12 @@ int SingleGPUSimulator::runMultiNets(real time, int parts, FireInfo &log) {
 
 	checkCudaErrors(cudaSetDevice(0));
 
-	MultiNetwork multiNet(_network, parts);
+	// Network multiNet(_network, parts);
+	_network->setNodeNum(parts);
 	SimInfo info(_dt);
-	DistriNetwork *subnets = multiNet.buildNetworks(info);
+	DistriNetwork *subnets = _network->buildNetworks(info);
 	assert(subnets != NULL);
-	CrossNodeDataGPU *crossData = multiNet.arrangeCrossNodeDataGPU(parts);
+	CrossNodeDataGPU *crossData = _network->arrangeCrossNodeDataGPU(parts);
 	assert(crossData != NULL);
 
 	GNetwork ** networks = (GNetwork **)malloc(sizeof(GNetwork *) * parts);
@@ -280,9 +281,9 @@ int SingleGPUSimulator::runMultiNets(real time, int parts, FireInfo &log) {
 	BlockSize **updateSizes = (BlockSize **)malloc(sizeof(GBuffers *) * parts);
 
 	for (int i=0; i<parts; i++) {
-		subnets[i]._sim_cycle = sim_cycle;
-		subnets[i]._node_idx = i;
-		subnets[i]._node_num = parts;
+		subnets[i]._simCycle = sim_cycle;
+		subnets[i]._nodeIdx = i;
+		subnets[i]._nodeNum = parts;
 		subnets[i]._dt = _dt;
 
 		GNetwork *pNetCPU = subnets[i]._network;
@@ -300,8 +301,8 @@ int SingleGPUSimulator::runMultiNets(real time, int parts, FireInfo &log) {
 		buffers[i] = alloc_buffers(allNeuronNum, nodeSynapseNum, pNetCPU->pConnection->maxDelay, _dt);
 		updateSizes[i] = getBlockSize(allNeuronNum, nodeSynapseNum);
 
-		printf("Subnet %d NeuronTypeNum: %d, SynapseTypeNum: %d\n", subnets[i]._node_idx, nTypeNum, sTypeNum);
-		printf("Subnet %d NeuronNum: %d, SynapseNum: %d\n", subnets[i]._node_idx, nodeNeuronNum, nodeSynapseNum);
+		printf("Subnet %d NeuronTypeNum: %d, SynapseTypeNum: %d\n", subnets[i]._nodeIdx, nTypeNum, sTypeNum);
+		printf("Subnet %d NeuronNum: %d, SynapseNum: %d\n", subnets[i]._nodeIdx, nodeNeuronNum, nodeSynapseNum);
 	}
 
 	for (int time=0; time<sim_cycle; time++) {

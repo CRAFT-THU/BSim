@@ -7,8 +7,10 @@
 #include <assert.h>
 #include <iostream>
 
+#include "../utils/utils.h"
 #include "../utils/TypeFunc.h"
 #include "../utils/FileOp.h"
+
 #include "GNetwork.h"
 
 GNetwork * deepcopyNetwork(GNetwork * net) {
@@ -247,6 +249,27 @@ int mpiRecvNetwork(GNetwork *network, int rank, int rankSize)
 	return 0;
 }
 
+bool isEqualNetwork(GNetwork *n1, GNetwork *n2)
+{
+	bool ret = true;
+	ret = ret && (n1->nTypeNum == n2->nTypeNum);
+	ret = ret && (n1->sTypeNum == n2->sTypeNum);
+	ret = ret && isEqualArray(n1->pNTypes, n2->pNTypes, n1->nTypeNum);
+	ret = ret && isEqualArray(n1->pSTypes, n2->pSTypes, n1->sTypeNum);
+	ret = ret && isEqualArray(n1->pNeuronNums, n2->pNeuronNums, n1->nTypeNum+1);
+	ret = ret && isEqualArray(n1->pSynapseNums, n2->pSynapseNums, n1->sTypeNum+1);
+
+	for (int i=0; i<n1->nTypeNum; i++) {
+		ret = ret && isEqualType[n1->pNTypes[i]](n1->ppNeurons[i], n2->ppNeurons[i], n1->pNeuronNums[i+1]-n1->pNeuronNums[i]);
+	}
+	for (int i=0; i<n2->sTypeNum; i++) {
+		ret = ret && isEqualType[n1->pSTypes[i]](n1->ppSynapses[i], n2->ppSynapses[i], n1->pSynapseNums[i+1]-n1->pSynapseNums[i]);
+	}
+
+	ret = ret && isEqualConnection(n1->pConnection, n2->pConnection);
+
+	return ret;
+}
 
 // int printNetwork(GNetwork *net, int rank)
 // {

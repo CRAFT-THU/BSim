@@ -61,7 +61,7 @@ int mpiRecvNetwork(GNetwork *network, int rank, int rankSize);
 
 
 // Other utils
-int checkNetworkGPU(GNetwork *g, GNetwork *c);
+bool isEqualNetwork(GNetwork *n1, GNetwork *n2);
 int printNetwork(GNetwork *net, int rank = 0);
 
 #endif /* GNETWORK_H */

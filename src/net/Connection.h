@@ -35,5 +35,7 @@ int cudaFreeConnection(Connection *pGPU);
 int saveConnection(Connection *conn, FILE *f);
 Connection * loadConnection(FILE *f);
 
+bool isEqualConnection(Connection *c1, Connection *c2);
+
 #endif /* CONNECTION_H */
 
