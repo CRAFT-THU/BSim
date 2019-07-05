@@ -22,7 +22,7 @@ public:
 	// virtual int getData(void *data) override;
 	virtual int hardCopy(void * data, int idx, int base, const SimInfo &info) override;
 
-	virtual Synapse *createSynapse(real weight, real delay, SpikeType type, real tau, Neuron *dst) override;
+	virtual Synapse * createSynapse(real weight, real delay, SpikeType type, real tau, Neuron *dst) override;
 
 	const static Type type;
 protected:

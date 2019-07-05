@@ -52,11 +52,11 @@ def main(argv):
     try:
         opts, args = getopt.getopt(argv,"hi:o:s:",["ifile=","ofile=","sfile="])
     except getopt.GetoptError:
-        print usuage_msg
+        print(usuage_msg)
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
-            print usuage_msg 
+            print(usuage_msg)
             sys.exit()
         elif opt in ("-i", "--ifile"):
             inputfile.append(arg)
@@ -65,7 +65,7 @@ def main(argv):
         elif opt in ("-s", "--sfile"):
             inputfile, outputfile = find_series_files(arg)
     
-    print 'Column Merge: ' + ' '.join(str(e) for e in inputfile) + " to " + str(outputfile) 
+    print('Column Merge: ' + ' '.join(str(e) for e in inputfile) + " to " + str(outputfile))
     column_merge(inputfile, outputfile);
 
 
