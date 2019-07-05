@@ -84,6 +84,27 @@ Network::~Network()
 	_globalSTypeNum.clear();
 }
 
+int Network::setNodeNum(int nodeNum)
+{
+	_nodeNum = nodeNum;
+
+	_crossnodeNeuronsSend.clear();
+	_crossnodeNeuronsRecv.clear();
+	_crossnodeNeuron2idx.clear();
+
+	_globalNTypeNum.clear();
+	_globalSTypeNum.clear();
+
+	_crossnodeNeuronsSend.resize(nodeNum);
+	_crossnodeNeuronsRecv.resize(nodeNum);
+	_crossnodeNeuron2idx.resize(nodeNum);
+
+	_globalNTypeNum.resize(nodeNum);
+	_globalSTypeNum.resize(nodeNum);
+
+	return _nodeNum;
+}
+
 int Network::connect(Population *pSrc, Population *pDst, real weight, real delay, SpikeType type) {
 	int srcSize = pSrc->getNum();
 	int dstNum = pDst->getNum();
@@ -447,8 +468,14 @@ int Network::connect(int populationIDSrc, int neuronIDSrc, int populationIDDst, 
 	return 0;
 }
 
-int Network::reset(SimInfo &info)
+int Network::reset(const SimInfo &info)
 {
+	_crossnodeNeuronsSend.clear();
+	_crossnodeNeuronsRecv.clear();
+	_crossnodeNeuron2idx.clear();
+
+	_globalNTypeNum.clear();
+	_globalSTypeNum.clear();
 	// maxDelaySteps = static_cast<int>(round(maxDelay/info.dt));
 	// minDelaySteps = static_cast<int>(round(minDelay/info.dt));
 
@@ -467,11 +494,13 @@ int Network::reset(SimInfo &info)
 	// 	PopulationBase * p = *iterP;
 	// 	p->reset(info);
 	// }
+	
+
 
 	return 0;
 }
 // 
-// int Network::update(SimInfo &info)
+// int Network::update(const SimInfo &info)
 // {
 // 	vector<SynapseBase*>::iterator iterS;
 // 	vector<NeuronBase*>::iterator iterN;
@@ -495,7 +524,7 @@ int Network::reset(SimInfo &info)
 // 	return 0;
 // }
 // 
-// void Network::monitor(SimInfo &info)
+// void Network::monitor(const SimInfo &info)
 // {
 // 	vector<SynapseBase*>::iterator iterS;
 // 	vector<NeuronBase*>::iterator iterN;
@@ -592,7 +621,7 @@ void Network::countTypeNum()
 	}
 }
 
-GNetwork* Network::arrangeData(int nodeIdx, SimInfo &info) {
+GNetwork* Network::arrangeData(int nodeIdx, const SimInfo &info) {
 	int nTypeNum = _globalNTypeNum[nodeIdx].size();
 	int sTypeNum = _globalSTypeNum[nodeIdx].size();
 
@@ -684,7 +713,7 @@ GNetwork* Network::arrangeData(int nodeIdx, SimInfo &info) {
 	return net;
 }
 
-Connection* Network::arrangeConnect(int nNum, int sNum, int node_idx, SimInfo &info)
+Connection* Network::arrangeConnect(int nNum, int sNum, int node_idx, const SimInfo &info)
 {
 	int maxDelaySteps = static_cast<int>(round(_maxDelay/info.dt));
 	int minDelaySteps = static_cast<int>(round(_minDelay/info.dt));
@@ -746,10 +775,13 @@ CrossNodeMap* Network::arrangeCrossNodeMap(int n_num, int node_idx, int node_num
 	assert(crossMap->_idx2index != NULL);
 	std::fill(crossMap->_idx2index, crossMap->_idx2index + n_num, -1);
 
-	crossMap->_crossnodeIndex2idx = (int*)malloc(sizeof(int) * node_num * _crossnodeNeuronsSend[node_idx].size());
+	if (_crossnodeNeuronsSend[node_idx].size() > 0) {
+		crossMap->_crossnodeIndex2idx = (int*)malloc(sizeof(int) * node_num * _crossnodeNeuronsSend[node_idx].size());
+	} else {
+		crossMap->_crossnodeIndex2idx = NULL;
+	}
 	crossMap->_crossSize = node_num * _crossnodeNeuronsSend[node_idx].size();
 
-	assert(crossMap->_crossnodeIndex2idx != NULL);
 
 
 	int index = 0;
@@ -758,8 +790,10 @@ CrossNodeMap* Network::arrangeCrossNodeMap(int n_num, int node_idx, int node_num
 		crossMap->_idx2index[nidx] = index;
 		for (int t=0; t<node_num; t++) {
 			if (_crossnodeNeuronsRecv[t].find(*iter) != _crossnodeNeuronsRecv[t].end()) {
+				assert(crossMap->_crossnodeIndex2idx != NULL);
 				crossMap->_crossnodeIndex2idx[index*node_num + t] = _crossnodeNeuron2idx[t][*iter];
 			} else {
+				assert(crossMap->_crossnodeIndex2idx != NULL);
 				crossMap->_crossnodeIndex2idx[index*node_num + t] = -1;
 			}
 		}
@@ -841,10 +875,10 @@ void Network::splitNetwork()
 	return;
 }
 
-DistriNetwork* Network::buildNetworks(SimInfo &info, bool auto_splited)
+DistriNetwork* Network::buildNetworks(const SimInfo &info, bool auto_splited)
 {
 	assert(_nodeNum >= 1);
-	DistriNetwork * net = initDistriNet(_nodeNum);
+	DistriNetwork * net = initDistriNet(_nodeNum, info.dt);
 
 	if (auto_splited && _nodeNum > 1) {
 		splitNetwork();

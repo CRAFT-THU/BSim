@@ -45,13 +45,15 @@ int SingleGPUSimulator::run(real time, FireInfo &log)
 
 	FILE *v_file = openFile("v.data", "w+");
 
-	FILE *input_e_file = openFile("input_e.data", "w+");
+	// FILE *input_e_file = openFile("input_e.data", "w+");
 
-	FILE *input_i_file = openFile("input_i.data", "w+");
+	// FILE *input_i_file = openFile("input_i.data", "w+");
 
-	FILE *ie_file = openFile("ie.data", "w+");
+	// FILE *ie_file = openFile("ie.data", "w+");
 
-	FILE *ii_file = openFile("ii.data", "w+");
+	// FILE *ii_file = openFile("ii.data", "w+");
+
+	FILE *fire_file = openFile("fire.log", "w+");
 
 	FILE *log_file = openFile("sim.log", "w+");
 
@@ -109,16 +111,16 @@ int SingleGPUSimulator::run(real time, FireInfo &log)
 		//fflush(stdout);
 
 #ifdef DEBUG
-		copyFromGPU<real>(c_vm, buffers->c_gNeuronInput + c_pNetGPU->pNeuronNums[copy_idx], c_pNetGPU->pNeuronNums[copy_idx+1]-c_pNetGPU->pNeuronNums[copy_idx]);
-		for (int i=0; i<c_pNetGPU->pNeuronNums[copy_idx+1] - c_pNetGPU->pNeuronNums[copy_idx]; i++) {
-			fprintf(input_e_file, "%.10lf \t", c_vm[i]);
-		}
-		fprintf(input_e_file, "\n");
-		copyFromGPU<real>(c_vm, buffers->c_gNeuronInput_I + c_pNetGPU->pNeuronNums[copy_idx], c_pNetGPU->pNeuronNums[copy_idx+1]-c_pNetGPU->pNeuronNums[copy_idx]);
-		for (int i=0; i<c_pNetGPU->pNeuronNums[copy_idx+1] - c_pNetGPU->pNeuronNums[copy_idx]; i++) {
-			fprintf(input_i_file, "%.10lf \t", c_vm[i]);
-		}
-		fprintf(input_i_file, "\n");
+		// copyFromGPU<real>(c_vm, buffers->c_gNeuronInput + c_pNetGPU->pNeuronNums[copy_idx], c_pNetGPU->pNeuronNums[copy_idx+1]-c_pNetGPU->pNeuronNums[copy_idx]);
+		// for (int i=0; i<c_pNetGPU->pNeuronNums[copy_idx+1] - c_pNetGPU->pNeuronNums[copy_idx]; i++) {
+		// 	fprintf(input_e_file, "%.10lf \t", c_vm[i]);
+		// }
+		// fprintf(input_e_file, "\n");
+		// copyFromGPU<real>(c_vm, buffers->c_gNeuronInput_I + c_pNetGPU->pNeuronNums[copy_idx], c_pNetGPU->pNeuronNums[copy_idx+1]-c_pNetGPU->pNeuronNums[copy_idx]);
+		// for (int i=0; i<c_pNetGPU->pNeuronNums[copy_idx+1] - c_pNetGPU->pNeuronNums[copy_idx]; i++) {
+		// 	fprintf(input_i_file, "%.10lf \t", c_vm[i]);
+		// }
+		// fprintf(input_i_file, "\n");
 #endif
 
 		update_time<<<1, 1>>>(c_pNetGPU->pConnection, time, buffers->c_gFiredTableSizes);
@@ -136,32 +138,26 @@ int SingleGPUSimulator::run(real time, FireInfo &log)
 		//LOG DATA
 		int currentIdx = time%(deltaDelay+1);
 
-		//printf("HERE %p %d ", buffers->c_gFiredTableSizes, currentIdx);
-		//fflush(stdout);
 		int copySize = 0;
 		copyFromGPU<int>(&copySize, buffers->c_gFiredTableSizes + currentIdx, 1);
-		//printf("HERE1\n");
-		//fflush(stdout);
 		copyFromGPU<int>(buffers->c_neuronsFired, buffers->c_gFiredTable + (totalNeuronNum*currentIdx), copySize);
-		//copyFromGPU<real>(c_I_syn, c_g_I_syn, c_pNetGPU->pSynapseNums[exp_idx+1]-c_pNetGPU->pSynapseNums[exp_idx]);
 
-		//fprintf(dataFile, "Cycle %d: ", time);
 		copyFromGPU<real>(c_vm, c_g_vm, c_pNetGPU->pNeuronNums[copy_idx+1]-c_pNetGPU->pNeuronNums[copy_idx]);
 		for (int i=0; i<c_pNetGPU->pNeuronNums[copy_idx+1] - c_pNetGPU->pNeuronNums[copy_idx]; i++) {
 			fprintf(v_file, "%.10lf \t", c_vm[i]);
 		}
 		fprintf(v_file, "\n");
 #ifdef DEBUG
-		copyFromGPU<real>(c_vm, c_g_ie, c_pNetGPU->pNeuronNums[copy_idx+1]-c_pNetGPU->pNeuronNums[copy_idx]);
-		for (int i=0; i<c_pNetGPU->pNeuronNums[copy_idx+1] - c_pNetGPU->pNeuronNums[copy_idx]; i++) {
-			fprintf(ie_file, "%.10lf \t", c_vm[i]);
-		}
-		fprintf(ie_file, "\n");
-		copyFromGPU<real>(c_vm, c_g_ii, c_pNetGPU->pNeuronNums[copy_idx+1]-c_pNetGPU->pNeuronNums[copy_idx]);
-		for (int i=0; i<c_pNetGPU->pNeuronNums[copy_idx+1] - c_pNetGPU->pNeuronNums[copy_idx]; i++) {
-			fprintf(ii_file, "%.10lf \t", c_vm[i]);
-		}
-		fprintf(ii_file, "\n");
+		// copyFromGPU<real>(c_vm, c_g_ie, c_pNetGPU->pNeuronNums[copy_idx+1]-c_pNetGPU->pNeuronNums[copy_idx]);
+		// for (int i=0; i<c_pNetGPU->pNeuronNums[copy_idx+1] - c_pNetGPU->pNeuronNums[copy_idx]; i++) {
+		// 	fprintf(ie_file, "%.10lf \t", c_vm[i]);
+		// }
+		// fprintf(ie_file, "\n");
+		// copyFromGPU<real>(c_vm, c_g_ii, c_pNetGPU->pNeuronNums[copy_idx+1]-c_pNetGPU->pNeuronNums[copy_idx]);
+		// for (int i=0; i<c_pNetGPU->pNeuronNums[copy_idx+1] - c_pNetGPU->pNeuronNums[copy_idx]; i++) {
+		// 	fprintf(ii_file, "%.10lf \t", c_vm[i]);
+		// }
+		// fprintf(ii_file, "\n");
 		//for (int i=0; i<c_pNetGPU->pSynapseNums[1] - c_pNetGPU->pSynapseNums[0]; i++) {
 		//		fprintf(dataFile, ", %lf", c_I_syn[i]);
 		//}
@@ -248,10 +244,11 @@ int SingleGPUSimulator::run(real time, FireInfo &log)
 
 
 	closeFile(v_file);
-	closeFile(input_e_file);
-	closeFile(input_i_file);
-	closeFile(ie_file);
-	closeFile(ii_file);
+	// closeFile(input_e_file);
+	// closeFile(input_i_file);
+	// closeFile(ie_file);
+	// closeFile(ii_file);
+	closeFile(fire_file);
 	closeFile(log_file);
 
 	free_buffers(buffers);

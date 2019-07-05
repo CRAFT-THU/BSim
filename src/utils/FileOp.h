@@ -16,6 +16,7 @@ inline FILE * openFile(const char *filename, const char *mode) {
 }
 
 inline int closeFile(FILE *file) {
+	fflush(file);
 	return fclose(file);
 }
 

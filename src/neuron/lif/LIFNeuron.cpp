@@ -114,7 +114,7 @@ Synapse * LIFNeuron::createSynapse(real weight, real delay, SpikeType type, real
 	return NULL;
 }
 
-int LIFNeuron::hardCopy(void * data, int idx, int base, SimInfo &info)
+int LIFNeuron::hardCopy(void * data, int idx, int base, const SimInfo &info)
 {
 	LIFData *p = (LIFData *) data;
 

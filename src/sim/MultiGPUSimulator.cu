@@ -97,12 +97,12 @@ void * run_thread_gpu(void *para) {
 	DistriNetwork *network = (DistriNetwork*)para;
 
 	char log_filename[512];
-	sprintf(log_filename, "GSim_%d.log", network->_nodeIdx); 
+	sprintf(log_filename, "sim_%d.log", network->_nodeIdx); 
 	FILE *log_file = fopen(log_filename, "w+");
 	assert(log_file != NULL);
 
 	char v_filename[512];
-	sprintf(v_filename, "g_v_%d.data", network->_nodeIdx); 
+	sprintf(v_filename, "v_%d.data", network->_nodeIdx); 
 	FILE *v_file = fopen(v_filename, "w+");
 	assert(v_file != NULL);
 
@@ -122,8 +122,11 @@ void * run_thread_gpu(void *para) {
 	//int dataOffset = network->_nodeIdx * network->_nodeNum;
 	//int dataIdx = network->_nodeIdx * network->_nodeNum + network->_nodeIdx;
 
-	int deltaDelay = pNetCPU->pConnection->maxDelay - pNetCPU->pConnection->minDelay;
-	printf("Thread %d MaxDelay: %d MinDelay: %d\n", network->_nodeIdx, pNetCPU->pConnection->maxDelay, pNetCPU->pConnection->minDelay);
+	int maxDelay = pNetCPU->pConnection->maxDelay;
+	int minDelay = pNetCPU->pConnection->minDelay;
+	int deltaDelay = maxDelay - minDelay;
+	// int deltaDelay = pNetCPU->pConnection->maxDelay - pNetCPU->pConnection->minDelay;
+	printf("Thread %d MaxDelay: %d MinDelay: %d\n", network->_nodeIdx, maxDelay,  minDelay);
 
 	// init_connection<<<1, 1>>>(c_pNetGPU->pConnection);
 
@@ -206,7 +209,7 @@ void * run_thread_gpu(void *para) {
 		//peer_cpy_time += (t7.tv_sec - t3.tv_sec) + (t7.tv_usec - t3.tv_usec)/1000000.0;
 
 #ifdef LOG_DATA
-		int currentIdx = time%(deltaDelay+1);
+		int currentIdx = time%(maxDelay+1);
 
 		int copySize = 0;
 		copyFromGPU<int>(&copySize, buffers->c_gFiredTableSizes + currentIdx, 1);
@@ -285,7 +288,7 @@ void * run_thread_gpu(void *para) {
 	copyFromGPU<int>(rate, buffers->c_gFireCount, nodeNeuronNum);
 
 	char fire_filename[512];
-	sprintf(fire_filename, "GFire_%d.log", network->_nodeIdx); 
+	sprintf(fire_filename, "fire_%d.count", network->_nodeIdx); 
 	FILE *rate_file = fopen(fire_filename, "w+");
 	if (rate_file == NULL) {
 		printf("Open file Sim.log failed\n");

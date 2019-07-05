@@ -47,7 +47,7 @@ public:
 
 	// virtual size_t getSize() = 0;
 	// virtual int getData(void *data) = 0;
-	virtual int hardCopy(void *data, int idx, int base, SimInfo &info) = 0;
+	virtual int hardCopy(void *data, int idx, int base, const SimInfo &info) = 0;
 	
 protected:
 	ID _id;

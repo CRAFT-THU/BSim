@@ -45,8 +45,8 @@ GNetwork * deepcopyNetwork(GNetwork *net);
 void freeGNetwork(GNetwork * network);
 
 // Save and Load
-int saveGNetwork(GNetwork *, char *filename);
-GNetwork *loadGNetwork(char *filename);
+int saveGNetwork(GNetwork *, const char *filename);
+GNetwork *loadGNetwork(const char *filename);
 
 // Transfer GNetwork between CPU and GPU
 // Only copy inside data arrays to GPU, the info data is left on CPU

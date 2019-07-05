@@ -37,7 +37,7 @@ public:
 	// virtual void monitor(SimInfo &info);
 
 	// virtual int getData(void *data);
-	virtual int hardCopy(void *data, int idx, int base, SimInfo &info) override;
+	virtual int hardCopy(void *data, int idx, int base, const SimInfo &info) override;
 
 	int append(Item *templ);
 	// Item* findItem(ID id);
@@ -188,7 +188,7 @@ Item* ModelArray<Item>::find(ID id)
 // }
 
 template<class Item>
-int ModelArray<Item>::hardCopy(void *data, int idx, int base, SimInfo &info)
+int ModelArray<Item>::hardCopy(void *data, int idx, int base, const SimInfo &info)
 {
 	size_t copiedIdxs = 0;
 	for (auto iter = _items.begin(); iter != _items.end(); iter++) {

@@ -136,7 +136,8 @@ __global__ void curand_setup_kernel(curandState *state, int num)
 __global__ void cudaAddCrossNeurons(Connection *connection, int *firedTable, int *firedTableSizes, int *ids, int num, int time)
 {
 	int tid = blockIdx.x * blockDim.x + threadIdx.x;
-	int delayIdx = time % (connection->maxDelay-connection->minDelay+1);
+	// int delayIdx = time % (connection->maxDelay-connection->minDelay+1);
+	int delayIdx = time % (connection->maxDelay+1);
 	if (tid < num) {
 		firedTable[gFiredTableCap*delayIdx + firedTableSizes[delayIdx] + tid] = ids[tid];
 	}
@@ -158,7 +159,8 @@ __global__ void cudaDeliverNeurons(Connection *conn, int *firedTable, int *fired
 	__syncthreads();
 
 	int tid = blockIdx.x * blockDim.x + threadIdx.x;
-	int delayIdx = time % (conn->maxDelay-conn->minDelay+1);
+	// int delayIdx = time % (conn->maxDelay-conn->minDelay+1);
+	int delayIdx = time % (conn->maxDelay+1);
 	int fired_size = firedTableSizes[delayIdx];
 	for (int node = 0; node < node_num; node++) {
 		for (int idx = tid; idx < fired_size; idx += blockDim.x * gridDim.x) {
@@ -176,7 +178,7 @@ __global__ void cudaDeliverNeurons(Connection *conn, int *firedTable, int *fired
 			__syncthreads();
 
 			if (cross_cnt > 0) {
-				commit2globalTable(cross_neuron_id, cross_cnt, global_cross_data, &fired_n_num[node], gFiredTableCap*node);
+				commit2globalTable(cross_neuron_id, cross_cnt, global_cross_data, &(fired_n_num[node]), gFiredTableCap*node);
 				if (threadIdx.x == 0) {
 					cross_cnt = 0;
 				}

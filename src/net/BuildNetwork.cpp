@@ -35,7 +35,7 @@
 // 	std::copy(fire_array.begin(), fire_array.end(), p->p_fire_time);
 // }
 
-GNetwork* Network::buildNetwork(SimInfo &info)
+GNetwork* Network::buildNetwork(const SimInfo &info)
 {
 	vector<Population *>::iterator pIter;
 	vector<Neuron *>::iterator niter;

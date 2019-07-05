@@ -20,7 +20,7 @@ public:
 
 	// virtual size_t getSize() override;
 	// virtual int getData(void *data) override;
-	virtual int hardCopy(void * data, int idx, int base, SimInfo &info) override;
+	virtual int hardCopy(void * data, int idx, int base, const SimInfo &info) override;
 
 	virtual Synapse *createSynapse(real weight, real delay, SpikeType type, real tau, Neuron *dst) override;
 

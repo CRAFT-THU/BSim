@@ -21,7 +21,7 @@ int Simulator::run (real time) {
 	ArrayInfo zero_array = {0, NULL};
 	fire_info["count"] = zero_array;
 	int ret = run(time, fire_info);
-	logFireInfo(fire_info, "count", "GFire");
+	logFireInfo(fire_info, "count", "fire");
 
 	return ret;
 }

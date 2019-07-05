@@ -92,13 +92,10 @@ const real fv=-74e-3;
 	}
 	//Network.connect(population1, population2, weight_array, delay_array, Exec or Inhi array, num)
 
-	#if 0
-		STSim st(&c, dt);	// cpu
-		st.run(run_time);
-	#else
+		SGSim sg(&c, dt);	// cpu
+		sg.run(run_time);
 		MGSim mg(&c, dt);	//gpu
 		mg.run(run_time);	
-	#endif
 	
 	end=clock(); //time(NULL);
 	printf("exec time=%lf seconds\n",(double)(end-start) / CLOCKS_PER_SEC);

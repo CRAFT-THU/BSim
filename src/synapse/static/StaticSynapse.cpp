@@ -87,7 +87,7 @@ Type StaticSynapse::getType() const
 // 	return 0;
 // }
 
-int StaticSynapse::hardCopy(void * data, int idx, int base, SimInfo &info)
+int StaticSynapse::hardCopy(void * data, int idx, int base, const SimInfo &info)
 {
 	StaticData *p = (StaticData *) data;
 

@@ -8,7 +8,7 @@
 
 #include "DistriNetwork.h"
 
-DistriNetwork* initDistriNet(int num)
+DistriNetwork* initDistriNet(int num, real dt)
 {
 	DistriNetwork * ret_net = (DistriNetwork*)malloc(sizeof(DistriNetwork) * num);
 
@@ -17,7 +17,7 @@ DistriNetwork* initDistriNet(int num)
 		ret_net[i]._nodeIdx = i;
 		ret_net[i]._nodeNum = num;
 
-		ret_net[i]._dt = 0;
+		ret_net[i]._dt = dt;
 
 		ret_net[i]._network = NULL;
 		ret_net[i]._crossnodeMap = NULL; 

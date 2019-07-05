@@ -118,6 +118,7 @@ class Data(object):
         for t in self.parameters:
             for p in self.parameters[t]:
                 c.line("p->p{} = ({}*)malloc(num*sizeof({}))".format(mycap(p), t, t))
+                c.line("memset(p->p{}, 0, num*sizeof({}))".format(mycap(p), t))
             c.blank_line()
         c.func_end(0)
         c.blank_line()
@@ -157,7 +158,7 @@ class Data(object):
         c.blank_line()
 
         c.func_start("void *load{}(int num, FILE *f)".format(self.name))
-        c.line("{} *p = ({}*)malloc(sizeof({}))".format(self.classname, self.classname, self.classname))
+        c.line("{} *p = ({}*)alloc{}(num)".format(self.classname, self.classname, self.name))
         c.blank_line()
         for t in self.parameters:
             for p in self.parameters[t]:

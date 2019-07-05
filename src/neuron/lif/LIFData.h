@@ -10,22 +10,22 @@
 #include "../../utils/BlockSize.h"
 
 struct LIFData {
+	real *pV_reset;
+	real *pI_i;
+	real *pV_e;
+	real *pV_i;
+	real *pV_thresh;
+	real *pV_m;
+	real *pC_m;
+	real *pCe;
+	real *pV_tmp;
+	real *pI_e;
+	real *pC_i;
+	real *pCi;
+	real *pC_e;
+
 	int *pRefracStep;
 	int *pRefracTime;
-
-	real *pV_m;
-	real *pC_i;
-	real *pV_i;
-	real *pCe;
-	real *pI_e;
-	real *pCi;
-	real *pV_reset;
-	real *pV_e;
-	real *pC_m;
-	real *pC_e;
-	real *pV_thresh;
-	real *pI_i;
-	real *pV_tmp;
 
 };
 

@@ -30,10 +30,8 @@ public:
 	Network(int nodeNum = 1);
 	~Network();
 
-	inline int setNodeNum(int nodeNum) {
-		_nodeNum = nodeNum;
-		return _nodeNum;
-	}
+	int setNodeNum(int nodeNum); 
+	
 	// template<class N>
 	// Population<N>* createNeuron(N n1);
 	template<class N>
@@ -51,7 +49,7 @@ public:
 	int connect(int populationIDSrc, int neuronIDSrc, int populationIDDst, int neuronIDDst, real weight, real delay, real tau = 0);
 	Synapse* connect(Neuron *pSrc, Neuron *pDst, real weight, real delay, SpikeType type = Excitatory, real tau = 0, bool store = true);
 
-	GNetwork* buildNetwork(SimInfo &info);
+	GNetwork* buildNetwork(const SimInfo &info);
 
 	int addNeuronNum(Type type, int num);
 	int addConnectionNum(Type type, int num);
@@ -63,13 +61,13 @@ public:
 	Population* findPopulation(int populationID);
 	Neuron* findNeuron(int populationIDSrc, int neuronIDSrc);
 
-	int reset(SimInfo &info);
-	// int update(SimInfo &info);
-	// void monitor(SimInfo &info);
+	int reset(const SimInfo &info);
+	// int update(const SimInfo &info);
+	// void monitor(const SimInfo &info);
 	
 	void logMap();
 
-	DistriNetwork * buildNetworks(SimInfo &info, bool auto_splited = true);
+	DistriNetwork * buildNetworks(const SimInfo &info, bool auto_splited = true);
 	CrossNodeData* arrangeCrossNodeData(int node_num);
 	CrossNodeDataGPU* arrangeCrossNodeDataGPU(int node_num);
 
@@ -79,8 +77,8 @@ private:
 	
 	void splitNetwork();
 	void countTypeNum();
-	GNetwork* arrangeData(int node, SimInfo &info);
-	Connection* arrangeConnect(int n_num, int s_num, int node_idx, SimInfo &info);
+	GNetwork* arrangeData(int node, const SimInfo &info);
+	Connection* arrangeConnect(int n_num, int s_num, int node_idx, const SimInfo &info);
 	CrossNodeMap* arrangeCrossNodeMap(int n_num, int node_idx, int node_num);
 
 public:

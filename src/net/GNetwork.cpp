@@ -91,7 +91,7 @@ void freeGNetwork(GNetwork * network)
 	free(network->pSTypes);
 }
 
-int saveGNetwork(GNetwork *net, char *filename)
+int saveGNetwork(GNetwork *net, const char *filename)
 {
 	FILE * f = openFile(filename, "w+");
 
@@ -118,10 +118,10 @@ int saveGNetwork(GNetwork *net, char *filename)
 	return 0;
 }
 
-GNetwork *loadGNetwork(char *filename)
+GNetwork *loadGNetwork(const char *filename)
 {
 	int nTypeNum = 0, sTypeNum = 0;
-	FILE * f = openFile(filename, "w+");
+	FILE * f = openFile(filename, "r");
 
 	fread(&nTypeNum, sizeof(int), 1, f);
 	fread(&sTypeNum, sizeof(int), 1, f);

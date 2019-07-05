@@ -43,7 +43,7 @@ struct DistriNetwork {
 };
 
 // Pointers inited to NULL, specific funcs in MultiNetwork will deal with these pointers later 
-DistriNetwork* initDistriNet(int num);
+DistriNetwork* initDistriNet(int num, real dt=1e-4);
 
 // Not NULL pointers are also freed.
 DistriNetwork* freeDistriNet(int num);

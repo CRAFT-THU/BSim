@@ -10,9 +10,9 @@
 #include "../../utils/BlockSize.h"
 
 struct StaticData {
-	int *pDst;
-
 	real *pWeight;
+
+	int *pDst;
 
 };
 
