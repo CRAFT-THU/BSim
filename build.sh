@@ -20,7 +20,7 @@ fi
 if [ "$MODE" = "debug" ]; then
 	C_MODE="Debug"
 	VERBOSE=1
-	USE_LOG="OFF"
+	USE_LOG="ON"
 elif [ "$MODE" = "log" ]; then
 	C_MODE="Release"
 	VERBOSE=1
@@ -29,9 +29,11 @@ elif [ "$MODE" = "test" ]; then
 	C_MODE="Debug"
 	USE_LOG="ON"
 	VERBOSE=1
-	THREAD_NUM=1
+	# THREAD_NUM=1
 else
 	C_MODE="Release"
+	USE_LOG="OFF"
+	VERBOSE=0
 fi
 
 
@@ -47,6 +49,8 @@ fi
 set -x
 if [ "$MODE" = "clean" ]; then
 	cd $SCRIPT_PATH/build && make clean-all
+elif [ "$MODE" = "test" ]; then
+	cd $SCRIPT_PATH/build && cmake -DCMAKE_BUILD_TYPE=$C_MODE -DUSE_DOUBLE=$USE_DOUBLE -DUSE_LOG=$USE_LOG -lpthread .. 2> >(tee bin/error.err) && make -j$THREAD_NUM VERBOSE=$VERBOSE 2> >(tee -a bin/error.err) && make test && cd bin
 else
 	cd $SCRIPT_PATH/build && cmake -DCMAKE_BUILD_TYPE=$C_MODE -DUSE_DOUBLE=$USE_DOUBLE -DUSE_LOG=$USE_LOG -lpthread .. 2> >(tee bin/error.err) && make -j$THREAD_NUM VERBOSE=$VERBOSE 2> >(tee -a bin/error.err) && cd bin
 fi

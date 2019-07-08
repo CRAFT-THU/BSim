@@ -32,7 +32,8 @@ public:
 	// virtual  void setEnd(int idx) final;
 
 	virtual Synapse *addSynapse(Synapse *addSynapse) final;
-	virtual Synapse *createSynapse(real weight, real delay, SpikeType type, real tau, Neuron *dst) = 0;
+	
+	virtual Synapse *createSynapse(real weight, real delay, SpikeType type, real tau) = 0;
 
 	const vector<Synapse*> & getSynapses() const;
 protected:

@@ -23,7 +23,7 @@ public:
 	~CompositeNeuron();
 
 	//virtual Synapse* addSynapse(Synapse *synapse) override;
-	virtual Synapse* createSynapse(real weight, real delay, SpikeType type, real tau_in, Neuron *pDest) override;
+	virtual Synapse* createSynapse(real weight, real delay, SpikeType type, real tau_in) override;
 	//virtual int fire() override;
 	//virtual int setNode(int node);
 private:
@@ -59,7 +59,7 @@ CompositeNeuron<N, S>::~CompositeNeuron()
 }
 
 template<class N, class S>
-Synapse * CompositeNeuron<N, S>::createSynapse(real weight, real delay, SpikeType type, real tau_in, Neuron *pDest)
+Synapse * CompositeNeuron<N, S>::createSynapse(real weight, real delay, SpikeType type, real tau_in)
 {
 	real tau = 0.0;
 	if (fabs(tau_in) > ZERO) {
@@ -71,10 +71,10 @@ Synapse * CompositeNeuron<N, S>::createSynapse(real weight, real delay, SpikeTyp
 	}
 
 	Synapse *tmp = new S(weight, delay, tau);
-	tmp->setDst(pDest);
+	// tmp->setDst(pDest);
 
 	Synapse *ret = (Synapse *)tmp;
-	//pPreSynapses.push_back(ret);
+	// pPreSynapses.push_back(ret);
 	return ret;
 }
 

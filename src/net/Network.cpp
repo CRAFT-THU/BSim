@@ -311,8 +311,9 @@ Synapse* Network::connect(Neuron *pn1, Neuron *pn2, real weight, real delay, Spi
 	//	}
 	//}
 
-	Synapse * p = pn2->createSynapse(weight, delay, type, tau, pn2);
-	//p->setSrc(pn1);
+	Synapse * p = pn2->createSynapse(weight, delay, type, tau);
+	p->setSrc(pn1);
+	p->setDst(pn2);
 	pn1->addSynapse(p);
 
 	_pSynapses.push_back(p);

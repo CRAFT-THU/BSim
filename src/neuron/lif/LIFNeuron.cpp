@@ -109,7 +109,7 @@ Type LIFNeuron::getType() const
 // 	return sizeof(GLIFNeurons);
 // }
 
-Synapse * LIFNeuron::createSynapse(real weight, real delay, SpikeType type, real tau, Neuron *dst) {
+Synapse * LIFNeuron::createSynapse(real weight, real delay, SpikeType type, real tau) {
 	printf("Not implemented!\n");
 	return NULL;
 }

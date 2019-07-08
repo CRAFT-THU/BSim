@@ -85,8 +85,8 @@ int SingleGPUSimulator::run(real time, FireInfo &log)
 
 	real *c_g_vm = c_g_lif->pV_m;
 #ifdef DEBUG 
-	real *c_g_ie = c_g_lif->pI_e;
-	real *c_g_ii = c_g_lif->pI_i;
+	// real *c_g_ie = c_g_lif->pI_e;
+	// real *c_g_ii = c_g_lif->pI_i;
 #endif
 #endif
 

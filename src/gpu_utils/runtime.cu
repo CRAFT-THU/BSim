@@ -75,6 +75,21 @@ __device__ int *gFireCount;
 // __device__ N2SConnection *gConnection;
 
 
+__device__ real _clip(real a, real min, real max)
+{
+	// real t = (a<min) ? min : a;
+	// t = (t>max) ? max : t;
+	// return t;
+
+	if (a < min) {
+		return min;
+	} else if (a > max) {
+		return max;
+	} else {
+		return a;
+	}
+}
+
 __device__ int commit2globalTable(int *shared_buf, volatile unsigned int size, int *global_buf, int * global_size, int offset) 
 {
 	__shared__ volatile unsigned int start_loc;

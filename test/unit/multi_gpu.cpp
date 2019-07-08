@@ -5,9 +5,50 @@
 
 #include <string.h>
 
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
+
+#include "../../src/utils/python.h"
 #include "../../include/BSim.h"
 
 using namespace std;
+
+using std::vector;
+using ::testing::AtLeast;
+using ::testing::ElementsAreArray;
+
+TEST(MultiGPUTest, ResultTest) {
+	Py_Initialize();
+	ASSERT_TRUE(Py_IsInitialized());
+
+	PyRun_SimpleString("import sys");
+	PyRun_SimpleString("sys.path.append('../../script')");
+	PyRun_SimpleString("sys.path.append('../script')");
+
+	PyObject * pModule1 = PyModule("column_merge");
+	PyObject * find_files = PyFunc(pModule1, "find_series_files");
+	PyObject * filename = PyTuple("s", "v.data");
+	PyObject * files = PyCall(find_files, filename);
+
+	PyObject * column_merge = PyObject_GetAttrString(pModule1, "column_merge");
+	PyEval_CallObject(column_merge, files);
+
+	PyObject * pModule2 = PyModule("data_compare");
+	PyObject * column_sub = PyFunc(pModule2, "column_sub");
+	PyObject * delta = PyCall(column_sub, Py_BuildValue("ss", "v.data", "v_merge.data"));
+	double res = PyFloat_AsDouble(delta);
+	ASSERT_LT(res, 1e-7);
+
+	Py_DECREF(filename);
+	Py_DECREF(files);
+	Py_DECREF(find_files);
+	Py_DECREF(column_merge);
+	Py_DECREF(pModule1);
+	Py_DECREF(delta);
+	Py_DECREF(column_sub);
+	Py_DECREF(pModule2);
+	Py_Finalize();
+}
 
 int main(int argc, char **argv)
 {
@@ -19,12 +60,9 @@ int main(int argc, char **argv)
 
 	const int N = 5;
 	Network c;
-	//createPopulation(int id, int N, LIFNeuron(ID id, real v_init, real v_rest, real v_reset, real cm, real tau_m, real tau_refrac, real tau_syn_E, real tau_syn_I, real v_thresh, real i_offset)), ID(0, 0), real tau_syn_E, real tau_syn_I);
 	Population *pn0 = c.createPopulation(N, LIF_curr_exp(LIFNeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-3, 0.0, 1.0, 1.0, 15.0e-3, 0e-1), 1.0, 1.0));
 	Population *pn1 = c.createPopulation(N, LIF_curr_exp(LIFNeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-3, 0.0, 1.0, 1.0, 15.0e-3, 10e-1), 1.0, 1.0));
 	Population *pn2 = c.createPopulation(N, LIF_curr_exp(LIFNeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-3, 0.0, 1.0, 1.0, 15.0e-3, 0.0e-3), 1.0, 1.0));
-	// Population *pn3 = c.createPopulation(N, LIF_curr_exp(LIFNeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-3, 0.0, 1.0, 1.0, 15.0e-3, 0.0e-3), 1.0, 1.0));
-	// Population *pn4 = c.createPopulation(N, LIF_curr_exp(LIFNeuron(0.0, 0.0, 0.0, 1.0e-1, 50.0e-3, 0.0, 1.0, 1.0, 15.0e-3, 0.0e-3), 1.0, 1.0));
 
 	real * weight0 = NULL;
 	real * weight1 = NULL;
@@ -38,33 +76,19 @@ int main(int argc, char **argv)
 		printf("LOAD DATA FINISHED\n");
 	} else {
 		printf("GENERATE DATA...\n");
-		//real * array = getConstArray(weight_value, num);
-		//weight0 = new real[N*N];
-		//weight1 = new real[N*N];
-		//for (int i=0; i<N*N; i++) {
-		//	weight0[i] = 1e-6*((i+1));
-		//	weight1[i] = 1e-6*((N*N-i));
-		//}
 		weight0 = getRandomArray((real)3e-3, N*N);
 		weight1 = getRandomArray((real)4e-3, N*N);
 		delay = getConstArray((real)1e-3, N*N);
 		printf("GENERATE DATA FINISHED\n");
 	}
 
-	//Network.connect(population1, population2, weight_array, delay_array, Exec or Inhi array, num)
 	c.connect(pn0, pn1, weight0, delay, NULL, N*N);
 	c.connect(pn1, pn2, weight1, delay, NULL, N*N);
-	// c.connect(pn2, pn3, weight1, delay, NULL, N*N);
-	// c.connect(pn3, pn4, weight0, delay, NULL, N*N);
-	//STSim st(&c, 1.0e-3);
-	//st.run(0.1);
+
 	SGSim sg(&c, 1.0e-3);
 	sg.run(0.1);
 	MGSim mg(&c, 1.0e-3);
 	mg.run(0.1);
-	//MGSim mg2(&c, 1.0e-3);
-	//sg.compare_run(0.1);
-	//mg.single_run(0.1);
 
 	if (!load) {
 		printf("SAVE DATA...\n");
@@ -73,6 +97,9 @@ int main(int argc, char **argv)
 		saveArray("delay.csv", delay, N*N);
 		printf("SAVE DATA FINISHED\n");
 	}
+
+	::testing::InitGoogleMock(&argc, argv);
+	return RUN_ALL_TESTS();
 	
 	return 0;
 } 

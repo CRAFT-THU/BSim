@@ -22,11 +22,11 @@ int allocStaticPara(void *pCPU, int num)
 {
 	StaticData *p = (StaticData*)pCPU;
 
-	p->pWeight = (real*)malloc(num*sizeof(real));
-	memset(p->pWeight, 0, num*sizeof(real));
-
 	p->pDst = (int*)malloc(num*sizeof(int));
 	memset(p->pDst, 0, num*sizeof(int));
+
+	p->pWeight = (real*)malloc(num*sizeof(real));
+	memset(p->pWeight, 0, num*sizeof(real));
 
 	return 0;
 }
@@ -42,11 +42,11 @@ int freeStaticPara(void *pCPU)
 {
 	StaticData *p = (StaticData*)pCPU;
 
-	free(p->pWeight);
-	p->pWeight = NULL;
-
 	free(p->pDst);
 	p->pDst = NULL;
+
+	free(p->pWeight);
+	p->pWeight = NULL;
 
 	return 0;
 }
@@ -65,9 +65,9 @@ int saveStatic(void *pCPU, int num, FILE *f)
 {
 
 	StaticData *p = (StaticData*)pCPU;
-	fwrite(p->pWeight, sizeof(real), num, f);
-
 	fwrite(p->pDst, sizeof(int), num, f);
+
+	fwrite(p->pWeight, sizeof(real), num, f);
 
 	return 0;
 }
@@ -76,9 +76,9 @@ void *loadStatic(int num, FILE *f)
 {
 	StaticData *p = (StaticData*)allocStatic(num);
 
-	fread(p->pWeight, sizeof(real), num, f);
-
 	fread(p->pDst, sizeof(int), num, f);
+
+	fread(p->pWeight, sizeof(real), num, f);
 
 	return p;
 }
@@ -89,9 +89,9 @@ bool isEqualStatic(void *p1, void *p2, int num)
 	StaticData *t2 = (StaticData*)p2;
 
 	bool ret = true;
-	ret = ret && isEqualArray(t1->pWeight, t2->pWeight, num);
-
 	ret = ret && isEqualArray(t1->pDst, t2->pDst, num);
+
+	ret = ret && isEqualArray(t1->pWeight, t2->pWeight, num);
 
 	return ret;
 }

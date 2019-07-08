@@ -1,5 +1,5 @@
 
-#include "../../gpu_utils/runtime_info.h"
+#include "../../gpu_utils/runtime.h"
 
 #include "StaticData.h"
 
@@ -26,14 +26,14 @@ __global__ void update_dense_static_hit(Connection *connection, StaticData *data
 
 		for (int idx = 0; idx < fired_size_block; idx++) {
 			int nid = firedTable[time_idx*gFiredTableCap + (block_idx)*num_per_block + idx];
-			int start_loc = connection->pDelayStart[delta_t + nid * delayLength];
+			int startLoc = connection->pDelayStart[delta_t + nid * delayLength];
 			int synapseNum = connection->pDelayNum[delta_t + nid * delayLength];
 			if (threadIdx.x == 0) {
 				gLayerInput[nid]++;
 			}
 			for (int j=threadIdx.x; j<synapseNum; j += blockDim.x) {
-				//int sid = connection->pSynapsesIdx[j+start_loc];
-				int sid = j+start_loc;
+				//int sid = connection->pSynapsesIdx[j+startLoc];
+				int sid = j+startLoc;
 				real weight = data->pWeight[sid];
 				if (weight >= 0) {
 					atomicAdd(&(currentE[data->pDst[sid]]), weight);

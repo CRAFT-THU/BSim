@@ -4,13 +4,15 @@ import os
 import re
 import sys, getopt
 
-def column_merge(input=[], output=""):
-    if (not input):
+def column_merge(inputs=[], output=""):
+    # print(inputs)
+    # print(output)
+    if (not inputs):
         return
 
     files = []
     outfile = open(output, "w+")
-    for name in input:
+    for name in inputs:
         f = open(name, "r")
         files.append(f)
 
@@ -38,10 +40,6 @@ def find_series_files(name):
     out_file = fname + "_merge" + fext
 
     return (series_files, out_file)
-            
-
-
-
 
 def main(argv):
     inputfile = []

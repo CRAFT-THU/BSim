@@ -33,6 +33,10 @@ public:
 	//	return _p_src;
 	//}
 
+	inline Neuron* getSrc() {
+		return _p_src;
+	}
+
 	inline Neuron* getDst() {
 		return _p_dst;
 	}

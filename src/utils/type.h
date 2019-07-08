@@ -18,6 +18,7 @@ enum Type {
 	LIF = 0,
 	// TJ,
 	Static,
+	STDP,
 	TYPESIZE
 }; 
 

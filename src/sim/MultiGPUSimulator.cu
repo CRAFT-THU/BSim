@@ -124,7 +124,7 @@ void * run_thread_gpu(void *para) {
 
 	int maxDelay = pNetCPU->pConnection->maxDelay;
 	int minDelay = pNetCPU->pConnection->minDelay;
-	int deltaDelay = maxDelay - minDelay;
+	// int deltaDelay = maxDelay - minDelay;
 	// int deltaDelay = pNetCPU->pConnection->maxDelay - pNetCPU->pConnection->minDelay;
 	printf("Thread %d MaxDelay: %d MinDelay: %d\n", network->_nodeIdx, maxDelay,  minDelay);
 

@@ -40,6 +40,15 @@ public:
 	template<class N>
 	Population* createPopulation(int num, N templ, bool empty = false);
 
+	template<class S>
+	int connect(Population *pSrc, Population *pDst, S templ);
+
+	template<class S>
+	int connect(Population *pSrc, Population *pDst, S *pTempl, int size);
+
+	template<class S>
+	Synapse* connect(Neuron *pSrc, Neuron *pDst, S templ, bool store = true);
+
 	int connect(Population *pSrc, Population *pDst, real weight, real delay, SpikeType type);
 	int connect(Population *pSrc, Population *pDst, real *weight, real *delay, SpikeType *type, int size);
 	int connectOne2One(Population *pSrc, Population *pDst, real *weight, real *delay, SpikeType *type, int size);
@@ -174,6 +183,88 @@ Population * Network::createPopulation(int num, N templ, bool empty)
 	}
 
 	return pp1;
+}
+
+template<class S>
+int Network::connect(Population *pSrc, Population *pDst, S templ) {
+	int srcNum = pSrc->getNum();
+	int dstNum = pDst->getNum();
+
+	if (find(_pPopulations.begin(), _pPopulations.end(), pSrc) == _pPopulations.end()) {
+		_pPopulations.push_back(pSrc);
+		_populationNum++;
+		//neuronNum += pSrc->getNum();
+		addNeuronNum(pSrc->getType(), pSrc->getNum());
+	}
+	if (find(_pPopulations.begin(), _pPopulations.end(), pDst) == _pPopulations.end()) {
+		_pPopulations.push_back(pDst);
+		_populationNum++;
+		//neuronNum += pDst->getNum();
+		addNeuronNum(pDst->getType(), pDst->getNum());
+	}
+
+	int count = 0;
+	for (int iSrc=0; iSrc<srcNum; iSrc++) {
+		for (int iDst =0; iDst<dstNum; iDst++) {
+			connect(pSrc->locate(iSrc), pDst->locate(iDst), templ, false);
+			count++;
+		}
+	}
+
+	return count;
+}
+
+template<class S>
+int Network::connect(Population *pSrc, Population *pDst, S *pTempl, int size) {
+	int dstNum = pDst->getNum();
+	assert(size == (pSrc->getNum() * dstNum)); 
+
+	if (find(_pPopulations.begin(), _pPopulations.end(), pSrc) == _pPopulations.end()) {
+		_pPopulations.push_back(pSrc);
+		_populationNum++;
+		//neuronNum += pSrc->getNum();
+		addNeuronNum(pSrc->getType(), pSrc->getNum());
+	}
+	if (find(_pPopulations.begin(), _pPopulations.end(), pDst) == _pPopulations.end()) {
+		_pPopulations.push_back(pDst);
+		_populationNum++;
+		//neuronNum += pDst->getNum();
+		addNeuronNum(pDst->getType(), pDst->getNum());
+	}
+
+	int count = 0;
+	for (int i=0; i<size; i++) {
+		int iSrc = i/dstNum;
+		int iDst = i%dstNum;
+		connect(pSrc->locate(iSrc), pDst->locate(iDst), pTempl[i], false);
+		count++;
+	}
+
+	return count;
+}
+
+template<class S>
+Synapse * Network::connect(Neuron *pSrc, Neuron *pDst, S templ, bool store)
+{
+	Synapse * p = new S(templ);
+	p->setSrc(pSrc);
+	p->setDst(pDst);
+	pSrc->addSynapse(p);
+
+	_pSynapses.push_back(p);
+	addConnectionNum(pSrc->getType(), 1);
+	addSynapseNum(p->getType(), 1);
+
+
+	real delay = p->getRealDelay();
+	if (delay > _maxDelay) {
+		_maxDelay = delay;
+	}
+	if (delay < _minDelay) {
+		_minDelay = delay;
+	}
+	
+	return p;
 }
 
 #endif /* NETWORK_H */

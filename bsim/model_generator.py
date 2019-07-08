@@ -313,8 +313,18 @@ if __name__ == '__main__':
     lif.generate()
 
     static = Data('Static', {'int':['dst'], 'real':['weight']},
-            path='../src/synapse/static/', pre='', post='Data',
-            headers=['../../utils/type.h', '../../utils/BlockSize.h'], 
-            cu_headers=['../../third_party/cuda/helper_cuda.h'])
+                  path='../src/synapse/static/', pre='', post='Data',
+                  headers=['../../utils/type.h', '../../utils/BlockSize.h'], 
+                  cu_headers=['../../third_party/cuda/helper_cuda.h'])
+    static.generate()
+
+    static = Data('STDP', 
+                  {'int':['dst', 'lastUpdate'], 
+                   'real':['weight', 'aPre', 'aPost', 'dPre', 'dPost',
+                           'tauPre', 'tauPost']
+                  },
+                  path='../src/synapse/stdp/', pre='', post='Data',
+                  headers=['../../utils/type.h', '../../utils/BlockSize.h'], 
+                  cu_headers=['../../third_party/cuda/helper_cuda.h'])
     static.generate()
 
