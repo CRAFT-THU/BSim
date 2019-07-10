@@ -71,7 +71,6 @@ class Data(object):
         h.func("int free{}Para(void *pCPU)".format(self.name))
         h.func("int save{}(void *pCPU, int num, FILE *f)".format(self.name))
         h.func("void *load{}(int num, FILE *f)".format(self.name))
-        h.func("bool isEqual{}(void *p1, void *p2, int num)".format(self.name))
         h.blank_line()
 
         h.func("void *cudaMalloc{}()".format(self.name))
@@ -97,9 +96,6 @@ class Data(object):
         c.include_std("stdlib.h")
         c.include_std("string.h")
         c.blank_line()
-        c.include("../../utils/utils.h")
-        c.blank_line()
-        c.blank_line()
         c.include("{}.h".format(self.classname))
         c.blank_line()
 
@@ -118,7 +114,6 @@ class Data(object):
         for t in self.parameters:
             for p in self.parameters[t]:
                 c.line("p->p{} = ({}*)malloc(num*sizeof({}))".format(mycap(p), t, t))
-                c.line("memset(p->p{}, 0, num*sizeof({}))".format(mycap(p), t))
             c.blank_line()
         c.func_end(0)
         c.blank_line()
@@ -158,25 +153,13 @@ class Data(object):
         c.blank_line()
 
         c.func_start("void *load{}(int num, FILE *f)".format(self.name))
-        c.line("{} *p = ({}*)alloc{}(num)".format(self.classname, self.classname, self.name))
+        c.line("{} *p = ({}*)malloc(sizeof({}))".format(self.classname, self.classname, self.classname))
         c.blank_line()
         for t in self.parameters:
             for p in self.parameters[t]:
                 c.line("fread(p->p{}, sizeof({}), num, f)".format(mycap(p), t))
             c.blank_line()
         c.func_end("p")
-        c.blank_line()
-
-        c.func_start("bool isEqual{}(void *p1, void *p2, int num)".format(self.name))
-        c.line("{} *t1 = ({}*)p1".format(self.classname, self.classname))
-        c.line("{} *t2 = ({}*)p2".format(self.classname, self.classname))
-        c.blank_line()
-        c.line("bool ret = true")
-        for t in self.parameters:
-            for p in self.parameters[t]:
-                c.line("ret = ret && isEqualArray(t1->p{}, t2->p{}, num)".format(mycap(p), mycap(p)))
-            c.blank_line()
-        c.func_end("ret")
         c.blank_line()
 
         return 0
@@ -307,24 +290,14 @@ if __name__ == '__main__':
         parameters.setdefault(v, []).append(k)
 
     lif = Data('LIF', parameters, 
-            path='../src/neuron/lif/', pre='', post='Data', 
+            path='../src/neuron/lif/', pre='G', post='Neurons', 
             headers=['../../utils/type.h', '../../utils/BlockSize.h'], 
             cu_headers=['../../third_party/cuda/helper_cuda.h'])
     lif.generate()
 
     static = Data('Static', {'int':['dst'], 'real':['weight']},
-                  path='../src/synapse/static/', pre='', post='Data',
-                  headers=['../../utils/type.h', '../../utils/BlockSize.h'], 
-                  cu_headers=['../../third_party/cuda/helper_cuda.h'])
-    static.generate()
-
-    static = Data('STDP', 
-                  {'int':['dst', 'lastUpdate'], 
-                   'real':['weight', 'aPre', 'aPost', 'dPre', 'dPost',
-                           'tauPre', 'tauPost']
-                  },
-                  path='../src/synapse/stdp/', pre='', post='Data',
-                  headers=['../../utils/type.h', '../../utils/BlockSize.h'], 
-                  cu_headers=['../../third_party/cuda/helper_cuda.h'])
+            path='../src/synapse/static/', pre='G', post='Synapses',
+            headers=['../../utils/type.h', '../../utils/BlockSize.h'], 
+            cu_headers=['../../third_party/cuda/helper_cuda.h'])
     static.generate()
 

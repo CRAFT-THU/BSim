@@ -9,7 +9,7 @@ using std::list;
 
 class STDPSynapse : public Synapse {
 public:
-	STDPSynapse(real weight=0, real delay=1e-4, real aPre=0, real aPost=0, real dPre=0, real dPost=0, real tauSyn=1.0, real tauPre=0, real tauPost=0);
+	STDPSynapse(real weight=0, real delay=1e-4, real aPre=0, real aPost=0, real dPre=0, real dPost=0, real tauSyn=1e-4, real tauPre=1e-4, real tauPost=1e-4);
 	STDPSynapse(const STDPSynapse &synapse);
 	~STDPSynapse();
 

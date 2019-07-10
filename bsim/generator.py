@@ -39,7 +39,10 @@ class CGenerator(BaseGenerator):
         self.file = open(filename, "w+")
 
     def line(self, line, tab: int=1):
-        self.line_no_end('{};'.format(line), tab=tab)
+        if len(line) > 0:
+            self.line_no_end('{};'.format(line), tab=tab)
+        else:
+            self.line_no_end('', tab=tab)
 
     def func(self, line, tab: int=0):
         self.line(line, tab=tab)
@@ -49,7 +52,8 @@ class CGenerator(BaseGenerator):
         self.open_brace(tab=tab)
 
     def func_end(self, line, tab: int=1):
-        self.line('return {}'.format(line), tab=tab)
+        if len(line) > 0:
+            self.line('return {}'.format(line), tab=tab)
         self.close_brace(tab=abs(tab-1))
 
     def struct(self, name: str='', tab: int=0):
