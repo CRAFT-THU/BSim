@@ -35,6 +35,8 @@ class Model(object):
         self.name = mycap(name);
         self.classname = "{}{}{}{}".format(mycap(pre), mycap(name), mycap(post), mycap(type_))
         self.type_ = mycap(type_)
+        self.pre = pre
+        self.post = post
         self.path = path
         self.headers = headers
         self.cu_headers = cu_headers
@@ -60,19 +62,20 @@ class Model(object):
         #     h.include(i)
         # h.blank_line()
 
-        h.struct(self.classname, 0)
-        h.line("public:", tab=0)
-        h.line_no_end("{}(".format(self.classname))
+        h.struct(self.classname, self.type_, 0)
+        h.line_no_end("public:", tab=0)
+        h.print_("{}(".format(self.classname))
         for k in self.parameters:
             for v in self.parameters[k]:
-                h.line_no_end("{} {}={},".format(k, v, '1e-4' if (('delay' in v) or ('tau' in v)) else '0'))
-        h.line(")")
+                h.print_("{} {}={}, ".format(k, v, '1e-4' if (('delay' in v) or ('tau' in v)) else '0'))
+        h.backspace(2)
+        h.line(")", tab=0)
         h.line("{}(const {} &templ)".format(self.classname, self.classname))
         h.line("~{}()".format(self.classname))
         h.blank_line()
 
         h.line("virtual Type getType() const override")
-        h.line("virtual int hardCopy(void * data, int idx, int base, const SimInfo &info) const override")
+        h.line("virtual int hardCopy(void * data, int idx, int base, const SimInfo &info) override")
         if self.type_ == "Neuron":
             h.line("virtual Synapse * createSynapse(real weight, real delay, SpikeType type, real tau) override;") 
         h.blank_line()
@@ -80,14 +83,12 @@ class Model(object):
         h.line("const static Type type;")
         h.blank_line()
 
-        h.line("protected:", tab=0)
+        h.line_no_end("protected:", tab=0)
         for k in self.parameters:
             for v in self.parameters[k]:
                 if self.type_ != 'Synapse' or (v!='weight' and v!='delay'):
                     h.line("{} _{}".format(k, v))
-            h.blank_line()
         h.struct_end()
-        h.blank_line()
 
         h.close()
         return 0
@@ -100,22 +101,22 @@ class Model(object):
         c.include("{}Data.h".format(self.name))
         c.blank_line()
 
-        c.line("const Type {}::type = {};".format(self.classname, self.name.upper()));
+        c.line("const Type {}::type = {};".format(self.classname, self.name.upper()), tab=0);
         c.blank_line()
 
-        c.line_no_end("{}::{}(".format(self.classname, self.classname))
+        c.print_("{}::{}(".format(self.classname, self.classname))
         for k in self.parameters:
             for v in self.parameters[k]:
-                c.line_no_end("{} {}".format(k, v))
-        c.line_no_end("):")
+                c.print_("{} {}".format(k, v))
+        c.print_("):")
         if self.type_ == 'Synapse':
-            c.line_no_end(" Synapse(0, weight, delay)")
+            c.print_(" Synapse(0, weight, delay)")
         else:
-            c.line_no_end(" {}()".format(self.type_))
+            c.print_(" {}()".format(self.type_))
         for k in self.parameters:
             for v in self.parameters[k]:
                 if self.type_ != 'Synapse' or (v!='weight' and v!='delay'):
-                    c.line_no_end(", _{}({})".format(v, v))
+                    c.print_(", _{}({})".format(v, v))
         c.blank_line()
         c.line_no_end("{")
         c.line_no_end("}")
@@ -163,7 +164,9 @@ class Model(object):
         return 0
 
 if __name__ == '__main__':
-    izh = Model('Izhikevich', {'real': ['v', 'u', 'a', 'b', 'c', 'd']}, path='../src/neuron/izhikevich/', pre='', post='')
+    izh = Model('Izhikevich', {'real': ['v', 'u', 'a', 'b', 'c', 'd']},
+                path='../src/neuron/izhikevich/', pre='', post='',
+                type_='Neuron')
     izh.generate()
 
 

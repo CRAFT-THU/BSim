@@ -7,6 +7,14 @@ class BaseGenerator(object):
     def __init__(self, filename: str = ''):
         self.file = open(filename, "w+")
 
+    def backspace(self, step: int = 1):
+        self.file.seek(0, os.SEEK_END)
+        self.file.seek(self.file.tell()-step, os.SEEK_SET)
+        self.file.write('')
+
+    def print_(self, line: str = '', tab: int = 0):
+        self.file.write('{}{}'.format(tab * '\t', line))
+
     def line_no_end(self, line: str = '', tab: int = 1):
         self.file.write('{}{}\n'.format(tab * '\t', line))
 
@@ -38,11 +46,13 @@ class CGenerator(BaseGenerator):
     def __init__(self, filename: str= ''):
         self.file = open(filename, "w+")
 
-    def line(self, line, tab: int=1):
-        if len(line) > 0:
-            self.line_no_end('{};'.format(line), tab=tab)
+    def line(self, line:str, tab: int=1):
+        if not isinstance(line, str):
+            line = str(line)
+        if (len(line) < 1) or (line[-1] in [':', '{', '(', ';']):
+            self.line_no_end('{}'.format(line), tab=tab)
         else:
-            self.line_no_end('', tab=tab)
+            self.line_no_end('{};'.format(line), tab=tab)
 
     def func(self, line, tab: int=0):
         self.line(line, tab=tab)
@@ -51,13 +61,15 @@ class CGenerator(BaseGenerator):
         self.line_no_end(line, tab=tab)
         self.open_brace(tab=tab)
 
-    def func_end(self, line, tab: int=1):
+    def func_end(self, line='', tab: int=1):
+        if not isinstance(line, str):
+            line = str(line)
         if len(line) > 0:
             self.line('return {}'.format(line), tab=tab)
         self.close_brace(tab=abs(tab-1))
 
-    def struct(self, name: str='', tab: int=0):
-        self.line_no_end('struct {} {{'.format(name), tab=tab)
+    def struct(self, name: str='', father: str='', tab: int=0):
+        self.line_no_end('struct {} : {} {{'.format(name, father), tab=tab)
 
     def struct_end(self, name: str='', tab: int=0):
         self.line('}', tab=tab)
