@@ -20,7 +20,7 @@
 // extern __constant__ int gTimeTableCap;
 extern __constant__ int gFiredTableCap;
 // extern __constant__ int gSynapsesTableCap;
-// extern __constant__ real DT;
+extern __constant__ real DT;
 
 // Variable
 // extern __device__ int gCurrentIdx;
