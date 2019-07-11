@@ -11,6 +11,7 @@ void *cudaMallocIzhikevich()
 	return ret;
 }
 
+
 void *cudaAllocIzhikevich(void *pCPU, int num)
 {
 	void *ret = cudaMallocIzhikevich();
@@ -20,6 +21,7 @@ void *cudaAllocIzhikevich(void *pCPU, int num)
 	tmp = NULL;
 	return ret;
 }
+
 
 void *cudaAllocIzhikevichPara(void *pCPU, int num)
 {
@@ -49,6 +51,7 @@ void *cudaAllocIzhikevichPara(void *pCPU, int num)
 	return ret;
 }
 
+
 int cudaFetchIzhikevich(void *pCPU, void *pGPU, int num)
 {
 	IzhikevichData *pTmp = (IzhikevichData*)malloc(sizeof(IzhikevichData)*1);
@@ -58,6 +61,7 @@ int cudaFetchIzhikevich(void *pCPU, void *pGPU, int num)
 	cudaIzhikevichParaFromGPU(pCPU, pTmp, num);
 	return 0;
 }
+
 
 int cudaIzhikevichParaToGPU(void *pCPU, void *pGPU, int num)
 {
@@ -74,6 +78,7 @@ int cudaIzhikevichParaToGPU(void *pCPU, void *pGPU, int num)
 	return 0;
 }
 
+
 int cudaIzhikevichParaFromGPU(void *pCPU, void *pGPU, int num)
 {
 	IzhikevichData *pC = (IzhikevichData*)pCPU;
@@ -89,6 +94,7 @@ int cudaIzhikevichParaFromGPU(void *pCPU, void *pGPU, int num)
 	return 0;
 }
 
+
 int cudaFreeIzhikevich(void *pGPU)
 {
 	IzhikevichData *tmp = (IzhikevichData*)malloc(sizeof(IzhikevichData)*1);
@@ -101,6 +107,7 @@ int cudaFreeIzhikevich(void *pGPU)
 	pGPU = NULL;
 	return 0;
 }
+
 
 int cudaFreeIzhikevichPara(void *pGPU)
 {
@@ -120,4 +127,5 @@ int cudaFreeIzhikevichPara(void *pGPU)
 
 	return 0;
 }
+
 

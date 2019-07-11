@@ -101,13 +101,14 @@ class Model(object):
         c.include("{}Data.h".format(self.name))
         c.blank_line()
 
-        c.line("const Type {}::type = {};".format(self.classname, self.name.upper()), tab=0);
+        c.line("const Type {}::type = {};".format(self.classname, mycap(self.name)), tab=0);
         c.blank_line()
 
         c.print_("{}::{}(".format(self.classname, self.classname))
         for k in self.parameters:
             for v in self.parameters[k]:
-                c.print_("{} {}".format(k, v))
+                c.print_("{} {}, ".format(k, v))
+        c.backspace(2)
         c.print_("):")
         if self.type_ == 'Synapse':
             c.print_(" Synapse(0, weight, delay)")
@@ -118,8 +119,8 @@ class Model(object):
                 if self.type_ != 'Synapse' or (v!='weight' and v!='delay'):
                     c.print_(", _{}({})".format(v, v))
         c.blank_line()
-        c.line_no_end("{")
-        c.line_no_end("}")
+        c.open_brace()
+        c.close_brace()
         c.blank_line()
 
         c.func_start("{}::{}(const {} &templ)".format(self.classname, self.classname, self.classname))
@@ -129,9 +130,8 @@ class Model(object):
         c.func_end()
         c.func_start("{}::~{}()".format(self.classname, self.classname))
         c.func_end()
-        c.blank_line()
 
-        c.func_start("Type {}::getType() const")
+        c.func_start("Type {}::getType() const".format(self.classname))
         c.func_end("type")
         c.blank_line()
 
@@ -141,11 +141,11 @@ class Model(object):
             c.func_end("NULL");
             c.blank_line()
 
-        c.func_start("int {}::hardCopy(void * data, int idx, int base, const SimInfo &info)")
-        c.line("{}Data *p = (Data *)data".format(self.name, self.name))
-        c.line("real dt = info.dt")
-        c.line("int delay_steps = static_cast<int>(round(_delay/dt))")
+        c.func_start("int {}::hardCopy(void * data, int idx, int base, const SimInfo &info)".format(self.classname))
+        c.line("{}Data *p = ({}Data *)data".format(self.name, self.name))
+        # c.line("real dt = info.dt")
         if self.type_ == 'Synapse':
+            c.line("int delay_steps = static_cast<int>(round(_delay/dt))")
             c.line("real weight = this->_weight")
             c.line("assert(fabs(_tau_syn) > ZERO)")
             c.line_no_end("if (fabs(_tau_syn) > ZERO) {")
@@ -158,7 +158,7 @@ class Model(object):
 
         for k in self.parameters:
             for v in self.parameters[k]:
-                c.line("p->p{} = this->_{}".format(mycap(v), v))
+                c.line("p->p{}[idx] = this->_{}".format(mycap(v), v))
         c.func_end("1")
 
         return 0

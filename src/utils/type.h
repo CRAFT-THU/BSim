@@ -16,6 +16,7 @@ enum Type {
 	// Mem,
 	// Max,
 	LIF = 0,
+    Izhikevich=1,
 	// TJ,
 	Static,
 	STDP,

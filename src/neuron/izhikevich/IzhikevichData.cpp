@@ -11,12 +11,14 @@ size_t getIzhikevichSize()
 	return sizeof(IzhikevichData);
 }
 
+
 void *mallocIzhikevich()
 {
 	IzhikevichData *p = (IzhikevichData*)malloc(sizeof(IzhikevichData)*1);
 	memset(p, 0, sizeof(IzhikevichData)*1);
 	return (void*)p;
 }
+
 
 int allocIzhikevichPara(void *pCPU, int num)
 {
@@ -38,12 +40,14 @@ int allocIzhikevichPara(void *pCPU, int num)
 	return 0;
 }
 
+
 void *allocIzhikevich(int num)
 {
 	void *p = mallocIzhikevich();
 	allocIzhikevichPara(p, num);
 	return p;
 }
+
 
 int freeIzhikevichPara(void *pCPU)
 {
@@ -65,6 +69,7 @@ int freeIzhikevichPara(void *pCPU)
 	return 0;
 }
 
+
 int freeIzhikevich(void *pCPU)
 {
 	IzhikevichData *p = (IzhikevichData*)pCPU;
@@ -74,6 +79,7 @@ int freeIzhikevich(void *pCPU)
 	p = NULL;
 	return 0;
 }
+
 
 int saveIzhikevich(void *pCPU, int num, FILE *f)
 {
@@ -89,6 +95,7 @@ int saveIzhikevich(void *pCPU, int num, FILE *f)
 	return 0;
 }
 
+
 void *loadIzhikevich(int num, FILE *f)
 {
 	IzhikevichData *p = (IzhikevichData*)allocIzhikevich(num);
@@ -102,6 +109,7 @@ void *loadIzhikevich(int num, FILE *f)
 
 	return p;
 }
+
 
 bool isEqualIzhikevich(void *p1, void *p2, int num)
 {
@@ -118,4 +126,5 @@ bool isEqualIzhikevich(void *p1, void *p2, int num)
 
 	return ret;
 }
+
 

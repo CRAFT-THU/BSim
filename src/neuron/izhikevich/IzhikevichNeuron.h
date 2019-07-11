@@ -25,6 +25,5 @@ protected:
 	real _b;
 	real _c;
 	real _d;
-
 };
 #endif /* IZHIKEVICHNEURON_H */

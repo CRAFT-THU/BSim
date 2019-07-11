@@ -54,7 +54,7 @@ class Data(object):
         # h.include("../../utils/macros.h")
         h.blank_line()
 
-        h.struct(self.classname, 0)
+        h.struct(self.classname, tab=0)
         for k in self.parameters:
             for v in self.parameters[k]:
                 h.line("{} *p{}".format(k, mycap(v)))

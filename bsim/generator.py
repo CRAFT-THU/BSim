@@ -67,9 +67,13 @@ class CGenerator(BaseGenerator):
         if len(line) > 0:
             self.line('return {}'.format(line), tab=tab)
         self.close_brace(tab=abs(tab-1))
+        self.blank_line()
 
     def struct(self, name: str='', father: str='', tab: int=0):
-        self.line_no_end('struct {} : {} {{'.format(name, father), tab=tab)
+        if len(father) < 1:
+            self.line_no_end('struct {} {{'.format(name, father), tab=tab)
+        else:
+            self.line_no_end('struct {} : {} {{'.format(name, father), tab=tab)
 
     def struct_end(self, name: str='', tab: int=0):
         self.line('}', tab=tab)
