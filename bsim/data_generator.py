@@ -267,6 +267,100 @@ class Data(object):
         cu.close()
         return 0
 
+    def generate_kernel_cu(self):
+        cu = CUDAGenerator("{}/{}.kernel.part.cu".format(self.path, self.classname)) 
+        cu.include("../../gpu_untils/runtime.h".format(self.classname))
+        cu.include("../../net/Connection.h".format(self.classname))
+        cu.blank_line()
+        cu.include("{}.h".format(self.classname))
+        cu.blank_line()
+
+        cu.func_start("__global__ void update_{}(Connection *connection, {} *data, real *currentE, real *currentI, int *firedTable, int *firedTableSizes, int num, int offset, int time)".format(self.name.lower(), self.classname))
+        cu.line("int currentIdx = time % (connection->maxDelay+1)")
+        cu.line("__shared__ int fireTableT[MAX_BLOCK_SIZE]")
+        cu.line("__shared__ volatile int fireCNT")
+        cu.if_start("threadIdx.x == 0")
+        cu.line("fire_cnt = 0", tab=2)
+        cu.if_end()
+        cu.sync()
+
+        cu.line("int tid = blockIdx.x * blockDim.x + threadIdx.x")
+        cu.for_start("int idx = tid; idx < num; idx += blockDim.x*gridDim.x")
+        cu.line("int nid = idx", tab=2)
+        cu.line("int gnid = offset + idx", tab=2)
+        cu.line("int testLoc = 0", tab=2)
+        cu.line("bool fired = false", tab=2)
+
+        for t in self.parameters:
+            for p in self.parameters[t]:
+                cu.line("{} {} = data->p{}[nid]".format(t, p, mycap(p)))
+            cu.blank_line()
+
+        for t in self.parameters:
+            for p in self.parameters[t]:
+                cu.line("data->p{}[nid] = {}".format(mycap(p), p))
+            cu.blank_line()
+
+        cu.if_start("fired")
+        cu.line("testLoc = atomicAdd((int*)&fire_cnt, 1)", tab=2)
+        cu.if_start("testLoc < MAX_BLOCK_SIZE", tab=2)
+        cu.line("fireTableT[testLoc] = gnid", tab=3)
+        cu.line("fired = false", tab=3)
+        cu.if_end(tab=2)
+        cu.if_end()
+        cu.sync()
+        cu.blank_line()
+
+        cu.if_start("fire_cnt >= MAX_BLOCK_SIZE")
+        cu.line("commit2globalTable(fireTableT, MAX_BLOCK_SIZE, firedTable, &firedTableSizes[currentIdx], gFiredTableCap*currentIdx)", tab=2)
+        cu.if_start('threadIdx.x == 0', tab=2)
+        cu.line("fire_cnt = 0", tab=3)
+        cu.if_end(tab=2)
+        cu.if_end()
+        cu.sync();
+        cu.blank_line()
+
+        cu.if_start("fired")
+        cu.line("testLoc = atomicAdd((int*)&fire_cnt, 1)", tab=2)
+        cu.if_start("testLoc < MAX_BLOCK_SIZE", tab=2)
+        cu.line("fireTableT[testLoc] = gnid", tab=3)
+        cu.line("fired = false", tab=3)
+        cu.if_end(tab=2)
+        cu.if_end()
+        cu.sync()
+        cu.blank_line()
+
+        cu.if_start("fire_cnt >= MAX_BLOCK_SIZE")
+        cu.line("commit2globalTable(fireTableT, MAX_BLOCK_SIZE, firedTable, &firedTableSizes[currentIdx], gFiredTableCap*currentIdx)", tab=2)
+        cu.if_start('threadIdx.x == 0', tab=2)
+        cu.line("fire_cnt = 0", tab=3)
+        cu.if_end(tab=2)
+        cu.if_end()
+        cu.sync();
+        cu.blank_line()
+
+        cu.if_start("fire_cnt > 0")
+        cu.line("commit2globalTable(fireTableT, fire_cnt, firedTable, &firedTableSizes[currentIdx], gFiredTableCap*currentIdx)")
+        cu.if_start('threadIdx.x == 0')
+        cu.line("fire_cnt = 0")
+        cu.if_end()
+        cu.if_end()
+        cu.sync()
+        cu.blank_line()
+
+        cu.func_end()
+        cu.blank_line()
+
+        cu.func_start("void cudaUpdate{}(Connection *connection, void *data, real *currentE, real *currentI, int *firedTable, int *firedTableSizes, int num, int offset, int time, BlockSize *pSize)".format(self.name))
+        cu.line("update_{}<<<pSize->gridSize, pSize->blockSize>>>(connection, ({} *)data, currentE, currentI, firedTable, firedTableSizes, num, offset, time)".format(self.name.lower(), self.classname))
+        cu.func_end()
+        cu.blank_line()
+
+
+        cu.close()
+        return 0
+
+
     def generate_mpi(self):
         c = CGenerator("{}/{}.mpi.cpp".format(self.path, self.classname))
         c.include("mpi.h")

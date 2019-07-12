@@ -5,7 +5,7 @@
 #include "../../net/Connection.h"
 
 
-__global__ void update_izhikevich_neuron(Connection *connection, LIFData *data, real *currentE, real *currentI, int *firedTable, int *firedTableSizes, int num, int offset, int time)
+__global__ void update_izhikevich_neuron(Connection *connection, IzhikevichData *data, real *currentE, real *currentI, int *firedTable, int *firedTableSizes, int num, int offset, int time)
 {
 	int currentIdx = time % (connection->maxDelay+1);
 	__shared__ int fire_table_t[MAX_BLOCK_SIZE];
@@ -17,7 +17,6 @@ __global__ void update_izhikevich_neuron(Connection *connection, LIFData *data, 
 
 	int tid = blockIdx.x * blockDim.x + threadIdx.x;
 	for (int idx = tid; idx < num; idx +=blockDim.x*gridDim.x) {
-		bool fired = false;
 		int testLoc = 0;
 
 		int nid = idx;
@@ -45,7 +44,7 @@ __global__ void update_izhikevich_neuron(Connection *connection, LIFData *data, 
 		u += a*(b*v - u) * DT;
 
 		if (v > 30.0f) {
-			v = 30.0f
+			v = 30.0f;
 		}
 
 		bool fired = (v >= 29.99f) && (!oldSpike);
@@ -110,7 +109,7 @@ __global__ void update_izhikevich_neuron(Connection *connection, LIFData *data, 
 	//}
 }
 
-void cudaUpdateLIF(Connection *conn, void *data, real *currentE, real *currentI, int *firedTable, int *firedTableSizes, int num, int offset, int time, BlockSize *pSize)
+void cudaUpdateIzhikevich(Connection *conn, void *data, real *currentE, real *currentI, int *firedTable, int *firedTableSizes, int num, int offset, int time, BlockSize *pSize)
 {
-	update_izhikevich_neuron<<<pSize->gridSize, pSize->blockSize>>>(conn, (IzhikevichData*)data, currentE, currentI, firedTable, firedTableSizes, num, offset, time);
+	update_izhikevich_neuron<<<pSize->gridSize, pSize->blockSize>>>(conn, (IzhikevichData *)data, currentE, currentI, firedTable, firedTableSizes, num, offset, time);
 }

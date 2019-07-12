@@ -6,6 +6,7 @@ import subprocess
 class BaseGenerator(object):
     def __init__(self, filename: str = ''):
         self.file = open(filename, "w+")
+        self.tab = 0
 
     def backspace(self, step: int = 1):
         self.file.seek(0, os.SEEK_END)
@@ -13,9 +14,11 @@ class BaseGenerator(object):
         self.file.write('')
 
     def print_(self, line: str = '', tab: int = 0):
+        tab = max(tab, self.tab)
         self.file.write('{}{}'.format(tab * '\t', line))
 
     def line_no_end(self, line: str = '', tab: int = 1):
+        tab = max(tab, self.tab)
         self.file.write('{}{}\n'.format(tab * '\t', line))
 
     def blank_line(self, num: int = 1):
@@ -50,12 +53,26 @@ class CGenerator(BaseGenerator):
         if not isinstance(line, str):
             line = str(line)
         if (len(line) < 1) or (line[-1] in [':', '{', '(', ';']):
-            self.line_no_end('{}'.format(line), tab=tab)
+            self.line_no_end('{}'.format(line), tab)
         else:
-            self.line_no_end('{};'.format(line), tab=tab)
+            self.line_no_end('{};'.format(line), tab)
 
-    def func(self, line, tab: int=0):
-        self.line(line, tab=tab)
+    # def func(self, line, tab: int=0):
+    #     self.line(line, tab=tab)
+
+    def if_start(self, line, tab: int=1):
+        self.line_no_end("if ({}) ".format(line), tab=tab)
+        self.open_brace(tab=tab)
+
+    def if_end(self, tab: int=1):
+        self.close_brace(tab=abs(tab))
+
+    def for_start(self, line, tab: int=1):
+        self.line_no_end("for ({}) ".format(line), tab=tab)
+        self.open_brace(tab=tab)
+
+    def for_end(self, tab: int=1):
+        self.close_brace(tab=abs(tab))
 
     def func_start(self, line, tab: int=0):
         self.line_no_end(line, tab=tab)
@@ -71,12 +88,14 @@ class CGenerator(BaseGenerator):
 
     def struct(self, name: str='', father: str='', tab: int=0):
         if len(father) < 1:
-            self.line_no_end('struct {} {{'.format(name, father), tab=tab)
+            self.line_no_end('struct {} '.format(name, father), tab=tab)
+            self.open_brace(tab=tab)
         else:
-            self.line_no_end('struct {} : {} {{'.format(name, father), tab=tab)
+            self.line_no_end('struct {} : {} '.format(name, father), tab=tab)
+            self.open_brace(tab=tab)
 
     def struct_end(self, name: str='', tab: int=0):
-        self.line('}', tab=tab)
+        self.close_brace(tab=abs(tab))
 
     def if_define(self, name: str='', tab: int=0):
         self.line_no_end('#ifndef {}'.format(name.replace('.', '_').upper()), tab=tab)
@@ -93,8 +112,10 @@ class CGenerator(BaseGenerator):
 
     def open_brace(self, tab: int=0):
         self.line_no_end("{", tab=tab)
+        self.tab += 1
 
     def close_brace(self, tab: int=0):
+        self.tab -= 1
         self.line_no_end("}", tab=tab)
 
     def block(self, line: str=0):
@@ -132,6 +153,9 @@ class HGenerator(CGenerator):
 class CUDAGenerator(CGenerator):
     def __init__(self, filename: str= ''):
         self.file = open(filename, "w+")
+
+    def sync(self, tab: int=1):
+        self.line("__syncthreads()", tab=tab)
 
     def cu_line(self, line: str='', tab: int=1):
         self.line(line='checkCudaErrors({})'.format(line), tab=tab)
