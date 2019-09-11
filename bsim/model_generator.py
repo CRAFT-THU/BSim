@@ -30,8 +30,7 @@ def myhash(v):
         return len(C_TYPE_SORT) + abs(hash(v))
 
 class Model(object):
-    def __init__(self, name, parameters, path='./', pre='', post='', type_='',
-            headers=[], cu_headers=[]):
+    def __init__(self, name, parameters, variables = None, path='./', pre='', post='', type_='', headers=[], cu_headers=[]):
         self.name = mycap(name);
         self.classname = "{}{}{}{}".format(mycap(pre), mycap(name), mycap(post), mycap(type_))
         self.type_ = mycap(type_)
@@ -41,11 +40,14 @@ class Model(object):
         self.headers = headers
         self.cu_headers = cu_headers
         self.parameters = {k:parameters[k] for k in sorted(parameters.keys(), key= lambda x:myhash(x), reverse = False)}
+        self.variables = {k:variables[k] for k in sorted(variables.keys(), key= lambda x:myhash(x), reverse = False)} if variables else self.parameters
+        if not os.path.exists(path):
+            os.mkdir(path)
 
     def generate(self):
         self.generate_h()
         self.generate_c()
-        data = Data(name=self.name, parameters=self.parameters, path=self.path, pre=self.pre, post = self.post+"Data", headers=['../../utils/type.h', '../../utils/BlockSize.h'], cu_headers=['../../third_party/cuda/helper_cuda.h'])
+        data = Data(name=self.name, parameters=self.variables, path=self.path, pre=self.pre, post = self.post+"Data", headers=['../../utils/type.h', '../../utils/BlockSize.h'], cu_headers=['../../third_party/cuda/helper_cuda.h'])
         data.generate()
         # self.generate_cu()
         # self.generate_mpi()
@@ -167,6 +169,18 @@ if __name__ == '__main__':
     izh = Model('Izhikevich', {'real': ['v', 'u', 'a', 'b', 'c', 'd']},
                 path='../src/neuron/izhikevich/', pre='', post='',
                 type_='Neuron')
-    izh.generate()
+    # izh.generate()
 
+    traub = Model('TraubMiles', 
+                  {'real': ['gNa', 'ENa', 'gK', 'EK', 'gl', 'El', 'C', "V", "m", "h", "n", "tau", "E"]},
+                  {'real': ['gNa', 'ENa', 'gK', 'EK', 'gl', 'El', 'C', "V", "m", "h", "n", "decay", "E"]},
+                  path='../src/neuron/traubmiles/', pre='', post='',
+                  type_='Neuron')
+    traub.generate()
+
+    pw = Model('PiecewiseSTDP', 
+                  {'real': ['tLrn', 'tChng', 'tDecay', 'tPunish10', 'tPunish01', 'gMax', 'gMid', "gSlope", "tauShift", "gSyn0", 'g', 'gRaw', "tau", 'E']},
+                  {'real': ['lim0', 'lim1', 'slope0', 'slope1', 'off0', 'off1', 'off2', 'g', 'gRaw', "tau", 'E']},
+                  path='../src/neuron/piecewiseSTDP/', pre='', post='',
+                  type_='Synapse')
 

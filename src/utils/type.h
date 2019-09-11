@@ -17,6 +17,7 @@ enum Type {
 	// Max,
 	LIF = 0,
     Izhikevich=1,
+    TraubMiles=2,
 	// TJ,
 	Static,
 	STDP,

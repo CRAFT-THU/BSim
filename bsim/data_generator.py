@@ -40,6 +40,7 @@ class Data(object):
         self.generate_h()
         self.generate_c()
         self.generate_cu()
+        self.generate_kernel_cu()
         self.generate_mpi()
 
     def generate_h(self):
@@ -269,7 +270,8 @@ class Data(object):
 
     def generate_kernel_cu(self):
         cu = CUDAGenerator("{}/{}.kernel.part.cu".format(self.path, self.classname)) 
-        cu.include("../../gpu_untils/runtime.h".format(self.classname))
+        cu.blank_line()
+        cu.include("../../gpu_utils/runtime.h".format(self.classname))
         cu.include("../../net/Connection.h".format(self.classname))
         cu.blank_line()
         cu.include("{}.h".format(self.classname))
@@ -287,9 +289,10 @@ class Data(object):
         cu.line("int tid = blockIdx.x * blockDim.x + threadIdx.x")
         cu.for_start("int idx = tid; idx < num; idx += blockDim.x*gridDim.x")
         cu.line("int nid = idx", tab=2)
-        cu.line("int gnid = offset + idx", tab=2)
+        cu.line("int gnid = offset + nid", tab=2)
         cu.line("int testLoc = 0", tab=2)
         cu.line("bool fired = false", tab=2)
+        cu.blank_line()
 
         for t in self.parameters:
             for p in self.parameters[t]:
@@ -309,7 +312,6 @@ class Data(object):
         cu.if_end(tab=2)
         cu.if_end()
         cu.sync()
-        cu.blank_line()
 
         cu.if_start("fire_cnt >= MAX_BLOCK_SIZE")
         cu.line("commit2globalTable(fireTableT, MAX_BLOCK_SIZE, firedTable, &firedTableSizes[currentIdx], gFiredTableCap*currentIdx)", tab=2)
@@ -318,7 +320,6 @@ class Data(object):
         cu.if_end(tab=2)
         cu.if_end()
         cu.sync();
-        cu.blank_line()
 
         cu.if_start("fired")
         cu.line("testLoc = atomicAdd((int*)&fire_cnt, 1)", tab=2)
@@ -328,7 +329,6 @@ class Data(object):
         cu.if_end(tab=2)
         cu.if_end()
         cu.sync()
-        cu.blank_line()
 
         cu.if_start("fire_cnt >= MAX_BLOCK_SIZE")
         cu.line("commit2globalTable(fireTableT, MAX_BLOCK_SIZE, firedTable, &firedTableSizes[currentIdx], gFiredTableCap*currentIdx)", tab=2)
@@ -337,7 +337,6 @@ class Data(object):
         cu.if_end(tab=2)
         cu.if_end()
         cu.sync();
-        cu.blank_line()
 
         cu.if_start("fire_cnt > 0")
         cu.line("commit2globalTable(fireTableT, fire_cnt, firedTable, &firedTableSizes[currentIdx], gFiredTableCap*currentIdx)")
@@ -346,7 +345,7 @@ class Data(object):
         cu.if_end()
         cu.if_end()
         cu.sync()
-        cu.blank_line()
+        cu.for_end()
 
         cu.func_end()
         cu.blank_line()

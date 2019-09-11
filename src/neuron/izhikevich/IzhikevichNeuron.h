@@ -6,7 +6,8 @@
 
 #include "../../interface/Neuron.h"
 
-struct IzhikevichNeuron : Neuron {
+struct IzhikevichNeuron : Neuron 
+{
 public:
 IzhikevichNeuron(real v=0, real u=0, real a=0, real b=0, real c=0, real d=0);
 	IzhikevichNeuron(const IzhikevichNeuron &templ);

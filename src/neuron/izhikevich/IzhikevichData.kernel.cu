@@ -1,14 +1,13 @@
 
-#include "IzhikevichData.h"
-
 #include "../../gpu_utils/runtime.h"
 #include "../../net/Connection.h"
 
+#include "IzhikevichData.h"
 
-__global__ void update_izhikevich_neuron(Connection *connection, IzhikevichData *data, real *currentE, real *currentI, int *firedTable, int *firedTableSizes, int num, int offset, int time)
+__global__ void update_izhikevich(Connection *connection, IzhikevichData *data, real *currentE, real *currentI, int *firedTable, int *firedTableSizes, int num, int offset, int time)
 {
 	int currentIdx = time % (connection->maxDelay+1);
-	__shared__ int fire_table_t[MAX_BLOCK_SIZE];
+	__shared__ int fireTableT[MAX_BLOCK_SIZE];
 	__shared__ volatile int fire_cnt;
 	if (threadIdx.x == 0) {
 		fire_cnt = 0;
@@ -17,13 +16,12 @@ __global__ void update_izhikevich_neuron(Connection *connection, IzhikevichData 
 
 	int tid = blockIdx.x * blockDim.x + threadIdx.x;
 	for (int idx = tid; idx < num; idx +=blockDim.x*gridDim.x) {
+		int nid = idx;
+		int gnid = offset + nid;
 		int testLoc = 0;
 
-		int nid = idx;
-		int gnid = offset + nid; 
-
-		real u = data->pU[nid];
 		real v = data->pV[nid];
+		real u = data->pU[nid];
 		real a = data->pA[nid];
 		real b = data->pB[nid];
 		real c = data->pC[nid];
@@ -49,8 +47,8 @@ __global__ void update_izhikevich_neuron(Connection *connection, IzhikevichData 
 
 		bool fired = (v >= 29.99f) && (!oldSpike);
 
-		data->pU[nid] = u;
 		data->pV[nid] = v;
+		data->pU[nid] = u;
 		data->pA[nid] = a;
 		data->pB[nid] = b;
 		data->pC[nid] = c;
@@ -59,7 +57,7 @@ __global__ void update_izhikevich_neuron(Connection *connection, IzhikevichData 
 		if (fired) {
 			testLoc = atomicAdd((int*)&fire_cnt, 1);
 			if (testLoc < MAX_BLOCK_SIZE) {
-				fire_table_t[testLoc] = gnid;
+				fireTableT[testLoc] = gnid;
 				fired = false;
 			}
 		} else {
@@ -71,24 +69,24 @@ __global__ void update_izhikevich_neuron(Connection *connection, IzhikevichData 
 
 		__syncthreads();
 		if (fire_cnt >= MAX_BLOCK_SIZE) {
-			commit2globalTable(fire_table_t, MAX_BLOCK_SIZE, firedTable, &firedTableSizes[currentIdx], gFiredTableCap*currentIdx);
+			commit2globalTable(fireTableT, MAX_BLOCK_SIZE, firedTable, &firedTableSizes[currentIdx], gFiredTableCap*currentIdx);
 			if (threadIdx.x == 0) {
 				fire_cnt = 0;
 			}
 		}
-
 		__syncthreads();
 
 		if (fired) {
 			testLoc = atomicAdd((int*)&fire_cnt, 1);
 			if (testLoc < MAX_BLOCK_SIZE) {
-				fire_table_t[testLoc] = gnid;
+				fireTableT[testLoc] = gnid;
 				fired = false;
 			}
 		}
 		__syncthreads();
+
 		if (fire_cnt >= MAX_BLOCK_SIZE) {
-			commit2globalTable(fire_table_t, MAX_BLOCK_SIZE, firedTable, &firedTableSizes[currentIdx], gFiredTableCap*currentIdx);
+			commit2globalTable(fireTableT, MAX_BLOCK_SIZE, firedTable, &firedTableSizes[currentIdx], gFiredTableCap*currentIdx);
 			if (threadIdx.x == 0) {
 				fire_cnt = 0;
 			}
@@ -96,12 +94,12 @@ __global__ void update_izhikevich_neuron(Connection *connection, IzhikevichData 
 		__syncthreads();
 
 		if (fire_cnt > 0) {
-			commit2globalTable(fire_table_t, fire_cnt, firedTable, &firedTableSizes[currentIdx], gFiredTableCap*currentIdx);
+			commit2globalTable(fireTableT, fire_cnt, firedTable, &firedTableSizes[currentIdx], gFiredTableCap*currentIdx);
 			if (threadIdx.x == 0) {
 				fire_cnt = 0;
 			}
 		}
-
+		__syncthreads();
 	}
 	//__syncthreads();
 	//if (threadIdx.x == 0 && blockIdx.x == 0) {
@@ -109,7 +107,7 @@ __global__ void update_izhikevich_neuron(Connection *connection, IzhikevichData 
 	//}
 }
 
-void cudaUpdateIzhikevich(Connection *conn, void *data, real *currentE, real *currentI, int *firedTable, int *firedTableSizes, int num, int offset, int time, BlockSize *pSize)
+void cudaUpdateIzhikevich(Connection *connection, void *data, real *currentE, real *currentI, int *firedTable, int *firedTableSizes, int num, int offset, int time, BlockSize *pSize)
 {
-	update_izhikevich_neuron<<<pSize->gridSize, pSize->blockSize>>>(conn, (IzhikevichData *)data, currentE, currentI, firedTable, firedTableSizes, num, offset, time);
+	update_izhikevich<<<pSize->gridSize, pSize->blockSize>>>(connection, (IzhikevichData *)data, currentE, currentI, firedTable, firedTableSizes, num, offset, time);
 }

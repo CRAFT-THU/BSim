@@ -2,6 +2,7 @@
 import os
 import subprocess
 
+TAB = '\t'
 
 class BaseGenerator(object):
     def __init__(self, filename: str = ''):
@@ -14,12 +15,12 @@ class BaseGenerator(object):
         self.file.write('')
 
     def print_(self, line: str = '', tab: int = 0):
-        tab = max(tab, self.tab)
-        self.file.write('{}{}'.format(tab * '\t', line))
+        tab = max(tab, self.tab) if tab > 0 else tab
+        self.file.write('{}{}'.format(tab * TAB, line))
 
     def line_no_end(self, line: str = '', tab: int = 1):
-        tab = max(tab, self.tab)
-        self.file.write('{}{}\n'.format(tab * '\t', line))
+        tab = max(tab, self.tab) if tab > 0 else tab
+        self.file.write('{}{}\n'.format(tab * TAB, line))
 
     def blank_line(self, num: int = 1):
         self.file.write('\n'*num)
@@ -30,16 +31,17 @@ class BaseGenerator(object):
 
 class PyGenerator(BaseGenerator):
     def __init__(self, filename: str= ''):
-        self.file = open(filename, "w+")
+        super(PyGenerator, self).__init__(filename)
 
     def line(self, line: str='', tab: int=1):
         self.line_no_end(line, tab=tab)
 
     def import_(self, name: str='', package: str=''):
         if not package == '':
-            self.file.write('from {} import {}\n'.format(package, name))
+            self.file.line_no_end('from {} import {}\n'.format(package, name),
+                                 tab=0)
         else:
-            self.file.write('import {}\n'.format(name))
+            self.file.line_no_end('import {}\n'.format(name), tab=0)
 
     def class_(self, name: str='', parent: str='', tab: int=0):
         self.line('class {}({}):'.format(name, parent), tab=tab)
@@ -47,7 +49,7 @@ class PyGenerator(BaseGenerator):
 
 class CGenerator(BaseGenerator):
     def __init__(self, filename: str= ''):
-        self.file = open(filename, "w+")
+        super(CGenerator, self).__init__(filename)
 
     def line(self, line:str, tab: int=1):
         if not isinstance(line, str):
@@ -57,19 +59,19 @@ class CGenerator(BaseGenerator):
         else:
             self.line_no_end('{};'.format(line), tab)
 
-    # def func(self, line, tab: int=0):
-    #     self.line(line, tab=tab)
+    def func(self, line, tab: int=0):
+        self.line(line, tab=tab)
 
     def if_start(self, line, tab: int=1):
-        self.line_no_end("if ({}) ".format(line), tab=tab)
-        self.open_brace(tab=tab)
+        self.print_("if ({}) ".format(line), tab=tab)
+        self.open_brace(tab=0)
 
     def if_end(self, tab: int=1):
         self.close_brace(tab=abs(tab))
 
     def for_start(self, line, tab: int=1):
-        self.line_no_end("for ({}) ".format(line), tab=tab)
-        self.open_brace(tab=tab)
+        self.print_("for ({}) ".format(line), tab=tab)
+        self.open_brace(tab=0)
 
     def for_end(self, tab: int=1):
         self.close_brace(tab=abs(tab))
@@ -95,7 +97,7 @@ class CGenerator(BaseGenerator):
             self.open_brace(tab=tab)
 
     def struct_end(self, name: str='', tab: int=0):
-        self.close_brace(tab=abs(tab))
+        self.line('};', tab=abs(tab))
 
     def if_define(self, name: str='', tab: int=0):
         self.line_no_end('#ifndef {}'.format(name.replace('.', '_').upper()), tab=tab)
@@ -138,7 +140,7 @@ class CGenerator(BaseGenerator):
 
 class HGenerator(CGenerator):
     def __init__(self, filename: str= ''):
-        self.file = open(filename, "w+")
+        super(HGenerator, self).__init__(filename)
         _, self.name = os.path.split(filename)
         self.blank_line()
         self.if_define(self.name.upper().replace('.', '_'))
@@ -152,10 +154,11 @@ class HGenerator(CGenerator):
 
 class CUDAGenerator(CGenerator):
     def __init__(self, filename: str= ''):
-        self.file = open(filename, "w+")
+        super(CUDAGenerator, self).__init__(filename)
 
     def sync(self, tab: int=1):
         self.line("__syncthreads()", tab=tab)
+        self.blank_line()
 
     def cu_line(self, line: str='', tab: int=1):
         self.line(line='checkCudaErrors({})'.format(line), tab=tab)

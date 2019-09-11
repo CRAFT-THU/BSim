@@ -9,7 +9,8 @@
 #include "../../utils/type.h"
 #include "../../utils/BlockSize.h"
 
-struct IzhikevichData {
+struct IzhikevichData 
+{
 	real *pV;
 	real *pU;
 	real *pA;
