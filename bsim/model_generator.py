@@ -30,13 +30,15 @@ def myhash(v):
         return len(C_TYPE_SORT) + abs(hash(v))
 
 class Model(object):
-    def __init__(self, name, parameters, variables = None, path='./', pre='', post='', type_='', headers=[], cu_headers=[]):
+    def __init__(self, name, parameters, variables = None, path='./', pre='',
+                 post='', type_='', compute='', headers=[], cu_headers=[]):
         self.name = mycap(name);
         self.classname = "{}{}{}{}".format(mycap(pre), mycap(name), mycap(post), mycap(type_))
         self.type_ = mycap(type_)
         self.pre = pre
         self.post = post
         self.path = path
+        self.compute = compute
         self.headers = headers
         self.cu_headers = cu_headers
         self.parameters = {k:parameters[k] for k in sorted(parameters.keys(), key= lambda x:myhash(x), reverse = False)}
@@ -47,8 +49,11 @@ class Model(object):
     def generate(self):
         self.generate_h()
         self.generate_c()
-        data = Data(name=self.name, parameters=self.variables, path=self.path, pre=self.pre, post = self.post+"Data", headers=['../../utils/type.h', '../../utils/BlockSize.h'], cu_headers=['../../third_party/cuda/helper_cuda.h'])
+        data = Data(name=self.name, parameters=self.variables, path=self.path,
+                    pre=self.pre, post = self.post+"Data",
+                    compute=self.compute, headers=['../../utils/type.h', '../../utils/BlockSize.h'], cu_headers=['../../third_party/cuda/helper_cuda.h'])
         data.generate()
+
         # self.generate_cu()
         # self.generate_mpi()
 
@@ -162,8 +167,44 @@ class Model(object):
             for v in self.parameters[k]:
                 c.line("p->p{}[idx] = this->_{}".format(mycap(v), v))
         c.func_end("1")
+        c.close()
 
         return 0
+
+    def generate_compute(self):
+        lines = self.compute.split()
+        c = CGenerator("{}/{}Data.compute.cpp".format(self.path, self.classname))
+        c.func_start("void update{}(Connection *connection, void *_data, real * currentE, real *currentI, int *firedTable, int *firedTablesfiredTableSizes, int num, int offset, int time)".format(self.name))
+        c.line("{} *data = ({}*)_data".format(self.classname, self.classname));
+        c.line("int currentIdx = time % connection->maxDelay+1)")
+        c.for_start("int nid=0; nid<num; nid++")
+        c.line("int gnid = offset + nid")
+        c.if_start("data->pRefracStep[nid] <= 0")
+        for i in lines:
+            c.line(i);
+        c.line("bool fired = data->pV_m[nid] >= data->pV_thresh[nid]")
+        c.if_start("fired")
+        c.line("firedTable[firedTableSizes[currentIdx] + gFiredTableCap * currentIdx] =  gnid")
+        c.line("firedTableSizes[currentIdx]++")
+        c.line("data->pRefracStep[nid] = data->pRefracTime[nid] - 1")
+        c.line("data->pV_m[nid] = data->pV_reset[nid]")
+        c.else()
+        c.line("data->pI_e[nid] += currentE[gnid]")
+        c.line("data->pI_i[nid] += currentI[gnid]")
+        c.if_end()
+        c.else()
+        c.line("currentE[gnid] = 0")
+        c.line("currentI[gnid] = 0")
+        c.line("data->pRefracStep[nid]--")
+        c.if_end()
+        c.for_end()
+        c.func_end();
+        c.close()
+
+
+        cu = CUDAGenerator("{}/{}Data.kernel.cu".format(self.path, self.classname))
+        cu.close()
+
 
 if __name__ == '__main__':
     izh = Model('Izhikevich', {'real': ['v', 'u', 'a', 'b', 'c', 'd']},

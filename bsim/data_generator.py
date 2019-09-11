@@ -28,7 +28,7 @@ def myhash(v):
 
 class Data(object):
     def __init__(self, name, parameters, path='./', pre='', post='Data',
-            headers=[], cu_headers=[]):
+                 compute = '', headers=[], cu_headers=[]):
         self.name = mycap(name);
         self.classname = "{}{}{}".format(pre, name, post)
         self.path = path
@@ -40,7 +40,7 @@ class Data(object):
         self.generate_h()
         self.generate_c()
         self.generate_cu()
-        self.generate_kernel_cu()
+        # self.generate_compute()
         self.generate_mpi()
 
     def generate_h(self):
@@ -267,6 +267,12 @@ class Data(object):
 
         cu.close()
         return 0
+
+    def generate_compute(self):
+        lines = self.compute.split()
+        c = CGenerator("{}/{}.compute.cpp".format(self.path, self.classname))
+        cu = CUDAGenerator("{}/{}.compute.cpp".format(self.path, self.classname))
+
 
     def generate_kernel_cu(self):
         cu = CUDAGenerator("{}/{}.kernel.part.cu".format(self.path, self.classname)) 
