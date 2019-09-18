@@ -7,19 +7,16 @@ TAB = '\t'
 class BaseGenerator(object):
     def __init__(self, filename: str = ''):
         self.file = open(filename, "w+")
-        self.tab = 0
 
     def backspace(self, step: int = 1):
         self.file.seek(0, os.SEEK_END)
         self.file.seek(self.file.tell()-step, os.SEEK_SET)
         self.file.write('')
 
-    def print_(self, line: str = '', tab: int = 0):
-        tab = max(tab, self.tab) if tab > 0 else tab
+    def print_(self, line: str = '', tab):
         self.file.write('{}{}'.format(tab * TAB, line))
 
-    def line_no_end(self, line: str = '', tab: int = 1):
-        tab = max(tab, self.tab) if tab > 0 else tab
+    def line_no_end(self, line: str = '', tab):
         self.file.write('{}{}\n'.format(tab * TAB, line))
 
     def blank_line(self, num: int = 1):
@@ -49,9 +46,19 @@ class PyGenerator(BaseGenerator):
 
 class CGenerator(BaseGenerator):
     def __init__(self, filename: str= ''):
+        self.tab = 0
         super(CGenerator, self).__init__(filename)
 
-    def line(self, line:str, tab: int=1):
+    def print_(self, line: str = ''):
+        self.print_(self, line, tab=self.tab)
+
+    def line_no_end(self, line: str = '', tab):
+        self.line_no_end(self, line, tab=self.tab)
+
+    def line(self, line:str, tab: int=-1):
+        if tab < 0:
+            tab = self.tab
+
         if not isinstance(line, str):
             line = str(line)
         if (len(line) < 1) or (line[-1] in [':', '{', '(', ';']):
@@ -59,45 +66,57 @@ class CGenerator(BaseGenerator):
         else:
             self.line_no_end('{};'.format(line), tab)
 
-    def func(self, line, tab: int=0):
-        self.line(line, tab=tab)
+    # def func(self, line, tab: int=-1):
+    #     self.line(line, tab=tab)
 
-    def if_start(self, line, tab: int=1):
-        self.print_("if ({}) ".format(line), tab=tab)
-        self.open_brace(tab=0)
+    def if_(self, line):
+        self.print_("if ({}) {{".format(line))
+        self.tab += 1
 
-    def if_end(self, tab: int=1):
-        self.close_brace(tab=abs(tab))
+    def else_(self):
+        self.tab -= 1
+        self.print_("}} else {{") 
 
-    def for_start(self, line, tab: int=1):
-        self.print_("for ({}) ".format(line), tab=tab)
-        self.open_brace(tab=0)
+    def elseif_(self, line):
+        self.tab -= 1
+        self.print_("}} else if ({}) {{".format(line)) 
 
-    def for_end(self, tab: int=1):
-        self.close_brace(tab=abs(tab))
+    def if__(self, line):
+        self.tab -= 1
+        self.close_brace()
 
-    def func_start(self, line, tab: int=0):
-        self.line_no_end(line, tab=tab)
-        self.open_brace(tab=tab)
+    def for_(self, line):
+        self.print_("for ({}) {{".format(line), tab=tab)
+        self.tab += 1
 
-    def func_end(self, line='', tab: int=1):
+    def for__(self):
+        self.tab -= 1
+        self.close_brace()
+
+    def func(self, line):
+        self.line_no_end(line + " {")
+        self.tab += 1
+
+    def func_(self, line=''):
         if not isinstance(line, str):
             line = str(line)
         if len(line) > 0:
-            self.line('return {}'.format(line), tab=tab)
-        self.close_brace(tab=abs(tab-1))
+            self.line('return {}'.format(line))
+        self.tab -= 1
+        self.close_brace()
         self.blank_line()
 
-    def struct(self, name: str='', father: str='', tab: int=0):
+    def struct(self, name: str='', father: str=''):
         if len(father) < 1:
-            self.line_no_end('struct {} '.format(name, father), tab=tab)
-            self.open_brace(tab=tab)
+            self.line_no_end('struct {} {{'.format(name, father))
         else:
-            self.line_no_end('struct {} : {} '.format(name, father), tab=tab)
-            self.open_brace(tab=tab)
+            self.line_no_end('struct {} : {} {{'.format(name, father))
 
-    def struct_end(self, name: str='', tab: int=0):
-        self.line('};', tab=abs(tab))
+        self.tab += 1
+
+    def struct_(self, name: str=''):
+        self.tab -= 1
+        self.line('};')
 
     def if_define(self, name: str='', tab: int=0):
         self.line_no_end('#ifndef {}'.format(name.replace('.', '_').upper()), tab=tab)
@@ -112,24 +131,24 @@ class CGenerator(BaseGenerator):
     def include_std(self, filename: str='', tab: int=0):
         self.line_no_end('#include <{}>'.format(filename), tab=tab)
 
-    def open_brace(self, tab: int=0):
+    def open_brace(self):
         self.line_no_end("{", tab=tab)
         self.tab += 1
 
-    def close_brace(self, tab: int=0):
+    def close_brace(self):
         self.tab -= 1
         self.line_no_end("}", tab=tab)
 
     def block(self, line: str=0):
         self.line_no_end(line, tab=0)
 
-    def malloc(self, ret: str="", type_: str="", num='1', tab: int=1):
-        self.line(line='{} *{} = ({}*)malloc(sizeof({})*{})'.format(type_, ret, type_, type_, str(num)), tab=tab)
-        self.line(line='memset({}, 0, sizeof({})*{})'.format(ret, type_, str(num)), tab=tab)
+    def malloc(self, ret: str="", type_: str="", num='1'):
+        self.line(line='{} *{} = ({}*)malloc(sizeof({})*{})'.format(type_, ret, type_, type_, str(num)))
+        self.line(line='memset({}, 0, sizeof({})*{})'.format(ret, type_, str(num)))
 
-    def free(self, pointer: str="", tab: int=1):
-        self.line(line='free({})'.format(pointer), tab=tab)
-        self.line(line="{} = NULL".format(pointer), tab=tab)
+    def free(self, pointer: str=""):
+        self.line(line='free({})'.format(pointer))
+        self.line(line="{} = NULL".format(pointer))
 
     @staticmethod
     def compile_(src: str='a.cpp', output: str='a.so'):

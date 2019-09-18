@@ -62,12 +62,19 @@ void *cudaAllocTraubMilesPara(void *pCPU, int num)
 	checkCudaErrors(cudaMalloc((void**)&(ret->pN), sizeof(real)*num));
 	checkCudaErrors(cudaMemset(ret->pN, 0, sizeof(real)*num));
 	checkCudaErrors(cudaMemcpy(ret->pN, p->pN, sizeof(real)*num, cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaMalloc((void**)&(ret->pDecay), sizeof(real)*num));
-	checkCudaErrors(cudaMemset(ret->pDecay, 0, sizeof(real)*num));
-	checkCudaErrors(cudaMemcpy(ret->pDecay, p->pDecay, sizeof(real)*num, cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaMalloc((void**)&(ret->pE), sizeof(real)*num));
-	checkCudaErrors(cudaMemset(ret->pE, 0, sizeof(real)*num));
-	checkCudaErrors(cudaMemcpy(ret->pE, p->pE, sizeof(real)*num, cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMalloc((void**)&(ret->pDecayE), sizeof(real)*num));
+	checkCudaErrors(cudaMemset(ret->pDecayE, 0, sizeof(real)*num));
+	checkCudaErrors(cudaMemcpy(ret->pDecayE, p->pDecayE, sizeof(real)*num, cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMalloc((void**)&(ret->pDecayI), sizeof(real)*num));
+	checkCudaErrors(cudaMemset(ret->pDecayI, 0, sizeof(real)*num));
+	checkCudaErrors(cudaMemcpy(ret->pDecayI, p->pDecayI, sizeof(real)*num, cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMalloc((void**)&(ret->pEE), sizeof(real)*num));
+	checkCudaErrors(cudaMemset(ret->pEE, 0, sizeof(real)*num));
+	checkCudaErrors(cudaMemcpy(ret->pEE, p->pEE, sizeof(real)*num, cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMalloc((void**)&(ret->pEI), sizeof(real)*num));
+	checkCudaErrors(cudaMemset(ret->pEI, 0, sizeof(real)*num));
+	checkCudaErrors(cudaMemcpy(ret->pEI, p->pEI, sizeof(real)*num, cudaMemcpyHostToDevice));
+
 
 	return ret;
 }
@@ -100,8 +107,10 @@ int cudaTraubMilesParaToGPU(void *pCPU, void *pGPU, int num)
 	checkCudaErrors(cudaMemcpy(pG->pM, pC->pM, sizeof(real)*num, cudaMemcpyHostToDevice));
 	checkCudaErrors(cudaMemcpy(pG->pH, pC->pH, sizeof(real)*num, cudaMemcpyHostToDevice));
 	checkCudaErrors(cudaMemcpy(pG->pN, pC->pN, sizeof(real)*num, cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaMemcpy(pG->pDecay, pC->pDecay, sizeof(real)*num, cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaMemcpy(pG->pE, pC->pE, sizeof(real)*num, cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMemcpy(pG->pDecayE, pC->pDecayE, sizeof(real)*num, cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMemcpy(pG->pDecayI, pC->pDecayI, sizeof(real)*num, cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMemcpy(pG->pEE, pC->pEE, sizeof(real)*num, cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMemcpy(pG->pEI, pC->pEI, sizeof(real)*num, cudaMemcpyHostToDevice));
 
 	return 0;
 }
@@ -123,8 +132,10 @@ int cudaTraubMilesParaFromGPU(void *pCPU, void *pGPU, int num)
 	checkCudaErrors(cudaMemcpy(pC->pM, pG->pM, sizeof(real)*num, cudaMemcpyDeviceToHost));
 	checkCudaErrors(cudaMemcpy(pC->pH, pG->pH, sizeof(real)*num, cudaMemcpyDeviceToHost));
 	checkCudaErrors(cudaMemcpy(pC->pN, pG->pN, sizeof(real)*num, cudaMemcpyDeviceToHost));
-	checkCudaErrors(cudaMemcpy(pC->pDecay, pG->pDecay, sizeof(real)*num, cudaMemcpyDeviceToHost));
-	checkCudaErrors(cudaMemcpy(pC->pE, pG->pE, sizeof(real)*num, cudaMemcpyDeviceToHost));
+	checkCudaErrors(cudaMemcpy(pC->pDecayE, pG->pDecayE, sizeof(real)*num, cudaMemcpyDeviceToHost));
+	checkCudaErrors(cudaMemcpy(pC->pDecayI, pG->pDecayI, sizeof(real)*num, cudaMemcpyDeviceToHost));
+	checkCudaErrors(cudaMemcpy(pC->pEE, pG->pEE, sizeof(real)*num, cudaMemcpyDeviceToHost));
+	checkCudaErrors(cudaMemcpy(pC->pEI, pG->pEI, sizeof(real)*num, cudaMemcpyDeviceToHost));
 
 	return 0;
 }
@@ -169,10 +180,14 @@ int cudaFreeTraubMilesPara(void *pGPU)
 	p->pH = NULL;
 	cudaFree(p->pN);
 	p->pN = NULL;
-	cudaFree(p->pDecay);
-	p->pDecay = NULL;
-	cudaFree(p->pE);
-	p->pE = NULL;
+	cudaFree(p->pDecayE);
+	p->pDecayE = NULL;
+	cudaFree(p->pDecayI);
+	p->pDecayI = NULL;
+	cudaFree(p->pEE);
+	p->pEE = NULL;
+	cudaFree(p->pEI);
+	p->pEI = NULL;
 
 	return 0;
 }

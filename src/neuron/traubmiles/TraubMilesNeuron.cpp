@@ -61,7 +61,8 @@ int TraubMilesNeuron::hardCopy(void * data, int idx, int base, const SimInfo &in
 	p->pH[idx] = this->_h;
 	p->pN[idx] = this->_n;
 	p->pTau[idx] = this->_tau;
-	p->pE[idx] = this->_E;
+	p->pEE[idx] = this->_E;
+	p->pEI[idx] = this->_E;
 	return 1;
 }
 

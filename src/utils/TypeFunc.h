@@ -19,7 +19,7 @@ extern int (*freeTypePara[TYPESIZE])(void *pCPU);
 extern int (*saveType[TYPESIZE])(void *pCPU, int num, FILE *f);
 extern void* (*loadType[TYPESIZE])(int num, FILE *f);
 // extern int (*addTypeConnection[TYPESIZE])(void *, int *);
-extern void (*updateType[TYPESIZE])(Connection *, void *, real *, real *, int *, int*, int, int, int, BlockSize *);
+extern void (*updateType[TYPESIZE])(Connection *, void *, real *, real *, int *, int*, int, int, int);
 
 extern bool (*isEqualType[TYPESIZE])(void *p1, void *p2, int num);
 

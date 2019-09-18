@@ -22,8 +22,11 @@ struct TraubMilesData
 	real *pM;
 	real *pH;
 	real *pN;
-	real *pDecay;
-	real *pE;
+	real *pDecayI;
+	real *pDecayE;
+	real *pTau;
+	real *pEI;
+	real *pEE;
 
 };
 

@@ -46,10 +46,14 @@ int allocTraubMilesPara(void *pCPU, int num)
 	memset(p->pH, 0, num*sizeof(real));
 	p->pN = (real*)malloc(num*sizeof(real));
 	memset(p->pN, 0, num*sizeof(real));
-	p->pDecay = (real*)malloc(num*sizeof(real));
-	memset(p->pDecay, 0, num*sizeof(real));
-	p->pE = (real*)malloc(num*sizeof(real));
-	memset(p->pE, 0, num*sizeof(real));
+	p->pDecayE = (real*)malloc(num*sizeof(real));
+	memset(p->pDecayE, 0, num*sizeof(real));
+	p->pDecayI = (real*)malloc(num*sizeof(real));
+	memset(p->pDecayI, 0, num*sizeof(real));
+	p->pEE = (real*)malloc(num*sizeof(real));
+	memset(p->pEE, 0, num*sizeof(real));
+	p->pEI = (real*)malloc(num*sizeof(real));
+	memset(p->pEI, 0, num*sizeof(real));
 
 	return 0;
 }
@@ -89,10 +93,14 @@ int freeTraubMilesPara(void *pCPU)
 	p->pH = NULL;
 	free(p->pN);
 	p->pN = NULL;
-	free(p->pDecay);
-	p->pDecay = NULL;
-	free(p->pE);
-	p->pE = NULL;
+	free(p->pDecayE);
+	p->pDecayE = NULL;
+	free(p->pDecayI);
+	p->pDecayI = NULL;
+	free(p->pEE);
+	p->pEE = NULL;
+	free(p->pEI);
+	p->pEI = NULL;
 
 	return 0;
 }
@@ -124,8 +132,10 @@ int saveTraubMiles(void *pCPU, int num, FILE *f)
 	fwrite(p->pM, sizeof(real), num, f);
 	fwrite(p->pH, sizeof(real), num, f);
 	fwrite(p->pN, sizeof(real), num, f);
-	fwrite(p->pDecay, sizeof(real), num, f);
-	fwrite(p->pE, sizeof(real), num, f);
+	fwrite(p->pDecayE, sizeof(real), num, f);
+	fwrite(p->pDecayI, sizeof(real), num, f);
+	fwrite(p->pEE, sizeof(real), num, f);
+	fwrite(p->pEI, sizeof(real), num, f);
 
 	return 0;
 }
@@ -146,8 +156,10 @@ void *loadTraubMiles(int num, FILE *f)
 	fread(p->pM, sizeof(real), num, f);
 	fread(p->pH, sizeof(real), num, f);
 	fread(p->pN, sizeof(real), num, f);
-	fread(p->pDecay, sizeof(real), num, f);
-	fread(p->pE, sizeof(real), num, f);
+	fread(p->pDecayE, sizeof(real), num, f);
+	fread(p->pDecayI, sizeof(real), num, f);
+	fread(p->pEE, sizeof(real), num, f);
+	fread(p->pEI, sizeof(real), num, f);
 
 	return p;
 }
@@ -170,8 +182,10 @@ bool isEqualTraubMiles(void *p1, void *p2, int num)
 	ret = ret && isEqualArray(t1->pM, t2->pM, num);
 	ret = ret && isEqualArray(t1->pH, t2->pH, num);
 	ret = ret && isEqualArray(t1->pN, t2->pN, num);
-	ret = ret && isEqualArray(t1->pDecay, t2->pDecay, num);
-	ret = ret && isEqualArray(t1->pE, t2->pE, num);
+	ret = ret && isEqualArray(t1->pDecayE, t2->pDecayE, num);
+	ret = ret && isEqualArray(t1->pDecayI, t2->pDecayI, num);
+	ret = ret && isEqualArray(t1->pEE, t2->pEE, num);
+	ret = ret && isEqualArray(t1->pEI, t2->pEI, num);
 
 	return ret;
 }

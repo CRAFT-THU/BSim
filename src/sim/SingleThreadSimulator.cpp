@@ -7,7 +7,15 @@
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
+
+#include "../utils/utils.h"
+#include "../utils/FileOp.h"
+#include "../utils/TypeFunc.h"
+#include "../neuron/lif/LIFData.h"
+
 #include "SingleThreadSimulator.h"
+
+int cFiredTableCap = 0;
 
 SingleThreadSimulator::SingleThreadSimulator(Network *network, real dt)
 	: Simulator(network, dt)
@@ -22,123 +30,84 @@ int SingleThreadSimulator::run(real time, FireInfo &log)
 {
 	int sim_cycle =  round((time)/_dt);
 
-	FILE *v_file = fopen("v.data", "w+");
-	if (v_file == NULL) {
-		printf("Open file v.data failed\n");
-		return -1;
-	}
-
-	FILE *input_e_file = fopen("input_e.data", "w+");
-	if (input_e_file == NULL) {
-		printf("Open file input_e.data failed\n");
-		return -1;
-	}
-
-	FILE *input_i_file = fopen("input_i.data", "w+");
-	if (input_i_file == NULL) {
-		printf("Open file input_i.data failed\n");
-		return -1;
-	}
-
-	FILE *ie_file = fopen("ie.data", "w+");
-	if (ie_file == NULL) {
-		printf("Open file ie.data failed\n");
-		return -1;
-	}
-
-	FILE *ii_file = fopen("ii.data", "w+");
-	if (ii_file == NULL) {
-		printf("Open file ii.data failed\n");
-		return -1;
-	}
-
-	FILE *log_file = fopen("Sim.log", "w+");
-	if (log_file == NULL) {
-		printf("Open file Sim.log failed\n");
-		return -1;
-	}
-	
-	//FILE *outFile = fopen("Output.csv", "w+");
-	//if (outFile == NULL) {
-	//	printf("Open file Sim.log failed\n");
-	//	return -2;
-	//} else {
-	//	fprintf(outFile, "Cycle");
-	//	int size = network->pOutputs.size();
-	//	for (int i=0; i<size; i++) {
-	//		fprintf(outFile, ",%s", network->pOutputs[i]->getID().getInfo().c_str());
-	//	}
-	//	fprintf(outFile, "\n");
-	//}
-
 	reset();
-	vector<Synapse*>::iterator iterS;
-	vector<Neuron*>::iterator iterN;
-	vector<Population*>::iterator iterP;
 
 	SimInfo info(_dt);
+
+	GNetwork *pNetCPU = _network->buildNetwork(info);
+
+	FILE *v_file = openFile("v.cpu.data", "w+");
+	// FILE *input_e_file = openFile("input_e.data", "w+");
+	// FILE *input_i_file = openFile("input_i.data", "w+");
+	// FILE *ie_file = openFile("ie.data", "w+");
+	// FILE *ii_file = openFile("ii.data", "w+");
+	FILE *fire_file = openFile("fire.cpu.log", "w+");
+	FILE *log_file = openFile("sim.cpu.log", "w+");
+
+	int nTypeNum = pNetCPU->nTypeNum;
+	int sTypeNum = pNetCPU->sTypeNum;
+	int totalNeuronNum = pNetCPU->pNeuronNums[nTypeNum];
+	int totalSynapseNum = pNetCPU->pSynapseNums[sTypeNum];
+	printf("NeuronTypeNum: %d, SynapseTypeNum: %d\n", nTypeNum, sTypeNum);
+	printf("NeuronNum: %d, SynapseNum: %d\n", totalNeuronNum, totalSynapseNum);
+
+	int maxDelay = pNetCPU->pConnection->maxDelay;
+	int deltaDelay = pNetCPU->pConnection->maxDelay - pNetCPU->pConnection->minDelay + 1;
+	printf("maxDelay: %d minDelay: %d\n", pNetCPU->pConnection->maxDelay, pNetCPU->pConnection->minDelay);
+
+	cFiredTableCap = totalNeuronNum;
+
 
 	printf("Start runing for %d cycles\n", sim_cycle);
 	struct timeval ts, te;
 	gettimeofday(&ts, NULL);
 
-	for (int cycle=0; cycle<sim_cycle; cycle++) {
+	real *c_gNeuronInput = (real*)malloc(sizeof(real)*totalNeuronNum);
+	memset(c_gNeuronInput, 0, sizeof(real)*totalNeuronNum);
+	real *c_gNeuronInput_I = (real*)malloc(sizeof(real)*totalNeuronNum); 
+	memset(c_gNeuronInput_I, 0, sizeof(real)*totalNeuronNum);
+	int *c_gFiredTable = (int*)malloc(sizeof(int)*totalNeuronNum*(maxDelay+1));
+	memset(c_gFiredTable, 0, sizeof(int)*totalNeuronNum*(maxDelay+1));
+   	int *c_gFiredTableSizes = (int*)malloc(sizeof(int)*(maxDelay+1));
+   	memset(c_gFiredTableSizes, 0, sizeof(int)*(maxDelay+1));
+
+	for (int time=0; time<sim_cycle; time++) {
 		//printf("\rCycle: %d", cycle);
 		//fflush(stdout);
 
-		info.currCycle = cycle;
+		info.currCycle = time;
 		info.fired.clear();
 		info.input.clear();
 
-		//Update
-		// network->update(info);
+		int currentIdx = time % (maxDelay + 1);
+		c_gFiredTableSizes[currentIdx] = 0;
 
-		//Log info
-		// network->monitor(info);
+		for (int i=0; i<nTypeNum; i++) {
+			updateType[pNetCPU->pNTypes[i]](pNetCPU->pConnection, pNetCPU->ppNeurons[i], c_gNeuronInput, c_gNeuronInput_I, c_gFiredTable, c_gFiredTableSizes, pNetCPU->pNeuronNums[i+1]-pNetCPU->pNeuronNums[i], pNetCPU->pNeuronNums[i], time);
+		}
+
+		for (int i=0; i<sTypeNum; i++) {
+			updateType[pNetCPU->pSTypes[i]](pNetCPU->pConnection, pNetCPU->ppSynapses[i], c_gNeuronInput, c_gNeuronInput_I, c_gFiredTable, c_gFiredTableSizes, pNetCPU->pSynapseNums[i+1]-pNetCPU->pSynapseNums[i], pNetCPU->pSynapseNums[i], time);
+		}
 
 #ifdef LOG_DATA
-		int isize = info.input.size();
-		//fprintf(dataFile, "Cycle %d: ", info.currCycle);
-		int total_record = 5;
-		for (int i=0; i<isize; i++) {
-			if (i%total_record == 0) {
-				fprintf(v_file, "%.10lf \t", info.input[i]);
-			} else if (i%total_record == 1) {
-				fprintf(input_e_file, "%.10lf \t", info.input[i]);
-			} else if (i%total_record == 2) {
-				fprintf(input_i_file, "%.10lf \t", info.input[i]);
-			} else if (i%total_record == 3) {
-				fprintf(ie_file, "%.10lf \t", info.input[i]);
-			} else {
-				fprintf(ii_file, "%.10lf \t", info.input[i]);
-			}
+		int copy_idx = getIndex(pNetCPU->pNTypes, nTypeNum, LIF);
+		LIFData *c_lif = (LIFData *)pNetCPU->ppNeurons[copy_idx];
+		real *c_vm = c_lif->pV_m;
+
+		int copySize = c_gFiredTableSizes[currentIdx];
+
+		for (int i=0; i<pNetCPU->pNeuronNums[copy_idx+1] - pNetCPU->pNeuronNums[copy_idx]; i++) {
+			fprintf(v_file, "%.10lf \t", c_vm[i]);
 		}
-
 		fprintf(v_file, "\n");
-		fprintf(input_e_file, "\n");
-		fprintf(input_i_file, "\n");
-		fprintf(ie_file, "\n");
-		fprintf(ii_file, "\n");
 
-		int size = info.fired.size();
-		//fprintf(logFile, "Cycle %d: ", info.currCycle);
-		for (int i=0; i<size; i++) {
-			if (info.fired[i]) {
-				fprintf(log_file, "%d ", i);
-			}
+		for (int i=0; i<copySize; i++) {
+			fprintf(log_file, "%d ", c_gFiredTable[totalNeuronNum*currentIdx+i]);
 		}
 		fprintf(log_file, "\n");
-
-		//size = network->pOutputs.size();
-		//fprintf(outFile, "%d", info.currCycle);
-		//if (size > 0) {
-		//	fprintf(outFile, ",%d", network->pOutputs[0]->isFired());
-		//	for (int i=1; i<size; i++) {
-		//		fprintf(outFile, ",%d", network->pOutputs[i]->isFired());
-		//	}
-		//}
-		//fprintf(outFile, "\n");
 #endif
+		
 	}
 	gettimeofday(&te, NULL);
 	long seconds = te.tv_sec - ts.tv_sec;
@@ -153,29 +122,15 @@ int SingleThreadSimulator::run(real time, FireInfo &log)
 	}
 
 	printf("\nSimulation finished in %ld:%ld:%ld.%06lds\n", hours, minutes, seconds, uSeconds);
+
+
+
 	fclose(v_file);
-	fclose(input_e_file);
-	fclose(input_i_file);
-	fclose(ie_file);
-	fclose(ii_file);
+	// fclose(input_e_file);
+	// fclose(input_i_file);
+	// fclose(ie_file);
+	// fclose(ii_file);
 	fclose(log_file);
-	//fclose(outFile);
-
-	FILE *rateFile = fopen("Fire.log", "w+");
-	if (rateFile == NULL) {
-		printf("Open file Fire.log failed\n");
-		return -1;
-	}
-
-	//for (auto piter = _network->pPopulations.begin(); piter != _network->pPopulations.end(); piter++) {
-	//	Population * p = *piter;
-	//	for (int i=0; i<p->getNum(); i++) {
-	//		int rate = p->locate(i)->getFireCount();
-	//		fprintf(rateFile, "%d ", rate);
-	//	}
-	//}
-
-	fclose(rateFile);
 
 	return 0;
 }

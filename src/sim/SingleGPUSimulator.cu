@@ -43,19 +43,13 @@ int SingleGPUSimulator::run(real time, FireInfo &log)
 	SimInfo info(_dt);
 	GNetwork *pNetCPU = _network->buildNetwork(info);
 
-	FILE *v_file = openFile("v.data", "w+");
-
+	FILE *v_file = openFile("v.gpu.data", "w+");
 	// FILE *input_e_file = openFile("input_e.data", "w+");
-
 	// FILE *input_i_file = openFile("input_i.data", "w+");
-
 	// FILE *ie_file = openFile("ie.data", "w+");
-
 	// FILE *ii_file = openFile("ii.data", "w+");
-
-	FILE *fire_file = openFile("fire.log", "w+");
-
-	FILE *log_file = openFile("sim.log", "w+");
+	FILE *fire_file = openFile("fire.gpu.log", "w+");
+	FILE *log_file = openFile("sim.gpu.log", "w+");
 
 	//findCudaDevice(0, NULL);
 	checkCudaErrors(cudaSetDevice(0));
@@ -68,6 +62,7 @@ int SingleGPUSimulator::run(real time, FireInfo &log)
 	printf("NeuronTypeNum: %d, SynapseTypeNum: %d\n", nTypeNum, sTypeNum);
 	printf("NeuronNum: %d, SynapseNum: %d\n", totalNeuronNum, totalSynapseNum);
 
+	int maxDelay = pNetCPU->pConnection->maxDelay;
 	int deltaDelay = pNetCPU->pConnection->maxDelay - pNetCPU->pConnection->minDelay + 1;
 	printf("maxDelay: %d minDelay: %d\n", pNetCPU->pConnection->maxDelay, pNetCPU->pConnection->minDelay);
 
@@ -136,7 +131,7 @@ int SingleGPUSimulator::run(real time, FireInfo &log)
 
 #ifdef LOG_DATA
 		//LOG DATA
-		int currentIdx = time%(deltaDelay+1);
+		int currentIdx = time%(maxDelay+1);
 
 		int copySize = 0;
 		copyFromGPU<int>(&copySize, buffers->c_gFiredTableSizes + currentIdx, 1);

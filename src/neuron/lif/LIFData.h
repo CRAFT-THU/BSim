@@ -36,6 +36,7 @@ void *allocLIF(int num);
 int allocLIFPara(void *pCPU, int num);
 int freeLIF(void *pCPU);
 int freeLIFPara(void *pCPU);
+void updateLIF(Connection *, void *, real *, real *, int *, int*, int, int, int);
 int saveLIF(void *pCPU, int num, FILE *f);
 void *loadLIF(int num, FILE *f);
 bool isEqualLIF(void *p1, void *p2, int num);

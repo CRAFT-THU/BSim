@@ -8,7 +8,7 @@ __global__ void update_traubmiles(Connection *connection, TraubMilesData *data, 
 {
 	int currentIdx = time % (connection->maxDelay+1);
 	__shared__ int fireTableT[MAX_BLOCK_SIZE];
-	__shared__ volatile int fireCNT;
+	__shared__ volatile int fire_cnt;
 	if (threadIdx.x == 0) {
 		fire_cnt = 0;
 	}
@@ -45,8 +45,8 @@ __global__ void update_traubmiles(Connection *connection, TraubMilesData *data, 
 		const bool oldSpike = (v >= 0);
 
 		for (int i=0; i<25; i++) {
-           real iTmp = -(m*m*m*h*gNa*(V-ENa) + n*n*n*n*gK*(V-EK) + gl*(V-El)- i);
-           real a = (v==-52.0)?1.28:(0.32*(-52.0-V)/(exp((-52.0-V)/4.0)-1.0));
+           real iTmp = -(m*m*m*h*gNa*(v-ENa) + n*n*n*n*gK*(v-EK) + gl*(v-El)- i);
+           real a = (v==-52.0)?1.28:(0.32*(-52.0-v)/(exp((-52.0-v)/4.0)-1.0));
            real b = (v==-25.0)?1.4:(0.28*(v+25.0)/(exp((v+25.0)/5.0)-1.0));
 
            m += (a*(1.0-m)-b*m)*mDt;
@@ -59,6 +59,8 @@ __global__ void update_traubmiles(Connection *connection, TraubMilesData *data, 
            v += iTmp/C*mDt;
 		}
 
+		bool spikeLikeEvent = false;
+
 		// data->pGNa[nid] = gNa;
 		// data->pENa[nid] = ENa;
 		// data->pGK[nid] = gK;
@@ -70,8 +72,10 @@ __global__ void update_traubmiles(Connection *connection, TraubMilesData *data, 
 		data->pM[nid] = m;
 		data->pH[nid] = h;
 		data->pN[nid] = n;
-		data->pDecay[nid] = decay;
-		data->pE[nid] = E;
+		data->pDecayE[nid] = decayE;
+		data->pDecayI[nid] = decayI;
+		data->pEE[nid] = EE;
+		data->pEI[nid] = EI;
 
 		if (fired) {
 			testLoc = atomicAdd((int*)&fire_cnt, 1);

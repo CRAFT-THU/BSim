@@ -23,6 +23,7 @@ void *allocStatic(int num);
 int allocStaticPara(void *pCPU, int num);
 int freeStatic(void *pCPU);
 int freeStaticPara(void *pCPU);
+void updateStatic(Connection *, void *, real *, real *, int *, int*, int, int, int);
 int saveStatic(void *pCPU, int num, FILE *f);
 void *loadStatic(int num, FILE *f);
 bool isEqualStatic(void *p1, void *p2, int num);
