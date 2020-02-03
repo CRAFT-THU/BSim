@@ -37,9 +37,9 @@ def line_diff(file1="", file2=""):
         linenum = linenum + 1
 
     if diffed:
-        print "Diff"
+        print("Diff")
     else:
-        print "Same"
+        print("Same")
 
 
 
@@ -52,11 +52,11 @@ def main(argv):
     try:
         opts, args = getopt.getopt(argv,"h1:2:",["file1=","file2="])
     except getopt.GetoptError:
-        print usuage_msg
+        print(usuage_msg)
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
-            print usuage_msg 
+            print(usuage_msg)
             sys.exit()
         elif opt in ("-1", "--file1"):
             file1 = arg

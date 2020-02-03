@@ -26,11 +26,11 @@ def main(argv):
     try:
         opts, args = getopt.getopt(argv,"hi:o:",["ifile=","ofile="])
     except getopt.GetoptError:
-        print sys.argv[0] + ' -i <inputfile> -o <outputfile>'
+        print(sys.argv[0] + ' -i <inputfile> -o <outputfile>')
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
-            print sys.argv[0] + ' -i <inputfile> -o <outputfile>'
+            print(sys.argv[0] + ' -i <inputfile> -o <outputfile>')
             sys.exit()
         elif opt in ("-i", "--ifile"):
             inputfile = arg
