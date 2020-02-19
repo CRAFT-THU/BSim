@@ -57,8 +57,12 @@ $ ./standard_test number_of_populations number_of_neurons_per_population 1.3 1 2
 
 **Branches:**
 
-Currently, different branches provide different optimization methods:
+Currently, different branches provide different optimization methods and/or for different devices:
 
-- *fast\_multi\_device*: It provides most of the stable optimization methods.
-- *test\_no\_synapse\_sparsity*: It drops the sparsity exploration of synapses.
-- *test\_no\_neuron\_sparsity*: It further drops the sparsity exploration of neurons.
+- *master*: It provides most of the stable optimization methods.
+- *c_and_s*: It provides both the cross-population/-projection parallelism exploration and sparsity aware load balance.
+- *no_s_synapse*: It drops the sparsity aware load balance for synapses.
+- *no_s_neuron*: It drops the sparsity aware load balance for neurons.
+- *lol*: It refers to the list of list (LOL) representation for fine-grained network representation.
+- *dgx1*: It supports multiple GPGPUs on NVIDIA DGX-1 server. 
+
