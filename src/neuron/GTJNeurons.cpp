@@ -1,6 +1,6 @@
 
 #include <stdlib.h>
-#include "mpi.h"
+// #include "mpi.h"
 #include "../utils/macros.h"
 #include "../utils/TagPool.h"
 #include "GTJNeurons.h"

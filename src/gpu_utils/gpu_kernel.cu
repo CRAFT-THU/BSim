@@ -1237,16 +1237,22 @@ __global__ void deliver_neurons(int *idx2index, int *crossnode_index2idx, int *g
 	int tid = blockIdx.x * blockDim.x + threadIdx.x;
 
 	int fired_size = gFiredTableSizes[gCurrentIdx];
+	int threads_num = blockDim.x * gridDim.x;
+	int cycle_all = (fired_size + threads_num-1)/threads_num;
 	for (int node = 0; node < node_num; node++) {
-		for (int idx = tid; idx < fired_size; idx += blockDim.x * gridDim.x) {
-			int nid = gFiredTable[gFiredTableCap*gCurrentIdx + idx];
-			int tmp = idx2index[nid];
-			if (tmp >= 0) {
-				int map_nid = crossnode_index2idx[tmp*node_num + node];
-				if (map_nid >= 0) {
-					int test_loc = atomicAdd((int*)&cross_cnt, 1);
-					if (test_loc < MAXBLOCKSIZE) {
-						cross_neuron_id[test_loc] = map_nid;
+		int idx=tid;
+		for (int cycle =0; cycle<cycle_all; cycle++) {
+		//for (int idx = tid; idx < fired_size; idx += blockDim.x * gridDim.x) {
+			if (idx <fired_size) {
+				int nid = gFiredTable[gFiredTableCap*gCurrentIdx + idx];
+				int tmp = idx2index[nid];
+				if (tmp >= 0) {
+					int map_nid = crossnode_index2idx[tmp*node_num + node];
+					if (map_nid >= 0) {
+						int test_loc = atomicAdd((int*)&cross_cnt, 1);
+						if (test_loc < MAXBLOCKSIZE) {
+							cross_neuron_id[test_loc] = map_nid;
+						}
 					}
 				}
 			}
@@ -1258,6 +1264,8 @@ __global__ void deliver_neurons(int *idx2index, int *crossnode_index2idx, int *g
 					cross_cnt = 0;
 				}
 			}
+
+			idx = idx + threads_num;
 			__syncthreads();
 		}
 		__syncthreads();

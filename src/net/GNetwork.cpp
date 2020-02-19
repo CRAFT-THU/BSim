@@ -3,7 +3,7 @@
  * 一 四月 18 2016
  */
 
-#include <mpi.h>
+// #include <mpi.h>
 #include <assert.h>
 #include <iostream>
 

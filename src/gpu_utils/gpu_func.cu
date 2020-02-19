@@ -167,14 +167,16 @@ BlockSize * getBlockSize(int nSize, int sSize)
 	//ret[Basic].gridSize = (sSize + (ret[Basic].blockSize) - 1) / (ret[Basic].blockSize);
 
 	//cudaOccupancyMaxPotentialBlockSize(&(ret[Exp].minGridSize), &(ret[Exp].blockSize), update_exp_synapse, 0, sSize); 
-	//ret[Exp].gridSize = (upzero_else_set_one(sSize) + (ret[Exp].blockSize) - 1) / (ret[Exp].blockSize);
+	ret[Exp].blockSize = 128;
+	ret[Exp].gridSize = (upzero_else_set_one(nSize) + (ret[Exp].blockSize) - 1) / (ret[Exp].blockSize);
 
 	//cudaOccupancyMaxPotentialBlockSize(&(ret[Static].minGridSize), &(ret[Static].blockSize), update_static_hit, 0, sSize); 
 	ret[Static].blockSize = 128;
 	ret[Static].gridSize = (upzero_else_set_one(nSize) + (ret[Static].blockSize) - 1) / (ret[Static].blockSize);
 
 	//cudaOccupancyMaxPotentialBlockSize(&(ret[Alpha].minGridSize), &(ret[Alpha].blockSize), update_alpha_synapse, 0, sSize); 
-	//ret[Alpha].gridSize = (sSize + (ret[Alpha].blockSize) - 1) / (ret[Alpha].blockSize);
+	// ret[Alpha].blockSize = 128;
+	// ret[Alpha].gridSize = (upzero_else_set_one(sSize) + (ret[Alpha].blockSize) - 1) / (ret[Alpha].blockSize);
 
 	return ret;
 }
