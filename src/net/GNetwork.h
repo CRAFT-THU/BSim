@@ -33,6 +33,7 @@ struct GNetwork {
 
 	//Neuron to Synapse Connection
 	Connection *pConnection;
+	LolConnection *pLolConnection;
 
 };
 

@@ -26,6 +26,8 @@ Connection * allocConnection(int nNum, int sNum, int maxDelay, int minDelay)
 	assert(ret->pDelayNum != NULL);
 	memset(ret->pDelayNum, 0, sizeof(int)*length);
 
+	printf("Size of Connection:\t%lu\n", sizeof(int)*length*2);
+
 	ret->pDelayStartRev = (int*)malloc(sizeof(int)*length);
 	assert(ret->pDelayStartRev != NULL);
 	memset(ret->pDelayStartRev, 0, sizeof(int)*length);
@@ -119,3 +121,56 @@ bool isEqualConnection(Connection *c1, Connection *c2)
 
 	return ret;
 }
+
+LolConnection * allocLolConnection(Connection *pConn)
+{
+	LolConnection *ret = (LolConnection*)malloc(sizeof(LolConnection));
+	assert(ret != NULL);
+
+	ret->nNum = pConn->nNum;
+	ret->sNum = pConn->sNum;
+	ret->maxDelay = pConn->maxDelay;
+	ret->minDelay = pConn->minDelay;
+
+	int length = (ret->maxDelay - ret->minDelay + 1) * ret->nNum;
+
+	ret->pIndex = (int**)malloc(sizeof(int*)*length);
+	assert(ret->pIndex != NULL);
+	memset(ret->pIndex, 0, sizeof(int)*length);
+	ret->pNum = (int*)malloc(sizeof(int)*length);
+	assert(ret->pNum != NULL);
+	memset(ret->pNum, 0, sizeof(int)*length);
+
+	int size_t_ = 0;
+	for (int i=0; i<length; i++) {
+		ret->pNum[i] = pConn->pDelayNum[i];
+		if (ret->pNum[i] > 0) {
+			ret->pIndex[i] = (int*)malloc(sizeof(int)*(ret->pNum[i]));
+			size_t_ += ret->pNum[i];
+			for (int j=0; j<ret->pNum[i]; j++) {
+				ret->pIndex[i][j] = pConn->pDelayStart[i] + j;
+			}
+		} else {
+			ret->pIndex[i] = NULL;
+		}
+	}
+
+	printf("Size of LolConnection:\t%lu\n", (size_t_ + length) * sizeof(int));
+
+
+	return ret;
+}
+
+int freeLolConnection(LolConnection *pCPU)
+{
+	int length = (pCPU->maxDelay - pCPU->minDelay + 1) * pCPU->nNum;
+	for (int i=0; i<length; i++) {
+		free(pCPU->pIndex[i]);
+	}
+	free(pCPU->pIndex);
+	free(pCPU->pNum);
+	free(pCPU);
+	pCPU = NULL;
+	return 0;
+}
+

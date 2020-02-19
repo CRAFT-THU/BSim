@@ -44,6 +44,7 @@ GNetwork* copyNetworkToGPU(GNetwork *pCpuNet)
 	}
 
 	tmp->pConnection = cudaAllocConnection(pCpuNet->pConnection);
+	tmp->pLolConnection = cudaAllocLolConnection(pCpuNet->pLolConnection);
 
 	return tmp;
 }
@@ -103,6 +104,7 @@ int freeNetworkGPU(GNetwork *pGpuNet)
 	}
 
 	cudaFreeConnection(pTmp->pConnection);
+	cudaFreeLolConnection(pTmp->pLolConnection);
 
 	free(pTmp->ppNeurons);
 	free(pTmp->ppSynapses);

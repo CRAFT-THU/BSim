@@ -36,7 +36,7 @@ int cudaFreeStaticPara(void *pGPU);
 int cudaFetchStatic(void *pCPU, void *pGPU, int num);
 int cudaStaticParaToGPU(void *pCPU, void *pGPU, int num);
 int cudaStaticParaFromGPU(void *pCPU, void *pGPU, int num);
-void cudaUpdateStatic(Connection *conn, void *data, real *currentE, real *currentI, int *firedTable, int *firedTableSizes, int num, int start_id, int t, BlockSize *pSize);
+void cudaUpdateStatic(LolConnection *conn, void *data, real *currentE, real *currentI, int *firedTable, int *firedTableSizes, int num, int start_id, int t, BlockSize *pSize);
 
 int mpiSendStatic(void *data, int rank, int offset, int size);
 int mpiRecvStatic(void **data, int rank, int size);

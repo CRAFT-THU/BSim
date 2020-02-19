@@ -67,7 +67,7 @@ __global__ void find_lif_neuron(LIFData *data, real * currentE, real * currentI,
 	}
 }
 
-__global__ void update_lif_neuron(Connection *connection, LIFData *data, real *currentE, real *currentI, int *firedTable, int *firedTableSizes, int num, int offset, int time)
+__global__ void update_lif_neuron(LolConnection *connection, LIFData *data, real *currentE, real *currentI, int *firedTable, int *firedTableSizes, int num, int offset, int time)
 {
 	int currentIdx = time % (connection->maxDelay+1);
 	__shared__ int fire_table_t[MAX_BLOCK_SIZE];
@@ -159,7 +159,7 @@ __global__ void update_lif_neuron(Connection *connection, LIFData *data, real *c
 	//}
 }
 
-__global__ void update_all_lif_neuron(Connection *connection, LIFData *data, real *currentE, real *currentI, int *firedTable, int *firedTableSizes, int num, int offset, int time)
+__global__ void update_all_lif_neuron(LolConnection *connection, LIFData *data, real *currentE, real *currentI, int *firedTable, int *firedTableSizes, int num, int offset, int time)
 // __global__ void update_all_lif_neuron(LIFData *data, int num, int offset, int time)
 {
 	int currentIdx = time % (connection->maxDelay + 1);
@@ -254,7 +254,7 @@ __global__ void update_all_lif_neuron(Connection *connection, LIFData *data, rea
 	__syncthreads();
 }
 
-__global__ void update_dense_lif_neuron(Connection *connection, LIFData *data, real *currentE, real *currentI, int *firedTable, int *firedTableSizes, int num, int offset, int time)
+__global__ void update_dense_lif_neuron(LolConnection *connection, LIFData *data, real *currentE, real *currentI, int *firedTable, int *firedTableSizes, int num, int offset, int time)
 {
 	//__shared__ int fire_table_t[MAX_BLOCK_SIZE];
 	//__shared__ volatile int fire_cnt;
@@ -316,7 +316,7 @@ __global__ void update_dense_lif_neuron(Connection *connection, LIFData *data, r
 	__syncthreads();
 }
 
-void cudaUpdateLIF(Connection *conn, void *data, real *currentE, real *currentI, int *firedTable, int *firedTableSizes, int num, int offset, int time, BlockSize *pSize)
+void cudaUpdateLIF(LolConnection *conn, void *data, real *currentE, real *currentI, int *firedTable, int *firedTableSizes, int num, int offset, int time, BlockSize *pSize)
 {
 	find_lif_neuron<<<pSize->gridSize, pSize->blockSize>>>((LIFData*)data, currentE, currentI, num, offset);
 	update_lif_neuron<<<pSize->gridSize, pSize->blockSize>>>(conn, (LIFData*)data, currentE, currentI, firedTable, firedTableSizes, num, offset, time);

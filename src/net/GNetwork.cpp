@@ -32,6 +32,7 @@ GNetwork * deepcopyNetwork(GNetwork * net) {
 
 	ret->pConnection = allocConnection(net->pConnection->nNum, net->pConnection->sNum, 
 			net->pConnection->maxDelay, net->pConnection->minDelay);
+	ret->pLolConnection = allocLolConnection(net->pConnection);
 
 	return ret;
 }
@@ -65,6 +66,7 @@ GNetwork * allocNetwork(int nTypeNum, int sTypeNum) {
 	assert(ret->ppSynapses != NULL);
 
 	ret->pConnection = NULL;
+	ret->pLolConnection = NULL;
 
 	return ret;
 }
@@ -83,6 +85,7 @@ void freeGNetwork(GNetwork * network)
 	free(network->ppSynapses);
 
 	freeConnection(network->pConnection);
+	freeLolConnection(network->pLolConnection);
 
 	free(network->pNeuronNums);
 	free(network->pSynapseNums);

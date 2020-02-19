@@ -893,6 +893,7 @@ DistriNetwork* Network::buildNetworks(const SimInfo &info, bool auto_splited)
 		int nNum = net[nodeIdx]._network->pNeuronNums[net[nodeIdx]._network->nTypeNum] + _crossnodeNeuron2idx[nodeIdx].size();
 		int sNum = net[nodeIdx]._network->pSynapseNums[net[nodeIdx]._network->sTypeNum];
 		net[nodeIdx]._network->pConnection = arrangeConnect(nNum, sNum, nodeIdx, info);
+		net[nodeIdx]._network->pLolConnection = allocLolConnection(net[nodeIdx]._network->pConnection);
 
 	}
 

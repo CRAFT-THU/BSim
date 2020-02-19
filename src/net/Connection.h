@@ -7,6 +7,7 @@
 
 #include <stdio.h>
 
+
 struct Connection {
 	//int *pSynapsesIdx; 
 	//int synapsesNum; 
@@ -36,6 +37,31 @@ int saveConnection(Connection *conn, FILE *f);
 Connection * loadConnection(FILE *f);
 
 bool isEqualConnection(Connection *c1, Connection *c2);
+
+struct LolConnection {
+	int nNum;
+	int sNum;
+
+	int maxDelay;
+	int minDelay;
+
+	int **pIndex;
+	int *pNum;
+};
+
+// LolConnection * allocLolConnection(int nNum, int sNum, int maxDelay, int minDelay);
+LolConnection * allocLolConnection(Connection *pConn);
+
+int freeLolConnection(LolConnection * pCPU);
+
+LolConnection * cudaAllocLolConnection(LolConnection * pCPU);
+// int cudaFetchLolConnection(LolConnection *pCPU, LolConnection *pGPU);
+int cudaFreeLolConnection(LolConnection *pGPU);
+
+// int saveLolConnection(Connection *conn, FILE *f);
+// LolConnection * loadLolConnection(FILE *f);
+// 
+// bool isEqualLolConnection(LolConnection *c1, LolConnection *c2);
 
 #endif /* CONNECTION_H */
 

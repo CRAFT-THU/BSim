@@ -149,5 +149,7 @@ GNetwork* Network::buildNetwork(const SimInfo &info)
 		}
 	}
 
+	ret->pLolConnection = allocLolConnection(ret->pConnection);
+
 	return ret;
 }
