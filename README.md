@@ -13,13 +13,38 @@ The simulator only intergrates the LIF model and support for clusters is under d
 
 # Usage
 
-**Samples:**
+**Tutorial**:
 
-At the moment, the following example SNNs are provides:
+A typical SNN is defined as follows:
 
-- *test/gpu/standard\_test.cpp*: It provides a CUBA IF network, which is a forward network along with several cross-population projections. About 80\% of all the populations only connect with its front and rear populations, and the rest 20\% also connect with remote populations. Other factors, such as the number of populations, the average number of neurons in one population, the firing rate, are all configurable.
+```c
+	#include "include/BSim.h"
 
-- Toy examples
+	...
+
+	Network c;
+	// Define a population of N1 LIF neurons.
+	Population<LIF_brian> *p0 = c.createPopulation(N1, LIF_brian(....));
+	// Define a population of N2 LIF neurons.
+	Population<LIF_brian> *p1 = c.createPopulation(N2, LIF_brian(....));
+
+	...
+
+	float * weight = getRandomArray(N1*N2);
+	float * delay = getRandomArray(N1*N2);
+	// Define an all-to-all projection between the two population
+	c.connect(p0, p1, weight, delay, NULL, N1*N2);
+
+	// Define the simulator and set the simulation step to 0.1ms
+	SGSim sg(&c, 1e-4 /*dt*/);
+	// Run the simulation for 0.1s
+	sg.run(0.1)
+
+```
+
+To customize neuron/synapse models, one can refer to the code under neuron/synapse directory. We will provide interfaces that are easier to use later.
+
+
 
 **Compiling**:
 
@@ -30,6 +55,14 @@ Put your customized examples under *test/gpu* and run the *build/bin/build.sh* s
 The first parameter is release/log/debug. Release parameter provides the release build and records the overall firing rate of each neuron in *GFire.log* file. Log parameter further records the membrane voltage in *g\_v.data* file. Debug paramter provides the debug build. 
 
 The sceond paramter is float/double, which indicates whether to use single/double floating point numbers.
+
+**Samples:**
+
+At the moment, the following example SNNs are provides:
+
+- *test/gpu/standard\_test.cpp*: It provides a CUBA IF network, which is a forward network along with several cross-population projections. About 80\% of all the populations only connect with its front and rear populations, and the rest 20\% also connect with remote populations. Other factors, such as the number of populations, the average number of neurons in one population, the firing rate, are all configurable.
+
+- Toy examples
 
 **Tests:**
 
