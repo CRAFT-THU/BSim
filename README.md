@@ -96,6 +96,6 @@ Currently, different branches provide different optimization methods and/or for 
 - *c_and_s*: It provides both the cross-population/-projection parallelism exploration and sparsity aware load balance.
 - *no_s_synapse*: It drops the sparsity aware load balance for synapses.
 - *no_s_neuron*: It drops the sparsity aware load balance for neurons.
-- *lol*: It refers to the list of list (LOL) representation for fine-grained network representation.
 - *dgx1*: It supports multiple GPGPUs on NVIDIA DGX-1 server. 
+- develop: The under development version. 
 
