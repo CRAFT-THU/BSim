@@ -4,7 +4,7 @@ A faster SNN simulator which supports multiple GPGPUs.
 
 The simulator only intergrates the LIF model and support for clusters is under development.
 
-When using this software, please using the following citation:
+When using this software, please use the following citation:
 
 ```bibtex
 @ARTICLE{9091320,
