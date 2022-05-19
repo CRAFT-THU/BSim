@@ -4,6 +4,20 @@ A faster SNN simulator which supports multiple GPGPUs.
 
 The simulator only intergrates the LIF model and support for clusters is under development.
 
+When using this software, please using the following citation:
+
+```bibtex
+@ARTICLE{9091320,
+  author={Qu, Peng and Zhang, Youhui and Fei, Xiang and Zheng, Weimin},
+  journal={IEEE Transactions on Parallel and Distributed Systems},
+  title={High Performance Simulation of Spiking Neural Network on GPGPUs},
+  year={2020},
+  volume={31},
+  number={11},
+  pages={2510-2523},
+  doi={10.1109/TPDS.2020.2994123}}
+```
+
 # Prerequisites
 
 - g++ 5.4.0
